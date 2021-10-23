@@ -16,11 +16,10 @@
     <Compile Include="Constraint.fs" />
     <Compile Include="Api.fs" />
     <Compile Include="SolverLogging.fs" />
-    <None Include="Scripts/load-project-release.fsx" />
-    <None Include="Scripts\DrugExample.fsx" />
-    <None Include="Scripts\Variable.fsx" />
-    <None Include="Scripts/Equation.fsx" />
-    <None Include="Scripts\Api.fsx" />
+    <None Include="Scripts/load-utils.fsx" />
+    <None Include="Scripts/load.fsx" />
+    <None Include="Scripts/Api.fsx" />
+    <None Include="Scripts/DrugExample.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />

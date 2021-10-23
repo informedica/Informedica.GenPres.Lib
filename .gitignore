@@ -95,31 +95,32 @@
 # Add source files
 !/scripts/
 !/src/
+# Informedica.Utils.Lib
 !/src/Informedica.Utils.Lib/
 !/src/Informedica.Utils.Lib/BCL/
 !/src/Informedica.Utils.Lib/Scripts/
-
+# Informedica.GenUnits.Lib
 !/src/Informedica.GenUnits.Lib/
 !/src/Informedica.GenUnits.Lib/Scripts/
-
+#Informedica.GenSolver.Lib
 !/src/Informedica.GenSolver.Lib/
 !/src/Informedica.GenSolver.Lib/Scripts/
-
+#Informedica.GenOrder.Lib
 !/src/Informedica.GenOrder.Lib/
 !/src/Informedica.GenOrder.Lib/Scripts/
 
 # Add test files
 !/tests/
-
+# Informedica.Utils.Tests
 !/tests/Informedica.Utils.Tests/
 !/tests/Informedica.Utils.Tests/Scripts/
-
+# Informedica.GenUnits.Tests
 !/tests/Informedica.GenUnits.Tests/
 !/tests/Informedica.GenUnits.Tests/Scripts/
-
+# Informedica.GenSolver.Tests
 !/tests/Informedica.GenSolver.Tests/
 !/tests/Informedica.GenSolver.Tests/Scripts/
-
+# Informedica.GenOrder.Tests
 !/tests/Informedica.GenOrder.Tests/
 !/tests/Informedica.GenOrder.Tests/Scripts/
 

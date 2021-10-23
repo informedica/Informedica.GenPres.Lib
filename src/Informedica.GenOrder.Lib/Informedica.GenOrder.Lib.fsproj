@@ -19,14 +19,10 @@
     <Compile Include="Prescription.fs" />
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
-    <None Include="Scripts\Drug2.fsx" />
-    <None Include="Scripts\VariableUnit.fsx" />
-    <None Include="Scripts\Solver.fsx" />
-    <None Include="Scripts\Orderable.fsx" />
-    <None Include="Scripts\Prescription.fsx" />
+    <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Order.fsx" />
-    <None Include="Scripts/Lab.fsx" />
-    <None Include="Scripts/OrderSet.fsx" />
+    <None Include="Scripts\ValueUnit.fsx" />
+    <None Include="Scripts\Drug2.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
