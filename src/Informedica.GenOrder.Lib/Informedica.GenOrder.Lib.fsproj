@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="DateTime.fs" />
+    <Compile Include="List.fs" />
+    <Compile Include="Logging.fs" />
+    <Compile Include="WrappedString.fs" />
+    <Compile Include="ValueUnit.fs" />
+    <Compile Include="ValueRange.fs" />
+    <Compile Include="VariableUnit.fs" />
+    <Compile Include="Solver.fs" />
+    <Compile Include="Orderable.fs" />
+    <Compile Include="Prescription.fs" />
+    <Compile Include="Order.fs" />
+    <Compile Include="DrugOrder.fs" />
+    <None Include="Scripts\Drug2.fsx" />
+    <None Include="Scripts\VariableUnit.fsx" />
+    <None Include="Scripts\Solver.fsx" />
+    <None Include="Scripts\Orderable.fsx" />
+    <None Include="Scripts\Prescription.fsx" />
+    <None Include="Scripts\Order.fsx" />
+    <None Include="Scripts/Lab.fsx" />
+    <None Include="Scripts/OrderSet.fsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
+    <ProjectReference Include="..\Informedica.GenUnits.Lib\Informedica.GenUnits.Lib.fsproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
