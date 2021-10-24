@@ -198,7 +198,58 @@ module ValueUnit =
         apply f
 
 
-    let getUnitValue u = id
+    let getUnitValue u = 
+        let rec app u =
+            match u with
+            | NoUnit -> None
+            | General (s, n) -> n |> Some
+            | Count g ->
+                match g with
+                | Times n -> n |> Some
+            | Mass g  ->
+                match g with
+                | Gram n      -> n |> Some
+                | KiloGram n  -> n |> Some
+                | MilliGram n -> n |> Some
+                | MicroGram n -> n |> Some
+                | NanoGram n  -> n |> Some
+            | Volume g  ->
+                match g with
+                | Liter n      -> n |> Some
+                | DeciLiter n  -> n |> Some
+                | MilliLiter n -> n |> Some
+                | MicroLiter n -> n |> Some
+            | Time g  ->
+                match g with
+                | Year n   -> n |> Some
+                | Month n  -> n |> Some
+                | Week n   -> n |> Some
+                | Day n    -> n |> Some
+                | Hour n   -> n |> Some
+                | Minute n -> n |> Some
+                | Second n -> n |> Some
+            | Molar g ->
+                match g with
+                | Mol n      -> n |> Some
+                | MilliMol n -> n |> Some
+            | InterNatUnit g ->
+                match g with
+                | MIU n -> n |> Some
+                | IU n  -> n |> Some
+            | Weight g ->
+                match g with
+                | WeightKiloGram n -> n |> Some
+                | WeightGram n     -> n |> Some
+            | Height g ->
+                match g with
+                | HeightMeter n      -> n |> Some
+                | HeightCentiMeter n -> n |> Some
+            | BSA g ->
+                match g with
+                | M2 n -> n |> Some
+            | CombiUnit (u1, op, u2) -> None
+
+        app u
 
 
     module Group =
@@ -485,7 +536,7 @@ module ValueUnit =
 
     let count = 1N |> Times |> Count
 
-
+    // ToDo: need to check if this is correct!!
     let createCombiUnit (u1, op, u2)  =
         if u1 = NoUnit && u2 = NoUnit then NoUnit
         else
@@ -493,36 +544,54 @@ module ValueUnit =
             | OpPer ->
                 match u1, u2 with
                 | _ when u1 |> Group.eqsGroup u2 ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    count |> setUnitValue (v1 / v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        count |> setUnitValue (x1 / x2)
+                    | _ -> count
                 | _ when u2 |> Group.eqsGroup count ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    u1 |> setUnitValue (v1 / v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u1 |> setUnitValue (x1 / x2)
+                    | _ -> u1
                 | _ -> (u1, OpPer, u2) |> CombiUnit
             | OpTimes ->
                 match u1, u2 with
                 | _ when u1 |> Group.eqsGroup count ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    u2 |> setUnitValue (v1 * v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u2 |> setUnitValue (x1 * x2)
+                    | _ -> u2
                 | _ when u2 |> Group.eqsGroup count ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    u1 |> setUnitValue (v1 * v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u1 |> setUnitValue (x1 * x2)
+                    | _ -> u1
                 | _ when u1 |> Group.eqsGroup count &&
                          u2 |> Group.eqsGroup count ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    u1 |> setUnitValue (v1 * v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u1 |> setUnitValue (x1 * x2)
+                    | _ -> u1
                 | _ -> (u1, OpTimes, u2) |> CombiUnit
             | OpPlus | OpMinus ->
                 match u1, u2 with
                 | _ when u1 |> Group.eqsGroup u2 ->
-                    let v1 = u1 |> Multipliers.getMultiplier
-                    let v2 = u2 |> Multipliers.getMultiplier
-                    u1 |> setUnitValue (v1 + v2)
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u1 |> setUnitValue (x1 + x2)
+                    | _ -> u1
                 | _ -> (u1, op, u2) |> CombiUnit
 
 
@@ -536,26 +605,6 @@ module ValueUnit =
 
 
     let minus u2 u1 = (u1, OpMinus, u2) |> createCombiUnit
-
-
-    let remove rm u =
-
-        let rec rem u rm =
-            let eqs = Group.eqsGroup rm
-
-            match u with
-            | CombiUnit (u1, op, u2) ->
-                match u1 |> eqs,  u2 |> eqs with
-                | true,  true  -> count
-                | false, true  -> createCombiUnit (u1, op, count)
-                | true,  false -> createCombiUnit (count, op, u2)
-                | false, false ->
-                    createCombiUnit ((rem u1 rm), op, (rem u2 rm))
-            | _ ->
-                if u |> eqs then count
-                else u
-
-        rem u rm
 
 
     let hasUnit u2 u1 =
@@ -585,21 +634,6 @@ module ValueUnit =
             | OpDivItem of Operator
 
 
-        let unitToList u =
-            let rec toList u =
-                match u with
-                | CombiUnit (ul, op, ur) ->
-                    let op =
-                        match op with
-                        | OpPer -> op |> OpDivItem
-                        | OpPlus | OpMinus -> op |> OpPlusMinItem
-                        | OpTimes -> op |> OpMultItem
-                    (toList ul) @ [ op ] @ (toList ur)
-                | _ -> [ u |> UnitItem ]
-
-            toList u
-
-
         let listToUnit ul =
             let rec toUnit ul u =
                 match ul with
@@ -625,18 +659,6 @@ module ValueUnit =
 
             toUnit ul NoUnit
 
-
-        let eqs ui1 ui2 =
-            match ui1, ui2 with
-            | UnitItem u1, UnitItem u2 ->
-                u1 |> Group.eqsGroup u2
-            | _ -> false
-
-
-        let isUnitItem ui =
-            match ui with
-            | UnitItem _ -> true
-            | _          -> false
 
 
     let rec getUnits u =

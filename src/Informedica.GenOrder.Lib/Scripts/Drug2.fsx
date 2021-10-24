@@ -1,8 +1,9 @@
 ﻿
 
 //#I __SOURCE_DIRECTORY__
+// Go to load.fsx and send that to FSI first.
+// Running load.fsx in a single time fails.
 #load "load.fsx"
-
 
 open System
 open System.Diagnostics
@@ -29,11 +30,15 @@ type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
 type Level = Informedica.GenSolver.Lib.Types.Logging.Level
 
 
+fsi.AddPrinter<DateTime> (fun dt -> sprintf $"{dt.ToShortDateString()}")
+
+
 let printOrderMsg msg = 
     match msg with 
     | Logging.OrderMessage m ->
         match m with
-        | Events.SolverReplaceUnit (n, u) -> ""
+        | Events.SolverReplaceUnit (n, u) -> 
+            $"replaced {n} with {u |> ValueUnit.unitToString}"
         | Events.OrderSolved o -> ""
         | Events.OrderConstraintsSolved (o, cs) -> 
             o
@@ -209,6 +214,9 @@ logger.Start Level.Informative
             MaxDoseTotalAdjust = Some 90N
     }
 |> DrugOrder.setAdjust "paracetamol" 2N
+//|> fun (cs, o) ->
+//    o |> Order.solveUnits logger.Logger
+//    DrugOrder.DrugConstraint.apply logger.Logger cs o
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["paracetamol"]
 

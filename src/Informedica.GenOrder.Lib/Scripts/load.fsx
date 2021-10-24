@@ -1,9 +1,9 @@
-#time
-
+// Cannot load this in a single time. 
+// Need to run these loads each at a time
 #load "../../Informedica.Utils.Lib/Scripts/load.fsx"
 #load "../../Informedica.GenUnits.Lib/Scripts/load.fsx"
 #load "../../Informedica.GenSolver.Lib/Scripts/load.fsx"
-
+// These can be loaded in a single time.
 #load "../Types.fs"
 #load "../DateTime.fs"
 #load "../List.fs"
