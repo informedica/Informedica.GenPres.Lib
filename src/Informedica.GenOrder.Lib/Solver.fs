@@ -107,6 +107,7 @@ module Solver =
                 match h with
                 | OrderProductEquation (y, xs) ->
                     if y::xs  |> List.hasExactlyOne noUnit then
+                        printfn $"one unit:\n{y::xs} "
                         if y |> noUnit then
                             let y =
                                 { y with 

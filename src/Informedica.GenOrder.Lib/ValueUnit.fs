@@ -14,12 +14,15 @@ module ValueUnit =
 
     module Units = ValueUnit.Units
 
+
     let valueToBase u v =
         ValueUnit.create u v
         |> ValueUnit.toBase
 
+
     let unitToString = 
         ValueUnit.Units.toString Units.English Units.Short
+
 
     let unitFromString s =
         if s |> String.isNullOrWhiteSpace then None
