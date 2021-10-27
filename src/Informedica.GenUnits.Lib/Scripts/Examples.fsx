@@ -6,35 +6,38 @@
 #time
 
 
-module Tests =
+module Examples =
 
     open MathNet.Numerics
     open Informedica.GenUnits.Lib
 
     open ValueUnit
 
-    let toString = toString Units.English Units.Short
 
     // Print intermediate results
-    let (>>*) u f =
-        u |> toString |> printfn "%s"
-        f u
+    let (>>*) vu f =
+        $"{vu |> toStringFloatEngShort}" |> printfn "%s"
+        f vu
+
+    let print vu = (>>*) vu ignore
 
     (* CREATE VALUE UNITS *)
 
     // Some basic units
-    let mg400 = 400N |> create Units.Mass.milliGram
-    let ml50  = 50N |> create Units.Volume.milliLiter
-    let ml5  = 5N |> create Units.Volume.milliLiter
-    let l5 = 5N |> create Units.Volume.liter 
+    let mg400  = 400.  |> withUnit Units.Mass.milliGram
+    let ml50   = 50.   |> withUnit Units.Volume.milliLiter
+    let ml5    = 5.    |> withUnit Units.Volume.milliLiter
+    let l5     = 5.    |> withUnit Units.Volume.liter 
+    let ml5000 = 5000. |> withUnit Units.Volume.milliLiter
 
     // The count group is a special unit group 
     // with only one unit: times.
-    let times3 = 3N |> create Units.Count.times
+    let times3 = 3. |> withUnit Units.Count.times
     // Division or mutliplication with times
     // results in unchanged units:
     // 3 times * 5 ml = 15 ml
     times3 * ml5
+    >>* ignore
 
     (* GET BASE AND UNIT VALUES *)
 
@@ -49,28 +52,32 @@ module Tests =
     (* USE OF COMPARISON OPERATORS *)
 
     // Normal comparison operators don't work
-    (ml50 > l5) // Returns true, but is false
+    ml50 > l5 // Returns true, but is false
 
     // Use the specific comparison operators
-    (ml50 >? l5) // Returns correct false
-
+    ml50   >?  l5 // Returns false
+    ml50   >=? l5 // Returns false
+    ml50   <?  l5 // Returns true
+    ml50   <=? l5 // Returns true
+    ml5    =?  l5 // Returns false
+    ml5000 =?  l5 // Returns true
 
     (* CALCULATION WITH VALUE UNITS *)
 
     // All four basic arrythmic operations can be performed
     
     // - multiplication
-    times3 * times3 // = 9 times
+    times3 * times3 >>* ignore // = 9 times
     // - division
-    times3 / times3 // = 1 times
+    times3 / times3 >>* ignore // = 1 times
     // - addition
-    times3 + times3 // = 6 times
+    times3 + times3 >>* ignore // = 6 times
     // - subtraction 
-    times3 - times3 // = 0 times
+    times3 - times3 >>* ignore // = 0 times
 
     // Addition and subtraction can only be performed within same unitgroups
-    (ml50 + l5)    // = 5.05 l
-    (mg400 + ml50) // System.Exception: cannot add or subtract different units Mass (MilliGram 1N) Volume (MilliLiter 1N)
+    ml50 + l5    >>* ignore // = 5.05 l
+    mg400 + ml50 >>* ignore // System.Exception: cannot add or subtract different units Mass (MilliGram 1N) Volume (MilliLiter 1N)
     
     // When two valueunits with the same unitgroup are divided you get a count group
     let (_, u) = (l5 / ml50) |> get  // = 100N times
@@ -81,14 +88,14 @@ module Tests =
     >>* ((*) ml50)              // 16 mg[Mass]/ml[Volume] * 50 ml[Volume] = 800 mg[Mass] 
     >>* (fun vu -> vu / ml50)   // 800 mg[Mass] / 50 ml[Volume] = 16 mg[Mass]/ml[Volume]
     >>* ((*) ml50)              // 16 mg[Mass]/ml[Volume] * 50 ml[Volume] = 800 mg[Mass]
-    |> toString
+    >>* ignore
 
     (* VALUE UNITS CAN BE CONVERTED TO DIFFERENT UNITS WITHIN THE SAME UNIT GROUP *)
 
     // Unit conversion
     l5                            // 5 l[Volume]
     ==> Units.Volume.milliLiter   // = 5000 ml[Volume]
-    |> toString
+    >>* ignore
 
     // Calculate and get the resulting unit group
     4N
@@ -109,8 +116,7 @@ module Tests =
         |> Group.getUnits
         |> List.iter (fun u ->
             create u 1N
-            |> toString
-            |> printfn "%s"
+            >>* ignore
         )
     )
 

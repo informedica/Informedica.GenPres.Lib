@@ -57,5 +57,5 @@ module Api =
         | Some u ->
             vu 
             |> VU.convertTo u
-            |> VU.toString loc verb
+            |> VU.toString BigRational.toString loc verb
         | None -> s1

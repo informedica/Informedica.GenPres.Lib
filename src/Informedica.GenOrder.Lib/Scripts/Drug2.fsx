@@ -170,6 +170,7 @@ let printScenarios v n (sc : Order list) =
 
 
 logger.Start Level.Informative
+
 // Paracetamol supp
 {
     DrugOrder.drugOrder with

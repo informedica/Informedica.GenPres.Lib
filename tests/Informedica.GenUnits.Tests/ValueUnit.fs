@@ -6,7 +6,7 @@ open MathNet.Numerics
 
 module VU = Informedica.GenUnits.Lib.ValueUnit
 
-let toString = VU.toString VU.Units.English VU.Units.Short
+let toString = VU.toStringEngShort
 
 let (>>*) u f = 
     u |> toString |> printfn "%s"
