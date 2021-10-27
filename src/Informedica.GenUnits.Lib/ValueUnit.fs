@@ -3,6 +3,7 @@ namespace Informedica.GenUnits.Lib
 
 module List =
 
+    // ToDo move to utils lib
     let remove1 pred =
         List.fold (fun acc x ->
             let b, xs = acc
@@ -192,6 +193,7 @@ module ValueUnit =
                 (app u1, op, app u2) |> CombiUnit
 
         app u
+
 
     let setUnitValue v =
         let f = fun _ -> v
@@ -516,6 +518,16 @@ module ValueUnit =
     let create u v = (v, u) |> ValueUnit
 
 
+    let withUnit u v = 
+        v 
+        |> BigRational.fromFloat
+        |> function
+        | None -> 
+            sprintf $"{v} cannot be converted to a BigRational!"
+            |> failwith
+        | Some br -> create u br
+
+
     let generalUnit v s = (s, v) |> General
 
 
@@ -544,8 +556,8 @@ module ValueUnit =
             | OpPer ->
                 match u1, u2 with
                 | _ when u1 |> Group.eqsGroup u2 ->
-                    let v1 = u1 |> getUnitValue
-                    let v2 = u2 |> getUnitValue
+                    let v1 = (u1 |> getUnitValue) 
+                    let v2 = (u2 |> getUnitValue)
                     match v1, v2 with
                     | Some x1, Some x2 ->
                         count |> setUnitValue (x1 / x2)
@@ -595,13 +607,13 @@ module ValueUnit =
                 | _ -> (u1, op, u2) |> CombiUnit
 
 
-    let per u2 u1 = (u1, OpPer, u2) |> createCombiUnit
+    let per u2 u1 = (u1, OpPer, u2)     |> createCombiUnit
 
 
     let times u2 u1 = (u1, OpTimes, u2) |> createCombiUnit
 
 
-    let plus u2 u1 = (u1, OpPlus, u2) |> createCombiUnit
+    let plus u2 u1 = (u1, OpPlus, u2)   |> createCombiUnit
 
 
     let minus u2 u1 = (u1, OpMinus, u2) |> createCombiUnit
@@ -1184,17 +1196,21 @@ module ValueUnit =
             str u
 
 
-    let toString loc verb vu =
+    let toString brf loc verb vu =
         let v, u = vu |> get
 
-        (v |> BigRational.toString) + " " + (Units.toString loc verb u)
+        $"{v |> brf} {Units.toString loc verb u}"
 
 
-    let toStringDutchShort = toString Units.Dutch Units.Short
-    let toStringDutchLong = toString Units.Dutch Units.Long
-    let toStringEngShort = toString Units.English Units.Short
-    let toStringEngLong = toString Units.English Units.Long
+    let toStringDutchShort = toString BigRational.toString Units.Dutch Units.Short
+    let toStringDutchLong  = toString BigRational.toString Units.Dutch Units.Long
+    let toStringEngShort   = toString BigRational.toString Units.English Units.Short
+    let toStringEngLong    = toString BigRational.toString Units.English Units.Long
 
+    let toStringFloatDutchShort = toString (BigRational.toFloat >> string) Units.Dutch Units.Short
+    let toStringFloatDutchLong  = toString (BigRational.toFloat >> string) Units.Dutch Units.Long
+    let toStringFloatEngShort   = toString (BigRational.toFloat >> string) Units.English Units.Short
+    let toStringFloatEngLong    = toString (BigRational.toFloat >> string) Units.English Units.Long
 
     let fromString s =
 
