@@ -29,10 +29,10 @@ type Agent<'Msg> = MailboxProcessor<'Msg>
 type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
 type Level = Informedica.GenSolver.Lib.Types.Logging.Level
 
-
+// Just to have a nice print of date time
 fsi.AddPrinter<DateTime> (fun dt -> sprintf $"{dt.ToShortDateString()}")
 
-
+// To print all messages related to an order
 let printOrderMsg msg = 
     match msg with 
     | Logging.OrderMessage m ->
@@ -50,7 +50,8 @@ let printOrderMsg msg =
         | Events.OrderScenerioWithNameValue (o, n, br) -> ""
     | Logging.OrderException s -> s
 
-
+// Catches a message and will dispatch this to the appropiate
+// print function
 let printMsg (msg : IMessage) = 
     match msg with
     | :? SolverMessage as m -> 
@@ -60,13 +61,14 @@ let printMsg (msg : IMessage) =
     | _ -> 
         sprintf ""
 
-
+// A message to send to the order logger agent
 type Message =  
     | Start of Level
     | Received of Informedica.GenSolver.Lib.Types.Logging.Message
     | Report
 
-
+// The type for an order logger agent that will
+// catch a message and will proces this in an asynchronous way.
 type OrderLogger =
     {
         Start : Level -> unit
@@ -74,7 +76,7 @@ type OrderLogger =
         Report: unit -> unit
     }
 
-
+// Create the logger agent 
 let logger =
 
     let loggerAgent : Agent<Message> = 
@@ -139,7 +141,7 @@ let logger =
                 |> loggerAgent.Post        
     }
 
-
+// print an order list
 let printScenarios v n (sc : Order list) =
     let w =
         match sc with 
@@ -157,7 +159,7 @@ let printScenarios v n (sc : Order list) =
         |> Order.printPrescription n
         |> fun (p, a, d) ->
             printfn "%i\tprescription:\t%s" (i + 1) p
-            printfn "  \tdispensing:\t\t%s" a
+            printfn "  \tdispensing:\t%s" a
             printfn "  \tpreparation:\t%s" d
         
         if v then
@@ -168,10 +170,11 @@ let printScenarios v n (sc : Order list) =
             printfn "\n"
     )
 
-
+// Start the logger at an informative level
 logger.Start Level.Informative
 
-// Paracetamol supp
+// Paracetamol supp example
+// First define the drug order
 {
     DrugOrder.drugOrder with
         Id = "1"
@@ -203,21 +206,18 @@ logger.Start Level.Informative
         Route = "rect"
         OrderType = DiscontinuousOrder
 }
-|> DrugOrder.create
+|> DrugOrder.create 
 |> DrugOrder.setDoseLimits
     {   DrugOrder.doseLimits with
             Name = "paracetamol"
-            Frequencies = [ 2N..4N ]
+            Frequencies = [ 2N..4N ]            // Allowed frequencies are 2, 3 or 4 per day
             SubstanceName = "paracetamol"
-            MaxDoseQuantity = Some 1000N
-            MaxDoseTotal = Some 4000N
-            MinDoseTotalAdjust = Some 40N
-            MaxDoseTotalAdjust = Some 90N
+            MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+            MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
+            MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
+            MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
     }
-|> DrugOrder.setAdjust "paracetamol" 2N
-//|> fun (cs, o) ->
-//    o |> Order.solveUnits logger.Logger
-//    DrugOrder.DrugConstraint.apply logger.Logger cs o
+|> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["paracetamol"]
 
@@ -225,6 +225,23 @@ logger.Report ()
 
 
 logger.Start Level.Informative
+
+let printItemConcentration = Order.printItemConcentration
+open Informedica.GenSolver.Lib.Variable
+
+let printComponentQuantity o =
+    o.Orderable.Components
+    |> Seq.map (fun c ->
+        $"mapping component: %A{c.OrderableQuantity}" |> printfn "%s"
+        c.OrderableQuantity
+        |> Quantity.toValueUnitStringList None
+        |> fun xs -> $"ValueUnit string list:\n%A{xs}" |> printfn "%s"; xs
+        |> Seq.map (fun (_, q) ->
+            $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
+        )
+        |> String.concat ""
+    ) |> String.concat " + "
+
 
 // Drug with multiple items
 // cotrimoxazol for infection
@@ -289,7 +306,11 @@ logger.Start Level.Informative
             MaxDoseTotalAdjust = Some 6N
     }
 |> DrugOrder.evaluate logger.Logger
-//|> Order.calcScenarios2
+|> fun xs ->
+    xs |> List.iteri (fun i x -> 
+        x |> printComponentQuantity |> (printfn "%i. %s" (i + 1))
+    )
+    xs
 |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
 
 

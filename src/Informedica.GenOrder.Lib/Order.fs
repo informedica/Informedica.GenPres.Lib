@@ -440,44 +440,42 @@ module Order =
         |> calc [ o ]
 
 
+    let printItemConcentration (c : Component) =
+        c.Items
+        |> Seq.collect (fun i ->
+            i.ComponentConcentration
+            |> Concentration.toValueUnitStringList None
+            |> Seq.map (fun (_, s) ->
+                $"{s} {i.Name |> Name.toString}"
+            )
+        )
+        |> String.concat " + "
+
+
+    let printComponentQuantity o =
+        o.Orderable.Components
+        |> Seq.map (fun c ->
+            c.OrderableQuantity
+            |> Quantity.toValueUnitStringList None
+            |> Seq.map (fun (_, q) ->
+                $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
+            )
+            |> String.concat ""
+        ) |> String.concat " + "
+
+
+    let printOrderableDoseQuantity o =
+        o.Orderable.Dose
+        |> Dose.get
+        |> fun (qt, _, _) ->
+            qt
+            |> Quantity.toValueUnitStringList None
+            |> Seq.map snd
+            |> String.concat ""
+
+
     let printPrescription sn (o : Order) =
         let on = o.Orderable.Name |> Name.toString
-
-        let printItemConc (c : Component) =
-            c.Items
-            |> Seq.collect (fun i ->
-                i.ComponentConcentration
-                |> Concentration.toValueUnitStringList None
-                |> Seq.map (fun (_, s) ->
-                    i.Name
-                    |> Name.toString
-                    |> sprintf "%s %s" s
-                )
-            )
-            |> String.concat " + "
-
-
-        let printCmpQuantity o =
-            o.Orderable.Components
-            |> Seq.map (fun c ->
-                c.OrderableQuantity
-                |> Quantity.toValueUnitStringList None
-                |> Seq.map (fun (_, q) ->
-                    c 
-                    |> printItemConc
-                    |> sprintf "%s %s (%s)" q (c.Name |> Name.toString)
-                )
-                |> String.concat ""
-            ) |> String.concat " + "
-
-        let printOrderableDoseQuantity o =
-            o.Orderable.Dose
-            |> Dose.get
-            |> fun (qt, _, _) ->
-                qt
-                |> Quantity.toValueUnitStringList None
-                |> Seq.map snd
-                |> String.concat ""
 
         let printItem get unt o =
             o.Orderable.Components
@@ -503,7 +501,6 @@ module Order =
             )
             |> String.concat " + "
 
-
         match o.Prescription with
         | Prescription.Discontinuous fr ->
             // frequencies
@@ -525,14 +522,9 @@ module Order =
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
                     (VariableUnit.TotalAdjust.toValueUnitStringList None)
 
-            let p =
-                sprintf "%s %s %s = (%s)" (o.Orderable.Name |> Name.toString) fr dq dt
-
-            let a =  
-                o 
-                |> printOrderableDoseQuantity
-                |> sprintf "%s %s" fr
-            let d = o |> printCmpQuantity |> sprintf "%s" 
+            let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
+            let a = $"{fr} {o |> printOrderableDoseQuantity}"
+            let d = o |> printComponentQuantity
 
             p, a, d
 
@@ -564,15 +556,10 @@ module Order =
                 |> printItem 
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, _, dr) -> dr))
                     (VariableUnit.RateAdjust.toValueUnitStringList (Some 2))
-            let p =
-                sprintf "%s %s" (sn |> String.concat " + ") dr
-            let a =
-                sprintf "%s %s in %s, %s" (sn |> String.concat " + ") it oq rt
 
-            let d =
-                o
-                |> printCmpQuantity
-                |> sprintf "%s" 
+            let p = $"""{sn |> String.concat " + "} {dr}"""
+            let a = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
+            let d = o |> printComponentQuantity
         
             p, a, d
 
@@ -612,19 +599,12 @@ module Order =
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
                     (VariableUnit.TotalAdjust.toValueUnitStringList None)
 
-            let p =
-                sprintf "%s %s %s = (%s) %s"  
-                    (o.Orderable.Name |> Name.toString) fr dq dt o.Route
-            let d =
-                o
-                |> printCmpQuantity
-                |> sprintf "%s" 
-
-            let a =  
-                sprintf "%s %s in %s, %s" fr (o |> printOrderableDoseQuantity) tme rt
+            let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"  
+            let d = o |> printComponentQuantity
+            let a = $"{fr} {o |> printOrderableDoseQuantity} in {tme}, {rt}"
 
             p, a, d
-
+ 
 
         | Prescription.Process ->
             let p =
