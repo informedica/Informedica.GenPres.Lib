@@ -3,7 +3,7 @@
 #load "../../Informedica.Utils.Lib/Scripts/load.fsx"
 #load "../../Informedica.GenUnits.Lib/Scripts/load.fsx"
 #load "../../Informedica.GenSolver.Lib/Scripts/load.fsx"
-// These can be loaded in a single time.
+// These can be loaded all at once.
 #load "../Types.fs"
 #load "../DateTime.fs"
 #load "../List.fs"

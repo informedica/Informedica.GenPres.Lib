@@ -73,12 +73,13 @@ module Types =
     /// Type that represents an adjusted dose quantity, total and rate
     type DoseAdjust = DoseAdjust of QuantityAdjust * TotalAdjust * RateAdjust
 
-
+    /// An order equation is either a product equation or a 
+    /// sum equation
     type OrderEquation =
         | OrderProductEquation of VariableUnit * VariableUnit list
         | OrderSumEquation of VariableUnit * VariableUnit list
 
-
+    /// An Id is represented by a string
     type Id = Id of string
 
 
@@ -198,7 +199,7 @@ module Types =
             StartStop: StartStop
         }
 
-
+    /// Mapping of an order to variables
     type OrderMapping =
         | PresFreq
         | PresTime
@@ -235,7 +236,7 @@ module Types =
         | OrderableDoseAdjustRateAdjust
         | OrderAdjustQty
 
-
+    /// The different possible order types
     type OrderType =
         | AnyOrder
         | ProcessOrder
@@ -243,7 +244,7 @@ module Types =
         | DiscontinuousOrder
         | TimedOrder
 
-
+    /// Relation between shape and route
     type RouteShape =
         | AnyRouteShape
         | IntravenousFluid
@@ -251,7 +252,8 @@ module Types =
         | OralSolid
         | RectalSolid
 
-
+    /// Constrained that can be applied to a
+    /// variable in an equation.
     type DrugConstraint =
         {
             Name : string
@@ -262,49 +264,86 @@ module Types =
             OrderType : OrderType
         }
 
-
+    /// The representation of a drug order that 
+    /// can be derived by a drug product inventory
+    /// and the related dose rule
     type DrugOrder =
         {
+            /// Identifies the specific drug order
             Id:  string
+            /// The name of the order
             Name : string
+            /// The list of drug products that can be used for the order
             Products : ProductComponent list
+            /// The quantities of the drug order
             Quantities :  BigRational list
+            /// The unit the `DrugOrder` is measured in,
+            /// i.e. of the `Quantities`
             Unit : string
+            /// The time unit to be used when using a frequency
             TimeUnit : string
+            /// The time unit to be used when using a rate
             RateUnit : string
+            /// The shape of the products
             Shape : string
+            /// The "divisibility" of the products
+            /// Note: should be a product attribute
             Divisible : BigRational
+            /// The route by which the order is applied
             Route : string
+            // The type of order
             OrderType : OrderType
         }
+    /// The product components that are used by the drug order
     and ProductComponent = 
         { 
+            /// The name of the product
             Name : string
+            /// The quantities of the product
+            /// Note: measured in the same unit as
+            /// the `DrugOrder` unit
             Quantities : BigRational list
+            /// The time unit used for frequency
             TimeUnit : string
+            /// The rate unit used for rate
             RateUnit : string
+            /// The list of substances contained in the product
             Substances: SubstanceItem list 
         }
     and SubstanceItem = 
         { 
+            /// The name of the substance
             Name : string
+            /// The possible concentrations of the substance 
+            /// in the products
             Concentrations : BigRational list
+            /// The possible quantities of the substance in the orderable
             OrderableQuantities : BigRational list
+            /// The unit by which the substance is 
+            /// measured.
             Unit : string
+            /// The unit used for the dose
             DoseUnit : string
+            /// The time unit used for the frequency
             TimeUnit : string
+            /// The time unit used for the rate
             RateUnit : string
         }
 
-    
+    /// The constraints that can be applied 
+    /// and the order
     type ConstrainedOrder = (DrugConstraint list * Order)
 
-
+    /// The dose limits that can be applied
     type DoseLimits =
         {
+            /// The name of the order variable to
+            /// which the 
             Name : string
             Frequencies : BigRational list
             Rates : BigRational list
+            /// The substance name to which the dose limits
+            /// are applied
             SubstanceName : string
             MaxDoseQuantity : BigRational option
             MinDoseQuantity : BigRational option
