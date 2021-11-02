@@ -66,6 +66,7 @@ type Message =
     | Start of Level
     | Received of Informedica.GenSolver.Lib.Types.Logging.Message
     | Report
+    | Write of string
 
 // The type for an order logger agent that will
 // catch a message and will proces this in an asynchronous way.
@@ -74,7 +75,9 @@ type OrderLogger =
         Start : Level -> unit
         Logger: Logger
         Report: unit -> unit
+        Write : string -> unit
     }
+
 
 // Create the logger agent 
 let logger =
@@ -99,6 +102,7 @@ let logger =
                             msgs.Add(timer.Elapsed.TotalSeconds, m)
                         return! loop timer level msgs
 
+
                     | Report ->
                         printfn "=== Start Report ===\n"
                         msgs 
@@ -114,7 +118,21 @@ let logger =
                             | s -> printfn "\n%i. %f: %A\n%s" i t m.Level s
                         )
                         printfn "\n"
-                        
+
+                    | Write path ->
+                        msgs 
+                        |> Seq.iteri (fun i (t, m) ->
+                            m.Message
+                            |> printMsg
+                            |> function 
+                            | s when s |> String.IsNullOrEmpty -> ()
+                            | s -> 
+                                let s = sprintf "\n%i. %f: %A\n%s" i t m.Level s
+                                System.IO.File.AppendAllLines(path, [s])
+                        )
+                        System.IO.File.AppendAllLines(path, ["\n"])
+
+
                         let timer = Stopwatch.StartNew()
                         return! loop timer level msgs
                 }
@@ -138,7 +156,11 @@ let logger =
         Report = 
             fun _ ->
                 Report
-                |> loggerAgent.Post        
+                |> loggerAgent.Post
+        Write =
+            fun path ->
+                Write path
+                |> loggerAgent.Post
     }
 
 // print an order list
@@ -221,8 +243,12 @@ logger.Start Level.Informative
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["paracetamol"]
 
+// report output to the fsi
 logger.Report ()
 
+// write results to the test.txt in this folder
+$"{__SOURCE_DIRECTORY__}/test.txt"
+|> logger.Write
 
 logger.Start Level.Informative
 
@@ -315,6 +341,7 @@ let printComponentQuantity o =
 
 
 logger.Start Level.Informative
+
 
 // Paracetamol drink
 {
@@ -500,7 +527,7 @@ logger.Start Level.Informative
 |> printScenarios false ["dopamin"]
 
 
-
+logger.Report()
 
 // Dopamin infusion calculate scenario's 
 // with a a fixed infusion - dose rate
