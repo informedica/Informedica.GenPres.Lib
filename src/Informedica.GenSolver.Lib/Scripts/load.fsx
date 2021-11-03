@@ -1,4 +1,9 @@
-// Warning: generated file; your changes could be lost when a new file is generated.
+
+#r "nuget: MathNet.Numerics.FSharp"
+#r "nuget: FParsec"
+
+#r "../../Informedica.Utils.Lib/bin/Debug/net5.0/Informedica.Utils.Lib.dll"
+#r "../../Informedica.GenUnits.Lib/bin/Debug/net5.0/Informedica.GenUnits.Lib.dll"
 
 #load "../Types.fs"
 #load "../Utils.fs"

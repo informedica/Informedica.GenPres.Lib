@@ -1,8 +1,11 @@
 ﻿
 
-//#I __SOURCE_DIRECTORY__
-// Go to load.fsx and send that to FSI first.
-// Running load.fsx in a single time fails.
+// #I __SOURCE_DIRECTORY__
+// The above directive doesn't work anymore, instead
+// the fsi will silent cd to the present script directory
+// but still try to run the below load script first.
+// So first start the fsi, only then you can run the below
+// script.
 #load "load.fsx"
 
 open System
@@ -102,7 +105,6 @@ let logger =
                             msgs.Add(timer.Elapsed.TotalSeconds, m)
                         return! loop timer level msgs
 
-
                     | Report ->
                         printfn "=== Start Report ===\n"
                         msgs 
@@ -119,6 +121,8 @@ let logger =
                         )
                         printfn "\n"
 
+                        return! loop timer level msgs
+
                     | Write path ->
                         msgs 
                         |> Seq.iteri (fun i (t, m) ->
@@ -132,8 +136,6 @@ let logger =
                         )
                         System.IO.File.AppendAllLines(path, ["\n"])
 
-
-                        let timer = Stopwatch.StartNew()
                         return! loop timer level msgs
                 }
             
