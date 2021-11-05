@@ -19,6 +19,7 @@
     <Compile Include="Prescription.fs" />
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
+    <Compile Include="OrderLogger.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Order.fsx" />
     <None Include="Scripts\ValueUnit.fsx" />
