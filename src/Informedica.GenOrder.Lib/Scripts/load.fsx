@@ -21,4 +21,5 @@
 #load "../Prescription.fs"
 #load "../Order.fs"
 #load "../DrugOrder.fs"
+#load "../OrderLogger.fs"
 
