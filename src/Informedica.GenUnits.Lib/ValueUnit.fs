@@ -4,7 +4,7 @@ namespace Informedica.GenUnits.Lib
 module List =
 
     // ToDo move to utils lib
-    let remove1 pred =
+    let removeFirst pred =
         List.fold (fun acc x ->
             let b, xs = acc
             if b then (true, x::(acc |> snd))
@@ -204,7 +204,7 @@ module ValueUnit =
         let rec app u =
             match u with
             | NoUnit -> None
-            | General (s, n) -> n |> Some
+            | General (_, n) -> n |> Some
             | Count g ->
                 match g with
                 | Times n -> n |> Some
@@ -249,7 +249,7 @@ module ValueUnit =
             | BSA g ->
                 match g with
                 | M2 n -> n |> Some
-            | CombiUnit (u1, op, u2) -> None
+            | CombiUnit (_, _, _) -> None
 
         app u
 
@@ -528,6 +528,9 @@ module ValueUnit =
         | Some br -> create u br
 
 
+    let withValue v u = create u v
+
+
     let generalUnit v s = (s, v) |> General
 
 
@@ -675,7 +678,7 @@ module ValueUnit =
 
     let rec getUnits u =
         match u with
-        | CombiUnit (ul, op, ur) ->
+        | CombiUnit (ul, _, ur) ->
             ul
             |> getUnits
             |> List.append (ur |> getUnits)
@@ -718,7 +721,9 @@ module ValueUnit =
                         else u |> per d
                 | h::tail, _ ->
                     if ds |> List.exists (Group.eqsGroup h) then
-                        build tail (ds |> List.remove1 (Group.eqsGroup h)) u
+                        // just removes the group, but should calc div multipliers?
+                        // or do a "per" operation?
+                        build tail (ds |> List.removeFirst (Group.eqsGroup h)) u
                     else
                         if u = NoUnit then h
                         else u |> times h
@@ -738,15 +743,15 @@ module ValueUnit =
             |> simpl
             |> (fun u ->
                 vu
-//                |> toBase
-//                |> create u
-                |> (get >> fst)
+                |> toBase
+                |> create u
+                |> toUnit
                 |> create u
             )
 
 
 
-    let calc op vu1 vu2 =
+    let calc b op vu1 vu2 =
 
         let (ValueUnit (_, u1)) = vu1
         let (ValueUnit (_, u2)) = vu2
@@ -768,7 +773,7 @@ module ValueUnit =
         |> create u
         |> toUnit
         |> create u
-        |> simplify
+        |> fun vu -> if b then vu |> simplify else vu
 
 
     let cmp cp vu1 vu2 =
@@ -804,13 +809,13 @@ module ValueUnit =
 
     type ValueUnit with
 
-        static member (*) (vu1, vu2) = calc (*) vu1 vu2
+        static member (*) (vu1, vu2) = calc true (*) vu1 vu2
 
-        static member (/) (vu1, vu2) = calc (/) vu1 vu2
+        static member (/) (vu1, vu2) = calc true (/) vu1 vu2
 
-        static member (+) (vu1, vu2) = calc (+) vu1 vu2
+        static member (+) (vu1, vu2) = calc true (+) vu1 vu2
 
-        static member (-) (vu1, vu2) = calc (-) vu1 vu2
+        static member (-) (vu1, vu2) = calc true (-) vu1 vu2
 
         static member (=?) (vu1, vu2) = cmp (=) vu1 vu2
 
@@ -1196,6 +1201,13 @@ module ValueUnit =
                     )
 
             str u
+
+
+        let toStringDutchShort = toString Dutch Short
+        let toStringDutchLong  = toString Dutch Long
+        let toStringEngShort   = toString English Short
+        let toStringEngLong    = toString English Long
+
 
 
     let toString brf loc verb vu =
