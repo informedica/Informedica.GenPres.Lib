@@ -1,6 +1,6 @@
 #!markdown
 
-# Demonstration of some of the concepts underlying `Informedica.GenPres.Lib` #
+# Demonstration of some of the concepts underlying `Informedica.GenUnits.Lib` #
 
 #!markdown
 
@@ -37,12 +37,23 @@ module Print =
 
 #!markdown
 
+Some basic units, that can be combined to `CombiUnit`
+
+#!fsharp
+
+let mg = Units.Mass.milliGram
+let ml = Units.Volume.milliLiter
+let hr = Units.Time.hour
+$"{(mg |> per ml |> per hr)}"
+
+#!markdown
+
 We can build `ValueUnit` instances from numeric values and units:
 
 #!fsharp
 
-// Some basic units
-let mg400  = 400.  |> withUnit Units.Mass.milliGram
+// Some basic value units
+let mg400  = 400.  |> withUnit Units.Mass.milliGram     
 let ml50   = 50.   |> withUnit Units.Volume.milliLiter
 let ml5    = 5.    |> withUnit Units.Volume.milliLiter
 let l5     = 5.    |> withUnit Units.Volume.liter 
@@ -186,6 +197,6 @@ mg400 / ml50 / (1N |> create Units.Time.day) // 8 mg[Mass]/ml[Volume]/day[Time]
     |> Group.getUnits
     |> List.iter (fun u ->
         create u 1N
-        >>* ignore
+        |> print
     )
 )
