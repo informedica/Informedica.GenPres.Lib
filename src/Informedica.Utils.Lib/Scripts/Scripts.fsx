@@ -37,6 +37,4 @@ module Double =
 
 
 
-Double.getPrecision 1 0.00001
-
-0.00001.ToString("F10")
+Double.getPrecision 20 1.00001
