@@ -30,7 +30,7 @@ type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
 type Level = Informedica.GenSolver.Lib.Types.Logging.Level
 
 // Just to have a nice print of date time
-fsi.AddPrinter<DateTime> (fun dt -> sprintf $"{dt.ToShortDateString()}")
+fsi.AddPrinter<DateTime> (fun dt ->  $"{dt.ToShortDateString()}")
 
 // To print all messages related to an order
 let printOrderMsg msg = 
@@ -118,6 +118,8 @@ let logger =
                             | s -> printfn "\n%i. %f: %A\n%s" i t m.Level s
                         )
                         printfn "\n"
+
+                        return! loop timer level msgs
 
                     | Write path ->
                         msgs 
