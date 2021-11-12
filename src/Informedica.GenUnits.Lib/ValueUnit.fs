@@ -558,6 +558,8 @@ module ValueUnit =
             match op with
             | OpPer ->
                 match u1, u2 with
+                // this is not enough when u2 is combiunit but 
+                // contains u1!
                 | _ when u1 |> Group.eqsGroup u2 ->
                     let v1 = (u1 |> getUnitValue) 
                     let v2 = (u2 |> getUnitValue)
@@ -685,7 +687,70 @@ module ValueUnit =
         | _ -> [ u ]
 
 
-    let calc op vu1 vu2 =
+    let simplify vu =
+        let (_, u) = vu |> get
+
+        let simpl u =
+            // separate numerators from denominators
+            let rec numDenom b u =
+                match u with
+                | CombiUnit(ul, OpTimes, ur) ->
+                    let lns, lds = ul |> numDenom b
+                    let rns, rds = ur |> numDenom b
+                    lns @ rns, lds @ rds
+
+                | CombiUnit(ul, OpPer, ur) ->
+                    if b then
+                        let lns, lds = ul |> numDenom true
+                        let rns, rds = ur |> numDenom false
+                        lns @ rns, lds @ rds
+                    else
+                        let lns, lds = ur |> numDenom true
+                        let rns, rds = ul |> numDenom false
+                        lns @ rns, lds @ rds
+                | _ -> if b then (u |> getUnits, []) else ([], u |> getUnits)
+            // build a unit from a list of numerators and denominators
+            let rec build ns ds (b, u) =
+                match ns, ds with
+                | [], _ ->
+                    match ds with
+                    | [] -> (b, u)
+                    | _ ->
+                        let d = ds |> List.rev |> List.reduce times
+                        if u = NoUnit then
+                            Count(Times 1N) |> per d
+                        else u |> per d
+                        |> fun u -> (b, u)
+                | h::tail, _ ->
+                    if ds |> List.exists (Group.eqsGroup h) then
+                        build tail (ds |> List.removeFirst (Group.eqsGroup h)) (true, u)
+                    else
+                        if u = NoUnit then h
+                        else u |> times h
+                        |> fun u -> build tail ds (b, u)
+
+            let ns, ds = u |> numDenom true
+
+            (false, NoUnit)
+            |> build ns ds
+            |> (fun (b, u) -> if u = NoUnit then (b, count) else (b, u))
+
+        u
+        |> function
+        | _ when u = NoUnit -> vu
+        | _ ->
+            u
+            |> simpl
+            |> (fun (b, u') ->
+                vu
+                |> toBase
+                |> create (if b then u' else u)
+                |> toUnit
+                |> create (if b then u' else u)
+            )
+
+
+    let calc b op vu1 vu2 =
 
         let (ValueUnit (_, u1)) = vu1
         let (ValueUnit (_, u2)) = vu2
@@ -709,7 +774,7 @@ module ValueUnit =
         |> toUnit
         // recreate again to final value unit
         |> create u
-        //|> fun vu -> if b then vu |> simplify else vu
+        |> fun vu -> if b then vu |> simplify else vu
 
 
     let cmp cp vu1 vu2 =
@@ -745,13 +810,13 @@ module ValueUnit =
 
     type ValueUnit with
 
-        static member (*) (vu1, vu2) = calc (*) vu1 vu2
+        static member (*) (vu1, vu2) = calc true (*) vu1 vu2
 
-        static member (/) (vu1, vu2) = calc (/) vu1 vu2
+        static member (/) (vu1, vu2) = calc true (/) vu1 vu2
 
-        static member (+) (vu1, vu2) = calc (+) vu1 vu2
+        static member (+) (vu1, vu2) = calc true (+) vu1 vu2
 
-        static member (-) (vu1, vu2) = calc (-) vu1 vu2
+        static member (-) (vu1, vu2) = calc true (-) vu1 vu2
 
         static member (=?) (vu1, vu2) = cmp (=) vu1 vu2
 

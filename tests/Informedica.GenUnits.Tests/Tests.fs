@@ -90,10 +90,10 @@ let unitTests =
                 |> get 
                 |> fun (_, u) ->
                     vu1
-                    >>* ValueUnit.toBase
-                    >>* create u 
-                    >>* toUnit 
-                    >>* create u
+                    |> ValueUnit.toBase
+                    |> create u 
+                    |> toUnit 
+                    |> create u
             Expect.equal "" vu1 vu2
         }
 
@@ -108,10 +108,10 @@ let unitTests =
                 |> get 
                 |> fun (_, u) ->
                     vu1
-                    >>* ValueUnit.toBase
-                    >>* create u 
-                    >>* toUnit 
-                    >>* create u
+                    |> ValueUnit.toBase
+                    |> create u 
+                    |> toUnit 
+                    |> create u
             Expect.equal "" vu1 vu2
         }
     ]
@@ -228,9 +228,16 @@ let calculationTests =
 
         test "division with 3 unit values" {
             let vu =
-                mg400 / (mg400 / ml50)
+                mg400 / (mg400 / ml50) // equals mg400 * (ml50 / mg400) = mg50
             
             Expect.equal "should be 50 ml" ml50 vu
+        }
+
+        test "more complicated division" {
+            let vu =
+                (mg400 / ml50) / (day2 / ml50) // equals (mg400 / ml50) * (ml50 / day2) = mg400 / day2
+
+            Expect.equal "" (mg400 / day2) vu
         }
     ] 
 
