@@ -80,6 +80,9 @@
 # Add fsharp source files
 !*.fs
 
+# Add notebook files
+!*.dib
+
 # Add documentation tools 
 !/docsTool/
 !/docsTool/templates/
@@ -99,15 +102,19 @@
 !/src/Informedica.Utils.Lib/
 !/src/Informedica.Utils.Lib/BCL/
 !/src/Informedica.Utils.Lib/Scripts/
+!/src/Informedica.Utils.Lib/Notebooks/
 # Informedica.GenUnits.Lib
 !/src/Informedica.GenUnits.Lib/
 !/src/Informedica.GenUnits.Lib/Scripts/
+!/src/Informedica.GenUnits.Lib/Notebooks/
 #Informedica.GenSolver.Lib
 !/src/Informedica.GenSolver.Lib/
 !/src/Informedica.GenSolver.Lib/Scripts/
+!/src/Informedica.GenSolver.Lib/Notebooks/
 #Informedica.GenOrder.Lib
 !/src/Informedica.GenOrder.Lib/
 !/src/Informedica.GenOrder.Lib/Scripts/
+!/src/Informedica.GenOrder.Lib/Notebooks/
 
 # Add test files
 !/tests/

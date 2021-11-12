@@ -686,6 +686,7 @@ module ValueUnit =
         let (_, u) = vu |> get
 
         let simpl u =
+            // separate numerators from denominators
             let rec numDenom b u =
                 match u with
                 | CombiUnit(ul, OpTimes, ur) ->
@@ -703,14 +704,15 @@ module ValueUnit =
                         let rns, rds = ul |> numDenom false
                         lns @ rns, lds @ rds
                 | _ -> if b then (u |> getUnits, []) else ([], u |> getUnits)
-
+            // build a unit from a list of numerators and denominators
             let rec build ns ds u =
                 match ns, ds with
                 | [], _ ->
                     match ds with
                     | [] -> u
                     | _ ->
-                        let d = ds |> List.reduce times
+                        // should this be times or per??
+                        let d = ds |> List.rev |> List.reduce per
                         if u = NoUnit then
                             Count(Times 1N) |> per d
                         else u |> per d
@@ -736,9 +738,9 @@ module ValueUnit =
             |> simpl
             |> (fun u ->
                 vu
-                |> toBase
-                |> create u
-                |> toUnit
+//                |> toBase
+//                |> create u
+                |> (get >> fst)
                 |> create u
             )
 

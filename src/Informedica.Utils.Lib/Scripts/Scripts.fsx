@@ -44,8 +44,13 @@ module Double =
 
 
 
+<<<<<<< HEAD
 Double.getPrecision 1 0.00001
 Double.getPrecision 2 0.00000000666
 Double.getPrecision 2 0.0101 //gives precision 3, but should it be 4?
 
 Double.getPrecision 1 6666666666.666 // (*) can only work with int64 types 
+=======
+
+Double.getPrecision 20 1.00001
+>>>>>>> 4a2cdadbd8b9206ece3265d0b9581ab35b26f56c

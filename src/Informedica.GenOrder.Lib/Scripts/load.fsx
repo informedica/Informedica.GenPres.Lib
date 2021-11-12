@@ -1,8 +1,12 @@
-// Cannot load this in a single time. 
-// Need to run these loads each at a time
-#load "../../Informedica.Utils.Lib/Scripts/load.fsx"
-#load "../../Informedica.GenUnits.Lib/Scripts/load.fsx"
-#load "../../Informedica.GenSolver.Lib/Scripts/load.fsx"
+
+#r "nuget: MathNet.Numerics.FSharp"
+#r "nuget: FParsec"
+
+
+#r "../../Informedica.Utils.Lib/bin/Debug/net5.0/Informedica.Utils.Lib.dll"
+#r "../../Informedica.GenUnits.Lib/bin/Debug/net5.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.GenSolver.Lib/bin/Debug/net5.0/Informedica.GenSolver.Lib.dll"
+
 // These can be loaded all at once.
 #load "../Types.fs"
 #load "../DateTime.fs"
@@ -17,4 +21,5 @@
 #load "../Prescription.fs"
 #load "../Order.fs"
 #load "../DrugOrder.fs"
+#load "../OrderLogger.fs"
 

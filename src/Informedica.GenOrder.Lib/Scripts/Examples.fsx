@@ -1,12 +1,14 @@
 ﻿
 
-//#I __SOURCE_DIRECTORY__
-// Go to load.fsx and send that to FSI first.
-// Running load.fsx in a single time fails.
+// #I __SOURCE_DIRECTORY__
+// The above directive doesn't work anymore, instead
+// the fsi will silent cd to the present script directory
+// but still try to run the below load script first.
+// So first start the fsi, only then you can run the below
+// script.
 #load "load.fsx"
 
 open System
-open System.Diagnostics
 open MathNet.Numerics
 
 open Informedica.GenUnits.Lib
@@ -18,20 +20,12 @@ module Units = ValueUnit.Units
 module DrugConstraint = DrugOrder.DrugConstraint
 module Quantity = VariableUnit.Quantity
 
-module SolverLogging = Informedica.GenSolver.Lib.SolverLogging
-
-type Logger = Informedica.GenSolver.Lib.Types.Logging.Logger
-type SolverMessage = Informedica.GenSolver.Lib.Types.Logging.SolverMessage
-type OrderMessage = Informedica.GenOrder.Lib.Types.Logging.Message
-
-
-type Agent<'Msg> = MailboxProcessor<'Msg>
-type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
-type Level = Informedica.GenSolver.Lib.Types.Logging.Level
+open OrderLogger
 
 // Just to have a nice print of date time
 fsi.AddPrinter<DateTime> (fun dt ->  $"{dt.ToShortDateString()}")
 
+<<<<<<< HEAD
 // To print all messages related to an order
 let printOrderMsg msg = 
     match msg with 
@@ -193,6 +187,8 @@ let printScenarios v n (sc : Order list) =
 
             printfn "\n"
     )
+=======
+>>>>>>> 4a2cdadbd8b9206ece3265d0b9581ab35b26f56c
 
 // Start the logger at an informative level
 logger.Start Level.Informative

@@ -3,7 +3,6 @@
 
 #r "nuget: Unquote"
 
-#load "load-utils.fsx"
 #load "load.fsx"
 
 open MathNet.Numerics
