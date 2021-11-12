@@ -145,47 +145,6 @@ let comparisonTests =
 
 
 [<Tests>]
-let simplifyTests =
-
-    testList "simplify" [
-
-        test "no unit" {
-            let vu = create NoUnit 1N
-            Expect.equal "" vu (vu |> simplify) 
-        }
-
-        test "400 mg" {
-            Expect.equal "" mg400 (mg400 |> simplify)
-        }
-
-        test "400 mg / ml" {
-            let vu = 
-                Units.Mass.milliGram
-                |> per Units.Volume.milliLiter
-                |> withValue 400N
-            
-            vu
-            |> simplify
-            |> Expect.equal "" vu
-        }
-
-        test "400 mg / ml / hour" {
-            let vu = 
-                Units.Mass.milliGram
-                |> per Units.Volume.milliLiter
-                |> per Units.Time.hour
-                |> withValue 400N
-
-            
-            vu
-            |> simplify
-            |> Expect.equal "" vu
-        }
-    ]
-
-
-
-[<Tests>]
 let calculationTests =
 
     let (>>?) res exp =
@@ -266,7 +225,14 @@ let calculationTests =
             >>? "400 mg[Mass]"
             |> ignore    
         }
-    ]
+
+        test "division with 3 unit values" {
+            let vu =
+                mg400 / (mg400 / ml50)
+            
+            Expect.equal "should be 50 ml" ml50 vu
+        }
+    ] 
 
 
 [<Tests>]

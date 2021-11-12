@@ -72,6 +72,9 @@ let ml5    = 5.    |> withUnit Units.Volume.milliLiter >>* id
 let l5     = 5.    |> withUnit Units.Volume.liter      >>* id
 let ml5000 = 5000. |> withUnit Units.Volume.milliLiter >>* id
 
+mg400 |> pa
+4. |> withUnit d2 |> pa
+
 #!markdown
 
 The `Count` group is a special unit group with only one unit: `times`:
@@ -214,23 +217,33 @@ We can get all valid units for conversion:
 #!fsharp
 
 let d2 = 2. |> withUnit Units.Time.day
+let g4 = 0.4 |> withUnit Units.Mass.gram
+let mg400 = 400. |> withUnit Units.Mass.milliGram
 
+printfn "First example"
+// failing case, simplify doesn't work in this case
+calc false (/) (calc false (*) times3 mg400) g4
+|> fun x -> 
+    printfn "result without simplify:"
+    x |> pa; x
+|> simplify
+|> fun x ->
+    printfn "result with simplify:"
+    x |> pa
+
+printfn "Failing example"
 // failing case, simplify doesn't work in this case
 calc false (/) (calc false (/) mg400 ml50) d2
->>* simplify
-|> pa
+|> fun x -> 
+    printfn "result without simplify:"
+    x |> pa; x
+|> simplify
+|> fun x ->
+    printfn "result with simplify:"
+    x |> pa
 
-mg400 / ml50 >>* 
-(fun x -> x / d2) |> pa
+// mg/kg/dag = mg * dag / kg 
+// a / c/ d
 
-mg400 / ml50 / d2 // 4 mg[Mass]/ml[Volume]/day[Time]
->>* (fun vu -> 
-    let (_, u) = vu |> get
-    u 
-    |> Group.unitToGroup
-    |> Group.getUnits
-    |> List.iter (fun u ->
-        create u 1N
-        |> print
-    )
-)
+// 60 mg/kg/2 dagen * 10 kg = 600 mg/2 dagen = 300 mg/dag
+// 60 mg/(kg / 2 dagen) * 10 kg = 600 mg / 2 dagen = 300 mg/dag

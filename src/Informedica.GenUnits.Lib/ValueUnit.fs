@@ -685,95 +685,31 @@ module ValueUnit =
         | _ -> [ u ]
 
 
-    let simplify vu =
-        let (_, u) = vu |> get
-
-        let simpl u =
-            // separate numerators from denominators
-            let rec numDenom b u =
-                match u with
-                | CombiUnit(ul, OpTimes, ur) ->
-                    let lns, lds = ul |> numDenom b
-                    let rns, rds = ur |> numDenom b
-                    lns @ rns, lds @ rds
-
-                | CombiUnit(ul, OpPer, ur) ->
-                    if b then
-                        let lns, lds = ul |> numDenom true
-                        let rns, rds = ur |> numDenom false
-                        lns @ rns, lds @ rds
-                    else
-                        let lns, lds = ur |> numDenom true
-                        let rns, rds = ul |> numDenom false
-                        lns @ rns, lds @ rds
-                | _ -> if b then (u |> getUnits, []) else ([], u |> getUnits)
-            // build a unit from a list of numerators and denominators
-            let rec build ns ds u =
-                match ns, ds with
-                | [], _ ->
-                    match ds with
-                    | [] -> u
-                    | _ ->
-                        // should this be times or per??
-                        let d = ds |> List.rev |> List.reduce per
-                        if u = NoUnit then
-                            Count(Times 1N) |> per d
-                        else u |> per d
-                | h::tail, _ ->
-                    if ds |> List.exists (Group.eqsGroup h) then
-                        // just removes the group, but should calc div multipliers?
-                        // or do a "per" operation?
-                        build tail (ds |> List.removeFirst (Group.eqsGroup h)) u
-                    else
-                        if u = NoUnit then h
-                        else u |> times h
-                        |> build tail ds
-
-            let ns, ds = u |> numDenom true
-
-            NoUnit
-            |> build ns ds
-            |> (fun u -> if u = NoUnit then count else u)
-
-        u
-        |> function
-        | _ when u = NoUnit -> vu
-        | _ ->
-            u
-            |> simpl
-            |> (fun u ->
-                vu
-                |> toBase
-                |> create u
-                |> toUnit
-                |> create u
-            )
-
-
-
-    let calc b op vu1 vu2 =
+    let calc op vu1 vu2 =
 
         let (ValueUnit (_, u1)) = vu1
         let (ValueUnit (_, u2)) = vu2
-
+        // calculate value in base
         let v = vu1 |> toBase |> op <| (vu2 |> toBase)
-
+        // calculate new combi unit
         let u =
             match op with
-            | BigRational.Mult    -> (u1, OpTimes, u2) |> CombiUnit
-            | BigRational.Div     -> (u1, OpPer,   u2) |> CombiUnit
+            | BigRational.Mult    -> u1 |> times u2
+            | BigRational.Div     -> u1 |> per u2
             | BigRational.Add
             | BigRational.Subtr   ->
                 if u1 |> Group.eqsGroup u2 then u2
                 else
                     failwith <| sprintf "cannot add or subtract different units %A %A" u1 u2
             | BigRational.NoMatch -> failwith <| sprintf "invalid operator %A" op
-
+        // recreate valueunit with base value and combined unit
         v
         |> create u
+        // calculate to the new combiunit
         |> toUnit
+        // recreate again to final value unit
         |> create u
-        |> fun vu -> if b then vu |> simplify else vu
+        //|> fun vu -> if b then vu |> simplify else vu
 
 
     let cmp cp vu1 vu2 =
@@ -809,13 +745,13 @@ module ValueUnit =
 
     type ValueUnit with
 
-        static member (*) (vu1, vu2) = calc true (*) vu1 vu2
+        static member (*) (vu1, vu2) = calc (*) vu1 vu2
 
-        static member (/) (vu1, vu2) = calc true (/) vu1 vu2
+        static member (/) (vu1, vu2) = calc (/) vu1 vu2
 
-        static member (+) (vu1, vu2) = calc true (+) vu1 vu2
+        static member (+) (vu1, vu2) = calc (+) vu1 vu2
 
-        static member (-) (vu1, vu2) = calc true (-) vu1 vu2
+        static member (-) (vu1, vu2) = calc (-) vu1 vu2
 
         static member (=?) (vu1, vu2) = cmp (=) vu1 vu2
 
