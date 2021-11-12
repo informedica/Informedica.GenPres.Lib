@@ -25,7 +25,6 @@ open OrderLogger
 // Just to have a nice print of date time
 fsi.AddPrinter<DateTime> (fun dt ->  $"{dt.ToShortDateString()}")
 
-<<<<<<< HEAD
 // To print all messages related to an order
 let printOrderMsg msg = 
     match msg with 
@@ -187,8 +186,6 @@ let printScenarios v n (sc : Order list) =
 
             printfn "\n"
     )
-=======
->>>>>>> 4a2cdadbd8b9206ece3265d0b9581ab35b26f56c
 
 // Start the logger at an informative level
 logger.Start Level.Informative
