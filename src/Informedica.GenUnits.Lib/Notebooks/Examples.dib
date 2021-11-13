@@ -41,10 +41,23 @@ Some basic units, that can be combined to `CombiUnit`
 
 #!fsharp
 
+// basic units
 let mg = Units.Mass.milliGram
 let ml = Units.Volume.milliLiter
 let hr = Units.Time.hour
-$"{(mg |> per ml |> per hr)}"
+let d2 = Units.Time.nDay 2N
+
+$"Combining simple units:\n{(mg |> per ml |> per hr)}"
+|> printfn "%s"
+
+$"Units can be a unit with a value!:\n{d2}"
+|> printfn "%s"
+
+$"That enables things like:\n{mg |> per d2}"
+|> printfn "%s"
+
+$"Or like:\n{Units.Count.times |> per (Units.Time.nHour 36N)}"
+|> printfn "%s"
 
 #!markdown
 
@@ -53,11 +66,14 @@ We can build `ValueUnit` instances from numeric values and units:
 #!fsharp
 
 // Some basic value units
-let mg400  = 400.  |> withUnit Units.Mass.milliGram     
-let ml50   = 50.   |> withUnit Units.Volume.milliLiter
-let ml5    = 5.    |> withUnit Units.Volume.milliLiter
-let l5     = 5.    |> withUnit Units.Volume.liter 
-let ml5000 = 5000. |> withUnit Units.Volume.milliLiter
+let mg400  = 400.  |> withUnit Units.Mass.milliGram    >>* id
+let ml50   = 50.   |> withUnit Units.Volume.milliLiter >>* id
+let ml5    = 5.    |> withUnit Units.Volume.milliLiter >>* id
+let l5     = 5.    |> withUnit Units.Volume.liter      >>* id
+let ml5000 = 5000. |> withUnit Units.Volume.milliLiter >>* id
+
+mg400 |> pa
+4. |> withUnit d2 |> pa
 
 #!markdown
 
@@ -65,7 +81,7 @@ The `Count` group is a special unit group with only one unit: `times`:
 
 #!fsharp
 
-let times3 = 3. |> withUnit Units.Count.times
+let times3 = 3. |> withUnit Units.Count.times >>* id
 
 #!fsharp
 
@@ -83,12 +99,15 @@ l5  |> toBase |> pa // 5N i.e. 5 l = 5 l
 
 #!markdown
 
-Given a `ValueUnit`, we can also extract its units:
+Given a `ValueUnit`, we can also extract its values as a "unit" value or "base" value:
 
 #!fsharp
 
 ml5 |> toUnit |> pa // 500N i.e. 5 l = 5000 ml
 l5  |> toUnit |> pa // 5 i.e. 5 l = 5 l
+
+ml5 |> toBase |> pa // base value = 5 / 1000 = 1 / 200
+l5  |> toBase |> pa // base value = 5 as liter is the reference unit
 
 #!markdown
 
@@ -115,6 +134,7 @@ All four basic arithmetic operations can be performed:
 
 #!fsharp
 
+"Calculating with counts:\n" |> printfn "%s"
 // - multiplication
 times3 * times3 >>* ignore // = 9 times
 // - division
@@ -123,6 +143,13 @@ times3 / times3 >>* ignore // = 1 times
 times3 + times3 >>* ignore // = 6 times
 // - subtraction 
 times3 - times3 >>* ignore // = 0 times
+
+"You calculate any unit with times\n" |> printfn "%s"
+times3 * ml5 >>* ignore // 3 * 5 ml = 15 ml
+(Units.Time.hour |> withValue 36N) / times3 >>* ignore // 36 hr / 3 = 12 hr
+
+"But calculating with other units yield combi units"
+(Units.Mass.milliGram |> withValue 200N) / ml5 >>* ignore // 200 mg / 5 ml = 40 mg / ml
 
 #!markdown
 
@@ -139,7 +166,7 @@ When two `ValueUnit` instances with the same unitgroup are divided you get a `Co
 
 #!fsharp
 
-let (_, u) = (l5 / ml50) |> get  // = 100N times
+let (_, u) = (l5 / ml50) >>* get  // = 100N times
 u |> Group.unitToGroup           // now is a count group
 
 #!markdown
@@ -189,14 +216,34 @@ We can get all valid units for conversion:
 
 #!fsharp
 
-mg400 / ml50 / (1N |> create Units.Time.day) // 8 mg[Mass]/ml[Volume]/day[Time]
->>* (fun vu -> 
-    let (_, u) = vu |> get
-    u 
-    |> Group.unitToGroup
-    |> Group.getUnits
-    |> List.iter (fun u ->
-        create u 1N
-        |> print
-    )
-)
+let d2 = 2. |> withUnit Units.Time.day
+let g4 = 0.4 |> withUnit Units.Mass.gram
+let mg400 = 400. |> withUnit Units.Mass.milliGram
+
+printfn "First example"
+// failing case, simplify doesn't work in this case
+calc false (/) (calc false (*) times3 mg400) g4
+|> fun x -> 
+    printfn "result without simplify:"
+    x |> pa; x
+|> simplify
+|> fun x ->
+    printfn "result with simplify:"
+    x |> pa
+
+printfn "Failing example"
+// failing case, simplify doesn't work in this case
+calc false (/) (calc false (/) mg400 ml50) d2
+|> fun x -> 
+    printfn "result without simplify:"
+    x |> pa; x
+|> simplify
+|> fun x ->
+    printfn "result with simplify:"
+    x |> pa
+
+// mg/kg/dag = mg * dag / kg 
+// a / c/ d
+
+// 60 mg/kg/2 dagen * 10 kg = 600 mg/2 dagen = 300 mg/dag
+// 60 mg/(kg / 2 dagen) * 10 kg = 600 mg / 2 dagen = 300 mg/dag

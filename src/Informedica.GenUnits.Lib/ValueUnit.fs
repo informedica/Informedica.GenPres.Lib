@@ -4,7 +4,7 @@ namespace Informedica.GenUnits.Lib
 module List =
 
     // ToDo move to utils lib
-    let remove1 pred =
+    let removeFirst pred =
         List.fold (fun acc x ->
             let b, xs = acc
             if b then (true, x::(acc |> snd))
@@ -204,7 +204,7 @@ module ValueUnit =
         let rec app u =
             match u with
             | NoUnit -> None
-            | General (s, n) -> n |> Some
+            | General (_, n) -> n |> Some
             | Count g ->
                 match g with
                 | Times n -> n |> Some
@@ -249,7 +249,7 @@ module ValueUnit =
             | BSA g ->
                 match g with
                 | M2 n -> n |> Some
-            | CombiUnit (u1, op, u2) -> None
+            | CombiUnit (_, _, _) -> None
 
         app u
 
@@ -528,6 +528,9 @@ module ValueUnit =
         | Some br -> create u br
 
 
+    let withValue v u = create u v
+
+
     let generalUnit v s = (s, v) |> General
 
 
@@ -555,6 +558,8 @@ module ValueUnit =
             match op with
             | OpPer ->
                 match u1, u2 with
+                // this is not enough when u2 is combiunit but 
+                // contains u1!
                 | _ when u1 |> Group.eqsGroup u2 ->
                     let v1 = (u1 |> getUnitValue) 
                     let v2 = (u2 |> getUnitValue)
@@ -675,7 +680,7 @@ module ValueUnit =
 
     let rec getUnits u =
         match u with
-        | CombiUnit (ul, op, ur) ->
+        | CombiUnit (ul, _, ur) ->
             ul
             |> getUnits
             |> List.append (ur |> getUnits)
@@ -705,30 +710,30 @@ module ValueUnit =
                         lns @ rns, lds @ rds
                 | _ -> if b then (u |> getUnits, []) else ([], u |> getUnits)
             // build a unit from a list of numerators and denominators
-            let rec build ns ds u =
+            let rec build ns ds (b, u) =
                 match ns, ds with
                 | [], _ ->
                     match ds with
-                    | [] -> u
+                    | [] -> (b, u)
                     | _ ->
-                        // should this be times or per??
-                        let d = ds |> List.rev |> List.reduce per
+                        let d = ds |> List.rev |> List.reduce times
                         if u = NoUnit then
                             Count(Times 1N) |> per d
                         else u |> per d
+                        |> fun u -> (b, u)
                 | h::tail, _ ->
                     if ds |> List.exists (Group.eqsGroup h) then
-                        build tail (ds |> List.remove1 (Group.eqsGroup h)) u
+                        build tail (ds |> List.removeFirst (Group.eqsGroup h)) (true, u)
                     else
                         if u = NoUnit then h
                         else u |> times h
-                        |> build tail ds
+                        |> fun u -> build tail ds (b, u)
 
             let ns, ds = u |> numDenom true
 
-            NoUnit
+            (false, NoUnit)
             |> build ns ds
-            |> (fun u -> if u = NoUnit then count else u)
+            |> (fun (b, u) -> if u = NoUnit then (b, count) else (b, u))
 
         u
         |> function
@@ -736,39 +741,40 @@ module ValueUnit =
         | _ ->
             u
             |> simpl
-            |> (fun u ->
+            |> (fun (b, u') ->
                 vu
-//                |> toBase
-//                |> create u
-                |> (get >> fst)
-                |> create u
+                |> toBase
+                |> create (if b then u' else u)
+                |> toUnit
+                |> create (if b then u' else u)
             )
 
 
-
-    let calc op vu1 vu2 =
+    let calc b op vu1 vu2 =
 
         let (ValueUnit (_, u1)) = vu1
         let (ValueUnit (_, u2)) = vu2
-
+        // calculate value in base
         let v = vu1 |> toBase |> op <| (vu2 |> toBase)
-
+        // calculate new combi unit
         let u =
             match op with
-            | BigRational.Mult    -> (u1, OpTimes, u2) |> CombiUnit
-            | BigRational.Div     -> (u1, OpPer,   u2) |> CombiUnit
+            | BigRational.Mult    -> u1 |> times u2
+            | BigRational.Div     -> u1 |> per u2
             | BigRational.Add
             | BigRational.Subtr   ->
                 if u1 |> Group.eqsGroup u2 then u2
                 else
                     failwith <| sprintf "cannot add or subtract different units %A %A" u1 u2
             | BigRational.NoMatch -> failwith <| sprintf "invalid operator %A" op
-
+        // recreate valueunit with base value and combined unit
         v
         |> create u
+        // calculate to the new combiunit
         |> toUnit
+        // recreate again to final value unit
         |> create u
-        |> simplify
+        |> fun vu -> if b then vu |> simplify else vu
 
 
     let cmp cp vu1 vu2 =
@@ -804,13 +810,13 @@ module ValueUnit =
 
     type ValueUnit with
 
-        static member (*) (vu1, vu2) = calc (*) vu1 vu2
+        static member (*) (vu1, vu2) = calc true (*) vu1 vu2
 
-        static member (/) (vu1, vu2) = calc (/) vu1 vu2
+        static member (/) (vu1, vu2) = calc true (/) vu1 vu2
 
-        static member (+) (vu1, vu2) = calc (+) vu1 vu2
+        static member (+) (vu1, vu2) = calc true (+) vu1 vu2
 
-        static member (-) (vu1, vu2) = calc (-) vu1 vu2
+        static member (-) (vu1, vu2) = calc true (-) vu1 vu2
 
         static member (=?) (vu1, vu2) = cmp (=) vu1 vu2
 
@@ -1196,6 +1202,13 @@ module ValueUnit =
                     )
 
             str u
+
+
+        let toStringDutchShort = toString Dutch Short
+        let toStringDutchLong  = toString Dutch Long
+        let toStringEngShort   = toString English Short
+        let toStringEngLong    = toString English Long
+
 
 
     let toString brf loc verb vu =

@@ -1,4 +1,92 @@
-﻿
+#!markdown
+
+# Examples for use of the `Informedica.GenOrder.Lib` library
+
+#!fsharp
+
+// #I __SOURCE_DIRECTORY__
+// The above directive doesn't work anymore, instead
+// the fsi will silent cd to the present script directory
+// but still try to run the below load script first.
+// So first start the fsi, only then you can run the below
+// script.
+#load "../Scripts/load.fsx"
+
+open System
+open MathNet.Numerics
+
+open Informedica.GenUnits.Lib
+open Informedica.GenOrder.Lib
+
+open Types
+
+module Units = ValueUnit.Units
+module DrugConstraint = DrugOrder.DrugConstraint
+module Quantity = VariableUnit.Quantity
+
+open OrderLogger
+
+#!fsharp
+
+// Start the logger at an informative level
+logger.Start Level.Informative
+
+// Paracetamol supp example
+// First define the drug order
+{
+    DrugOrder.drugOrder with
+        Id = "1"
+        Name = "paracetamol"
+        Products = 
+            [
+                { 
+                    DrugOrder.productComponent with 
+                        Name = "paracetamol"
+                        Quantities = [ 1N ]
+                        TimeUnit = "day"
+                        Substances =
+                            [
+                                {
+                                    DrugOrder.substanceItem with
+                                        Name = "paracetamol"
+                                        Concentrations = 
+                                            [ 60N; 120N; 240N; 500N; 1000N ]
+                                        Unit = "mg"
+                                        DoseUnit = "mg"
+                                        TimeUnit = "day"
+                                }
+                            ]
+                }
+            ]
+        Unit = "piece"
+        TimeUnit = "day"
+        Shape = "supp"
+        Route = "rect"
+        OrderType = DiscontinuousOrder
+}
+|> DrugOrder.create 
+|> DrugOrder.setDoseLimits
+    {   DrugOrder.doseLimits with
+            Name = "paracetamol"
+            Frequencies = [ 2N..4N ]            // Allowed frequencies are 2, 3 or 4 per day
+            SubstanceName = "paracetamol"
+            MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+            MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
+            MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
+            MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
+    }
+|> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
+|> DrugOrder.evaluate logger.Logger
+|> printScenarios false ["paracetamol"]
+
+#!fsharp
+
+let fileName = "test1.txt"
+
+$"{__SOURCE_DIRECTORY__}/{fileName}"
+|> logger.Write
+
+#!csharp
 
 // #I __SOURCE_DIRECTORY__
 // The above directive doesn't work anymore, instead
@@ -80,8 +168,6 @@ logger.Start Level.Informative
 logger.Report ()
 
 // write results to the test.txt in this folder
-$"{__SOURCE_DIRECTORY__}/test.txt"
-|> logger.Write
 
 logger.Start Level.Informative
 
@@ -527,4 +613,3 @@ logger.Start Level.Informative
 |> printScenarios false ["gentamicin"]
 
 logger.Report ()
-
