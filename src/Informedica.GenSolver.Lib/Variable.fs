@@ -1054,18 +1054,9 @@ module Variable =
                     |> Exceptions.raiseExc
 
                 else
-                    let s1 = new ResizeArray<_>(s1)
-                    let s2 = new ResizeArray<_>(s2)
-                    let s3 = new ResizeArray<_>()
-                    for x1 in s1 do
-                        for x2 in s2 do
-                            s3.Add(x1 |> op <| x2)
-
-                            //not needed for non zero use case
-                            //match calcOpt id x1 x2 with
-                            //| Some v -> s3.Add(v)
-                            //| None -> ()
-                    new Set<_>(s3)
+                    Seq.allPairs s1 s2
+                    |> Seq.map (fun (x1, x2) -> x1 |> op <| x2)
+                    |> Set.ofSeq
                     |> createValueSet
 
             // A set with an increment results in a new set of increment
