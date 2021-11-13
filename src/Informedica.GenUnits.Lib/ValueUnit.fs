@@ -539,6 +539,9 @@ module ValueUnit =
 
     let get (ValueUnit (v, u)) = v, u
 
+    let getValue (ValueUnit (v, _)) = v
+
+    let getUnit (ValueUnit (_,u )) = u
 
     let isCountUnit = Group.eqsGroup (1N |> Times |> Count)
 
@@ -688,7 +691,7 @@ module ValueUnit =
 
 
     let simplify vu =
-        let (_, u) = vu |> get
+        let u = vu |> getUnit
 
         let simpl u =
             // separate numerators from denominators
@@ -711,17 +714,18 @@ module ValueUnit =
                 | _ -> if b then (u |> getUnits, []) else ([], u |> getUnits)
             // build a unit from a list of numerators and denominators
             let rec build ns ds (b, u) =
-                match ns, ds with
-                | [], _ ->
+                match ns with
+                | [] ->
                     match ds with
                     | [] -> (b, u)
                     | _ ->
-                        let d = ds |> List.rev |> List.reduce times
+                        // TODO Was the List.rev needed here (times is comutative?)
+                        let d = ds |> List.reduce times
                         if u = NoUnit then
                             Count(Times 1N) |> per d
                         else u |> per d
                         |> fun u -> (b, u)
-                | h::tail, _ ->
+                | h::tail ->
                     if ds |> List.exists (Group.eqsGroup h) then
                         build tail (ds |> List.removeFirst (Group.eqsGroup h)) (true, u)
                     else
@@ -735,10 +739,9 @@ module ValueUnit =
             |> build ns ds
             |> (fun (b, u) -> if u = NoUnit then (b, count) else (b, u))
 
-        u
-        |> function
-        | _ when u = NoUnit -> vu
-        | _ ->
+        if u = NoUnit then
+            vu
+        else
             u
             |> simpl
             |> (fun (b, u') ->
