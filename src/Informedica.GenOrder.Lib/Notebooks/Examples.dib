@@ -2,14 +2,12 @@
 
 # Examples for use of the `Informedica.GenOrder.Lib` library
 
+#!markdown
+
+First load all the required references and source files
+
 #!fsharp
 
-// #I __SOURCE_DIRECTORY__
-// The above directive doesn't work anymore, instead
-// the fsi will silent cd to the present script directory
-// but still try to run the below load script first.
-// So first start the fsi, only then you can run the below
-// script.
 #load "../Scripts/load.fsx"
 
 open System
@@ -26,10 +24,31 @@ module Quantity = VariableUnit.Quantity
 
 open OrderLogger
 
+#!markdown
+
+Start up the logger which will retrieve all the calculation messages. This can be used for profiling the calculation code. When the logger start message is send, the logger will start with a clean logging que.
+
 #!fsharp
 
 // Start the logger at an informative level
 logger.Start Level.Informative
+
+#!markdown
+
+Now define a drug order. In this example a paracetamol suppository with the following constraints:
+
+- There are supps with concentrations of 60, 120, 240 500 and 1000 mg per piece
+- You can give the supp 2 to 4 times a day
+- The max dose quantity is 1000 mg per time
+- The max dose total is 4 gram per day
+- The min adjusted dose total is 40 mg/kg/day and
+- The max adjusted dose total is 90 mg/kg/day
+
+**Note** The code will recognize a supp as something you want to give 1 per time, so this is an additional constraint.
+
+The resulting dosing scenarios will then be printed out.
+
+#!fsharp
 
 // Paracetamol supp example
 // First define the drug order
@@ -79,113 +98,83 @@ logger.Start Level.Informative
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["paracetamol"]
 
+#!markdown
+
+Another paracetemol example. However now we have a paracetamol solution. This means that there are a lot more dosing scenarios as a solution can be measured in milliliters instead of being constraint by 1 supp each time.
+
 #!fsharp
 
-let fileName = "test1.txt"
+logger.Start Level.Informative
+
+
+// Paracetamol drink
+{
+    DrugOrder.drugOrder with
+        Id = "1"
+        Name = "paracetamol"
+        Products = 
+            [
+                { 
+                    DrugOrder.productComponent with 
+                        Name = "paracetamol"
+                        Quantities = [ 100N ]
+                        TimeUnit = "day"
+                        Substances =
+                            [
+                                {
+                                    DrugOrder.substanceItem with
+                                        Name = "paracetamol"
+                                        Concentrations = [ 24N ]
+                                        Unit = "mg"
+                                        DoseUnit = "mg"
+                                        TimeUnit = "day"
+                                }
+                            ]
+                }
+            ]
+        Unit = "ml"
+        TimeUnit = "day"
+        Shape = "drink"
+        Route = "or"
+        OrderType = DiscontinuousOrder
+}
+|> DrugOrder.create
+|> DrugOrder.setAdjust "paracetamol" 8N
+|> DrugOrder.setDoseLimits
+    {   DrugOrder.doseLimits with
+            Name = "paracetamol"
+            Frequencies = [ 2N ]
+            SubstanceName = "paracetamol"
+            MaxDoseQuantity = Some 1000N
+            MaxDoseTotal = Some 4000N
+            MinDoseTotalAdjust = Some 40N
+            MaxDoseTotalAdjust = Some 90N
+    }
+|> DrugOrder.evaluate logger.Logger
+//|> List.length
+|> printScenarios false ["paracetamol"]
+
+#!markdown
+
+We can also write the logging of all the calculations to a file with the name in the ``fileName`` in the current directory.
+
+#!fsharp
+
+let fileName = "calculations.txt"
 
 $"{__SOURCE_DIRECTORY__}/{fileName}"
 |> logger.Write
 
-#!csharp
+#!markdown
 
-// #I __SOURCE_DIRECTORY__
-// The above directive doesn't work anymore, instead
-// the fsi will silent cd to the present script directory
-// but still try to run the below load script first.
-// So first start the fsi, only then you can run the below
-// script.
-#load "load.fsx"
+Now do this for a more complicated example in which a ``Component``, i.e. a product contains 2 ``Items``, i.e. substances. In this case *cotrimoxazol*, a drug with:
 
-open System
-open MathNet.Numerics
+- sulfamethoxazol 100, 400 or 800 mg per tablet and
+- trimethoprim 20, 80 or 160 mg per tablet
 
-open Informedica.GenUnits.Lib
-open Informedica.GenOrder.Lib
-
-open Types
-
-module Units = ValueUnit.Units
-module DrugConstraint = DrugOrder.DrugConstraint
-module Quantity = VariableUnit.Quantity
-
-open OrderLogger
-
-// Just to have a nice print of date time
-fsi.AddPrinter<DateTime> (fun dt ->  $"{dt.ToShortDateString()}")
-
-// Start the logger at an informative level
-logger.Start Level.Informative
-
-// Paracetamol supp example
-// First define the drug order
-{
-    DrugOrder.drugOrder with
-        Id = "1"
-        Name = "paracetamol"
-        Products = 
-            [
-                { 
-                    DrugOrder.productComponent with 
-                        Name = "paracetamol"
-                        Quantities = [ 1N ]
-                        TimeUnit = "day"
-                        Substances =
-                            [
-                                {
-                                    DrugOrder.substanceItem with
-                                        Name = "paracetamol"
-                                        Concentrations = 
-                                            [ 60N; 120N; 240N; 500N; 1000N ]
-                                        Unit = "mg"
-                                        DoseUnit = "mg"
-                                        TimeUnit = "day"
-                                }
-                            ]
-                }
-            ]
-        Unit = "piece"
-        TimeUnit = "day"
-        Shape = "supp"
-        Route = "rect"
-        OrderType = DiscontinuousOrder
-}
-|> DrugOrder.create 
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "paracetamol"
-            Frequencies = [ 2N..4N ]            // Allowed frequencies are 2, 3 or 4 per day
-            SubstanceName = "paracetamol"
-            MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-            MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
-            MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
-            MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
-    }
-|> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["paracetamol"]
-
-// report output to the fsi
-logger.Report ()
-
-// write results to the test.txt in this folder
+#!fsharp
 
 logger.Start Level.Informative
-
-let printItemConcentration = Order.printItemConcentration
-open Informedica.GenSolver.Lib.Variable
-
-let printComponentQuantity o =
-    o.Orderable.Components
-    |> Seq.map (fun c ->
-        $"mapping component: %A{c.OrderableQuantity}" |> printfn "%s"
-        c.OrderableQuantity
-        |> Quantity.toValueUnitStringList None
-        |> fun xs -> $"ValueUnit string list:\n%A{xs}" |> printfn "%s"; xs
-        |> Seq.map (fun (_, q) ->
-            $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
-        )
-        |> String.concat ""
-    ) |> String.concat " + "
 
 
 // Drug with multiple items
@@ -251,65 +240,15 @@ let printComponentQuantity o =
             MaxDoseTotalAdjust = Some 6N
     }
 |> DrugOrder.evaluate logger.Logger
-|> fun xs ->
-    xs |> List.iteri (fun i x -> 
-        x |> printComponentQuantity |> (printfn "%i. %s" (i + 1))
-    )
-    xs
 |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
 
+#!markdown
+
+The same *cotrimoxazol* example, but now contained in a drinkable solution.
+
+#!fsharp
 
 logger.Start Level.Informative
-
-
-// Paracetamol drink
-{
-    DrugOrder.drugOrder with
-        Id = "1"
-        Name = "paracetamol"
-        Products = 
-            [
-                { 
-                    DrugOrder.productComponent with 
-                        Name = "paracetamol"
-                        Quantities = [ 100N ]
-                        TimeUnit = "day"
-                        Substances =
-                            [
-                                {
-                                    DrugOrder.substanceItem with
-                                        Name = "paracetamol"
-                                        Concentrations = [ 24N ]
-                                        Unit = "mg"
-                                        DoseUnit = "mg"
-                                        TimeUnit = "day"
-                                }
-                            ]
-                }
-            ]
-        Unit = "ml"
-        TimeUnit = "day"
-        Shape = "drink"
-        Route = "or"
-        OrderType = DiscontinuousOrder
-}
-|> DrugOrder.create
-|> DrugOrder.setAdjust "paracetamol" 8N
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "paracetamol"
-            Frequencies = [ 2N ]
-            SubstanceName = "paracetamol"
-            MaxDoseQuantity = Some 1000N
-            MaxDoseTotal = Some 4000N
-            MinDoseTotalAdjust = Some 40N
-            MaxDoseTotalAdjust = Some 90N
-    }
-|> DrugOrder.evaluate logger.Logger
-//|> List.length
-|> printScenarios false ["paracetamol"]
-
-
 
 // Drug with multiple items
 // cotrimoxazol drink for infection
@@ -368,7 +307,17 @@ logger.Start Level.Informative
 //|> List.length
 |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
 
+#!markdown
 
+But a ``Component`` cannot only have multiple ``Items``, multiple ``Components`` can be added to an ``Orderable``. For example:
+
+- A dopamin pump infusion using a syringe of 50 ml, i.e. the ``Orderable``.
+- Contains a product dopamin, with the substance dopamin, i.e. a ``Component`` with one ``Item``.
+- And also contains a product normal saline which contains 2 electrolytes, sodium and chloride. So, another ``Component``, this one with 2 ``Items``.
+
+#!fsharp
+
+logger.Start Level.Informative
 
 // Dopamin infusion calculate scenario's 
 // with a number of standard solutions
@@ -445,8 +394,13 @@ logger.Start Level.Informative
 //|> Order.calcScenarios2
 |> printScenarios false ["dopamin"]
 
+#!markdown
 
-logger.Report()
+A different way to calculate the same dopamine pump infusion order.
+
+#!fsharp
+
+logger.Start Level.Informative
 
 // Dopamin infusion calculate scenario's 
 // with a a fixed infusion - dose rate
@@ -522,7 +476,11 @@ logger.Report()
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["dopamin"]
 
-let noLogger : Logger = { Log = ignore }
+#!markdown
+
+An even more complicated example is the calculation of gentamicin, an antibiotic, which is contained in a solution (so 2 ``Components`` are involved), and is infused over a certain amount of time.
+
+#!fsharp
 
 logger.Start Level.Informative
 
@@ -611,5 +569,3 @@ logger.Start Level.Informative
     }
 |> DrugOrder.evaluate logger.Logger
 |> printScenarios false ["gentamicin"]
-
-logger.Report ()
