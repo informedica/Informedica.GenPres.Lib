@@ -1,0 +1,418 @@
+#!markdown
+
+# Examples for the ``Informedica.GenSolver.Lib`` library
+
+#!markdown
+
+First load all required references and source files.
+
+#!fsharp
+
+#load "../Scripts/load.fsx"
+
+#!markdown
+
+Do some preprocessing.
+
+#!fsharp
+
+open Informedica.GenSolver.Lib
+open Informedica.Utils.Lib.BCL
+open Informedica.GenSolver.Utils
+open MathNet.Numerics
+open Types
+
+module Api = Informedica.GenSolver.Lib.Api
+module Solver = Informedica.GenSolver.Lib.Solver
+module Name = Variable.Name
+module ValueRange = Variable.ValueRange
+
+let procss s = $"{s} " |> printfn "%s"
+
+type Logger = Types.Logging.Logger
+
+let printEqs = Solver.printEqs true procss
+let solve n p eqs =
+    let logger = { Logger.Log = ignore }
+    let n = n |> Name.createExc
+    Api.solve id logger None n p eqs
+//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
+
+let init     = Api.init
+let nonZeroNegative = Api.nonZeroNegative
+
+#!markdown
+
+## Variables, equations and notation
+
+#!markdown
+
+The solver will "solve" an ``Equation`` or a set of equations. An equation can be either a product equation or a sum equation of ``Variables``. A ``Variable`` is identified with a name and can be constraint by:
+
+- No constraint, i.e. the variable can be any rational number
+- A lower and/or upper limit, i.e. the variable can be any rational number within the limits of a lower and/or upper limit. 
+- A limit can be inclusive or exclusive corresponding with ``>=, >, <, <=``.
+- Increments, i.e. the variable can only contain rational numbers that are a multiple of one of the increments. 
+- A set of numbers, i.e. the variable can only be one of the set.
+
+When a variable is constraint to just one rational number, that variable is considered solved. When a variable is not solved the variable can have an further limitation until the variable is solved.
+
+A variable (with name a) is printed out as:
+
+- ``a <..>``
+- ``a <0..>``
+- ``a [0..>``
+- ``a <..3..>``
+- ``a [1, 2, 3]``
+
+When a variable is limited by, for example ``[0..5>``, then you can
+
+- increase the lower limit to ad most, but excluding 5, 
+- lower the upper limit to and including 0,
+- set a value(-s) between >= 0 and < 5.
+
+Meaning you can only "shrink" a variable, not expand a variable.
+
+#!markdown
+
+### The simple "equals" equation.
+
+#!fsharp
+
+let simpleEq = [ "a = b" ] |> init
+simpleEq
+|> printEqs |> ignore
+
+#!markdown
+
+We can limit the variables to a lower and upper limit.
+
+#!fsharp
+
+simpleEq
+|> solve "b" (MinInclProp 0N)
+|> printEqs
+|> solve "b" (MaxExclProp 5N)
+|> printEqs |> ignore
+
+#!markdown
+
+We can now try to change variable ``a``.
+
+#!fsharp
+
+printfn "=== Try setting 10 to variable a will throw an exception ==="
+try
+    simpleEq
+    |> solve "b" (MinInclProp 0N)
+    |> solve "b" (MaxExclProp 5N)
+    |> solve "a" (ValsProp ([10N] |> Set.ofList))
+    |> printEqs |> ignore
+with
+| e -> printfn "%A" e
+
+printfn "=== But setting 4 to variable a will succeed ==="
+simpleEq
+|> solve "b" (MinInclProp 0N)
+|> solve "b" (MaxExclProp 5N)
+|> solve "a" (ValsProp ([4N] |> Set.ofList))
+|> printEqs |> ignore
+
+printfn "=== Try setting a max 10 to variable a will be ignored ==="
+try
+    simpleEq
+    |> solve "b" (MinInclProp 0N)
+    |> solve "b" (MaxExclProp 5N)
+    |> solve "a" (MaxInclProp 10N)
+    |> printEqs |> ignore
+with
+| e -> printfn "%A" e
+
+printfn "=== But setting a max 3 to variable a will succeed ==="
+simpleEq
+|> solve "b" (MinInclProp 0N)
+|> solve "b" (MaxExclProp 5N)
+|> solve "a" (MaxInclProp 3N)
+|> printEqs |> ignore
+
+#!markdown
+
+### Define product and sum equations
+
+We can define product equations like: 
+
+``a = b * c``
+
+and sum equations like:
+
+``c = d + e + f``
+
+#!fsharp
+
+printfn "=== Product Equation ==="
+let prodEq1 = 
+    [
+        "a = b * c"  
+    ] 
+    |> init
+// print the equation
+prodEq1 |> printEqs |> ignore
+
+printfn "=== Sum Equation ==="
+let sumEq1 = 
+    [
+        "c = d + e + f"  
+    ] 
+    |> init
+// print the equation
+sumEq1 |> printEqs |> ignore
+
+#!markdown
+
+## Setting variables to single values
+
+#!markdown
+
+Variables can be set to a single value, each at a time. This will result in the calculation of dependent variables. This means the solver will look at the defined product equation 
+
+``a = b * c`` 
+
+as:
+
+- ``a = b * c`` 
+- ``b = a / c`` 
+- ``c = a / b``
+
+When both indepent variables in one of the equations above have a value or are in someway limited, the value or limitation is calculated for the dependent variable.
+
+A sum equation will be solved like:
+
+``c = d + e + f``
+
+as:
+
+- ``c = d + e + f``
+- ``d = c - e - f``
+- ``e = c - d - f``
+- ``f = c - d - e``
+
+#!markdown
+
+For example, we set the variable ``b`` in the product equation to 3.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([3N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+And value 2 to variable ``c``.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([3N] |> Set.ofList))
+|> solve "c" (ValsProp ([2N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Or we first set variable ``a`` to 6 and then, for example variable ``c`` to 2.
+
+#!fsharp
+
+prodEq1
+|> solve "a" (ValsProp ([6N] |> Set.ofList))
+|> solve "c" (ValsProp ([2N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+## Setting variables to sets of values
+
+#!markdown
+
+Set the variable ``b`` to 1, 2, 3, 6.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Set the variable ``c`` to 60, 120, 240, 500, 1000
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Or set variable ``a`` to 60, 120, 180, 240, 360, 480, 500, 720, 1000, 1440, 1500, 2000, 3000, 6000.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solve "a" (ValsProp ([60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Then set variable ``c`` to 60, 120, 240, 500, 100.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solve "a" (ValsProp ([60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N] |> Set.ofList))
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+## Setting upper and lower limits
+
+#!markdown
+
+Limit ``b`` with a minimum inclusive of 0.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (MinInclProp 0N)
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Limit ``c`` as well to a minimum of inclusive 0
+
+#!fsharp
+
+prodEq1
+|> solve "b" (MinInclProp 0N)
+|> solve "c" (MinInclProp 0N)
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Add a lower exclusive limit of 1 to ``a``.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (MinInclProp 0N)
+|> solve "c" (MinInclProp 0N)
+|> solve "a" (MinExclProp 1N)
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Add an upper limit of exclusive 10 to ``a``.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (MinInclProp 0N)
+|> solve "c" (MinInclProp 0N)
+|> solve "a" (MinExclProp 1N)
+|> solve "a" (MaxExclProp 10N)
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Add an exlusive upper limit of 1 to ``c``.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (MinInclProp 0N)
+|> solve "c" (MinInclProp 0N)
+|> solve "a" (MinExclProp 1N)
+|> solve "a" (MaxExclProp 10N)
+|> solve "c" (MaxExclProp 1N)
+|> printEqs 
+|> ignore
+
+#!markdown
+
+An example of limiting variable ``a`` with an lower and upper limit and setting values to ``b`` and ``c``.
+
+#!fsharp
+
+printfn "=== Example without limits on a ==="
+prodEq1
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+printfn "=== Example with limits on a ==="
+prodEq1
+|> solve "a" (MinInclProp 120N)
+|> solve "a" (MaxInclProp 1000N)
+|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+## Setting one or more increments
+
+#!markdown
+
+Limiting ``b`` to an increment of 1. 
+
+**Note**
+Setting an increment also results in a lower limit!
+
+#!fsharp
+
+prodEq1
+|> solve "b" (IncrProp ([1N] |> Set.ofList))
+//|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+We can also set multiple increments to ``b``, for example 2, 3, 6. 
+
+**Note**
+As 6 is a already a multiple of 2 and 3, this will/should be eliminated from the list. Have to fix this!
+See: [issue](https://github.com/informedica/Informedica.GenPres.Lib/issues/15).
+
+#!fsharp
+
+prodEq1
+|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
+//|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!fsharp
+
+prodEq1
+|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore
