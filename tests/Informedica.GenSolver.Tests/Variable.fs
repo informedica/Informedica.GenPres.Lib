@@ -713,13 +713,13 @@ module Variable =
                     |> Variable.Dto.setMax (Some 5N) true
                     |> Variable.Dto.fromDto
 
-                let exp = [1N..1N..5N]    
+                let exp = [1N]    
                 let act = 
                     v1 ^* v2
                     |> Variable.Dto.toDto
-                    |> fun x -> x.Vals
+                    |> fun x -> x.Incr
 
-                Expect.equal "the result should be an valueset" exp act
+                Expect.equal "the result should have an increment 1" exp act
 
             }
         ]

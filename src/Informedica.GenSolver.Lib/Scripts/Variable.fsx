@@ -8,62 +8,54 @@
 
 #time
 
-open MathNet.Numerics
 open Informedica.GenSolver.Lib
+open Informedica.Utils.Lib.BCL
+open Informedica.GenSolver.Utils
+open MathNet.Numerics
+open Types
 
-let v1 = 
-    [1N..1000N] 
-    |> Set.ofList
-    |> Variable.ValueRange.createValueSet 
-    |> Variable.createSucc ("vr1" |> Variable.Name.createExc)
+module Api = Informedica.GenSolver.Lib.Api
+module Solver = Informedica.GenSolver.Lib.Solver
+module Name = Variable.Name
+module ValueRange = Variable.ValueRange
 
-let v2 = 
-    [1N..1000N] 
-    |> Set.ofList
-    |> Variable.ValueRange.createValueSet 
-    |> Variable.createSucc ("vr2" |> Variable.Name.createExc)
+let procss s = $"{s} " |> printfn "%s"
 
-open Variable.Operators
+type Logger = Types.Logging.Logger
 
-// Example of long running operation
-v1 ^* v2
+let printEqs = Solver.printEqs true procss
+let solve n p eqs =
+    let logger = { Logger.Log = ignore }
+    let n = n |> Name.createExc
+    Api.solve id logger None n p eqs
+//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
 
-module Set =
+let init     = Api.init
+let nonZeroNegative = Api.nonZeroNegative
 
-    open Informedica.Utils.Lib
-    open Informedica.Utils.Lib.BCL
+printfn "=== Product Equation ==="
+let prodEq1 = 
+    [
+        "a = b * c"  
+    ] 
+    |> init
+// print the equation
+prodEq1 |> printEqs |> ignore
 
-    let removeBigRationalMultiples xs =
-        xs
-        |> Set.fold (fun acc x1 ->
-            acc 
-            |> Set.filter (fun x2 ->
-                x1 = x2 ||
-                x2 |> BigRational.isMultiple x1 |> not
-            )
-        ) xs
+printfn "=== Sum Equation ==="
+let sumEq1 = 
+    [
+        "c = d + e + f"  
+    ] 
+    |> init
+// print the equation
+sumEq1 |> printEqs |> ignore
 
 
-[2N; 3N; 6N; 11N; 12N; 19N]
-|> Set.ofList
-|> Set.removeBigRationalMultiples
-// returns [2, 3, 11, 19]
-
-
-let v3 =
-    Variable.Dto.createNew "v1"
-    |> Variable.Dto.setVals [1N]
-    |> Variable.Dto.fromDto
-
-let v4 = 
-    Variable.Dto.createNew "v2"
-    |> Variable.Dto.setMin (Some 1N) true
-    |> Variable.Dto.setIncr [1N]
-    |> Variable.Dto.setMax (Some 5N) true
-    |> Variable.Dto.fromDto
-
-let exp = [1N..1N..5N]    
-let act = 
-    v3 ^* v4
-    |> Variable.Dto.toDto
-    |> fun x -> x.Vals
+prodEq1
+|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
+|> solve "b" (MaxInclProp 24N)
+|> solve "a" (MaxInclProp 720N)
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs 
+|> ignore

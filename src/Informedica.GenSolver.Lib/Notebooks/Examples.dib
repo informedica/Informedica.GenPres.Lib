@@ -389,7 +389,6 @@ Setting an increment also results in a lower limit! This mathematically not corr
 
 prodEq1
 |> solve "b" (IncrProp ([1N] |> Set.ofList))
-//|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
 |> printEqs 
 |> ignore
 
@@ -404,13 +403,12 @@ As 6 is a already a multiple of 2 and 3, this will be eliminated from the list.
 
 prodEq1
 |> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-//|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
 |> printEqs 
 |> ignore
 
 #!markdown
 
-Setting an increment and an upper limit wil in fact result in a set of numbers
+Setting an increment and an upper limit wil in result in a descriptive range, from which each value can be calculated. However, in case of a wide range with small increments, this would result in a large set of values with a substantial performance penalty.
 
 #!fsharp
 
