@@ -285,7 +285,93 @@ prodEq1
 
 #!markdown
 
-## Setting upper and lower limits
+## Setting lower and/or upper limits
+
+#!markdown
+
+Setting lower and/or upper limits to variables is a complex proces, as this can result, depending on the calculation operator in the calculation of a resulting lower and/or upper limit. Limits can also be inclusive or exclusive. Thus the following props can be used:
+
+- ``MinInclProp``
+- ``MaxInclProp``
+- ``MaxExclProp``
+- ``MaxExclProp``
+
+And the following calculations have the performed:
+
+Inlc - Incl
+
+- ``MinInclProp * MinInclProp``  
+- ``MinInclProp / MinInclProp``  
+- ``MaxInclProp * MaxInclProp``  
+- ``MaxInclProp / MaxInclProp``  
+
+- ``MinInclProp * MaxInclProp``  
+- ``MinInclProp / MaxInclProp``  
+- ``MaxInclProp / MinInclProp``  
+
+- ``MinInclProp + MinInclProp``  
+- ``MinInclProp - MinInclProp``  
+- ``MaxInclProp + MaxInclProp``  
+- ``MaxInclProp - MaxInclProp``  
+
+- ``MinInclProp + MaxInclProp``  
+- ``MinInclProp - MaxInclProp``  
+- ``MaxInclProp - MinInclProp``  
+
+Excl - Excl
+
+- ``MinExclProp * MinExclProp``  
+- ``MinExclProp / MinExclProp``  
+- ``MaxExclProp * MaxExclProp``  
+- ``MaxExclProp / MaxExclProp``  
+
+- ``MinExclProp * MaxExclProp``  
+- ``MinExclProp / MaxExclProp``  
+- ``MaxExclProp / MinExclProp``  
+
+- ``MinExclProp + MinExclProp``  
+- ``MinExclProp - MinExclProp``  
+- ``MaxExclProp + MaxExclProp``  
+- ``MaxExclProp - MaxExclProp``  
+
+- ``MinExclProp + MaxExclProp``  
+- ``MinExclProp - MaxExclProp``  
+- ``MaxExclProp - MinExclProp``   
+
+Incl - Excl
+
+- ``MinInclProp * MinExclProp``  
+- ``MinInclProp / MinExclProp``  
+- ``MaxInclProp * MaxExclProp``  
+- ``MaxInclProp / MaxExclProp``  
+
+- ``MinInclProp / MaxExclProp``  
+- ``MaxInclProp / MinExclProp``  
+
+- ``MinInclProp - MinExclProp``  
+- ``MaxInclProp + MaxExclProp``  
+- ``MaxInclProp - MaxExclProp``  
+
+- ``MinInclProp - MaxExclProp``  
+- ``MaxInclProp - MinExclProp``  
+
+Excl - Incl
+
+
+- ``MinExclProp * MinInclProp``  
+- ``MinExclProp / MinInclProp``  
+- ``MaxExclProp * MaxInclProp``  
+- ``MaxExclProp / MaxInclProp``  
+
+- ``MinExclProp / MaxInclProp``  
+- ``MaxExclProp / MinInclProp``  
+
+- ``MinExclProp - MinInclProp``  
+- ``MaxExclProp + MaxInclProp``  
+- ``MaxExclProp - MaxInclProp``  
+
+- ``MinExclProp - MaxInclProp``  
+- ``MaxExclProp - MinInclProp``   
 
 #!markdown
 
@@ -388,7 +474,24 @@ Setting an increment also results in a lower limit! This mathematically not corr
 #!fsharp
 
 prodEq1
-|> solve "b" (IncrProp ([1N] |> Set.ofList))
+|> solve "b" (IncrProp ([3N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+Setting an increment and an upper limit will result in a variable with a lower limit, upper limit, both multiples of the increment(-s) and the increment(-s).
+
+#!fsharp
+
+prodEq1
+|> solve "b" (IncrProp ([3N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+prodEq1
+|> solve "b" (IncrProp ([3N] |> Set.ofList))
+|> solve "b" (MaxExclProp 7N)
 |> printEqs 
 |> ignore
 
@@ -418,6 +521,10 @@ prodEq1
 |> printEqs 
 |> ignore
 
+#!markdown
+
+When ``c`` is limited to a set of values, the increment of ``a`` is calculated accordingly.
+
 #!fsharp
 
 prodEq1
@@ -426,4 +533,53 @@ prodEq1
 |> solve "a" (MaxInclProp 720N)
 |> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
 |> printEqs 
+|> ignore
+
+#!markdown
+
+When setting ``b`` to a set of values, these will be filtered by the increments.
+
+#!fsharp
+
+prodEq1
+|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
+|> solve "b" (MaxInclProp 24N)
+|> solve "a" (MaxInclProp 720N)
+|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "b" (ValsProp ([2N..2N..6N] |> Set.ofList))
+|> printEqs 
+|> ignore
+
+#!markdown
+
+## Solving multiple equations
+
+#!markdown
+
+GenSolver can solve sets of equations following the rules and principle described above.
+
+#!fsharp
+
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> printEqs
+|> ignore
+
+#!markdown
+
+For each equation an additional variable will be calculated when all but one of the other variables are limited in some way.
+
+#!fsharp
+
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> solve "a" (ValsProp ([8N] |> Set.ofList))
+|> printEqs
 |> ignore
