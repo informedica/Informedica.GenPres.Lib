@@ -65,6 +65,7 @@ module Name =
         ]
 
 
+
 module Increment =
 
     open Informedica.GenSolver.Lib.Variable.ValueRange
@@ -98,6 +99,7 @@ module Increment =
             }
 
         ]
+
 
 
 module ValueRange =
@@ -294,8 +296,7 @@ module ValueRange =
 
                 |> testProp "The result can contain any Value GTE one"
             ]
-
-            
+          
             testList "Given Min is None Incr is None Max Incl is 1" [
             
                 let min = None
@@ -373,7 +374,6 @@ module ValueRange =
                 |> testProp "The ValueRange can only any Value equal to or between 2 and 4"
             
             ]
-
 
             testList "Given a ValueRange with a Min and a ValueRange with a Min" [
 
@@ -481,7 +481,6 @@ module ValueRange =
 
             ]
             
-
             testList "Given calculation with ValueRange with a Max and a ValueRange with a Min" [
 
                 let createVrMin incl v = ValueRange.create None (v |> Minimum.createMin incl |> Some) None None
@@ -687,4 +686,40 @@ module ValueRange =
             ] 
 
 
+        ]
+
+
+
+module Variable =
+    
+    open Variable.Operators
+
+    [<Tests>]
+    let tests =
+
+        testList "Given a variable with an incr and upper limit" [
+
+            test "multiplying by 1 should" {
+                let v1 =
+                    Variable.Dto.createNew "v1"
+                    |> Variable.Dto.setVals [1N]
+                    |> Variable.Dto.fromDto
+
+                let v2 = 
+                    Variable.Dto.createNew "v2"
+                    // ToDo: shouldn't need to set min
+                    |> Variable.Dto.setMin (Some 1N) true
+                    |> Variable.Dto.setIncr [1N]
+                    |> Variable.Dto.setMax (Some 5N) true
+                    |> Variable.Dto.fromDto
+
+                let exp = [1N..1N..5N]    
+                let act = 
+                    v1 ^* v2
+                    |> Variable.Dto.toDto
+                    |> fun x -> x.Vals
+
+                Expect.equal "the result should be an valueset" exp act
+
+            }
         ]

@@ -1049,6 +1049,13 @@ module Variable =
         /// **x1** and **x2** are `Unrestricted`.
         let calc op (x1, x2) =
             let calcOpt = calcOpt op
+            let toVS vr =
+                match vr with
+                | Range(MinIncrMax (min, inr, max)) -> minIncrMaxToValueSet min inr max
+                | _ -> vr
+            // first check if range can be changed to valueset
+            let x1 = x1 |> toVS
+            let x2 = x2 |> toVS
 
             match x1, x2 with
             | Unrestricted, Unrestricted -> unrestricted

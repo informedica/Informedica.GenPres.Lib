@@ -1,5 +1,7 @@
 ﻿namespace Informedica.GenSolver.Utils
 
+/// ToDo: should move to Informedica.Utils.Lib
+
 
 /// Helper functions for `BigRational`
 module BigRational = 
@@ -7,7 +9,9 @@ module BigRational =
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL.BigRational
     
-
+    /// ToDo: doesn't return `NoOp` but fails, 
+    /// have to rewrite
+    /// 
     /// Match an operator `op` to either
     /// multiplication, division, addition
     /// or subtraction, returns `NoOp` when
