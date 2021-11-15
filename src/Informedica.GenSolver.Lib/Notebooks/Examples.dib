@@ -398,8 +398,7 @@ prodEq1
 We can also set multiple increments to ``b``, for example 2, 3, 6. 
 
 **Note**
-As 6 is a already a multiple of 2 and 3, this will/should be eliminated from the list. Have to fix this!
-See: [issue](https://github.com/informedica/Informedica.GenPres.Lib/issues/15).
+As 6 is a already a multiple of 2 and 3, this will be eliminated from the list. 
 
 #!fsharp
 

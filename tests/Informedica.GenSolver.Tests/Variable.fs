@@ -65,6 +65,40 @@ module Name =
         ]
 
 
+module Increment =
+
+    open Informedica.GenSolver.Lib.Variable.ValueRange
+
+    [<Tests>]
+    let tests =
+        testList "Increment" [
+
+            test "create" {
+                let act = 
+                    [2N; 3N; 6N; 11N; 12N; 16N; 19N]
+                    |> Set.ofList
+                    |> Increment.createIncr
+                    |> Increment.incrToBigRationalSet
+
+                let exp = [2N; 3N; 11N; 19N] |> Set.ofList
+                Expect.equal "removes multiples" exp act
+            }
+
+            test "create min incr range" {
+                let act = 
+                    [2N; 3N; 6N; 11N; 12N; 16N; 19N]
+                    |> Set.ofList
+                    |> createMinIncrRange
+                    |> function
+                    | MinIncr(_, (Increment vs)) -> vs
+                    | _ -> Set.empty
+
+                let exp = [2N; 3N; 11N; 19N] |> Set.ofList
+                Expect.equal "removes multiples" exp act
+            }
+
+        ]
+
 
 module ValueRange =
 
