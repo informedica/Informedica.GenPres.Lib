@@ -1071,7 +1071,6 @@ module Variable =
                 else
                     Seq.allPairs s1 s2
                     |> Seq.map (fun (x1, x2) -> x1 |> op <| x2)
-                    |> Set.ofSeq
                     |> createValueSet
 
             // A set with an increment results in a new set of increment
