@@ -6,7 +6,7 @@ module List =
 
     open Informedica.Utils.Lib.BCL
 
-
+    /// ToDo: not the best implementation
     let remove pred xs =
         match xs |> List.tryFindIndex pred with
         | Some (ind) ->

@@ -5,6 +5,23 @@ open MathNet.Numerics
 open Informedica.GenSolver.Utils
 
 
+module Set =
+
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
+
+    let removeBigRationalMultiples xs =
+        xs
+        |> Set.fold (fun acc x1 ->
+            acc 
+            |> Set.filter (fun x2 ->
+                x1 = x2 ||
+                x2 |> BigRational.isMultiple x1 |> not
+            )
+        ) xs
+
+
+
 /// Contains functions and types to represent
 /// a `Variable` in an `Equation`:
 ///
@@ -222,25 +239,14 @@ module Variable =
                     |> Exceptions.raiseExc
                 else
                     i
-                    |> Set.toList
-                    |> List.sort
-                    |> List.fold (fun acc v ->
-                        if acc |> List.isEmpty then [v]
+                    |> Set.removeBigRationalMultiples
+                    |> fun xs ->
+                        if xs |> Set.isEmpty then 
+                            Set.empty 
+                            |> Exceptions.IncrementZeroNegativeOrEmpty 
+                            |> Exceptions.raiseExc
                         else
-                            match acc |> List.tryFind (BigRational.isMultiple v) with
-                            | Some _ -> acc
-                            | None   -> [v] |> List.append acc
-
-                    ) []
-                    |> function
-                    | [] -> 
-                        Set.empty 
-                        |> Exceptions.IncrementZeroNegativeOrEmpty 
-                        |> Exceptions.raiseExc
-                    | xs ->
-                        xs
-                        |> Set.ofList
-                        |> Increment
+                            xs |> Increment
 
 
         module Exceptions =
