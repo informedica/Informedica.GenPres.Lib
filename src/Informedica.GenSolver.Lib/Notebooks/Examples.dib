@@ -425,6 +425,7 @@ prodEq1
 prodEq1
 |> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
 |> solve "b" (MaxInclProp 24N)
+|> solve "a" (MaxInclProp 720N)
 |> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
 |> printEqs 
 |> ignore
