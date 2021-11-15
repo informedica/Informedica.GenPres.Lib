@@ -67,7 +67,7 @@ A variable (with name a) is printed out as:
 
 When a variable is limited by, for example ``[0..5>``, then you can
 
-- increase the lower limit to ad most, but excluding 5, 
+- increase the lower limit to at most, but excluding 5, 
 - lower the upper limit to and including 0,
 - set a value(-s) between >= 0 and < 5.
 
@@ -433,8 +433,9 @@ prodEq1
 |> solve "b" (MinInclProp 0N)
 |> solve "c" (MinInclProp 0N)
 |> solve "a" (MinExclProp 1N)
-|> solve "a" (MaxExclProp 10N)
-|> solve "c" (MaxExclProp 1N)
+|> solve "a" (MaxInclProp 10N)
+// ToDo: fix this as c gets a MinIncl instead of a MinExcl
+|> solve "c" (MaxExclProp 2N)
 |> printEqs 
 |> ignore
 
@@ -583,3 +584,172 @@ prodEq1 @ sumEq1
 |> solve "a" (ValsProp ([8N] |> Set.ofList))
 |> printEqs
 |> ignore
+
+
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> solve "a" (ValsProp ([8N] |> Set.ofList))
+|> solve "e" (ValsProp ([1N] |> Set.ofList))
+|> solve "f" (ValsProp ([2N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+## Order of limiting/setting variables doesn't matter
+
+#!markdown
+
+The order in which variables are set or limited doesn't matter to the end result, as can be shown below.
+
+#!fsharp
+
+printfn "First run"
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> solve "a" (ValsProp ([8N] |> Set.ofList))
+|> solve "e" (ValsProp ([1N] |> Set.ofList))
+|> solve "f" (ValsProp ([2N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+printfn "Second run in reversed order"
+prodEq1 @ sumEq1
+|> nonZeroNegative
+|> solve "f" (ValsProp ([2N] |> Set.ofList))
+|> solve "e" (ValsProp ([1N] |> Set.ofList))
+|> solve "a" (ValsProp ([8N] |> Set.ofList))
+|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+## Real world example
+
+#!markdown
+
+Now, a real world example of usage of the GenSolver. The calculation of drug doses. In this example the following variables are used:
+
+- ``ParacetamolDoseTotal``: The total dose of paracetamol
+- ``ParacetamolDoseQuantity``: The dose quantity of paracetamol per administration
+- ``Frequency``: The administration frequency
+- ``ParacetamolDoseTotalAdjust``: The total dose of paracetamol adjusted by weight
+- ``ParacetamolSuppositoryConcentration``: The concentration of paracetamol per suppository
+- ``SuppositoryDoseQuantity``: The dose quantity of suppository per administration
+
+#!fsharp
+
+let pcmEqs =
+
+    [
+        "ParacetamolDoseTotal = ParacetamolDoseQuantity * Frequency"
+        "ParacetamolDoseTotal = ParacetamolDoseTotalAdjust * Adjust"
+        "ParacetamolDoseQuantity = ParacetamolSuppositoryConcentration * SuppositoryDoseQuantity"
+    ]
+    |> init
+    |> nonZeroNegative
+
+pcmEqs
+|> printEqs
+|> ignore
+
+#!markdown
+
+In the pharmacy the following suppository concentrations are available: 60, 120, 240, 500 and 1000 mg per suppository.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+Also we cannot break a suppository we always need to give whole supps.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+In the drug formulary we can read that the daily adjusted dose of paracetamol should be between 40 mg/kg/day and 90 mg/kg/day
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> printEqs
+|> ignore
+
+#!markdown
+
+But we should never give more than 1000 mg each time and 4000 mg total per day.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> printEqs
+|> ignore
+
+#!markdown
+
+**Note** 
+
+The ``ParacetamolDoseTotal`` is now set to 4000 excl, instead of incl. This seems to be a bug related to this [issue](https://github.com/informedica/Informedica.GenPres.Lib/issues/23)
+
+#!markdown
+
+The drug formulary also states that you should give a supp 2, 3, 4 or 6 times a day.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+A further limitation is that in fact you would not give more than 1 supp each time.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+This tells us that for example patients with weight 4/3 kg about 1.33 kg up to 75 kg can be prescribed within those limits.
