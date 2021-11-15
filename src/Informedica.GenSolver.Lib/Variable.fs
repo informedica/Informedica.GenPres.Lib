@@ -387,17 +387,6 @@ module Variable =
         /// to **min**, **incr** and **max** constraints
         let filter min incr max = Set.filter (isBetweenAndMultOf min incr max)
 
-
-        /// Calculate `Minimum` as a multiple of `Increment` **incr**.
-        /// This assumes that the smallest increment will calculate the smallest 
-        /// minimum as a multiple of that increment.
-        let minMultipleOf incr min =
-            let n  = min  |> Minimum.minToBigRational
-            let d  = incr |> Increment.incrToBigRationalSet |> Set.minElement
-            let n' = n    |> BigRational.toMinMultipleOf d
-            
-            if min |> Minimum.isMinExcl && n' <= n then n' + d else n'
-
         /// Calculate the smallest possible `Minimum` that is a multiple of 
         /// an increment in the set of `Increment`.
         let minMultipleOf2 incr min =
@@ -417,13 +406,19 @@ module Variable =
             ) (None)
 
 
-        // Calculate `Maximum` **max** as a multiple of **incr**.
-        let maxMultipleOf incr max =
-            let n  = max  |> Maximum.maxToBigRational
+        /// Calculate `Minimum` as a multiple of `Increment` **incr**.
+        /// This assumes that the smallest increment will calculate the smallest 
+        /// minimum as a multiple of that increment.
+        let minMultipleOf incr min =
+            let n  = min  |> Minimum.minToBigRational
             let d  = incr |> Increment.incrToBigRationalSet |> Set.minElement
-            let n' = n    |> BigRational.toMaxMultipleOf d
-
-            if max |> Maximum.isMaxExcl && n' >= n then n' - d else n'
+                // TODO: fix this as this gives a div by zero exception
+                // match min |> minMultipleOf2 incr with
+                // | Some x -> x
+                // | None   -> incr |> Increment.incrToBigRationalSet |> Set.minElement
+            let n' = n    |> BigRational.toMinMultipleOf d
+            
+            if min |> Minimum.isMinExcl && n' <= n then n' + d else n'
 
 
         /// Calculate the largest possible `Maximum` that is a multiple of 
@@ -443,6 +438,20 @@ module Variable =
                 | None     -> Some m'
                     
             ) (None)
+
+
+        // Calculate `Maximum` **max** as a multiple of **incr**.
+        let maxMultipleOf incr max =
+            let n  = max  |> Maximum.maxToBigRational
+            // the Set.minElement is not good a valid larger multiple could be lost!!
+            // solution is first try to get the largest possible max
+            let d  = 
+                match max |> maxMultipleOf2 incr with
+                | Some x -> x
+                | None   ->incr |> Increment.incrToBigRationalSet |> Set.minElement
+            let n' = n    |> BigRational.toMaxMultipleOf d
+
+            if max |> Maximum.isMaxExcl && n' >= n then n' - d else n'
 
 
         /// Create a set of `BigRational` using **min**, **incr** and a **max**.
@@ -542,8 +551,8 @@ module Variable =
                     print None false incr (Some max) incl
 
                 let fMinMax (min, max) =
-                    let maxincl, min = min |> Minimum.minToBoolBigRational
-                    let minincl, max = max |> Maximum.maxToBoolBigRational
+                    let minincl, min = min |> Minimum.minToBoolBigRational
+                    let maxincl, max = max |> Maximum.maxToBoolBigRational
 
                     print (Some min) minincl [] (Some max) maxincl
 
@@ -886,7 +895,8 @@ module Variable =
                 match x1, x2 with
                 | Some (v1), Some (v2) ->
                     if op |> BigRational.opIsDiv && v2 = 0N then None
-                    else v1 |> op <| v2 |> c (incl1 && incl2) |> Some
+                    else 
+                        v1 |> op <| v2 |> c (incl1 && incl2) |> Some
                 | _ -> None
 
 
@@ -1396,7 +1406,6 @@ module Variable =
 
         let inline (<==) v1 v2 = (?<-) Expr v1 v2
 
-        let hello x = x * 2
 
     /// Handle the creation of a `Variable` from a `Dto` and
     /// vice versa.

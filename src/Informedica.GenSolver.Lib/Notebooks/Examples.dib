@@ -425,7 +425,7 @@ prodEq1
 
 #!markdown
 
-Add an exlusive upper limit of 1 to ``c``.
+Add an exlusive upper limit of 2 to ``c``.
 
 #!fsharp
 
@@ -434,7 +434,6 @@ prodEq1
 |> solve "c" (MinInclProp 0N)
 |> solve "a" (MinExclProp 1N)
 |> solve "a" (MaxInclProp 10N)
-// ToDo: fix this as c gets a MinIncl instead of a MinExcl
 |> solve "c" (MaxExclProp 2N)
 |> printEqs 
 |> ignore
@@ -705,15 +704,9 @@ pcmEqs
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+//|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
 |> printEqs
 |> ignore
-
-#!markdown
-
-**Note** 
-
-The ``ParacetamolDoseTotal`` is now set to 4000 excl, instead of incl. This seems to be a bug related to this [issue](https://github.com/informedica/Informedica.GenPres.Lib/issues/23)
 
 #!markdown
 
@@ -752,4 +745,41 @@ pcmEqs
 
 #!markdown
 
-This tells us that for example patients with weight 4/3 kg about 1.33 kg up to 75 kg can be prescribed within those limits.
+This tells us that for example patients with weight 4/3 kg about 1.33 kg up to 100 kg can be prescribed within those limits.
+
+We can now set the weight of the patient to for example 10 kg.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
+|> printEqs
+|> ignore
+
+#!markdown
+
+And if we then pick a frequency of 3, there is a solved equation set.
+
+#!fsharp
+
+pcmEqs
+|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
+|> solve "Frequency" (ValsProp ([3N] |> Set.ofList))
+|> printEqs
+|> ignore
