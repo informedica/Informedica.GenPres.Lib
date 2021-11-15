@@ -1035,7 +1035,7 @@ module Variable =
                     |> Set.ofList
                     |> Increment.createIncr
                     |> Some
-
+                // incr cannot be calculated based on division or subtraction
                 |  _ -> None
 
             | _ -> None
@@ -1049,6 +1049,15 @@ module Variable =
         /// **x1** and **x2** are `Unrestricted`.
         let calc op (x1, x2) =
             let calcOpt = calcOpt op
+
+            // Note: doing this can have serious performance issues!!
+            // let toVS vr =
+            //     match vr with
+            //     | Range(MinIncrMax (min, inr, max)) -> minIncrMaxToValueSet min inr max
+            //     | _ -> vr
+            // // first check if range can be changed to valueset
+            // let x1 = x1 |> toVS
+            // let x2 = x2 |> toVS
 
             match x1, x2 with
             | Unrestricted, Unrestricted -> unrestricted
@@ -1066,6 +1075,7 @@ module Variable =
                     |> createValueSet
 
             // A set with an increment results in a new set of increment
+            // Need to match all scenarios with a valueset and an increment
             | ValueSet s, Range(MinIncr(_, i))
             | Range(MinIncr(_, i)), ValueSet s
 
@@ -1076,7 +1086,22 @@ module Variable =
             | Range(IncrMax(i, _)), ValueSet s
 
             | ValueSet s, Range(MinIncr(_, i))
-            | Range(IncrMax(i, _)), ValueSet s ->
+            | Range(IncrMax(i, _)), ValueSet s 
+
+            | ValueSet s, Range(MinIncrMax(_, i, _))
+            | Range(MinIncrMax(_, i, _)), ValueSet s 
+
+            | ValueSet s, Range(MinIncrMax(_, i, _))
+            | Range(MinIncr(_, i)), ValueSet s 
+
+            | ValueSet s, Range(MinIncrMax(_, i, _))
+            | Range(IncrMax(i, _)), ValueSet s 
+
+            | ValueSet s, Range(MinIncr(_, i))
+            | Range(MinIncrMax(_, i, _)) , ValueSet s 
+
+            | ValueSet s, Range(IncrMax(i, _))
+            | Range(MinIncrMax(_, i, _)) , ValueSet s ->
 
                 let min1, max1 = x1 |> getMin, x1 |> getMax
                 let min2, max2 = x2 |> getMin, x2 |> getMax
@@ -1103,9 +1128,9 @@ module Variable =
                         (min2 |> getMin)
                         (max2 |> getMax)
 
+                // calculate a new increment based upon the valueset and an increment
                 let incr1 = i |> Some
                 let incr2 = s |> Increment.createIncr |> Some
-
                 let incr = calcIncr op incr1 incr2
 
                 match min, incr, max with
@@ -1139,6 +1164,7 @@ module Variable =
                         (min2 |> getMin)
                         (max2 |> getMax)
 
+                // calculate a new increment based upon the incr1 and incr2
                 let incr = calcIncr op incr1 incr2
 
                 match min, incr, max with
@@ -1251,7 +1277,7 @@ module Variable =
     let get = apply id
 
 
-    let toString exact { Name = n; Values = vs } =
+    let toString exact ({ Name = n; Values = vs }: Variable) =
         vs
         |> ValueRange.toString exact
         |> sprintf "%s %s" (n |> Name.toString)
