@@ -4,6 +4,10 @@
 
 #!markdown
 
+## Setup
+
+#!markdown
+
 Do some basic setup:
 
 #!fsharp
@@ -37,6 +41,21 @@ module Print =
 
 #!markdown
 
+## Units and CombiUnits
+
+#!markdown
+
+A ``Unit`` defines how a ``Value`` is measured. For example, 100 mg. So, there is the value ``100`` and the unit ``mg``. 
+
+But also
+
+- Units can be combined, ``CombiUnit``, for example 100 mg/ml
+- Units can also have a value to express for example 1 x / 36 hour. 
+
+In the last example the value is ``1`` and the unit is ``x / 36 hour``, which is in fact a ``CombiUnit`` of ``x`` and ``36 hour``.
+
+#!markdown
+
 Some basic units, that can be combined to `CombiUnit`
 
 #!fsharp
@@ -61,6 +80,10 @@ $"Or like:\n{Units.Count.times |> per (Units.Time.nHour 36N)}"
 
 #!markdown
 
+## ValueUnits
+
+#!markdown
+
 We can build `ValueUnit` instances from numeric values and units:
 
 #!fsharp
@@ -77,6 +100,10 @@ mg400 |> pa
 
 #!markdown
 
+## The Count Unit Group
+
+#!markdown
+
 The `Count` group is a special unit group with only one unit: `times`:
 
 #!fsharp
@@ -87,6 +114,10 @@ let times3 = 3. |> withUnit Units.Count.times >>* id
 
 // 3 times * 5 ml = 15 ml
 times3 * ml5 |> print
+
+#!markdown
+
+## Extracting unit to base and unit to unit value
 
 #!markdown
 
@@ -111,6 +142,10 @@ l5  |> toBase |> pa // base value = 5 as liter is the reference unit
 
 #!markdown
 
+## ValueUnit comparison
+
+#!markdown
+
 We need special comparison operators to correctly compare `ValueUnit` instances:
 
 #!fsharp
@@ -128,7 +163,7 @@ ml5000 =?  l5  |> pa // Returns true
 
 #!markdown
 
-## Calculating with `ValueUnit` instances ##
+## Calculation with `ValueUnit` instances ##
 
 All four basic arithmetic operations can be performed:
 

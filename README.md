@@ -8,6 +8,12 @@ The current solution file contains a number of projects. These projects
 will move to separate repositories and will be referenced by Nuget. For
 ease of developing, these are currently bundled together.
 
+## Documentation 
+
+Currently most of the documentation can be retrieved by running the notebooks with examples
+for each project.
+
+
 ## Builds
 
 GitHub Actions |
@@ -25,19 +31,19 @@ Informedica.GenPres.Lib | [![NuGet Badge](https://buildstats.info/nuget/Informed
 
 ---
 
-### Developing
+## Developing
 
 How to develop and contribute is described at: https://informedica.nl/?p=320
 
 The general principle is that you can run, test and develop all code in 
 the FSI. 
 
-To contribute, please fork this repository and make pull requests.
+To contribute, please **fork** this repository and make **pull requests**.
 
 ---
 
 
-### Building
+## Building
 
 Building is kept deliberately simple. You can use either the build 
 commands or use
@@ -52,7 +58,11 @@ dotnet test
 
 
 
-### Git push tags
+## Collaboration 
+
+Please feel free to collaborate! 
+
+Git push tags
 
 Use the following tags for pushing changes to git:
 
