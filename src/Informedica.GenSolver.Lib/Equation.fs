@@ -7,7 +7,6 @@
 /// y = x1 \* x2 * ... \* xn
 module Equation =
 
-    open Informedica.GenSolver.Utils
     open Types
     open Variable.Operators
 

@@ -36,6 +36,53 @@ module Generators =
     let config = { FsCheckConfig.defaultConfig with arbitrary = [typeof<BigRGenerator>] }
 
 
+module Utils =
+
+    let config = 
+        { FsCheckConfig.defaultConfig with 
+            maxTest = 10000 }
+
+    [<Tests>]
+    let emptyIncrs =
+
+
+        testList "Given an empty set of increments" [
+            let act =
+                10N
+                |> BigRational.maxInclMultipleOf Set.empty
+            let exp = (true, 10N)        
+
+            test "any max will remain the same max" {
+                Expect.equal "always true" exp act
+            }   
+
+            testPropertyWithConfig config "with any incl or excl min max" <| fun (minmax : bool * bool * BigRational) ->
+                let (b1, b2, m) = minmax
+                BigRational.calcMinOrMaxToMultiple b1 b2 Set.empty m
+                |> Expect.equal "should return the same" (b2, m)
+
+            testPropertyWithConfig config "with any max" <| fun (m : BigRational) ->
+                m
+                |> BigRational.maxInclMultipleOf Set.empty
+                |> Expect.equal "should return the same" (true, m)
+
+            testPropertyWithConfig config "with any min" <| fun (m : BigRational) ->
+                m
+                |> BigRational.minInclMultipleOf Set.empty
+                |> Expect.equal "should return the same" (true, m)
+        ]
+
+    [<Tests>]
+    let incrs = 
+        testList "Given any set of increments" [
+            
+            testPropertyWithConfig config "with max incl 10" <| fun (incrs: BigRational list) ->
+//                printfn $"increments length: {incrs |> List.length}"
+                Expect.isTrue "true" true
+
+        ]
+
+
 
 module Name =
 

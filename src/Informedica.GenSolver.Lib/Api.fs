@@ -5,7 +5,6 @@ module Api =
 
     open System
 
-    open Informedica.GenSolver.Utils
     open Informedica.Utils.Lib.BCL
 
     open Types

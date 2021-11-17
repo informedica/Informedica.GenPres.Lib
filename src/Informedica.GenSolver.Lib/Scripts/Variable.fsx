@@ -19,43 +19,63 @@ module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
 
-let procss s = $"{s} " |> printfn "%s"
 
-type Logger = Types.Logging.Logger
-
-let printEqs = Solver.printEqs true procss
-let solve n p eqs =
-    let logger = { Logger.Log = ignore }
-    let n = n |> Name.createExc
-    Api.solve id logger None n p eqs
-//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
-
-let init     = Api.init
-let nonZeroNegative = Api.nonZeroNegative
-
-printfn "=== Product Equation ==="
-let prodEq1 = 
-    [
-        "a = b * c"  
-    ] 
-    |> init
-// print the equation
-prodEq1 |> printEqs |> ignore
-
-printfn "=== Sum Equation ==="
-let sumEq1 = 
-    [
-        "c = d + e + f"  
-    ] 
-    |> init
-// print the equation
-sumEq1 |> printEqs |> ignore
+(1N/2N)
+|> BigRational.toMaxMultipleOf (1N/3N)
 
 
-prodEq1
-|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-|> solve "b" (MaxInclProp 24N)
-|> solve "a" (MaxInclProp 720N)
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> printEqs 
-|> ignore
+let m = 1000N
+let isExcl = false
+
+//[60N; 120N; 500N]
+let calcMinOrMaxToMultiple isMax isIncl incrs m =
+    incrs
+    |> Set.fold (fun (b, acc) i ->
+        let ec = if isMax then (>=) else (<=)
+        let nc = if isMax then (>) else (<)
+        let ad = if isMax then (-) else (+)
+
+        let m' = 
+            if isMax then m |> BigRational.toMaxMultipleOf i
+            else m |> BigRational.toMinMultipleOf i
+            
+        let m' = 
+            if (isIncl |> not) && (m' |> ec <| m) then 
+                printfn $"recalc because is excl: {(m' |> ad <| i) }"
+                (m' |> ad <| i) 
+            else m'
+        
+        match acc with 
+        | Some a -> if (m' |> nc <| a) then (true, Some m') else (b, Some a)
+        | None   -> (true, Some m')
+    ) (isIncl, None)
+    |> fun (b, r) -> b, r |> Option.defaultValue m
+
+
+let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
+
+let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
+
+let minInclMultipleOf = calcMinOrMaxToMultiple false true
+
+let minExclMultipleOf = calcMinOrMaxToMultiple false false
+
+
+1000N
+|> maxInclMultipleOf ([60N; 120N; 500N] |> Set.ofList)
+
+1000N
+|> maxExclMultipleOf ([60N; 120N; 500N] |> Set.ofList)
+
+7N
+|> minInclMultipleOf ([2N; 3N] |> Set.ofList)
+
+9N
+|> minInclMultipleOf ([2N; 3N] |> Set.ofList)
+
+9N
+|> minExclMultipleOf ([2N; 3N] |> Set.ofList)
+
+9N
+|> minExclMultipleOf ([] |> Set.ofList)
+

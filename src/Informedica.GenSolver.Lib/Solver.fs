@@ -5,8 +5,6 @@
 /// equations
 module Solver =
     
-    open Informedica.GenSolver.Utils
-
     module EQD = Equation.Dto
 
     open Types

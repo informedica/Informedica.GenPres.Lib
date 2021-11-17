@@ -1,14 +1,13 @@
-﻿namespace Informedica.GenSolver.Tests
+﻿module Main
+open Expecto
 
-module Main =
-    open Expecto
+let config = 
+    {
+        defaultConfig with
+            verbosity = Logging.Verbose
+    }
 
-    [<EntryPoint>]
-    let main argv =    
-        testList "All" [
-            ValueRange.tests
-            Name.tests
-        ]
-        |> runTests { defaultConfig with verbosity = Logging.LogLevel.Verbose }
-    
-//        Tests.runTestsInAssembly defaultConfig argv
+[<EntryPoint>]
+let main argv =
+    argv |> Array.append [|"--summary"|]
+    |> Tests.runTestsInAssembly defaultConfig 

@@ -2,12 +2,10 @@
 
 open System
 open MathNet.Numerics
-open Informedica.GenSolver.Utils
 
 
 module Set =
 
-    open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
     let removeBigRationalMultiples xs =
@@ -421,37 +419,20 @@ module Variable =
             if min |> Minimum.isMinExcl && n' <= n then n' + d else n'
 
 
-        /// Calculate the largest possible `Maximum` that is a multiple of 
-        /// an increment in the set of `Increment`.
-        let maxMultipleOf2 incr max =
-            let m = max |> Maximum.maxToBigRational
+        // Calculate `Maximum` **max** as a multiple of **incr**.
+        let maxMultipleOf incr max =
+            let m  = max  |> Maximum.maxToBigRational
+            let isExcl = max |> Maximum.isMaxExcl
 
-            incr
-            |> Increment.incrToBigRationalSet
+            incr 
+            |> Increment.incrToBigRationalSet   
             |> Set.fold (fun acc i ->
                 let m' = m |> BigRational.toMaxMultipleOf i
                 let m' = 
-                    if max |> Maximum.isMaxExcl && m' >= m then m' - i else m'
-
-                match acc with
-                | Some m'' -> if m' > m'' then Some m' else acc
-                | None     -> Some m'
-                    
-            ) (None)
-
-
-        // Calculate `Maximum` **max** as a multiple of **incr**.
-        let maxMultipleOf incr max =
-            let n  = max  |> Maximum.maxToBigRational
-            // the Set.minElement is not good a valid larger multiple could be lost!!
-            // solution is first try to get the largest possible max
-            let d  = 
-                match max |> maxMultipleOf2 incr with
-                | Some x -> x
-                | None   ->incr |> Increment.incrToBigRationalSet |> Set.minElement
-            let n' = n    |> BigRational.toMaxMultipleOf d
-
-            if max |> Maximum.isMaxExcl && n' >= n then n' - d else n'
+                    if isExcl && m' >= m then m' - i else m'
+                
+                if m' > acc then m' else acc
+            ) m
 
 
         /// Create a set of `BigRational` using **min**, **incr** and a **max**.
