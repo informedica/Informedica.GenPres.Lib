@@ -1,9 +1,9 @@
 module Tests
 
-    open Expecto
+open Expecto
 
-    [<Tests>]
-    let test =
-        testCase "Hello World" <| fun _ ->
-            Expect.isTrue true "This is true"
+[<Tests>]
+let test =
+    testCase "Hello World" <| fun _ ->
+        Expect.isTrue true "This is true"
 

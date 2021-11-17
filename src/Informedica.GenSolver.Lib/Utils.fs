@@ -70,8 +70,6 @@ module BigRational =
     let minExclMultipleOf = calcMinOrMaxToMultiple false false
 
 
-
-
 /// Helper functions for `List`
 module List =
 
