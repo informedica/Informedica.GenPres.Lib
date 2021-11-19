@@ -91,7 +91,7 @@ The resulting dosing scenarios will then be printed out.
             SubstanceName = "paracetamol"
             MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
             MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
-            MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
+            MinDoseTotalAdjust = Some 60N       // Min adjusted dose = 40 mg/kg/day
             MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
     }
 |> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
@@ -213,7 +213,7 @@ logger.Start Level.Informative
                             ]
                 }
             ]
-        Unit = "piece"
+        Unit = "tablet"
         TimeUnit = "day"
         Shape = "tablet"
         Route = "or"
@@ -326,7 +326,7 @@ logger.Start Level.Informative
         Id = "1"
         Name = "dopamin infusion"
         Quantities = [ 50N ]
-        Divisible = 2N
+        Divisible = 10N
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"

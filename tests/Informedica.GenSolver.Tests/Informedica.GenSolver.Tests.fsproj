@@ -7,7 +7,7 @@
     <WarnOn>3390;$(WarnOn)</WarnOn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Variable.fs" />
+    <Compile Include="Tests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>

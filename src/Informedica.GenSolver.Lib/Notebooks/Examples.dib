@@ -704,7 +704,7 @@ pcmEqs
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-//|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
 |> printEqs
 |> ignore
 
@@ -778,8 +778,8 @@ pcmEqs
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
 |> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
 |> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N; 2N] |> Set.ofList))
 |> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
-|> solve "Frequency" (ValsProp ([3N] |> Set.ofList))
+|> solve "Frequency" (ValsProp ([3N; 4N; 6N] |> Set.ofList))
 |> printEqs
 |> ignore

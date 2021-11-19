@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenSolver.Utils
+﻿namespace Informedica.GenSolver.Lib
 
 /// ToDo: should move to Informedica.Utils.Lib
 
@@ -30,10 +30,44 @@ module BigRational =
             if m * d < n then (m + 1N) * d else m * d
         else 
             if m * d > n then (m - 1N) * d else m * d
-    
+
+
     let toMinMultipleOf = toMultipleOf true
 
     let toMaxMultipleOf = toMultipleOf false
+
+        
+    let calcMinOrMaxToMultiple isMax isIncl incrs m =
+        incrs
+        |> Set.fold (fun (b, acc) i ->
+            let ec = if isMax then (>=) else (<=)
+            let nc = if isMax then (>) else (<)
+            let ad = if isMax then (-) else (+)
+
+            let m' = 
+                if isMax then m |> toMaxMultipleOf i
+                else m |> toMinMultipleOf i
+                
+            let m' = 
+                if (isIncl |> not) && (m' |> ec <| m) then 
+                    printfn $"recalc because is excl: {(m' |> ad <| i) }"
+                    (m' |> ad <| i) 
+                else m'
+            
+            match acc with 
+            | Some a -> if (m' |> nc <| a) then (true, Some m') else (b, Some a)
+            | None   -> (true, Some m')
+        ) (isIncl, None)
+        |> fun (b, r) -> b, r |> Option.defaultValue m
+
+
+    let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
+
+    let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
+
+    let minInclMultipleOf = calcMinOrMaxToMultiple false true
+
+    let minExclMultipleOf = calcMinOrMaxToMultiple false false
 
 
 /// Helper functions for `List`
