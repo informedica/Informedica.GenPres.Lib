@@ -721,7 +721,7 @@ module Variable =
         /// Apply a `Minimum` **min** to a `ValueRange` **vr**.
         /// If minimum cannot be set the original `Minimum` is returned.
         /// So, it always returns a more restrictive, i.e. larger, or equal `Minimum`.
-        let setMin min vr =
+        let setMin min (vr: ValueRange) =
             // Check whether the new min is more restrictive than the old min
             let checkMin f min' = if min |> Minimum.minLTmin min' then min |> f else vr
 
@@ -873,11 +873,16 @@ module Variable =
             /// the result is inclusive. Use constructor **c** to
             /// create the optional result.
             let calc c op (x1, incl1) (x2, incl2) =
+                let incl = 
+                    match incl1, incl2 with
+                    | true, true -> true
+                    | _          -> false
+
                 match x1, x2 with
                 | Some (v1), Some (v2) ->
                     if op |> BigRational.opIsDiv && v2 = 0N then None
                     else 
-                        v1 |> op <| v2 |> c (incl1 && incl2) |> Some
+                        v1 |> op <| v2 |> c incl |> Some
                 | _ -> None
 
 
@@ -1177,7 +1182,7 @@ module Variable =
             let set get set vr =
                 match expr |> get with
                 | Some m -> vr |> set m
-                | None -> vr
+                | None   -> vr
 
             match expr with
             | Unrestricted -> y

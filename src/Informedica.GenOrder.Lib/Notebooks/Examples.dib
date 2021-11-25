@@ -91,7 +91,7 @@ The resulting dosing scenarios will then be printed out.
             SubstanceName = "paracetamol"
             MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
             MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
-            MinDoseTotalAdjust = Some 60N       // Min adjusted dose = 40 mg/kg/day
+            MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
             MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
     }
 |> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
@@ -563,9 +563,9 @@ logger.Start Level.Informative
 //            MinConcentration = Some (1N)
             MaxConcentration = Some (2N)
             DoseCount = Some (1N)
-//            MinTime = (Some (1N/2N))
+ //           MinTime = (Some (1N/2N))
             MaxTime = (Some (1N/2N))
 
     }
-|> DrugOrder.evaluate logger.Logger
+|> DrugOrder.evaluate logger.Logger 
 |> printScenarios false ["gentamicin"]

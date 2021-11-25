@@ -169,6 +169,7 @@ module Equation =
         | ProductEquation (y, xs)
         | SumEquation (y, xs) ->
             ([y] @ xs |> List.exists Variable.isSolvable) &&
+            // maybe only when > 1 is unrestricted instead of all
             ([y] @ xs |> List.forall Variable.isUnrestricted |> not)
 
 

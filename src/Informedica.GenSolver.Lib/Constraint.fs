@@ -57,28 +57,54 @@ module Constraint =
             match c.Property with
             | ValsProp vs -> 
                 let n = vs |> Set.count
-                if n = 1 then -3, c
-                else n, c
+                if n = 1 then    -3, c
+                else              n, c
             | MinInclProp _
             | MinExclProp _   -> -5, c
-            | IncrProp _ -> -4, c
-            | _                    -> -2, c
+            | IncrProp _      -> -4, c
+            | _               -> -2, c
 
 
     let orderConstraints log cs =
         cs
+        // calc min and max from valsprop constraints
         |> List.fold (fun acc c ->
             match c.Property with
             | ValsProp vs ->
-                let min = vs |> Set.minElement |> MinInclProp
-                let max = vs |> Set.maxElement |> MaxInclProp
-                [
-                    c
-                    { c with Property = min ; Limit = NoLimit }
-                    { c with Property = max ; Limit = NoLimit }
-                ]
-                |> List.append acc
+                if vs |> Set.count <= 1 then [c] |> List.append acc
+                else
+                    let min = vs |> Set.minElement |> MinInclProp
+                    let max = vs |> Set.maxElement |> MaxInclProp
+                    [
+                        c
+                        { c with Property = min ; Limit = NoLimit }
+                        { c with Property = max ; Limit = NoLimit }
+                    ]
+                    |> List.append acc
             | _ -> [c] |> List.append acc
+        ) []
+        // clean up list of constraints
+        // |> List.fold (fun acc c ->
+        //     if acc |> List.exists ((=) c) then acc
+        //     else c::acc
+        //         // match acc |> List.tryFind (fun x -> c.Name = x.Name) with
+        //         // | None    -> c::acc
+        //         // | Some c' ->
+        //         //     match c'.Property with
+        //         //     | ValsProp n when n |> Set.count = 1 ->
+        //         //         acc
+        //         //         |> List.fold (fun acc x ->
+        //         //             if x.Name = c'.Name then 
+        //         //                 if acc |> List.exists ((=) c') then acc
+        //         //                 else c'::acc
+        //         //             else x::acc
+        //         //         ) []
+        //         //     | _ -> c::acc
+        // ) []
+        |> List.fold (fun acc c ->
+            if acc |> List.exists ((=) c) then acc
+            else
+                acc @ [c]
         ) []
         |> fun cs -> cs |> List.map scoreConstraint
         |> List.sortBy fst

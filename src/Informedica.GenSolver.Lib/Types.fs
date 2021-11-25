@@ -45,6 +45,8 @@ module Types =
     /// * Range: <0N..[2N,3N]..20N] 
     type ValueRange =
         | Unrestricted
+// ToDo need to model this
+//        | NotZero
         | ValueSet of Set<BigRational>
         | Range of Range
 

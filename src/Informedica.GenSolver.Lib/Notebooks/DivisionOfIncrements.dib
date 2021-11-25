@@ -1,0 +1,127 @@
+#!markdown
+
+# Explore situations with division of increments
+
+#!fsharp
+
+#load "../Scripts/load.fsx"
+
+open Informedica.GenSolver.Lib
+
+#!markdown
+
+### Setup the environment
+
+#!fsharp
+
+open Informedica.GenSolver.Lib
+open Informedica.Utils.Lib.BCL
+open MathNet.Numerics
+open Types
+
+module Api = Informedica.GenSolver.Lib.Api
+module Solver = Informedica.GenSolver.Lib.Solver
+module Name = Variable.Name
+module ValueRange = Variable.ValueRange
+
+let procss s = $"{s} " |> printfn "%s"
+
+type Logger = Types.Logging.Logger
+
+let printEqs msg = 
+    printfn "%s" msg
+    Solver.printEqs true procss
+
+let solve n p eqs =
+    let logger = { Logger.Log = ignore }
+    let n = n |> Name.createExc
+    Api.solve id logger None n p eqs
+//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
+
+
+let setMinMax p v = 
+    v
+    |> BigRational.fromFloat
+    |> function
+    | Some br -> br |> p
+    | None    -> $"{v} cannot be converted to BigRational" |> failwith
+
+let setIncrVS p vs =
+    vs
+    |> List.choose BigRational.fromFloat
+    |> Set.ofList
+    |> p
+
+let setMinIncl = setMinMax MinInclProp
+let setMinExcl = setMinMax MinExclProp
+let setMaxIncl = setMinMax MaxInclProp
+let setMaxExcl = setMinMax MaxExclProp
+
+let setIncr = setIncrVS IncrProp
+let setValueSet = setIncrVS ValsProp
+
+
+let init     = Api.init
+let nonZeroNegative = Api.nonZeroNegative
+
+#!markdown
+
+### Define a simple product equation
+
+#!fsharp
+
+let eqs = 
+    [
+        "a = b * c"
+    ]
+    |> Api.init
+    |> nonZeroNegative
+
+#!markdown
+
+**Note** In this case we take `b` as the dependent variable and `a` an `c` as the independent variables.
+
+#!fsharp
+
+eqs
+|> solve "a" (setMinIncl 1.)
+|> solve "a" (setMaxIncl 5.)
+|> solve "a" (setIncr [1.])
+|> solve "c" (setMaxIncl 5.)
+|> solve "c" (setMinIncl 1.)
+|> solve "c" (setIncr [1.])
+|> printEqs ""
+|> ignore
+
+#!fsharp
+
+eqs
+|> solve "a" (setMaxIncl 10.)
+|> solve "a" (setIncr [1.])
+|> solve "c" (setMaxIncl 10.)
+|> solve "c" (setIncr [1.])
+|> printEqs
+|> ignore
+
+#!fsharp
+
+eqs
+|> solve "a" (setMaxIncl 5.)
+|> solve "a" (setIncr [1.])
+|> solve "c" (setMaxIncl 5.)
+|> solve "c" (setIncr [1.])
+|> solve "a" (setValueSet [1. .. 5.])
+|> solve "c" (setValueSet [1. .. 5.])
+|> printEqs
+|> ignore
+
+#!fsharp
+
+[1N..1N..100N] 
+|> List.allPairs [1N..1N..100N]
+|> List.map (fun (x1, x2) -> x1 / x2)
+|> fun xs -> 
+    printfn $"{xs |> List.length}" ; xs
+|> Set.ofSeq
+|> Set.removeBigRationalMultiples 
+|> Set.count
