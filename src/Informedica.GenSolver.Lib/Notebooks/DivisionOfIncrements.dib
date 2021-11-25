@@ -77,10 +77,6 @@ let eqs =
     |> Api.init
     |> nonZeroNegative
 
-#!markdown
-
-**Note** In this case we take `b` as the dependent variable and `a` an `c` as the independent variables.
-
 #!fsharp
 
 eqs
@@ -110,18 +106,54 @@ eqs
 |> solve "a" (setIncr [1.])
 |> solve "c" (setMaxIncl 5.)
 |> solve "c" (setIncr [1.])
-|> solve "a" (setValueSet [1. .. 5.])
-|> solve "c" (setValueSet [1. .. 5.])
-|> printEqs
+|> solve "a" (setValueSet [1. ..0.5 .. 5.])
+|> solve "c" (setValueSet [1. .. 0.75 .. 5.])
+|> printEqs ""
 |> ignore
 
 #!fsharp
 
-[1N..1N..100N] 
-|> List.allPairs [1N..1N..100N]
+List.allPairs [1N/2N..1N/2N..5N] [1N/3N..1N/3N..3N] 
+//|> fun xs -> xs |> List.iter (printfn "%A"); xs
 |> List.map (fun (x1, x2) -> x1 / x2)
-|> fun xs -> 
-    printfn $"{xs |> List.length}" ; xs
 |> Set.ofSeq
+|> fun xs -> printfn "before: "; xs |> Set.iter (printf "%A\n"); xs
+//|> fun xs -> xs |> Set.add ((3N/4N)) 
 |> Set.removeBigRationalMultiples 
+|> fun xs -> printfn "after: "; xs |> Set.iter (printfn "%A"); xs
 |> Set.count
+
+#!fsharp
+
+let nextSmallestStep min1 incr1 max2 incr2 min max =
+    List.allPairs [min1..incr1..(min + incr1)] [(max - incr2)..incr2..max2] 
+    |> List.sortBy (fun (x1, x2) -> x1 / x2)
+    |> List.tryFind (fun (x1, x2) -> (x1 / x2) > (min/max)) 
+    |> function
+    | None            -> min, max
+    | Some (min, max) -> min, max
+
+let rec calcIncrDivisors min1 incr1 max1 min2 incr2 max2 =
+    let next = nextSmallestStep min1 incr1 max2 incr2 
+    let rec calc min max acc =
+        match acc with
+        | [] -> 
+            let incr = min / max
+            let min, max = next min max
+            [incr]
+            |> calc min max
+        | h::tail ->
+            let incr = min / max
+            if incr |> BigRational.isMultiple h then acc
+            else
+                let min, max = next min max
+                acc @ [incr]
+                |> calc min max
+    calc min1 max2 []
+
+calcIncrDivisors (1N/2N) (1N/2N) 5N (1N/3N) (1N/3N) 3N
+// let test = smallestStep (1N/2N) (1N/2N) 3N (1N/3N) 
+// test (1N/2N) (5N/3N)
+// |> fun (min, max) -> 
+//     printfn $"min: {min}, max: {max}"
+//     printfn $"{min / max}"
