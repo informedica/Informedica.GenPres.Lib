@@ -113,14 +113,14 @@ eqs
 
 #!fsharp
 
-List.allPairs [1N/2N..1N/2N..5N] [1N/3N..1N/3N..3N] 
+List.allPairs [1N/2N..1N/2N..1N] [3N/4N..3N/4N..(6N/4N)] 
 //|> fun xs -> xs |> List.iter (printfn "%A"); xs
 |> List.map (fun (x1, x2) -> x1 / x2)
 |> Set.ofSeq
-|> fun xs -> printfn "before: "; xs |> Set.iter (printf "%A\n"); xs
+|> fun xs -> printfn "before: "; xs |> Set.iter (printf "%A\n") ; xs
 //|> fun xs -> xs |> Set.add ((3N/4N)) 
 |> Set.removeBigRationalMultiples 
-|> fun xs -> printfn "after: "; xs |> Set.iter (printfn "%A"); xs
+|> fun xs -> printfn "after: ";  xs |> (printfn "%A") ; xs
 |> Set.count
 
 #!fsharp
@@ -151,9 +151,57 @@ let rec calcIncrDivisors min1 incr1 max1 min2 incr2 max2 =
                 |> calc min max
     calc min1 max2 []
 
-calcIncrDivisors (1N/2N) (1N/2N) 5N (1N/3N) (1N/3N) 3N
+calcIncrDivisors (1N/2N) (1N/2N) (50N) (10N) (10N) (100N)
+|> List.length
+|> fun x -> printfn $"no = {x}"
 // let test = smallestStep (1N/2N) (1N/2N) 3N (1N/3N) 
 // test (1N/2N) (5N/3N)
 // |> fun (min, max) -> 
 //     printfn $"min: {min}, max: {max}"
 //     printfn $"{min / max}"
+
+#!fsharp
+
+let calcKerim min1 incr1 max1 min2 incr2 max2 =
+    let max = max2
+    let rec calc max2 acc =
+        if acc |> List.isEmpty then
+            [min1 / max]
+            |> calc (max2 - incr2)
+        else
+            if (min1 / max2) >= ((min1 + incr1) / max) then acc
+            else
+                acc @ [min1 / max2]
+                |> calc (max2 - incr2)
+    
+    calc max2 []
+
+calcKerim (1N/2N) (1N/2N) (50N) (1N/10N) (1N/10N) (100N)
+|> List.length
+|> fun x -> printfn $"no = {x}"
+
+#!fsharp
+
+let calcDivisorsOfIncrs  min1 incrs1 max1 min2 incrs2 max2 =
+    [
+        for incr1 in incrs1 do
+            for incr2 in incrs2 do
+                yield! calcKerim min1 incr1 max1 min2 incr2 max2
+    ]
+    |> Set.ofList
+
+calcDivisorsOfIncrs (1N/2N) [(1N/2N); (3N/4N)] (50N) (1N/10N) [(1N/10N); (1N/3N)] (100N)
+|> Set.count
+|> fun x -> printfn $"no = {x}"
+
+#!fsharp
+
+List.allPairs [1N/2N..1N/2N..40N] [3N/4N..3N/4N..(6N/4N)] 
+//|> fun xs -> xs |> List.iter (printfn "%A"); xs
+|> List.map (fun (x1, x2) -> x1 * x2)
+|> Set.ofSeq
+|> fun xs -> printfn "before: "; xs |> Set.iter (printf "%A\n") ; xs
+//|> fun xs -> xs |> Set.add ((3N/4N)) 
+|> Set.removeBigRationalMultiples 
+|> fun xs -> printfn "after: ";  xs |> (printfn "%A") ; xs
+|> Set.count

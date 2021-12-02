@@ -165,6 +165,7 @@ module Equation =
     // This is not the same as `isSolved`!! If all 
     // the variables are unrestricted than the equation
     // is not solvable but is also not solved.
+    // ToDo when > 1 variable is <0..> --> also not solvable!! 
     let isSolvable = function 
         | ProductEquation (y, xs)
         | SumEquation (y, xs) ->

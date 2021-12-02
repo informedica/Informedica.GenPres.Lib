@@ -160,7 +160,7 @@ We can also write the logging of all the calculations to a file with the name in
 
 #!fsharp
 
-let fileName = "gentamicin.txt"
+let fileName = "dopamin.txt"
 
 $"{__SOURCE_DIRECTORY__}/{fileName}"
 |> logger.Write

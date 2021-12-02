@@ -116,4 +116,20 @@ module MyType =
     let inline (*) x1 x2 = (?<-) MyTypeExtension x1 x2 
 
 //    let inline (/) x1 x2 = (?<-) Div x1 x2
+let calcKerim min1 incr1 max1 min2 incr2 max2 =
+    let min = min1
+    let max = max2
+    let rec calc min1 incr1 max1 min2 incr2 max2 acc =
+        match acc with
+        | [] ->
+            [min/ max]
+            |> calc min1 incr1 max1 min2 incr2 (max2 - incr2)
+        | h::tail ->
+            if (min1 / max2) >= ((min1 + incr1) / max) then acc
+            else
+                acc @ [min1 / max2]
+                |> calc min1 incr1 max1 min2 incr2 (max2 - incr2)
+    
+    calc min1 incr1 max1 min2 incr2 max2 []
 
+calcKerim (1N/2N) (1N/2N) (6N) (1N/3N) (1N/3N) 3N
