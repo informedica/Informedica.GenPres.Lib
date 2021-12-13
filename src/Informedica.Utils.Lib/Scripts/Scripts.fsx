@@ -3,10 +3,11 @@
 #load "load.fsx"
 
 open System
+open MathNet.Numerics
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 
-BigRational.one
+BigRational.calcConc 50I 2N
 
 // ToDo: need to fix this
 module Double =

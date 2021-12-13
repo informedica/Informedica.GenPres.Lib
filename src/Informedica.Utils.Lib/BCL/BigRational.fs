@@ -173,6 +173,23 @@ module BigRational =
     let inline triangular n = (n * (n + (n/n))) / ((n + n) / n)  
 
 
+    let farey_old n asc =
+        seq {
+            let p = if asc then ref 0I else ref 1I
+            let q = ref 1I
+            let p' = if asc then ref 1I else ref (n - 1I)
+            let q' = ref n
+            yield (!p, !q)
+            while (asc && not (!p = 1I && !q = 1I)) || (not asc && !p > 0I) do
+                let c = (!q + n) / !q'
+                let p'' = c * !p' - !p
+                let q'' = c * !q' - !q
+                p := !p'
+                q := !q'
+                p' := p''
+                q' := q''
+                yield (!p, !q) }
+
     let farey n asc =
         seq {
             let p = if asc then ref 0I else ref 1I
