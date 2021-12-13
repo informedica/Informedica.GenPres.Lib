@@ -1,7 +1,7 @@
 namespace Informedica.Utils.Lib.BCL
 
 /// Helper functions for `BigRational`
-[<AutoOpen>]
+[<RequireQualifiedAccess>]
 module BigRational = 
 
     open System
@@ -29,26 +29,24 @@ module BigRational =
 
 
     /// Utility to enable type inference
-    let get = apply id
-
-
-    /// Parse a string to a bigrational
-    /// Raises an exception `Message` when
-    /// the string cannot be parsed
-    let parse s = 
-        try 
-            s |> BigRational.Parse
-        with
-        | _ -> s |> CannotParseString |> raiseExc
+    let id = apply id
 
 
     /// Parse a string and pass the result 
     /// either to `succ` or `fail` function
     let parseCont succ fail s =
         try 
-            parse s |> succ
+            s 
+            |> BigRational.Parse
+            |> succ
         with
-        | BigRationalException(m) -> m |> fail
+        | _ -> s |> CannotParseString |> fail
+
+
+    /// Parse a string to a bigrational
+    /// Raises an exception `Message` when
+    /// the string cannot be parsed
+    let parse = parseCont id raiseExc
 
 
     /// Try to parse a string and 
@@ -75,7 +73,7 @@ module BigRational =
 
 
     /// Convert a bigrational to a string
-    let toString v = (v |> get).ToString()
+    let toString v = (v |> id).ToString()
 
 
     /// Convert an optional `BigRational` to a `string`.
@@ -110,7 +108,7 @@ module BigRational =
     let isMultiple incr v =
         if incr = 0N then false
         else
-            let incr, v = incr |> get, v |> get 
+            let incr, v = incr |> id, v |> id 
             (v.Numerator * incr.Denominator) % (incr.Numerator * v.Denominator) = 0I
 
     /// Constant 0
@@ -160,7 +158,7 @@ module BigRational =
 
     /// Convert a BigRational to a float
     let toFloat br =
-        ((br |> get).Numerator |> float) / (br.Denominator |> float)
+        ((br |> id).Numerator |> float) / (br.Denominator |> float)
 
     /// Perform a calculation when 
     /// both `n1` and `n2` are 'some'
@@ -170,27 +168,27 @@ module BigRational =
         |_ -> None
 
 
-    let inline triangular n = (n * (n + (n/n))) / ((n + n) / n)  
+    //let inline triangular n = (n * (n + (n/n))) / ((n + n) / n)  
 
-
+    /// Calculate an ordered farey sequence
     let farey n asc =
         seq {
             let p = if asc then ref 0I else ref 1I
             let q = ref 1I
             let p' = if asc then ref 1I else ref (n - 1I)
             let q' = ref n
-            yield (!p, !q)
-            while (asc && not (!p = 1I && !q = 1I)) || (not asc && !p > 0I) do
-                let c = (!q + n) / !q'
-                let p'' = c * !p' - !p
-                let q'' = c * !q' - !q
-                p := !p'
-                q := !q'
-                p' := p''
-                q' := q''
-                yield (!p, !q) }
+            yield (p.Value, q.Value)
+            while (asc && not (p.Value = 1I && q.Value = 1I)) || (not asc && p.Value > 0I) do
+                let c = (q.Value + n) / q'.Value
 
+                p.Value <- p'.Value
+                q.Value <- q'.Value
+                p'.Value <- c * p'.Value - p.Value
+                q'.Value <- c * q'.Value - q.Value
+                yield (p.Value, q.Value) }
 
+    /// Calculate the set of possible solutions with a concentration `conc` up 
+    /// to a maximum value `max` in descending order
     let calcConc max conc =
         seq { for f in (farey max false) do
                 let fn, fd = f

@@ -3,6 +3,7 @@
 #load "load.fsx"
 
 open System
+open MathNet.Numerics
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 
@@ -49,3 +50,6 @@ Double.getPrecision 2 0.00000000666
 Double.getPrecision 2 0.0101 //gives precision 3, but should it be 4?
 
 Double.getPrecision 1 6666666666.666 // (*) can only work with int64 types 
+
+
+BigRational.calcConc 50I 2N

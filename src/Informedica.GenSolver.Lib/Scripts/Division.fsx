@@ -60,7 +60,7 @@ module Set =
 
 
     //    let inline (/) x1 x2 = (?<-) Div x1 x2
-    let calcSingleDivisor2 min1 incr1 max1 min2 incr2 max2 =
+    let calcSingleDivisor2 min1 incr1 min2 incr2 max2 =
         let max_orig = max2
         let rec calc max2 acc =
             match acc with
@@ -78,31 +78,6 @@ module Set =
         calc max2 Set.empty
 
 
-    let calcSingleDivisors3 min1 incr1 max1 min2 incr2 max2 =
-        let a = seq [min1 .. incr1 .. max1]
-        let max_orig = max2
-        let rec calc max2 acc =
-            match acc with
-            | _ when acc |> Set.isEmpty ->
-                set [1N/ max2]
-                |> calc (max2 - incr2)
-            | _ ->
-                if (max2 <= min2) ||
-                   ((1N / max2) >= (2N / max_orig)) then acc
-                else
-                    acc 
-                    |> Set.add (1N / max2)
-                    |> calc (max2 - incr2)
-        
-        calc max2 Set.empty
-        |> Seq.allPairs a
-        |> Set.ofSeq
-        |> Set.map (fun (a, b) -> a * b)
-        |> fun xs ->
-            set [ for x in xs do yield! [x .. x .. (max1 / min2)] ]
-
-
-
 
     let calcDivisorsOfIncrs  min1 incrs1 max1 min2 incrs2 max2 =
         set [
@@ -111,59 +86,8 @@ module Set =
                     if min1 > incr1 then
                         yield! calcSingleDivisor1 min1 incr1 max1 min2 incr2 max2
                     else
-                        yield! calcSingleDivisor2 min1 incr1 max1 min2 incr2 max2
+                        yield! calcSingleDivisor2 min1 incr1 min2 incr2 max2
         ]
-
-
-
-module Types =
-
-    open MathNet.Numerics
-
-
-    /// The minimal value in
-    /// a `Range`. Can be inclusive
-    /// or exclusive.
-    type Minimum =
-        | MinIncl of BigRational
-        | MinExcl of BigRational
-
-
-    /// The maximum value in
-    /// a `Range`. Can be inclusive
-    /// or exclusive.
-    type Maximum =
-        | MaxIncl of BigRational
-        | MaxExcl of BigRational
-
-
-    /// The increment in a `Range`. This is the set of multiples by which each
-    /// value in a `ValueRange` must be divisible. 
-    /// So for each value in valuerange there is an incr -> value % incr = 0
-    ///
-    /// An increment cannnot be zero or negative.   
-    type Increments = Increments of Set<BigRational>
-
-
-    type Range =
-        {
-            Minimum : Minimum option
-            Increments : Increments
-            Maximum : Maximum option
-        }
-
-
-
-module Range =
-
-    open Types
-
-    let create min incrs max =
-        {
-            Minimum = min
-            Increments = incrs
-            Maximum = max
-        }
 
 
 
