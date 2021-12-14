@@ -556,6 +556,7 @@ module Variable =
 
 
         /// Create a `Range` with a `Minimum`, `Increment` and a `Maximum`.
+        [<Obsolete("do not use increments")>]
         let createMinIncrRange vs =
             let incr =
                 vs
@@ -582,12 +583,14 @@ module Variable =
 
 
         /// Create a `MinIncr` `ValueRange`.
+        [<Obsolete("do not use increments")>]
         let minIncrToValueRange min incr =
             let min' = min |> minMultipleOf incr |> Minimum.MinIncl
             (min', incr) |> MinIncr |> Range
 
 
         /// Create an `IncrMax` `ValueRange`.
+        [<Obsolete("do not use increments")>]
         let incrMaxToValueRange incr max =
             let max' = max |> maxMultipleOf incr |> Maximum.MaxIncl
             (incr, max') |> IncrMax |> Range
@@ -611,6 +614,7 @@ module Variable =
         /// Create a `MinIncrMax` `ValueRange`. If **min** > **max** raises 
         /// an `MinLargetThanMax` exception. If min equals max, a `ValueSet` with 
         /// value min (=max).
+        [<Obsolete("do not use increments")>]
         let minIncrMaxToValueRange min incr max =
             let min' = min |> minMultipleOf incr |> Minimum.createMin true
             let max' = max |> maxMultipleOf incr |> Maximum.createMax true
@@ -781,6 +785,7 @@ module Variable =
         /// Apply a **incr** to a `ValueRange` **vr**.
         /// If increment cannot be set the original is returned.
         /// So, the resulting increment is always more restrictive as the previous one
+        [<Obsolete("do not use increments")>]
         let setIncr incr vr =
             let cr = create None
 
@@ -1006,6 +1011,7 @@ module Variable =
         /// Calculate an increment with
         /// **incr1** of x1 and **incr2** of x2
         /// in an equation: y = x1 **op** x2
+        [<Obsolete("do not use increments")>]
         let calcIncr op incr1 incr2 =
             match incr1, incr2 with
             | Some (Increment.Increment i1), Some (Increment.Increment i2) ->
@@ -1430,6 +1436,7 @@ module Variable =
         let setMax  max incl dto = { dto with Unr = false; Max = max; MaxIncl = incl }
 
         /// Set an `incr` to a **dto**
+        [<Obsolete("do not use increments")>]
         let setIncr incr dto = { dto with Unr = false; Incr = incr }
 
         /// Match a string **p** to a field of `Dto`
