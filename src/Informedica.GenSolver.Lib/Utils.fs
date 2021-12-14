@@ -7,7 +7,7 @@
 module BigRational = 
     
     open MathNet.Numerics
-    open Informedica.Utils.Lib.BCL.BigRational
+    open Informedica.Utils.Lib.BCL
     
     /// ToDo: doesn't return `NoOp` but fails, 
     /// have to rewrite
@@ -18,10 +18,10 @@ module BigRational =
     /// the operation is neither.
     let (|Mult|Div|Add|Subtr|) op =
         match op with
-        | _ when op |> opIsMult  -> Mult
-        | _ when op |> opIsDiv   -> Div
-        | _ when op |> opIsAdd   -> Add
-        | _ when op |> opIsSubtr -> Subtr
+        | _ when op |> BigRational.opIsMult  -> Mult
+        | _ when op |> BigRational.opIsDiv   -> Div
+        | _ when op |> BigRational.opIsAdd   -> Add
+        | _ when op |> BigRational.opIsSubtr -> Subtr
         | _ -> failwith "Operator is not supported"
 
     let private toMultipleOf b d n  =
