@@ -16,7 +16,7 @@ module Props =
         | _ ->
             match p with
             | ValsProp _ -> "all ready matched" |> failwith
-            | IncrProp vs -> vs |> ValueRange.createMinIncrRange
+//            | IncrProp vs -> vs |> ValueRange.createMinIncrRange
             | MinInclProp v -> v |> ValueRange.createMinRange true 
             | MinExclProp v -> v |> ValueRange.createMinRange false 
             | MaxInclProp v -> v |> ValueRange.createMaxRange true 
@@ -33,9 +33,9 @@ module Props =
     | MaxInclProp v | MaxExclProp v -> v |> Some
     | _ -> None
 
-    let getIncr = function
-    | IncrProp vs -> vs |> Some
-    | _ -> None
+    // let getIncr = function
+    // | IncrProp vs -> vs |> Some
+    // | _ -> None
 
 
 
@@ -61,7 +61,7 @@ module Constraint =
                 else              n, c
             | MinInclProp _
             | MinExclProp _   -> -5, c
-            | IncrProp _      -> -4, c
+//            | IncrProp _      -> -4, c
             | _               -> -2, c
 
 

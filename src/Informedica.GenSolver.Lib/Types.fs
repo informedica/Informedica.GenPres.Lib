@@ -106,7 +106,7 @@ module Types =
     /// * `MaxExcl`: An exclusive maximum
     type Property =
         | ValsProp of BigRational Set
-        | IncrProp of BigRational Set
+//        | IncrProp of BigRational Set
         | MinInclProp of BigRational
         | MinExclProp of BigRational
         | MaxInclProp of BigRational

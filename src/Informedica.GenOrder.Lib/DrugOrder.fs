@@ -100,8 +100,8 @@ module DrugOrder =
                   AnyRouteShape AnyOrder
                 c OrderAdjustQty (MinInclProp (250N/1000N)) NoLimit 
                   AnyRouteShape AnyOrder
-                c OrderAdjustQty ((50N/1000N) |> Set.singleton |> IncrProp) NoLimit 
-                  AnyRouteShape AnyOrder
+                // c OrderAdjustQty ((50N/1000N) |> Set.singleton |> IncrProp) NoLimit 
+                //   AnyRouteShape AnyOrder
                 // == Oral Solid ==
                 // == Discontinuous ==
                 // give max 10 pieces each time
@@ -181,8 +181,8 @@ module DrugOrder =
             let ot = o |> OrderType.map
 
             let propHasVals = function
-            | ValsProp vs
-            | IncrProp vs -> vs |> Set.isEmpty |> not
+            | ValsProp vs -> vs |> Set.isEmpty |> not
+//            | IncrProp vs -> vs |> Set.isEmpty |> not
             | _ -> true
 
             let filter cs =
@@ -422,48 +422,48 @@ module DrugOrder =
                         OralSolid DiscontinuousOrder
 
                     // ORAL FLUID increment
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid DiscontinuousOrder
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid ContinuousOrder
+                    // cstr OrderableDoseQty 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     OralFluid DiscontinuousOrder
+                    // cstr OrderableDoseQty 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     OralFluid TimedOrder
+                    // cstr OrderableDoseRate 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     OralFluid TimedOrder
+                    // cstr OrderableDoseRate 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     OralFluid ContinuousOrder
 
                     // INTRAVENUOUS FLUID increment
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid DiscontinuousOrder
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid ContinuousOrder
+                    // cstr OrderableDoseQty 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     IntravenousFluid DiscontinuousOrder
+                    // cstr OrderableDoseQty 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     IntravenousFluid TimedOrder
+                    // cstr OrderableDoseRate 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     IntravenousFluid TimedOrder
+                    // cstr OrderableDoseRate 
+                    //     ((1N/d.Divisible) |> Set.singleton 
+                    //                         |> IncrProp)
+                    //     NoLimit
+                    //     IntravenousFluid ContinuousOrder
 
                 ]
         |> fun co ->
@@ -496,22 +496,22 @@ module DrugOrder =
                                     |> Set.ofList |> ValsProp)
                                 NoLimit
                                 OralFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible]
-                                    |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid DiscontinuousOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid TimedOrder
+                            // DrugConstraint.create n 
+                            //     ComponentOrderableQty 
+                            //     ([ 1N / d.Divisible]
+                            //         |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     OralFluid AnyOrder
+                            // DrugConstraint.create n 
+                            //     ComponentDoseQty 
+                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     OralFluid DiscontinuousOrder
+                            // DrugConstraint.create n 
+                            //     ComponentDoseQty 
+                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     OralFluid TimedOrder
                             //DrugConstraint.create n 
                             //    ComponentDoseRate 
                             //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
@@ -530,22 +530,22 @@ module DrugOrder =
                                     |> Set.ofList |> ValsProp)
                                 NoLimit
                                 IntravenousFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible ]
-                                    |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid DiscontinuousOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid TimedOrder
+                            // DrugConstraint.create n 
+                            //     ComponentOrderableQty 
+                            //     ([ 1N / d.Divisible ]
+                            //         |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     IntravenousFluid AnyOrder
+                            // DrugConstraint.create n 
+                            //     ComponentDoseQty 
+                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     IntravenousFluid DiscontinuousOrder
+                            // DrugConstraint.create n 
+                            //     ComponentDoseQty 
+                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
+                            //     NoLimit
+                            //     IntravenousFluid TimedOrder
                             //DrugConstraint.create n 
                             //    ComponentDoseRate 
                             //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)

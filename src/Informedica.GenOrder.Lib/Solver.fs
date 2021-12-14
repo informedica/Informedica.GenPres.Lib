@@ -274,7 +274,7 @@ module Solver =
 
         match p with
         | ValsProp vs   -> vs |> setToBase ValsProp
-        | IncrProp vs   -> vs |> setToBase IncrProp
+//        | IncrProp vs   -> vs |> setToBase IncrProp
         | MinInclProp v -> v  |> valToBase MinInclProp
         | MinExclProp v -> v  |> valToBase MinExclProp
         | MaxInclProp v -> v  |> valToBase MaxInclProp

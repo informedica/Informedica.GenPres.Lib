@@ -3,6 +3,7 @@
 /// Functions that deal with the `VariableUnit` type
 module VariableUnit =
 
+    open System
     open MathNet.Numerics
 
     open Informedica.Utils.Lib
@@ -150,6 +151,7 @@ module VariableUnit =
     let setMaxIncl =
         setValue (Maximum.createMax true) ValueRange.setMax
 
+    [<Obsolete("do not use increments")>]
     let setIncr vs vru =
 
         let incr =
