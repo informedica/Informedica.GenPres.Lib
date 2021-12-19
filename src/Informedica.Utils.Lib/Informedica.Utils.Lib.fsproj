@@ -15,6 +15,7 @@
     <Compile Include="BCL\String.fs" />
     <Compile Include="BCL\Int32.fs" />
     <Compile Include="BCL\Double.fs" />
+    <Compile Include="BCL\BigInteger.fs" />
     <Compile Include="BCL\BigRational.fs" />
     <Compile Include="BCL\DateTime.fs" />
     <Compile Include="Option.fs" />

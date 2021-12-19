@@ -60,15 +60,14 @@ module BigRational =
     let fromInt = BigRational.FromInt
 
 
+    let fromBigInt = BigRational.FromBigInt
+
+
     /// Get the greatest common divisor
     /// of two bigrationals `a` and `b`
     let gcd (a : BigRational) (b: BigRational) =
         let den = a.Denominator * b.Denominator
-        let rec gcd' a' b' =
-            match b' with
-            | _  when b' = 0I -> abs a'
-            | _ -> gcd' b' (a' % b')
-        let num = gcd' (a.Numerator * b.Denominator) (b.Numerator * a.Denominator)
+        let num = BigInteger.gcd (a.Numerator * b.Denominator) (b.Numerator * a.Denominator)
         (num |> BigRational.FromBigInt) / (den |> BigRational.FromBigInt)
 
 

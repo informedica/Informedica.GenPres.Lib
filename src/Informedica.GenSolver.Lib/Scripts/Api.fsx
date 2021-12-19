@@ -7,7 +7,6 @@
 
 open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
-open Informedica.GenSolver.Utils
 open MathNet.Numerics
 open Types
 
