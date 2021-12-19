@@ -18,7 +18,6 @@ module VariableUnit =
     module ValueRange  = Variable.ValueRange
     module Minimum = ValueRange.Minimum
     module Maximum = ValueRange.Maximum
-    module Increment = ValueRange.Increment
     module Equation    = Informedica.GenSolver.Lib.Equation
 
     module VariableDto = Informedica.GenSolver.Lib.Variable.Dto
@@ -36,9 +35,9 @@ module VariableUnit =
         { Variable = var; Unit = un } 
         
     /// Create a `VariableUnit` with preset values
-    let create n vs min incr max un =
+    let create n vs min max un =
 
-        ValueRange.create vs min incr max
+        ValueRange.create vs min max
         |> function
         | vlr ->
             let var = Variable.create id n vlr        
@@ -150,25 +149,6 @@ module VariableUnit =
 
     let setMaxIncl =
         setValue (Maximum.createMax true) ValueRange.setMax
-
-    [<Obsolete("do not use increments")>]
-    let setIncr vs vru =
-
-        let incr =
-            vs
-            |> List.map (fun v -> vru |> valueToBase v)
-            |> Set.ofList
-            |> Increment.createIncr
-
-        vru
-        |> getVar
-        |> Variable.getValueRange
-        |> ValueRange.setIncr incr
-        |> fun vr ->
-            { vru with 
-                Variable = 
-                    vr 
-                    |> Variable.setValueRange vru.Variable }
 
 
     let setVals vs vru =
@@ -373,19 +353,10 @@ module VariableUnit =
                     |> Some
 
             let min  = dto.Min  |> map  (toBase >> Minimum.createMin  dto.MinIncl)
-            let incr = 
-                dto.Incr
-                |> List.map toBase 
-                |> function
-                | [] -> None
-                | incr -> 
-                    incr
-                    |> Set.ofList
-                    |> Increment.createIncr |>Some
 
             let max  = dto.Max  |> map  (toBase >> Maximum.createMax  dto.MaxIncl)
 
-            create n vals min incr max un
+            create n vals min max un
 
         let toDto (vu : VariableUnit) =
             let toUnit = 
@@ -433,17 +404,6 @@ module VariableUnit =
                     |> List.map toUnit
                 | None -> []
 
-            dto.Incr <-
-                vr
-                |> ValueRange.getIncr
-                |> function
-                | None -> []
-                | Some i -> 
-                    i
-                    |> Increment.incrToBigRationalSet 
-                    |> Set.toList
-                    |> List.map toUnit
-
             dto.Min <- min
             dto.MinIncl <- inclMin
             dto.Max <- max
@@ -477,8 +437,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Frequency 
 
         /// Create a `Frequency` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Frequency
         
         /// Create a `Frequency` with name **n**
@@ -530,8 +490,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Time 
 
         /// Create a `Time` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Time
             
         /// Create a `Time` with name **n**
@@ -579,8 +539,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Count 
 
         /// Create a `Count` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Count
             
         /// Create a `Count` with name **n**
@@ -627,8 +587,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Quantity 
         
         /// Create a `Quantity` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Quantity
 
         /// Create a `Quantity` with name **n**
@@ -684,8 +644,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Total 
         
         /// Create a `Total` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Total
         
         /// Create a `Total` with name **n**
@@ -747,8 +707,8 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Rate 
 
         /// Create a `Rate` with a preset `Variable`
-        let create n vs min incr max un = 
-            create n vs min incr max un 
+        let create n vs min max un = 
+            create n vs min max un 
             |> Rate
                 
         /// Create a `Rate` with name **n**
@@ -811,9 +771,9 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt Concentration 
         
         /// Create a `Concentration` with a preset `Variable`
-        let create n vs min incr max un = 
+        let create n vs min max un = 
             un
-            |> create n vs min incr max
+            |> create n vs min max
             |> Concentration
                 
         /// Create a `Concentration` with name **n**
@@ -870,9 +830,9 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt QuantityAdjust 
 
         /// Create a `QuantityAdjust` with a preset `Variable`
-        let create n vs min incr max un = 
+        let create n vs min max un = 
             un
-            |> create n vs min incr max  
+            |> create n vs min max  
             |> QuantityAdjust
         
         /// Create a `QuantityAdjust` with name **n**
@@ -934,9 +894,9 @@ module VariableUnit =
         let fromVar = fromVar toVarUnt TotalAdjust 
 
         /// Create a `TotalAdjust` with a preset `Variable`
-        let create n vs min incr max un = 
+        let create n vs min max un = 
             un 
-            |> create n vs min incr max  
+            |> create n vs min max  
             |> TotalAdjust
                 
         /// Create a `TotalAdjust` with name **n**
@@ -1001,9 +961,9 @@ module VariableUnit =
         let fromDto dto = dto |> Dto.fromDto |> RateAdjust
 
         /// Create a `RateAdjust` with a preset `Variable`
-        let create n vs min incr max un =
+        let create n vs min max un =
             un
-            |> create n vs min incr max
+            |> create n vs min max
             |> RateAdjust
         
         /// Create a `RateAdjust` with name **n**

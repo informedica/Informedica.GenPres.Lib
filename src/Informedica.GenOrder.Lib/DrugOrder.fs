@@ -530,32 +530,6 @@ module DrugOrder =
                                     |> Set.ofList |> ValsProp)
                                 NoLimit
                                 IntravenousFluid AnyOrder
-                            // DrugConstraint.create n 
-                            //     ComponentOrderableQty 
-                            //     ([ 1N / d.Divisible ]
-                            //         |> Set.ofList |> IncrProp)
-                            //     NoLimit
-                            //     IntravenousFluid AnyOrder
-                            // DrugConstraint.create n 
-                            //     ComponentDoseQty 
-                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //     NoLimit
-                            //     IntravenousFluid DiscontinuousOrder
-                            // DrugConstraint.create n 
-                            //     ComponentDoseQty 
-                            //     ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //     NoLimit
-                            //     IntravenousFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    IntravenousFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    IntravenousFluid ContinuousOrder
 
                             // RECTAL SOLID
                             DrugConstraint.create n 

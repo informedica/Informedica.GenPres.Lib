@@ -1,6 +1,7 @@
 ﻿namespace Informedica.GenSolver.Lib
 
 
+
 module Props =
 
     open Types
@@ -21,7 +22,7 @@ module Props =
             | MinExclProp v -> v |> ValueRange.createMinRange false 
             | MaxInclProp v -> v |> ValueRange.createMaxRange true 
             | MaxExclProp v -> v |> ValueRange.createMaxRange false 
-            |> ValueRange.Range
+            | DeltaProp _ -> "not implemented" |> failwith
 
 
     let getMin = function
@@ -134,7 +135,7 @@ module Constraint =
                         else xs |> List.sortDescending
                     |> List.take l
                     |> Set.ofList
-                    |> ValueRange.createValueSet
+                    |> ValueRange.ValueSet.create
                     |> Variable.setValueRange vr
                 | None -> vr
 
@@ -187,4 +188,5 @@ module Constraint =
                 |> Logging.logInfo log
 
                 eqs
+
 

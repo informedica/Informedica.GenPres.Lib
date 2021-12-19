@@ -1,9 +1,10 @@
 ﻿namespace Informedica.GenSolver.Lib
 
-open System
-open MathNet.Numerics
 
 module Types =
+
+    open System
+    open MathNet.Numerics
 
     /// Represents a non empty/null string identifying a `Variable`.
     /// `Name` can be no longer than 1000 characters.
@@ -26,43 +27,22 @@ module Types =
         | MaxExcl of BigRational
 
 
-    /// The increment in a `Range`. This is the set of multiples by which each
-    /// value in a `ValueRange` must be divisible. 
-    /// So for each value in valuerange there is an incr -> value % incr = 0
-    ///
-    /// An increment cannnot be zero or negative.   
-    type Increment = Increment of Set<BigRational>
+    type Range =
+        {   
+            Multiples : bigint Set
+            Delta : BigRational
+        }
 
 
     /// `ValueRange` represents a discrete set of
     /// rational numbers.
-    /// A `ValueRange` is either unrestricted,
-    /// a finite set of `BigRational` or a `Range`.
-    ///
-    /// Notation:
-    /// * Unrestricted: <..>
-    /// * ValueSet: [1N/2N, 2N, 3N/5N, 5N]
-    /// * Range: <0N..[2N,3N]..20N] 
     type ValueRange =
         | Unrestricted
-// ToDo need to model this
-//        | NotZero
-        | ValueSet of Set<BigRational>
-        | Range of Range
-
-
-    /// A `Range` is restricted by either a
-    /// `Minimum`, a `Maximum`, a `Minimum`
-    /// and a increment, an increment and
-    /// a `Maximum` or a `Minimum` and a
-    /// `Maximum`. 
-    and Range =
         | Min of Minimum
         | Max of Maximum
-        | MinIncr of Minimum * Increment
-        | IncrMax of Increment * Maximum
         | MinMax  of Minimum * Maximum
-        | MinIncrMax of Minimum * Increment * Maximum
+        | Range of Range
+        | ValueSet of Set<BigRational>
 
 
     /// Represents a variable in an
@@ -99,14 +79,13 @@ module Types =
     /// Represents a property of a `Variable`.
     ///
     /// * `Vals`: A set of distinct values
-    /// * `Increment`: A set of distinct increments
     /// * `MinIncl`: An inclusive minimum
     /// * `MinExcl`: An exclusive minimum
     /// * `MaxIncl`: An inclusive maximum
     /// * `MaxExcl`: An exclusive maximum
     type Property =
         | ValsProp of BigRational Set
-//        | IncrProp of BigRational Set
+        | DeltaProp of BigRational
         | MinInclProp of BigRational
         | MinExclProp of BigRational
         | MaxInclProp of BigRational
@@ -159,7 +138,6 @@ module Types =
         type Message =
         | NameNullOrWhiteSpaceException
         | NameLongerThan1000 of string
-        | IncrementZeroNegativeOrEmpty of BigRational Set
         | ValueRangeMinLargerThanMax of Minimum * Maximum
         | ValueRangeNotAValidOperator
         | ValueRangeEmptyValueSet

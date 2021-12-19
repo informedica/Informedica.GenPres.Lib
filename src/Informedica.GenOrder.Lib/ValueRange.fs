@@ -15,54 +15,32 @@ module ValueRange =
                 |> List.map (ValueUnit.create un)
                 |> List.map ValueUnit.toUnit
 
-            print exact false vs None false [] None false
+            print exact false None false None false vs 
     
         let some =
             ValueUnit.create un
             >> ValueUnit.toUnit
             >> Some
 
-        let fRange =
-            let print min minincl incr max maxincl = print exact false [] min minincl incr max maxincl
+        let unr = print exact true None false None false []
 
-            let fMin min =
-                let incl, min = min |> Minimum.minToBoolBigRational
-                print (some min) incl [] None false
+        let print min minincl max maxincl = print exact false min minincl max maxincl []
 
-            let fMax max =
-                let incl, max = max |> Maximum.maxToBoolBigRational
+        let fMin min =
+            let incl, min = min |> Minimum.minToBoolBigRational
+            print (some min) incl None false
 
-                print None false [] (some max) incl
+        let fMax max =
+            let incl, max = max |> Maximum.maxToBoolBigRational
 
-            let fMinIncr (min, incr)  = 
-                let incl, min = min |> Minimum.minToBoolBigRational
-                let incr = incr |> Increment.incrToBigRationalSet |> Set.toList
+            print None false (some max) incl
+
+        let fMinMax (min, max) =
+            let maxincl, min = min |> Minimum.minToBoolBigRational
+            let minincl, max = max |> Maximum.maxToBoolBigRational
+
+            print (some min) minincl (some max) maxincl
     
-                print (some min) incl incr None false
-
-            let fIncrMax (incr, max)  = 
-                let incl, max = max |> Maximum.maxToBoolBigRational
-                let incr = incr |> Increment.incrToBigRationalSet |> Set.toList
-    
-                print None false incr (some max) incl
-
-            let fMinMax (min, max) =
-                let maxincl, min = min |> Minimum.minToBoolBigRational
-                let minincl, max = max |> Maximum.maxToBoolBigRational
-
-                print (some min) minincl [] (some max) maxincl
-
-            let fMinIncrMax (min, incr, max) =
-                let maxincl, min = min |> Minimum.minToBoolBigRational
-                let minincl, max = max |> Maximum.maxToBoolBigRational
-                let incr = incr |> Increment.incrToBigRationalSet |> Set.toList
-
-                print (some min) minincl incr (some max) maxincl
-
-            applyRange fMin fMax fMinIncr fIncrMax fMinMax fMinIncrMax
-
-        let unr = print exact true [] None false [] None false
-    
-        vr |> apply unr fVs fRange 
+        vr |> apply unr fMin fMax fMinMax (fun _ -> "") fVs 
 
 

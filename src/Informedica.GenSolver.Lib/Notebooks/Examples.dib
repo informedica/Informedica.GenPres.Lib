@@ -51,7 +51,6 @@ The solver will "solve" an ``Equation`` or a set of equations. An equation can b
 - No constraint, i.e. the variable can be any rational number
 - A lower and/or upper limit, i.e. the variable can be any rational number within the limits of a lower and/or upper limit. 
 - A limit can be inclusive or exclusive corresponding with ``>=, >, <, <=``.
-- Increments, i.e. the variable can only contain rational numbers that are a multiple of one of the increments. 
 - A set of numbers, i.e. the variable can only be one of the set.
 
 When a variable is constraint to just one rational number, that variable is considered solved. When a variable is not solved the variable can have an further limitation until the variable is solved.
@@ -61,7 +60,6 @@ A variable (with name a) is printed out as:
 - ``a <..>``
 - ``a <0..>``
 - ``a [0..>``
-- ``a <..3..>``
 - ``a [1, 2, 3]``
 
 When a variable is limited by, for example ``[0..5>``, then you can
@@ -461,96 +459,6 @@ prodEq1
 
 #!markdown
 
-## Setting one or more increments
-
-#!markdown
-
-Limiting ``b`` to an increment of 1. 
-
-**Note**
-Setting an increment also results in a lower limit! This mathematically not correct, but for the use case of GenSolver not a problem as negative numbers are not needed.
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([3N] |> Set.ofList))
-|> printEqs 
-|> ignore
-
-#!markdown
-
-Setting an increment and an upper limit will result in a variable with a lower limit, upper limit, both multiples of the increment(-s) and the increment(-s).
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([3N] |> Set.ofList))
-|> printEqs 
-|> ignore
-
-prodEq1
-|> solve "b" (IncrProp ([3N] |> Set.ofList))
-|> solve "b" (MaxExclProp 7N)
-|> printEqs 
-|> ignore
-
-#!markdown
-
-We can also set multiple increments to ``b``, for example 2, 3, 6. 
-
-**Note**
-As 6 is a already a multiple of 2 and 3, this will be eliminated from the list. 
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-|> printEqs 
-|> ignore
-
-#!markdown
-
-Setting an increment and an upper limit wil in result in a descriptive range, from which each value can be calculated. However, in case of a wide range with small increments, this would result in a large set of values with a substantial performance penalty.
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-|> solve "b" (MaxInclProp 24N)
-|> printEqs 
-|> ignore
-
-#!markdown
-
-When ``c`` is limited to a set of values, the increment of ``a`` is calculated accordingly.
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-|> solve "b" (MaxInclProp 24N)
-|> solve "a" (MaxInclProp 720N)
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> printEqs 
-|> ignore
-
-#!markdown
-
-When setting ``b`` to a set of values, these will be filtered by the increments.
-
-#!fsharp
-
-prodEq1
-|> solve "b" (IncrProp ([2N; 3N; 6N] |> Set.ofList))
-|> solve "b" (MaxInclProp 24N)
-|> solve "a" (MaxInclProp 720N)
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "b" (ValsProp ([2N..2N..6N] |> Set.ofList))
-|> printEqs 
-|> ignore
-
-#!markdown
-
 ## Solving multiple equations
 
 #!markdown
@@ -673,7 +581,7 @@ Also we cannot break a suppository we always need to give whole supps.
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> printEqs
 |> ignore
 
@@ -685,7 +593,7 @@ In the drug formulary we can read that the daily adjusted dose of paracetamol sh
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> printEqs
@@ -699,7 +607,7 @@ But we should never give more than 1000 mg each time and 4000 mg total per day.
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
@@ -715,30 +623,12 @@ The drug formulary also states that you should give a supp 2, 3, 4 or 6 times a 
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
-|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> printEqs
-|> ignore
-
-#!markdown
-
-A further limitation is that in fact you would not give more than 1 supp each time.
-
-#!fsharp
-
-pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
-|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
 |> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
+|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
+|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
 |> printEqs
 |> ignore
 
@@ -752,13 +642,12 @@ We can now set the weight of the patient to for example 10 kg.
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
 |> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
 |> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
 |> printEqs
 |> ignore
@@ -771,14 +660,13 @@ And if we then pick a frequency of 3, there is a solved equation set.
 
 pcmEqs
 |> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (IncrProp ([1N] |> Set.ofList))
+|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
 |> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
 |> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
 |> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
 |> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
 |> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N; 2N] |> Set.ofList))
 |> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
-|> solve "Frequency" (ValsProp ([3N; 4N; 6N] |> Set.ofList))
+|> solve "Frequency" (ValsProp ([3N] |> Set.ofList))
 |> printEqs
 |> ignore

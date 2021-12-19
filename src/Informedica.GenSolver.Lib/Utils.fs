@@ -3,71 +3,20 @@
 /// ToDo: should move to Informedica.Utils.Lib
 
 
-/// Helper functions for `BigRational`
-module BigRational = 
-    
-    open MathNet.Numerics
-    open Informedica.Utils.Lib.BCL
-    
-    /// ToDo: doesn't return `NoOp` but fails, 
-    /// have to rewrite
-    /// 
-    /// Match an operator `op` to either
-    /// multiplication, division, addition
-    /// or subtraction, returns `NoOp` when
-    /// the operation is neither.
-    let (|Mult|Div|Add|Subtr|) op =
-        match op with
-        | _ when op |> BigRational.opIsMult  -> Mult
-        | _ when op |> BigRational.opIsDiv   -> Div
-        | _ when op |> BigRational.opIsAdd   -> Add
-        | _ when op |> BigRational.opIsSubtr -> Subtr
-        | _ -> failwith "Operator is not supported"
 
-    let private toMultipleOf b d n  =
-        let m = (n / d) |> BigRational.ToBigInt |> BigRational.FromBigInt
-        if b then
-            if m * d < n then (m + 1N) * d else m * d
-        else 
-            if m * d > n then (m - 1N) * d else m * d
+/// Helper functions for `Option`
+module Option = 
+
+    let none _ = None
 
 
-    let toMinMultipleOf = toMultipleOf true
 
-    let toMaxMultipleOf = toMultipleOf false
+module Boolean =
 
-        
-    let calcMinOrMaxToMultiple isMax isIncl incrs m =
-        incrs
-        |> Set.fold (fun (b, acc) i ->
-            let ec = if isMax then (>=) else (<=)
-            let nc = if isMax then (>) else (<)
-            let ad = if isMax then (-) else (+)
+    let returnFalse _ = false
 
-            let m' = 
-                if isMax then m |> toMaxMultipleOf i
-                else m |> toMinMultipleOf i
-                
-            let m' = 
-                if (isIncl |> not) && (m' |> ec <| m) then 
-                    printfn $"recalc because is excl: {(m' |> ad <| i) }"
-                    (m' |> ad <| i) 
-                else m'
-            
-            match acc with 
-            | Some a -> if (m' |> nc <| a) then (true, Some m') else (b, Some a)
-            | None   -> (true, Some m')
-        ) (isIncl, None)
-        |> fun (b, r) -> b, r |> Option.defaultValue m
+    let returnTrue _ = true
 
-
-    let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
-
-    let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
-
-    let minInclMultipleOf = calcMinOrMaxToMultiple false true
-
-    let minExclMultipleOf = calcMinOrMaxToMultiple false false
 
 
 /// Helper functions for `List`
@@ -92,21 +41,3 @@ module List =
                 if x' |> pred then x else x'
             )
         else x::xs
-
-
-/// Helper functions for `Array`
-module Array = 
-    
-    let replace pred x xs = 
-        xs 
-        |> Array.toList 
-        |> List.replace pred x
-        |> List.toArray
-
-
-/// Helper functions for `Option`
-module Option = 
-
-    let none _ = None
-
-

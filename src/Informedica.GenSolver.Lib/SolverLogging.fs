@@ -1,5 +1,6 @@
 ﻿namespace Informedica.GenSolver.Lib
 
+
 module SolverLogging =
     
     open Informedica.Utils.Lib.BCL
@@ -12,13 +13,6 @@ module SolverLogging =
     module ValueRange = Variable.ValueRange
 
     let printException = function
-    | Exceptions.IncrementZeroNegativeOrEmpty vs ->
-        if vs |> Set.isEmpty then "Increment has no values"
-        else
-            vs
-            |> Set.map (BigRational.toString)
-            |> String.concat ", "
-            |> sprintf "Increment contains the zero or negative values: %s"
     | Exceptions.ValueRangeEmptyValueSet -> 
         "ValueRange cannot have an empty value set"
     | Exceptions.EquationEmptyVariableList -> 

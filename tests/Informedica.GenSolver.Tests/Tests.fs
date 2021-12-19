@@ -39,52 +39,6 @@ module Generators =
         }
 
 
-module Utils =
-
-    let config = Generators.config
-
-    [<Tests>]
-    let tests =
-
-        testList "Utils tests" [
-
-            testList "Given an empty set of increments" [
-                let act =
-                    10N
-                    |> BigRational.maxInclMultipleOf Set.empty
-                let exp = (true, 10N)        
-
-                test "any max will remain the same max" {
-                    Expect.equal "always true" exp act
-                }   
-
-                testPropertyWithConfig config "with any incl or excl min max" <| fun (minmax : bool * bool * BigRational) ->
-                    let (b1, b2, m) = minmax
-                    BigRational.calcMinOrMaxToMultiple b1 b2 Set.empty m
-                    |> Expect.equal "should return the same" (b2, m)
-
-                testPropertyWithConfig config "with any max" <| fun (m : BigRational) ->
-                    m
-                    |> BigRational.maxInclMultipleOf Set.empty
-                    |> Expect.equal "should return the same" (true, m)
-
-                testPropertyWithConfig config "with any min" <| fun (m : BigRational) ->
-                    m
-                    |> BigRational.minInclMultipleOf Set.empty
-                    |> Expect.equal "should return the same" (true, m)
-            ]            
-
-            testList "Given any set of increments" [
-                
-                testPropertyWithConfig config "with max incl 10" <| fun (incrs: BigRational list) ->
-                    Expect.isTrue "true" true
-
-            ]
-
-        ]
-
-
-
 
 
 module Name =
@@ -116,40 +70,6 @@ module Name =
 
 
 
-module Increment =
-
-    open Informedica.GenSolver.Lib.Variable.ValueRange
-
-    [<Tests>]
-    let tests =
-        testList "Increment" [
-
-            test "create" {
-                let act = 
-                    [2N; 3N; 6N; 11N; 12N; 16N; 19N]
-                    |> Set.ofList
-                    |> Increment.createIncr
-                    |> Increment.incrToBigRationalSet
-
-                let exp = [2N; 3N; 11N; 19N] |> Set.ofList
-                Expect.equal "removes multiples" exp act
-            }
-
-            test "create min incr range" {
-                let act = 
-                    [2N; 3N; 6N; 11N; 12N; 16N; 19N]
-                    |> Set.ofList
-                    |> createMinIncrRange
-                    |> function
-                    | MinIncr(_, (Increment vs)) -> vs
-                    | _ -> Set.empty
-
-                let exp = [2N; 3N; 11N; 19N] |> Set.ofList
-                Expect.equal "removes multiples" exp act
-            }
-
-        ]
-
 
 
 module ValueRange =
@@ -173,11 +93,11 @@ module ValueRange =
 
     let contains v vr = vr |> ValueRange.contains v
 
-    let isBetweenMinMax min max  = ValueRange.isBetweenAndMultOf min None max 
+    let isBetweenMinMax min max  = ValueRange.isBetween min max 
 
     let createMinMax succ fail vs min max = 
         try 
-            ValueRange.create vs min None max
+            ValueRange.create vs min max
             |> succ
         with
         | e -> 
@@ -250,7 +170,7 @@ module ValueRange =
                 |> testCase "Counting returns zero"
     
                 fun  x -> 
-                    let vr = ValueRange.create None None None None
+                    let vr = ValueRange.create None None None
                     vr |> contains x
                 |> testProp "The ValueRange can contain any Value"
             ]
@@ -429,7 +349,7 @@ module ValueRange =
 
                 let create incl v = 
                     ValueRange.create None 
-                        (v |> Minimum.createMin incl |> Some) None None
+                        (v |> Minimum.createMin incl |> Some) None
 
                 let test op pred v1 incl1 v2 incl2 =
                     let vr1 = v1 |> create incl1 
@@ -463,8 +383,8 @@ module ValueRange =
 
             testList "Given a calculation with ValueRange with a Min and a ValueRange with a Max" [
 
-                let createVrMin incl v = ValueRange.create None (v |> Minimum.createMin incl |> Some) None None
-                let createVrMax incl v = ValueRange.create None None None (v |> Maximum.createMax incl |> Some)
+                let createVrMin incl v = ValueRange.create None (v |> Minimum.createMin incl |> Some) None
+                let createVrMax incl v = ValueRange.create None None (v |> Maximum.createMax incl |> Some)
 
                 let prop op predMin predMax v1 incl1 v2 incl2 =
                     let vr1 = v1 |> createVrMin incl1 
@@ -533,8 +453,8 @@ module ValueRange =
             
             testList "Given calculation with ValueRange with a Max and a ValueRange with a Min" [
 
-                let createVrMin incl v = ValueRange.create None (v |> Minimum.createMin incl |> Some) None None
-                let createVrMax incl v = ValueRange.create None None None (v |> Maximum.createMax incl |> Some)
+                let createVrMin incl v = ValueRange.create None (v |> Minimum.createMin incl |> Some) None
+                let createVrMax incl v = ValueRange.create None None (v |> Maximum.createMax incl |> Some)
 
                 let prop op predMin predMax v1 incl1 v2 incl2 =
                     let vr1 = v1 |> createVrMax incl1 
@@ -695,7 +615,7 @@ module ValueRange =
             
             testList "Dto, There and back again" [
 
-                fun vs min minincl incr max maxincl ->
+                fun vs min minincl max maxincl ->
         
                     let fromDto = DTO.fromDtoOpt
                     let toDto   = DTO.toDto
@@ -712,10 +632,6 @@ module ValueRange =
                                 | _  -> dto |> DTO.setVals vs
                             let dto = if min <= max then dto |> setMin min else dto
                             let dto = if max >= min then dto |> setMax max else dto
-                            let dto = 
-                                match incr |> List.filter ((<) 0N) with
-                                | [] -> dto
-                                | i  -> dto |> DTO.setIncr i
                             dto
                         with _ -> dto
                         
@@ -740,36 +656,3 @@ module ValueRange =
 
 
 
-module Variable =
-    
-    open Variable.Operators
-
-    [<Tests>]
-    let tests =
-
-        testList "Given a variable with an incr and upper limit" [
-
-            test "multiplying by 1 should" {
-                let v1 =
-                    Variable.Dto.createNew "v1"
-                    |> Variable.Dto.setVals [1N]
-                    |> Variable.Dto.fromDto
-
-                let v2 = 
-                    Variable.Dto.createNew "v2"
-                    // ToDo: shouldn't need to set min
-                    |> Variable.Dto.setMin (Some 1N) true
-                    |> Variable.Dto.setIncr [1N]
-                    |> Variable.Dto.setMax (Some 5N) true
-                    |> Variable.Dto.fromDto
-
-                let exp = [1N]    
-                let act = 
-                    v1 ^* v2
-                    |> Variable.Dto.toDto
-                    |> fun x -> x.Incr
-
-                Expect.equal "the result should have an increment 1" exp act
-
-            }
-        ]

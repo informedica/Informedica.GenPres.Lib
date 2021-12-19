@@ -1,5 +1,6 @@
 ﻿namespace Informedica.GenSolver.Lib
 
+
 /// Functions that handle the `Equation` type that
 /// either represents a `ProductEquation` </br>
 /// y = x1 \* x2 * ... \* xn </br>
@@ -381,3 +382,4 @@ module Equation =
             let fs = c false 
             
             e |> apply fp fs
+

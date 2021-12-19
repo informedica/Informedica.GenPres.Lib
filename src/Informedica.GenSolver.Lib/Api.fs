@@ -1,5 +1,6 @@
 ﻿namespace Informedica.GenSolver.Lib
 
+
 /// Public funtions to use the library
 module Api =
 
@@ -9,8 +10,8 @@ module Api =
 
     open Types
 
-    module VRD = Informedica.GenSolver.Lib.Variable.Dto
-    module EQD = Informedica.GenSolver.Lib.Equation.Dto
+    module VRD = Variable.Dto
+    module EQD = Equation.Dto
     
     module ValueRange = Variable.ValueRange 
     module Name = Variable.Name
@@ -58,7 +59,7 @@ module Api =
                             vs 
                             |> Seq.sort 
                             |> Seq.take l 
-                            |> ValueRange.createValueSet
+                            |> ValueRange.ValueSet.create
                             |> Variable.setValueRange vr
                         | None -> vr
 
