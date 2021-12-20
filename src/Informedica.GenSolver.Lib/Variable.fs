@@ -532,16 +532,18 @@ module Variable =
 
             let fMin = checkMin >> Min
 
-            let fMinMax = fst >> checkMin >> Min
+            let fMax max = minMaxToValueRange min max
+
+            let fMinMax (min', max) = minMaxToValueRange (min' |> checkMin) max
 
             let fValueSet =
                 let max = vr  |> getMax
                 filter (Some min) max >> ValueSet.create
 
-            let returnVr _ = vr
+            let fRange _ = vr
 
             vr
-            |> apply (min |> Min) fMin returnVr fMinMax returnVr fValueSet
+            |> apply (min |> Min) fMin fMax fMinMax fRange fValueSet
 
 
         /// Apply a `Maximum` **max** to a `ValueRange` **vr**.
@@ -552,18 +554,20 @@ module Variable =
             let checkMax max' = 
                 if max |> Maximum.maxLTmax max' then max' else max
 
+            let fMin min = minMaxToValueRange min max
+
             let fMax = checkMax >> Max
 
-            let fMinMax = snd >> checkMax >> Max
+            let fMinMax (min, max') = minMaxToValueRange min (max' |> checkMax) 
 
             let fValueSet =
                 let min = vr  |> getMin
                 filter min (Some max) >> ValueSet.create
 
-            let returnVr _ = vr
+            let fRange _ = vr
 
             vr
-            |> apply (max |> Max) returnVr fMax fMinMax returnVr fValueSet
+            |> apply (max |> Max) fMin fMax fMinMax fRange fValueSet
 
 
 
@@ -725,24 +729,6 @@ module Variable =
                     |> Exceptions.raiseExc
 
 
-        /// Safely calculate **v1** and **v2** using operator **op**,
-        /// returns None if operator is division and **v2** is 0.
-        let calcOpt op c v1 v2 =
-            match op with
-            | BigRational.Mult
-            | BigRational.Subtr
-            | BigRational.Add  -> v1 |> op <| v2 |> c |> Some
-            // prevent division by zero
-            | BigRational.Div  ->
-                if v2 <> BigRational.zero then
-                    (v1 |> op <| v2) |> c |> Some
-                else None
-            | BigRational.NoMatch ->
-                Exceptions.ValueRangeNotAValidOperator
-                |> Exceptions.raiseExc
-
-
-
 
         /// Applies an infix operator **op**
         /// to `ValueRange` **x1** and **x2**.
@@ -751,16 +737,6 @@ module Variable =
         /// Doesn't perform any calculation when both
         /// **x1** and **x2** are `Unrestricted`.
         let calc op (x1, x2) =
-            let calcOpt = calcOpt op
-
-            // Note: doing this can have serious performance issues!!
-            // let toVS vr =
-            //     match vr with
-            //     | Range(MinIncrMax (min, inr, max)) -> minIncrMaxToValueSet min inr max
-            //     | _ -> vr
-            // // first check if range can be changed to valueset
-            // let x1 = x1 |> toVS
-            // let x2 = x2 |> toVS
 
             match x1, x2 with
             | Unrestricted, Unrestricted -> unrestricted
@@ -837,8 +813,8 @@ module Variable =
                 else y |> setValues vs
             | _ ->
                 y
-                |> set getMin  setMin
-                |> set getMax  setMax
+                |> set getMin setMin
+                |> set getMax setMax
 
 
         // Extend type with basic arrhythmic operations.
