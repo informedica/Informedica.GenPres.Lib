@@ -11,14 +11,12 @@ module Props =
     let matchProp p =
 
         match p with
-        | ValsProp vs -> 
-            vs
-            |> ValueRange.ValueSet
         | MinInclProp v -> v |> ValueRange.createMinRange true 
         | MinExclProp v -> v |> ValueRange.createMinRange false 
         | MaxInclProp v -> v |> ValueRange.createMaxRange true 
         | MaxExclProp v -> v |> ValueRange.createMaxRange false 
-        | DeltaProp _ -> "not implemented" |> failwith
+        | RangeProp _ -> "not implemented" |> failwith
+        | ValsProp vs ->  vs |> ValueRange.ValueSet.create
 
 
     let getMin = function

@@ -5,7 +5,7 @@
 /// either represents a `ProductEquation` </br>
 /// y = x1 \* x2 * ... \* xn </br>
 /// or a `SumEquations` </br>
-/// y = x1 \* x2 * ... \* xn
+/// y = x1 + x2 + ... + xn
 module Equation =
 
     open Types
@@ -159,20 +159,21 @@ module Equation =
     let isSolved = function
         | ProductEquation (y, xs) 
         | SumEquation (y, xs) ->
-            [y] @ xs |> List.forall Variable.isSolved
+            y::xs |> List.forall Variable.isSolved
 
 
     // Check whether an equation will change by calc
     // This is not the same as `isSolved`!! If all 
     // the variables are unrestricted than the equation
     // is not solvable but is also not solved.
-    // ToDo when > 1 variable is <0..> --> also not solvable!! 
     let isSolvable = function 
         | ProductEquation (y, xs)
         | SumEquation (y, xs) ->
-            ([y] @ xs |> List.exists Variable.isSolvable) &&
-            // maybe only when > 1 is unrestricted instead of all
-            ([y] @ xs |> List.forall Variable.isUnrestricted |> not)
+            let es = y::xs
+            es |> List.exists Variable.isSolvable &&
+            es |> List.filter Variable.isUnrestricted
+               |> List.length > 1
+               |> not
 
 
     let check e = 
@@ -205,7 +206,6 @@ module Equation =
 
     /// Solve an equation **e**, return a list of
     /// changed `Variable`s. 
-    /// ToDo change this to be more consistent with mutable values
     let solve log eq =
         eq
         |> Events.EquationStartedSolving
@@ -256,11 +256,11 @@ module Equation =
 
                     tail |> calc changed op1 op2 y (x'::xs')
 
+            // op1 = (*) or (+) and op2 = (/) or (-)
             let rec loop b op1 op2 y xs changed =
                 let x   = xs |> List.head
                 let xs' = xs |> List.filter ((<>) x)
             
-                // op1 = (*) or (+) and op2 = (/) or (-)
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
                 let ychanged, y' = calc [] op1 op1 x xs' [y]
             

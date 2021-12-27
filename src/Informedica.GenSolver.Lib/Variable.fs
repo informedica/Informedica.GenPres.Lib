@@ -15,8 +15,6 @@
 /// * <0N..> : meaning that the variable can be any number larger than but excluding 0N
 /// * [0N..10N> : meaning that the variable must be between 0N up to but excluding 10N
 /// * [0N..10N] : meaning that the variable can be 0N up to and including 10N
-/// * <..[1N]..> : meaning that the variable must be a number that is a multiple of 1N
-/// * <..[2N,3N]..> : meaning that the variable must be either a multiple of 2N or 3N
 /// * [1N,3N,4N,5N] : meaning that the variable can only be one of the numbers
 ///
 /// * `Name` : A `Variable` is identified by its `Name`
@@ -77,14 +75,25 @@ module Variable =
 
 
     /// Functions and types to create and handle `ValueRange`.
-    ///
-    /// * `Minimum`
-    /// * `Maximum`
-    /// * `Range`
-    /// * `ValueRange`
     module ValueRange =
 
         open Informedica.Utils.Lib.BCL
+
+
+
+        module Exceptions =
+
+
+            exception ValueRangeException of Exceptions.Message
+
+
+            let raiseExc m = m |> ValueRangeException |> raise
+
+
+            let raiseMinLargerThanMax min max =
+                (min, max)
+                |> Exceptions.ValueRangeMinLargerThanMax
+                |> raiseExc
 
 
 
@@ -216,20 +225,6 @@ module Variable =
                 |> Maximum.createMax true
 
 
-        module Exceptions =
-
-
-            exception ValueRangeException of Exceptions.Message
-
-
-            let raiseExc m = m |> ValueRangeException |> raise
-
-
-            let raiseMinLargerThanMax min max =
-                (min, max)
-                |> Exceptions.ValueRangeMinLargerThanMax
-                |> raiseExc
-
 
         module ValueSet =
 
@@ -260,9 +255,6 @@ module Variable =
 
 
         /// Aply the give functions to `Values`
-        /// where **unr** is used for an `Unrestricted`
-        /// `ValueRange`, **fv** is used for `ValueSet` and
-        /// **fr** is used for `Range`
         let apply unr fMin fMax fMinMax fRange fValueSet = function
             | Unrestricted      -> unr
             | Min min           -> min |> fMin
@@ -286,19 +278,19 @@ module Variable =
             apply true returnFalse returnFalse returnFalse returnFalse returnFalse
 
 
-        /// Checks whether a `ValueRange` is `Unrestricted`
+        /// Checks whether a `ValueRange` is `Min`
         let isMin =
             let returnFalse = Boolean.returnFalse
             apply false Boolean.returnTrue returnFalse returnFalse returnFalse returnFalse
 
 
-        /// Checks whether a `ValueRange` is `Unrestricted`
+        /// Checks whether a `ValueRange` is `Max`
         let isMax =
             let returnFalse = Boolean.returnFalse
             apply true returnFalse Boolean.returnTrue returnFalse returnFalse returnFalse
 
 
-        /// Checks whether a `ValueRange` is `Unrestricted`
+        /// Checks whether a `ValueRange` is `MinMax`
         let isMinMax =
             let returnFalse = Boolean.returnFalse
             apply true returnFalse returnFalse Boolean.returnTrue returnFalse returnFalse
@@ -318,22 +310,18 @@ module Variable =
 
         /// Checks whether a `BigRational` is between an optional 
         /// **min** and an optional **max** 
-        /// When min and max are `None` then this will
         let isBetween min max v =
-            let fTrue = fun _ -> true
-
-            let fMin  = function
-            | None -> fTrue
-            | Some(Minimum.MinIncl m) -> (<=) m
-            | Some(Minimum.MinExcl m) -> (<) m
+            let fMin = function
+            | None -> true
+            | Some(Minimum.MinIncl m) -> v >= m
+            | Some(Minimum.MinExcl m) -> v > m
 
             let fMax  = function
-            | None -> fTrue
-            | Some(Maximum.MaxIncl m) -> (>=) m
-            | Some(Maximum.MaxExcl m) -> (>) m
+            | None -> true
+            | Some(Maximum.MaxIncl m) -> v <= m
+            | Some(Maximum.MaxExcl m) -> v < m
 
-            v |> fMin min &&
-            v |> fMax max
+            (fMin min) && (fMax max)
 
 
         /// Checks whether `Minimum` **min** > `Maximum` **max**.
@@ -468,10 +456,10 @@ module Variable =
 
 
         /// Create a `ValueRange` using a `ValueSet` **vs**
-        /// an optional `Minimum` **min**, **incr** and `Maximum` **max**.
-        /// If both **min**, **incr** and **max** are `None` an `Unrestricted` 
+        /// an optional `Minimum` **min** and `Maximum` **max**.
+        /// If both **min** and **max** are `None` an `Unrestricted` 
         /// `ValueRange` is created. 
-        let create vs min max =
+        let create min max vs =
             match vs with
             | None ->
                 match min, max with
@@ -591,7 +579,7 @@ module Variable =
                     |> filter min max
                     |> Set.intersect vs1
 
-            create (Some vs2) min max
+            create min max (Some vs2) 
 
 
         /// Functions to calculate the `Minimum`
@@ -783,7 +771,7 @@ module Variable =
 
                 match min, max with
                 | None, None -> unrestricted
-                | _ -> create None min max
+                | _ -> create min max None
 
 
         /// Checks whether a `ValueRange` vr1 is a subset of 
@@ -1104,7 +1092,7 @@ module Variable =
             let min = dto.Min |> Option.bind (fun v -> v |> Minimum.createMin dto.MinIncl |> Some)
             let max = dto.Max |> Option.bind (fun v -> v |> Maximum.createMax dto.MaxIncl |> Some)
 
-            let vr = ValueRange.create vs min max 
+            let vr = ValueRange.create min max vs  
 
             create succ n vr
 
@@ -1128,7 +1116,7 @@ module Variable =
 
 
             try
-                let vr = ValueRange.create vs min max
+                let vr = ValueRange.create min max vs
 
                 match n with
                 | Some n' -> create succ n' vr

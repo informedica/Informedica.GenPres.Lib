@@ -273,12 +273,12 @@ module Solver =
             |> c
 
         match p with
-        | ValsProp vs   -> vs |> setToBase ValsProp
-//        | IncrProp vs   -> vs |> setToBase IncrProp
         | MinInclProp v -> v  |> valToBase MinInclProp
         | MinExclProp v -> v  |> valToBase MinExclProp
         | MaxInclProp v -> v  |> valToBase MaxInclProp
         | MaxExclProp v -> v  |> valToBase MaxExclProp
+        | RangeProp _   -> "not implemented" |> failwith
+        | ValsProp vs   -> vs |> setToBase ValsProp
 
 
         

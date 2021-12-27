@@ -37,7 +37,7 @@ module VariableUnit =
     /// Create a `VariableUnit` with preset values
     let create n vs min max un =
 
-        ValueRange.create vs min max
+        ValueRange.create min max vs
         |> function
         | vlr ->
             let var = Variable.create id n vlr        

@@ -12,7 +12,7 @@ module Types =
 
 
     /// The minimal value in
-    /// a `Range`. Can be inclusive
+    /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Minimum =
         | MinIncl of BigRational
@@ -20,13 +20,16 @@ module Types =
 
 
     /// The maximum value in
-    /// a `Range`. Can be inclusive
+    /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Maximum =
         | MaxIncl of BigRational
         | MaxExcl of BigRational
 
 
+    /// A range a set of numbers defined 
+    /// by a `Delta` and `Multiples` where
+    /// `delta * multiple` is the actual value
     type Range =
         {   
             Multiples : bigint Set
@@ -34,23 +37,31 @@ module Types =
         }
 
 
+    type ValueSet = BigRational Set
+
+
     /// `ValueRange` represents a discrete set of
-    /// rational numbers.
+    /// rational numbers. A `ValueRange` can be either
+    /// - `Unrestricted`: any rational number
+    /// - `Min`: have a minimum
+    /// - `Max`: have a maximum
+    /// - `MinMax`: have both a minimum and maximum
+    /// - `Range`: be a range type with a delta
+    /// - `ValueSet`: just be a set of numbers
     type ValueRange =
         | Unrestricted
         | Min of Minimum
         | Max of Maximum
         | MinMax  of Minimum * Maximum
         | Range of Range
-        | ValueSet of Set<BigRational>
+        | ValueSet of ValueSet // Set<BigRational>
 
 
     /// Represents a variable in an
     /// `Equation`. The variable is
     /// identified by `Name` and has
-    /// a `Values` that are either
-    /// `Unrestricted` or restricted by
-    /// a `ValueSet` or a `Range`.
+    /// a `Values` described by the
+    /// `ValueRange`.
     type Variable =
         {
             Name: Name
@@ -78,18 +89,19 @@ module Types =
 
     /// Represents a property of a `Variable`.
     ///
-    /// * `Vals`: A set of distinct values
     /// * `MinIncl`: An inclusive minimum
     /// * `MinExcl`: An exclusive minimum
     /// * `MaxIncl`: An inclusive maximum
     /// * `MaxExcl`: An exclusive maximum
+    /// * `RangeProp`: A delta with multiples
+    /// * `Vals`: A set of distinct values
     type Property =
-        | ValsProp of BigRational Set
-        | DeltaProp of BigRational
         | MinInclProp of BigRational
         | MinExclProp of BigRational
         | MaxInclProp of BigRational
         | MaxExclProp of BigRational
+        | RangeProp of BigRational * bigint Set
+        | ValsProp of BigRational Set
 
 
     /// A limitation of the maximum number
