@@ -16,6 +16,9 @@ Do some preprocessing.
 
 #!fsharp
 
+open System
+open System.IO
+
 open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
 open MathNet.Numerics
@@ -28,11 +31,12 @@ module ValueRange = Variable.ValueRange
 
 let procss s = $"{s} " |> printfn "%s"
 
-type Logger = Types.Logging.Logger
-
 let printEqs = Solver.printEqs true procss
 let solve n p eqs =
-    let logger = { Logger.Log = ignore }
+    let logger = 
+        fun (s : string) ->
+            File.AppendAllLines("examples.log", [s])
+        |> SolverLogging.logger 
     let n = n |> Name.createExc
     Api.solve id logger None n p eqs
 //    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs

@@ -1,10 +1,9 @@
-#!fsharp
-
+// throw this line first to the fsi
 #load "../Scripts/load.fsx"
 
-open Informedica.GenSolver.Lib
+#time
 
-#!fsharp
+open Informedica.GenSolver.Lib
 
 open System
 open System.IO
@@ -19,7 +18,9 @@ module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
 
-let procss s = $"{s} " |> printfn "%s"
+let procss s =
+    File.AppendAllLines("order.log", [s])
+    $"{s} " |> printfn "%s"
 
 let printEqs = Solver.printEqs true procss
 let solve n p eqs =
@@ -35,12 +36,11 @@ let setMinIncl n min = solve n (MinInclProp min)
 let setMinExcl n min = solve n (MinExclProp min)
 let setMaxIncl n max = solve n (MaxInclProp max)
 let setMaxExcl n max = solve n (MaxExclProp max)
-let setValues n vals = solve n (MinInclProp vals)
+let setValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
 
 let init     = Api.init
 let nonZeroNegative = Api.nonZeroNegative
 
-#!fsharp
 
 type Orb =
     {
@@ -51,6 +51,7 @@ and Component =
         Name : string
         Items : string list
     }
+
 
 let createEqs (orb : Orb) = 
     [
@@ -106,9 +107,22 @@ let createEqs (orb : Orb) =
         "orb_dos_rte = orb_dos_rte_adj * ord_adj"
         "orb_dos_qty_adj = orb_dos_rte_adj * pres_time"
         "orb_dos_tot_adj = orb_dos_qty_adj * pres_freq"
+        "orb_qty = sum(cmp_orb_qty)"
+        "orb_dos_qty = sum(cmp_dos_qty)"
+        "orb_dos_tot = sum(cmp_dos_tot)"
+        "orb_dos_rte = sum(cmp_dos_rte)"
+        "orb_dos_qty_adj = sum(cmp_dos_qty_adj)"
+        "orb_dos_tot_adj = sum(cmp_dos_tot_adj)"
+        "orb_dos_rte_adj = sum(cmp_dos_rte_adj)"
     ]
     |> fun eqs ->
         let eqs = eqs |> List.map (fun s -> $" {s}")
+        let sumEqs =
+            eqs
+            |> List.filter (fun e ->
+                e.Contains("sum")
+            )
+        let eqs = eqs |> List.filter (fun e -> e.Contains("sum") |> not)
         let itmEqs =
             eqs
             |> List.filter (fun e ->
@@ -141,18 +155,88 @@ let createEqs (orb : Orb) =
                     itmEqs
                     |> List.map (fun s -> s.Replace(" cmp", $" {c.Name}").Replace(" itm", $" {i}"))
                 )
-
-            cmpEqs 
-            |> List.collect (fun s1 ->
-                s1.Replace(" cmp", $" {c.Name}")
-            )
-            |> List.append itms
-            |> List.append acc
-        ) orbEqs
-        
+            let cmps =
+                cmpEqs 
+                |> List.map (fun s1 ->
+                    s1.Replace(" cmp", $" {c.Name}")
+                )
+            itms @ cmps @ acc 
+        ) []
+        |> fun es -> 
+            let sumEqs =
+                sumEqs
+                |> List.map (fun e ->
+                    match e.Replace("sum(", "").Replace(")", "").Split(" = ") with
+                    | [|lv; rv|] ->
+                        orb.Components
+                        |> List.map(fun c -> rv.Replace("cmp", c.Name))
+                        |> String.concat(" + ")
+                        |> fun s -> $"{lv} = {s}"
+                    | _ -> ""
+                )
+            es @ orbEqs @ sumEqs
     |> Api.init
     |> nonZeroNegative
 
-createEqs { Components = [ {Name = "pcm_supp"; Items = ["paracetamol"]} ] }
+
+let pcmEqs =
+    createEqs { Components = [ {Name = "pcm_supp"; Items = ["paracetamol"]} ] }
+
+
+pcmEqs
+// dose
+|> setValues "pres_freq" [3N;4N]
+|> setMinIncl "paracetamol_dos_tot_adj" 60N
+|> setMaxIncl "paracetamol_dos_tot_adj" 90N
+|> setMaxIncl "paracetamol_dos_qty" 1000N
+|> setMaxIncl "paracetamol_dos_tot" 4000N
+// administration
+|> setValues "orb_dos_qty" [1N]
+// preparation
+|> setValues "orb_qty" [1N]
+// patient
+|> setValues "ord_adj" [10N]
+// product 
+|> setValues "paracetamol_cmp_qty" [60N; 120N; 240N; 500N; 1000N]
+|> setValues "pcm_supp_qty" [1N]
+|> printEqs
+|> ignore
+
+
+let gentaEqs =
+    {
+        Components =
+            [
+                { 
+                    Name = "genta_sol"
+                    Items = ["gentamicin"]
+                }
+                {
+                    Name = "saline"
+                    Items = ["sodium"; "chloride"]
+                }
+            ]
+    }
+    |> createEqs 
+
+
+gentaEqs
+// dose
+|> setValues "pres_freq" [1N]
+|> setMinIncl "gentamicin_dos_tot_adj" 5N
+|> setMaxIncl "gentamicin_dos_tot_adj" 7N
+// administration
+|> setMinIncl "pres_time" (1N/2N)
+|> setMaxIncl "pres_time" 1N
+|> setMaxIncl "orb_dos_rte" 999N
+|> setMaxIncl "orb_dos_qty" 50N
+// preparation
+|> setMaxIncl "orb_qty" 50N
+|> setMaxIncl "gentamicin_orb_cnc" 2N
+// patient
+|> setValues "ord_adj" [10N]
+// product 
+|> setValues "genta_sol_qty" [2N; 10N]
+|> setValues "gentamicin_cmp_cnc" [10N]
 |> printEqs
 |> ignore

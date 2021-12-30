@@ -117,8 +117,10 @@ module Solver =
     /// equation is solved
     let solve log sortQue vr eqs =
 
-        let solveE = solveEquation log
-
+        let solveE = 
+            solveEquation log
+//            |> memSolve
+            
         let rec loop n que acc =
             que
             |> Events.SolverLoopedQue

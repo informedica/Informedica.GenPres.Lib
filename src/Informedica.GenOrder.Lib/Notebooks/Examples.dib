@@ -160,7 +160,7 @@ We can also write the logging of all the calculations to a file with the name in
 
 #!fsharp
 
-let fileName = "pcm.txt"
+let fileName = "genta.txt"
 
 $"{__SOURCE_DIRECTORY__}/{fileName}"
 |> logger.Write
@@ -560,10 +560,10 @@ logger.Start Level.Informative
         DrugOrder.solutionLimits with
             Name = "gentamicin"
             Component = "gentamicin"
-            MinConcentration = Some (1N)
+//            MinConcentration = Some (1N)
             MaxConcentration = Some (2N)
             DoseCount = Some (1N)
-            MinTime = (Some (1N/2N))
+//            MinTime = (Some (1N/2N))
             MaxTime = (Some (1N/2N))
 
     }
