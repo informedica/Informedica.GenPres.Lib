@@ -221,22 +221,67 @@ let gentaEqs =
 
 
 gentaEqs
+// patient
+|> setValues "ord_adj" [1N]
 // dose
 |> setValues "pres_freq" [1N]
-|> setMinIncl "gentamicin_dos_tot_adj" 5N
-|> setMaxIncl "gentamicin_dos_tot_adj" 7N
+|> setMinExcl "gentamicin_dos_tot_adj" 5N
+|> setMaxExcl "gentamicin_dos_tot_adj" 7N
 // administration
 |> setMinIncl "pres_time" (1N/2N)
 |> setMaxIncl "pres_time" 1N
+|> setMinIncl "orb_dos_rte" 1N
 |> setMaxIncl "orb_dos_rte" 999N
-|> setMaxIncl "orb_dos_qty" 50N
+|> setMinIncl "orb_dos_qty" (1N/10N)
+|> setMaxIncl "orb_dos_qty" 500N
+|> setMinIncl "orb_dos_qty_adj" (1N/10N)
+|> setMaxIncl "orb_dos_qty_adj" 5N
 // preparation
-|> setMaxIncl "orb_qty" 50N
-|> setMaxIncl "gentamicin_orb_cnc" 2N
-// patient
-|> setValues "ord_adj" [10N]
+|> setMinIncl "orb_qty" 1N
+|> setMaxIncl "orb_qty" 500N
+|> setMinExcl "gentamicin_orb_cnc" (1N/100N)
+|> setMaxExcl "gentamicin_orb_cnc" 2N
 // product 
 |> setValues "genta_sol_qty" [2N; 10N]
-|> setValues "gentamicin_cmp_cnc" [10N]
+|> setValues "gentamicin_cmp_cnc" [10N; 40N]
+|> setValues "gentamicin_cmp_qty" [20N;80N;400N]
+// set values
+// |> setValues "orb_qty" [2N/5N..1N/10N..10N]
+// |> setValues "orb_dos_qty" [2N/5N..1N/10N..5N]
+// |> setValues "orb_dos_rte" [13N/5N..1N/10N..10N]
+|> printEqs
+|> ignore
+
+
+// Problem case results in a loop
+gentaEqs
+// dose
+|> setValues "pres_freq" [1N]
+|> setMinExcl "gentamicin_dos_tot_adj" 5N
+|> setMaxExcl "gentamicin_dos_tot_adj" 7N
+// administration
+|> setMinIncl "pres_time" (1N/2N)
+|> setMaxIncl "pres_time" 1N
+|> setMinIncl "orb_dos_rte" 1N
+|> setMaxIncl "orb_dos_rte" 999N
+|> setMinIncl "orb_dos_qty" (1N/10N)
+|> setMaxIncl "orb_dos_qty" 500N
+|> setMinIncl "orb_dos_qty_adj" (1N/10N)
+|> setMaxIncl "orb_dos_qty_adj" 5N
+// preparation
+|> setMinIncl "orb_qty" 1N
+|> setMaxIncl "orb_qty" 500N
+|> setMinExcl "gentamicin_orb_cnc" (1N/100N)
+|> setMaxExcl "gentamicin_orb_cnc" 2N
+// patient
+|> setMinExcl "ord_adj" (2N/10N)
+|> setMaxIncl "ord_adj" 250N
+// product
+|> setValues "genta_sol_qty" [2N; 10N]
+|> setValues "gentamicin_cmp_cnc" [10N; 40N]
+|> setValues "gentamicin_cmp_qty" [20N;80N;400N]
+// set values
+|> printEqs // NOTE!! this line prevents the loop???
+|> setValues "ord_adj" [1N]
 |> printEqs
 |> ignore
