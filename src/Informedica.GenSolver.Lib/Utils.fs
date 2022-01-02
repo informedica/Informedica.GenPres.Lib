@@ -25,11 +25,15 @@ module List =
     /// Replace an element in a list
     /// when the `pred` function returns `true`.
     let replace pred x xs =
-        match xs |> List.tryFindIndex pred with
-        | Some(ind) ->
-            (xs |> Seq.take ind |> Seq.toList) @ [x] @ 
-            (xs |> Seq.skip (ind + 1) |> Seq.toList)
-        | None -> xs
+        xs
+        |> List.map (fun x' ->
+            if pred x' then x else x'
+        )
+        // match xs |> List.tryFindIndex pred with
+        // | Some(ind) ->
+        //     (xs |> Seq.take ind |> Seq.toList) @ [x] @ 
+        //     (xs |> Seq.skip (ind + 1) |> Seq.toList)
+        // | None -> xs
 
     let distinct xs = xs |> Seq.ofList |> Seq.distinct |> Seq.toList
 

@@ -20,27 +20,29 @@ module Solver =
         let raiseExc m = m |> SolverException |> raise
 
 
+    let sortByName eqs =
+        eqs 
+        |> List.sortBy (fun e ->
+            e 
+            |> Equation.toVars
+            |> List.head
+            |> Variable.getName)
+
+
     /// Format a set of equations to print.
     /// Using **f** to allow additional processing
     /// of the string.
     let printEqs exact pf eqs = 
-        let eqs = 
-            eqs 
-            |> List.sortBy (fun e ->
-                e 
-                |> Equation.toVars
-                |> List.head
-                |> Variable.getName)
 
         "equations result:\n" |> pf
         eqs
+        |> sortByName
         |> List.map (Equation.toString exact)
         |> List.iteri (fun i s ->
             s
             |> sprintf "%i.\t%s" i
             |> pf
         )
-//        sprintf "raw: \n%A" eqs |> pf
         "-----" |> pf 
 
         eqs    
@@ -67,10 +69,7 @@ module Solver =
             es 
             |> List.partition (fun e -> 
                 vars 
-                |> List.exists (fun v -> 
-                    e 
-                    |> Equation.contains v
-                )
+                |> List.exists (fun v -> e |> Equation.contains v)
             )
 
         vars 
@@ -117,9 +116,7 @@ module Solver =
     /// equation is solved
     let solve log sortQue vr eqs =
 
-        let solveE = 
-            solveEquation log
-//            |> memSolve
+        let solveE = solveEquation log
             
         let rec loop n que acc =
             que
