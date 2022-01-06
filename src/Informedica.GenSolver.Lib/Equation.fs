@@ -211,14 +211,14 @@ module Equation =
         |> Events.EquationStartedSolving
         |> Logging.logInfo log
 
-        let runOnce y xs =
-            let c1 =
-                y::xs 
-                |> List.filter (Variable.getValueRange >> ValueRange.isValueSet)
-                |> List.length
-            let c2 =  (y::xs |> List.length)
+        // let runOnce y xs =
+        //     let c1 =
+        //         y::xs 
+        //         |> List.filter (Variable.getValueRange >> ValueRange.isValueSet)
+        //         |> List.length
+        //     let c2 =  (y::xs |> List.length)
             
-            (c2 - c1 <= 1) 
+        //     (c2 - c1 <= 1) 
 
         if eq |> isSolved then 
             []
@@ -294,7 +294,7 @@ module Equation =
                             |> Events.EquationLoopedSolving
                             |> Logging.logInfo log
 
-                            let b = runOnce y xs
+                            let b = false // runOnce y xs
                             loop b op1 op2 y xs changed
             
             let b, y, xs, op1, op2 =
@@ -303,7 +303,7 @@ module Equation =
                 | SumEquation     (y, xs) -> y, xs, (^+), (^-)
                 |> fun (y, xs, op1, op2) ->
                     // run only once when all but one is a value set
-                    runOnce y xs, y, xs, op1, op2
+                    false, y, xs, op1, op2// runOnce y xs, y, xs, op1, op2
                         
             match xs with 
             | [] -> []

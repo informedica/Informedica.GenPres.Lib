@@ -32,17 +32,12 @@ module Solve =
 
     let printEqs = Solver.printEqs true procss
     let solve n p eqs =
-        try
-            let logger = 
-                fun s ->
-                    File.AppendAllLines("order.log", [s])
-                |> SolverLogging.logger
-            let n = n |> Name.createExc
-            Api.solve Solver.sortQue logger None n p eqs
-        with
-        |  e -> 
-            printfn $"{e}"
-            eqs
+        let logger = 
+            fun s ->
+                File.AppendAllLines("order.log", [s])
+            |> SolverLogging.logger
+        let n = n |> Name.createExc
+        Api.solve Solver.sortQue logger None n p eqs
 
     let setMinIncl n min = solve n (MinInclProp min)
     let setMinExcl n min = solve n (MinExclProp min)
@@ -189,6 +184,8 @@ module Solve =
                 es @ orbEqs @ sumEqs
         |> Api.init
         |> nonZeroNegative
+
+
 
 open Solve
 
@@ -348,25 +345,79 @@ let failEqs =
 
 
 failEqs
-|> setMinExcl "b" (1N/40N)
+|> setMinExcl "b" 1N
 |> printEqs
-|> setMaxExcl "b" (999N/5N)
+|> setMinExcl "c" 1N
 |> printEqs
-|> setMinExcl "c" (9N/25N)
-|> printEqs
-|> setMaxExcl "c" (223N/4N)
+|> setMaxExcl "c" 20N
 |> printEqs
 |> setMinIncl "e" 10N
 |> printEqs
-|> setMaxIncl "e" 40N
+|> setMaxIncl "e" 20N
 |> printEqs
-|> setMinExcl "f" (1N)
+|> setMinExcl "f" 1N
 |> printEqs
-|> setMaxExcl "f" (2N)
+|> setMaxExcl "f" 2N
+|> printEqs
+//|> setMaxExcl "a" 10N // this doesn't start a loop
+//|> setMaxExcl "a" 25N // this doesn't start a loop
+//|> setMaxExcl "a" 26N // this starts a loop
+//|> setMaxExcl "a" 30N // this starts a loop
 |> printEqs
 |> ignore
 
-// d <77/200N..5343/25N> = e [10N..40N] * b <1/40N..5111/100N> 
-(5343N/25N) < 40N * (5111N/100N)
-5343N/250N * 40N
-5343N/250N < 5111N/100N
+
+
+
+let findValidValues n (eqs : Equation list) =
+    let f = 
+        eqs
+        |> List.collect Equation.toVars
+        |> List.tryFind (fun v ->
+            v 
+            |> Variable.getName 
+            |> Name.toString 
+            |> fun x -> x = n
+        )
+        |> Option.get
+
+    match f.Values |> ValueRange.getValueSet with
+    | None    -> ()
+    | Some vs ->
+        for v in vs do
+            try
+                eqs
+                |> setValues "f" [v]
+                |> ignore
+                printfn $"can set {v}"
+            with
+            | _ -> 
+                printfn $"cannot set {v}"
+            
+
+
+failEqs
+|> setValues "b" [1N..5N]
+|> printEqs
+|> setValues "c" [1N..5N]
+|> printEqs
+|> setValues "e" [10N]
+|> printEqs
+|> findValidValues "f"
+//|> setValues "a" [2N]
+//|> printEqs
+//|> setValues "f" [3N] // this fails
+//|> setValues "f" [5N] // but this doesn't fail
+
+failEqs
+|> setValues "b" [1N..5N]
+|> printEqs
+|> setValues "c" [1N..5N]
+|> printEqs
+|> setValues "e" [10N]
+|> printEqs
+|> setValues "f" [50N/9N]
+|> printEqs
+
+1N/6N = (5N/3N) / 10N
+50N/9N/10N = 
