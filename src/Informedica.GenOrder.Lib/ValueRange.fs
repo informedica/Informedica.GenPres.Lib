@@ -41,6 +41,6 @@ module ValueRange =
 
             print (some min) minincl (some max) maxincl
     
-        vr |> apply unr fMin fMax fMinMax (fun _ -> "") fVs 
+        vr |> apply unr fMin fMax fMinMax fVs 
 
 

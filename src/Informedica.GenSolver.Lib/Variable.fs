@@ -199,33 +199,6 @@ module Variable =
 
 
 
-        module Range =
-
-
-            let create delta multiples = 
-                {
-                    Multiples = multiples
-                    Delta = delta
-                }
-
-
-            let getMin r =
-                r.Multiples
-                |> Set.minElement
-                |> BigRational.fromBigInt
-                |> fun x -> x * r.Delta
-                |> Minimum.createMin true
-
-
-            let getMax r =
-                r.Multiples
-                |> Set.maxElement
-                |> BigRational.fromBigInt
-                |> fun x -> x * r.Delta
-                |> Maximum.createMax true
-
-
-
         module ValueSet =
 
 
@@ -255,12 +228,11 @@ module Variable =
 
 
         /// Aply the give functions to `Values`
-        let apply unr fMin fMax fMinMax fRange fValueSet = function
+        let apply unr fMin fMax fMinMax fValueSet = function
             | Unrestricted      -> unr
             | Min min           -> min |> fMin
             | Max max           -> max |> fMax
             | MinMax (min, max) -> (min, max) |> fMinMax
-            | Range r           -> r  |> fRange
             | ValueSet vs       -> vs |> fValueSet
 
 
@@ -268,44 +240,37 @@ module Variable =
         /// Returns 0 if no count is possible.
         let count =
             let zero _ = 0
-            let countRange r = r.Multiples |> Set.count 
-            apply 0 zero zero zero countRange Set.count
+            apply 0 zero zero zero Set.count
 
 
         /// Checks whether a `ValueRange` is `Unrestricted`
         let isUnrestricted =
             let returnFalse = Boolean.returnFalse
-            apply true returnFalse returnFalse returnFalse returnFalse returnFalse
+            apply true returnFalse returnFalse returnFalse returnFalse
 
 
         /// Checks whether a `ValueRange` is `Min`
         let isMin =
             let returnFalse = Boolean.returnFalse
-            apply false Boolean.returnTrue returnFalse returnFalse returnFalse returnFalse
+            apply false Boolean.returnTrue returnFalse returnFalse returnFalse
 
 
         /// Checks whether a `ValueRange` is `Max`
         let isMax =
             let returnFalse = Boolean.returnFalse
-            apply true returnFalse Boolean.returnTrue returnFalse returnFalse returnFalse
+            apply true returnFalse Boolean.returnTrue returnFalse returnFalse
 
 
         /// Checks whether a `ValueRange` is `MinMax`
         let isMinMax =
             let returnFalse = Boolean.returnFalse
-            apply true returnFalse returnFalse Boolean.returnTrue returnFalse returnFalse
-
-
-        /// Checks whether a `ValueRange` is a `Range`
-        let isRange =
-            let returnFalse = Boolean.returnFalse
-            apply true returnFalse returnFalse returnFalse Boolean.returnTrue returnFalse
+            apply true returnFalse returnFalse Boolean.returnTrue returnFalse
 
 
         /// Checks whether a `ValueRange` is a `ValueSet`
         let isValueSet =
             let returnFalse = Boolean.returnFalse
-            apply false returnFalse returnFalse returnFalse returnFalse Boolean.returnTrue
+            apply false returnFalse returnFalse returnFalse Boolean.returnTrue
 
 
         /// Checks whether a `BigRational` is between an optional 
@@ -421,7 +386,7 @@ module Variable =
 
             let unr = print None false None false
 
-            vr |> apply unr fMin fMax fMinMax (fun _ -> "") fVs 
+            vr |> apply unr fMin fMax fMinMax fVs 
 
 
         /// An `Unrestricted` `ValueRange`.
@@ -476,7 +441,6 @@ module Variable =
                   Some
                   Option.none
                   (fst >> Some)
-                  (Range.getMin >> Some)
                   (ValueSet.getMin >> Some)
 
 
@@ -487,14 +451,13 @@ module Variable =
                   Option.none
                   Some
                   (snd >> Some)
-                  (Range.getMax >> Some)
                   (ValueSet.getMax >> Some)
 
 
         /// Get a set of `BigRational` from a `ValueRange`,
         /// returns an `None` when `ValueRange` is not
         /// a `ValueSet` 
-        let getValueSet = apply None Option.none Option.none Option.none Option.none Some
+        let getValueSet = apply None Option.none Option.none Option.none Some
 
         
         /// Check whether a `ValueRange` **vr** contains
@@ -502,7 +465,6 @@ module Variable =
         let contains v vr =
             match vr with
             | ValueSet vs -> vs |> Set.contains v
-            | Range _ -> "not supported" |> failwith
             | _ ->
                 let min = vr |> getMin
                 let max = vr |> getMax
@@ -528,10 +490,8 @@ module Variable =
                 let max = vr  |> getMax
                 filter (Some min) max >> ValueSet.create
 
-            let fRange _ = vr
-
             vr
-            |> apply (min |> Min) fMin fMax fMinMax fRange fValueSet
+            |> apply (min |> Min) fMin fMax fMinMax fValueSet
 
 
         /// Apply a `Maximum` **max** to a `ValueRange` **vr**.
@@ -552,10 +512,8 @@ module Variable =
                 let min = vr  |> getMin
                 filter min (Some max) >> ValueSet.create
 
-            let fRange _ = vr
-
             vr
-            |> apply (max |> Max) fMin fMax fMinMax fRange fValueSet
+            |> apply (max |> Max) fMin fMax fMinMax fValueSet
 
 
 

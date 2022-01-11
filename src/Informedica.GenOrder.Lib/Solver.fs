@@ -277,7 +277,6 @@ module Solver =
         | MinExclProp v -> v  |> valToBase MinExclProp
         | MaxInclProp v -> v  |> valToBase MaxInclProp
         | MaxExclProp v -> v  |> valToBase MaxExclProp
-        | RangeProp _   -> "not implemented" |> failwith
         | ValsProp vs   -> vs |> setToBase ValsProp
 
 

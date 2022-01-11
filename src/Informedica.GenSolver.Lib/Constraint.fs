@@ -15,7 +15,6 @@ module Props =
         | MinExclProp v -> v |> ValueRange.createMinRange false 
         | MaxInclProp v -> v |> ValueRange.createMaxRange true 
         | MaxExclProp v -> v |> ValueRange.createMaxRange false 
-        | RangeProp _ -> "not implemented" |> failwith
         | ValsProp vs ->  vs |> ValueRange.ValueSet.create
 
 

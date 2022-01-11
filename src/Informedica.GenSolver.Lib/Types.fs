@@ -27,16 +27,6 @@ module Types =
         | MaxExcl of BigRational
 
 
-    /// A range a set of numbers defined 
-    /// by a `Delta` and `Multiples` where
-    /// `delta * multiple` is the actual value
-    type Range =
-        {   
-            Multiples : bigint Set
-            Delta : BigRational
-        }
-
-
     type ValueSet = BigRational Set
 
 
@@ -53,7 +43,6 @@ module Types =
         | Min of Minimum
         | Max of Maximum
         | MinMax  of Minimum * Maximum
-        | Range of Range
         | ValueSet of ValueSet // Set<BigRational>
 
 
@@ -100,7 +89,6 @@ module Types =
         | MinExclProp of BigRational
         | MaxInclProp of BigRational
         | MaxExclProp of BigRational
-        | RangeProp of BigRational * bigint Set
         | ValsProp of BigRational Set
 
 
