@@ -80,12 +80,15 @@ module Equation =
         ) 0
 
     let countProduct e = 
-        e
-        |> toVars
-        |> List.fold (fun acc v ->
-            let c = v |> Variable.count
-            (if c = 0 then 1 else c) * acc
-        ) 1
+        match e with
+        | SumEquation _ -> -1
+        | _ ->
+            e
+            |> toVars
+            |> List.fold (fun acc v ->
+                let c = v |> Variable.count
+                (if c = 0 then 1 else c) * acc
+            ) 1
 
 
     let toString exact eq = 

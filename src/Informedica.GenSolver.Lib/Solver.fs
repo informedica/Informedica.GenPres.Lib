@@ -119,6 +119,8 @@ module Solver =
         let solveE = solveEquation log
             
         let rec loop n que acc =
+            let que = que |> sortQue
+
             que
             |> Events.SolverLoopedQue
             |> Logging.logInfo log
@@ -182,7 +184,7 @@ module Solver =
         eqs 
         |> replace [vr]
         |> function 
-        | (rpl, rst) -> loop 0 (rpl |> sortQue) rst
+        | (rpl, rst) -> loop 0 rpl rst
             
             
     

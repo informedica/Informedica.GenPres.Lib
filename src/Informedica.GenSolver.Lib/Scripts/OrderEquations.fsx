@@ -331,14 +331,17 @@ gentaEqs
 
 
 // minimal failing case
-// a [1N..999N] = b <1/40N..999/5N> + c <9/25N..223/4N> 
-// d <1N..1998N> = f <1N..2N> * a [1N..5111/20N> 
-// d <1N..5111/10N> = e [10, 40] * b <1/40N..999/5N> 
+// f = eb/(b + c)
+// e = f(b + c)/b
+// x = b/(b + c)
+// y = (b + c)/b
 let failEqs =
     [
         "a = b + c"
         "d = f * a"
         "d = e * b"
+        "f = e * x"
+        "e = f * y"
     ]
     |> Api.init
     |> nonZeroNegative
@@ -393,15 +396,87 @@ let findValidValues n (eqs : Equation list) =
             with
             | _ -> 
                 printfn $"cannot set {v}"
-            
+
+
+// x = b/(b + c)
+// y = (b + c)/b
+let calcXY (eqs : Equation list) =
+    let getVar n = 
+        eqs 
+        |> List.collect Equation.toVars
+        |> List.find (Variable.getName >> Name.toString >>((=) n))
+    
+    let b = (getVar "b").Values |> ValueRange.getValueSet |> Option.defaultValue Set.empty
+    let c = (getVar "c").Values |> ValueRange.getValueSet |> Option.defaultValue Set.empty
+    
+    let eqs =
+        if b |> Set.isEmpty || c |> Set.isEmpty then eqs
+        else
+            let xs =
+                [
+                    for i in b do
+                        for j in c do
+                            i / (i + j)
+                ]
+            let ys = xs |> List.map (fun x -> 1N / x)
+            eqs 
+            |> setValues "x" xs
+            |> setValues "y" ys
+    //eqs
+    let b_min, b_max = 
+        getVar "b" 
+        |> Variable.getValueRange
+        |> fun vr -> 
+            vr |> ValueRange.getMin,
+            vr |> ValueRange.getMax
+
+    let c_min, c_max = 
+        getVar "c" 
+        |> Variable.getValueRange
+        |> fun vr -> 
+            vr |> ValueRange.getMin,
+            vr |> ValueRange.getMax
+
+    let b_max, x_max = 
+        match b_max, c_min with
+        | Some max, Some min -> 
+            let b1, max = max |> ValueRange.Maximum.maxToBoolBigRational
+            let b2, min = min |> ValueRange.Minimum.minToBoolBigRational
+            (b1 && b2), max / (max + min) |> Some
+        | _ -> false, None
+
+    let b_min, x_min = 
+        match b_min, c_max with
+        | Some min, Some max -> 
+            let b1, max = max |> ValueRange.Maximum.maxToBoolBigRational
+            let b2, min = min |> ValueRange.Minimum.minToBoolBigRational
+            (b1 && b2), min / (min + max) |> Some
+        | _ -> false, None
+
+    match x_max with
+    | Some max ->
+        eqs
+        |> (if b_max then setMaxIncl "x" max else setMaxExcl "x" max)
+        |> (if b_max then setMinIncl "y" (1N/max) else setMinExcl "y" (1N/max))
+    | None -> eqs
+    |> fun eqs ->
+        match x_min with
+        | Some min ->
+            eqs
+            |> (if b_min then setMinIncl "x" min else setMinExcl "x" min)
+            |> (if b_min then setMaxIncl "y" (1N/min) else setMaxExcl "y" (1N/min))
+        | None -> eqs
 
 
 failEqs
 |> setValues "b" [1N..5N]
+|> calcXY
 |> printEqs
 |> setValues "c" [1N..5N]
+|> calcXY
 |> printEqs
 |> setValues "e" [10N]
+|> calcXY
 |> printEqs
 |> findValidValues "f"
 //|> setValues "a" [2N]
@@ -409,15 +484,33 @@ failEqs
 //|> setValues "f" [3N] // this fails
 //|> setValues "f" [5N] // but this doesn't fail
 
-failEqs
-|> setValues "b" [1N..5N]
-|> printEqs
-|> setValues "c" [1N..5N]
-|> printEqs
-|> setValues "e" [10N]
-|> printEqs
-|> setValues "f" [50N/9N]
-|> printEqs
 
-1N/6N = (5N/3N) / 10N
-50N/9N/10N = 
+failEqs
+|> setMinExcl "b" 1N
+|> calcXY
+|> printEqs
+|> setMinExcl "c" 1N
+|> calcXY
+|> printEqs
+|> setMaxExcl "c" 20N
+|> calcXY
+|> printEqs
+|> setMinIncl "e" 10N
+|> calcXY
+|> printEqs
+|> setMaxIncl "e" 20N
+|> calcXY
+|> printEqs
+|> setMinExcl "f" 1N
+|> calcXY
+|> printEqs
+|> setMaxExcl "f" 2N
+|> calcXY
+|> printEqs
+//|> setMaxExcl "a" 10N // this doesn't start a loop
+//|> setMaxExcl "a" 25N // this doesn't start a loop
+//|> setMaxExcl "a" 26N // this starts a loop
+//|> calcXY
+//|> setMaxExcl "a" 30N // this starts a loop
+|> printEqs
+|> ignore
