@@ -145,7 +145,7 @@ module Types =
         | EquationDuplicateVariables of Variable list
         | EquationEmptyVariableList 
         | SolverInvalidEquations of Equation list
-
+        | SolverLooped of Equation list
 
     module Logging =
 

@@ -119,6 +119,15 @@ module Solver =
         let solveE = solveEquation log
             
         let rec loop n que acc =
+            if n > ((que @ acc |> List.length) * 10) then
+                (que @ acc)
+                |> Exceptions.SolverLooped
+                |> Logging.logError log
+
+                (que @ acc)
+                |> Exceptions.SolverLooped
+                |> Exception.raiseExc
+
             let que = que |> sortQue
 
             que
@@ -184,7 +193,7 @@ module Solver =
         eqs 
         |> replace [vr]
         |> function 
-        | (rpl, rst) -> loop 0 rpl rst
+        | (rpl, rst) -> loop 0 rpl rst 
             
             
     

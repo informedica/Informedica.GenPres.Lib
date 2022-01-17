@@ -126,6 +126,9 @@ module Solve =
                         eqs
 
 
+
+module Equations =
+
     type Orb =
         {
             Components : Component list
@@ -261,145 +264,44 @@ module Solve =
                         | _ -> ""
                     )
                 es @ orbEqs @ sumEqs
-        |> Api.init
 
 
 
-open Solve
+open Equations
 
 
-
-
-let gentaEqs =
+let eqs =
     {
         Components =
             [
                 { 
-                    Name = "genta_sol"
-                    Items = ["gentamicin"]
+                    Name = "cmp_a"
+                    Items = ["itm_a"]
                 }
                 {
-                    Name = "saline"
-                    Items = ["sodium"; "chloride"]
+                    Name = "cmp_b"
+                    Items = ["itm_b"]
                 }
             ]
     }
     |> createEqs 
-
-
-
-// find min/max scenarios
-gentaEqs
-|> printEqs
-// patient
-|> solveValues "ord_adj" [755N/100N]
-|> printEqs
-// product
-|> solveValues "genta_sol_qty" [2N; 10N]
-|> solveValues "gentamicin_cmp_cnc" [10N; 40N]
-|> solveValues "gentamicin_cmp_qty" [20N;80N;400N]
-|> printEqs
-// preparation
-|> solveMaxIncl "gentamicin_orb_cnc" 2N // max conc
-|> solveMinIncl "orb_qty_ad" 5N
-|> solveMaxIncl "orb_qty_adj" 20N // 
-|> solveValues "orb_qty" [20N] // 
-|> solveValues "genta_sol_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N]) // max conc
-//|> solveValues "saline_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N])
-|> printEqs
-// dose
-|> solveMaxIncl "orb_dos_qty_adj" 10N
-|> solveMinIncl "gentamicin_dos_tot_adj" 5N // max dose
-|> solveMaxIncl "gentamicin_dos_tot_adj" 7N // max dose
-|> printEqs
-// administration
-|> solveValues "pres_freq" [1N] // freq
-|> solveMinIncl "pres_time" (1N/2N) // time
-|> solveMaxIncl "pres_time" 1N // time
-|> printEqs
-// pick the optimal scenario
-|> pick "orb_dos_qty" (Some (1N)) (TakeFromMin 10) // pick between min and max
-//|> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
-|> pick "gentamicin_dos_tot_adj" None (TakeFromMax 2) // choose from list
-|> printEqs
-|> ignore
-
-
-
-
-// find min/max scenarios
-gentaEqs
-// patient
-|> solveValues "ord_adj" [755N/100N]
-|> printEqs
-// product
-|> solveValues "genta_sol_qty" [2N; 10N]
-|> solveValues "gentamicin_cmp_cnc" [10N; 40N]
-|> solveValues "gentamicin_cmp_qty" [20N;80N;400N]
-|> printEqs
-// preparation
-|> solveMaxIncl "gentamicin_orb_cnc" 2N // max conc
-|> solveMinIncl "orb_qty_ad" 5N
-|> solveMaxIncl "orb_qty_adj" 20N // 
-|> solveValues "orb_qty" [20N] // 
-|> solveValues "genta_sol_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N]) // max conc
-|> solveValues "saline_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N])
-|> printEqs
-// dose
-|> solveMaxIncl "orb_dos_qty_adj" 10N
-|> solveMinIncl "gentamicin_dos_tot_adj" 5N // max dose
-|> solveMaxIncl "gentamicin_dos_tot_adj" 7N // max dose
-|> printEqs
-// administration
-|> solveValues "pres_freq" [1N] // freq
-|> solveMinIncl "pres_time" (1N/2N) // time
-|> solveMaxIncl "pres_time" 1N // time
-|> printEqs
-// pick the optimal scenario
-|> pick "orb_dos_qty" (Some (1N)) (TakeFromMin 10) // pick between min and max
-//|> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
-|> pick "gentamicin_dos_tot_adj" None (TakeFromMax 2) // choose from list
-|> printEqs
-|> ignore
-
-
-
-
-let examplEqs =
-    {
-        Components =
-            [
-                { 
-                    Name = "CMPA"
-                    Items = ["ITMA"]
-                }
-                {
-                    Name = "CMPB"
-                    Items = ["ITMB"]
-                }
-            ]
-    }
-    |> createEqs 
-
-examplEqs
-|> printEqs
-|> List.collect Equation.toVars
-|> List.map (fun v -> v.Name |> Name.toString)
-|> List.distinct
-|> fun vars ->
-    let cmps =
+    |> Api.init
+    |> List.map Equation.toVars
+    |> List.map (fun vars -> 
         vars
-        |> List.filter (fun s ->
-            s.Contains("CMPB") || s.Contains("ITMB")
-        )
-        |> List.filter (fun s -> 
-            s.Contains("cmp_cnc") || s.Contains("CMPB_qty")
-        )
-    vars
-    |> List.filter (fun s ->
-        s.Contains("CMPB") |> not &&
-        s.Contains("ITMB") |> not        
+        |> List.map (fun v -> v.Name |> Name.toString)
     )
-    |> List.append cmps
-    |> List.length
+
+let vars = eqs |> List.collect id |> List.distinct
+
+vars
+|> List.iter (fun v ->
+    let eqs =
+        eqs 
+        |> List.filter (fun eq -> eq |> List.exists ((=) v))
+        |> List.map (String.concat ", ")
+    printfn $"""
+{v} in: 
+{eqs |> String.concat "\n"}"""
+)
 

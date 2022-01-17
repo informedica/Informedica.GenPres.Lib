@@ -39,6 +39,11 @@ module SolverLogging =
         sprintf "This variable:\n%s\ncannot be set with this range:%s\n"
             (var |> Variable.toString true)
             (vlr |> ValueRange.toString true)
+    | Exceptions.SolverLooped eqs ->
+        eqs
+        |> List.map (Equation.toString true)
+        |> String.concat "\n"
+        |> sprintf "The following equations are looped\n%s"
 
 
     let printMsg = function
