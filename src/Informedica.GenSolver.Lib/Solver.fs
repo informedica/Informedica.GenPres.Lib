@@ -1,5 +1,4 @@
-﻿namespace Informedica.GenSolver.Lib
-
+namespace Informedica.GenSolver.Lib
 
 
 /// Implementations of solvers for product equations
@@ -38,11 +37,7 @@ module Solver =
         eqs
         |> sortByName
         |> List.map (Equation.toString exact)
-        |> List.iteri (fun i s ->
-            s
-            |> sprintf "%i.\t%s" i
-            |> pf
-        )
+        |> List.iteri (fun i s -> sprintf "%i.\t%s" i s  |> pf)
         "-----" |> pf 
 
         eqs    
@@ -96,11 +91,11 @@ module Solver =
     let memSolve f =
         let cache = ref Map.empty
         fun e ->
-            match (!cache).TryFind(e) with
+            match (cache.Value).TryFind(e) with
             | Some r -> r
             | None ->
                 let r = f e
-                cache := (!cache).Add(e, r)
+                cache.Value <- (cache.Value).Add(e, r)
                 r
 
     let sortQue que =
@@ -194,6 +189,5 @@ module Solver =
         |> replace [vr]
         |> function 
         | (rpl, rst) -> loop 0 rpl rst 
-            
             
     

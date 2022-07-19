@@ -1,8 +1,7 @@
-﻿namespace Informedica.GenSolver.Lib
+namespace Informedica.GenSolver.Lib
 
 
 module Logging =
-
     
     open System
     open Types.Logging
@@ -34,4 +33,3 @@ module Logging =
         |> ExceptionMessage
         |> create Error
         |> logger.Log
-

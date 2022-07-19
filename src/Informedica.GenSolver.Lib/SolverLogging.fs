@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenSolver.Lib
+namespace Informedica.GenSolver.Lib
 
 
 module SolverLogging =
@@ -18,32 +18,28 @@ module SolverLogging =
     | Exceptions.EquationEmptyVariableList -> 
         "An equation should at least contain one variable"
     | Exceptions.SolverInvalidEquations eqs ->
-        eqs
-        |> List.map (Equation.toString true)
-        |> String.concat "\n"
-        |> sprintf "The following equations are invalid\n%s"
+        $"""The following equations are invalid
+        {eqs |> List.map (Equation.toString true) |> String.concat "\n"}
+        """
     | Exceptions.ValueRangeMinLargerThanMax (min, max) ->
-        sprintf "%A is larger than %A" min max
+        $"{min} is larger than {max}"
     | Exceptions.ValueRangeNotAValidOperator ->
-        sprintf "The value range operator was invalid or unknown"
+        "The value range operator was invalid or unknown"
     | Exceptions.EquationDuplicateVariables vrs ->
-        vrs
-        |> List.map (Variable.getName >> Name.toString)
-        |> String.concat (", ")
-        |> sprintf "The list of variables for the equation contains duplicates:\n%s"
+        $"""The list of variables for the equation contains duplicates
+        {vrs |> List.map (Variable.getName >> Name.toString) |> String.concat ", "}
+        """
     | Exceptions.NameLongerThan1000 s ->
-        sprintf "This name contains more than 1000 chars: %s" s
+        $"This name contains more than 1000 chars: {s}"
     | Exceptions.NameNullOrWhiteSpaceException ->
-        sprintf "A name cannot be a blank string"
+        "A name cannot be a blank string"
     | Exceptions.VariableCannotSetValueRange (var, vlr) ->
-        sprintf "This variable:\n%s\ncannot be set with this range:%s\n"
-            (var |> Variable.toString true)
-            (vlr |> ValueRange.toString true)
+        $"This variable:\n{var |> Variable.toString true}\ncannot be set with this range:{vlr |> ValueRange.toString true}\n"
     | Exceptions.SolverLooped eqs ->
-        eqs
-        |> List.map (Equation.toString true)
-        |> String.concat "\n"
-        |> sprintf "The following equations are looped\n%s"
+        $"""The following equations are looped
+        {eqs |> List.map (Equation.toString true) |> String.concat "\n"}
+        """
+    | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
 
 
     let printMsg = function
@@ -53,41 +49,38 @@ module SolverLogging =
     | SolverMessage m ->
         match m with
         | EquationCouldNotBeSolved eq -> 
-            eq
-            |> Equation.toString true
-            |> sprintf "=== Cannot solve Equation ===\n%s" 
+            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}" 
         | EquationStartedCalculation vars -> ""
         | EquationStartedSolving eq -> 
-            eq
-            |> Equation.toString true
-            |> sprintf "=== Start solving Equation ===\n%s"
-        | EquationFinishedCalculation (changed, vars) -> 
-            changed
-            |> List.map (Variable.getName >> Name.toString)
-            |> String.concat ", "
-            |> fun s -> 
-                if s |> String.isNullOrWhiteSpace then "No changed vars"
-                else s
-            |> sprintf "=== Equation finished calculation ===\n%s"
+            $"=== Start solving Equation ===\n{eq |> Equation.toString true}"
+        | EquationFinishedCalculation (changed, _) -> 
+            $"""=== Equation finished calculation ===
+            {changed |> List.map (Variable.getName >> Name.toString)
+                     |> String.concat ", "
+                     |> fun s ->
+                        if s |> String.isNullOrWhiteSpace then "No changed vars"
+                        else s
+            }
+            """
         | EquationVariableChanged var -> 
-            var
-            |> Variable.toString true
-            |> sprintf "=== Equation Variable changed ===\n%s"
+            $"=== Equation Variable changed ===\n{var |> Variable.toString true}"
         | EquationFinishedSolving vars -> ""
         | EquationLoopedSolving (b, var, changed, vars) -> 
             "=== Equation loop solving"
         | SolverLoopedQue eqs -> ""
         | ConstraintSortOrder cs -> 
-            cs
-            |> List.map (fun (i, c) ->
+            $"""=== Constraint sort order ===
+            { cs |> List.map (fun (i, c) ->
                 c
                 |> Constraint.toString
                 |> sprintf "%i: %s" i
             )
             |> String.concat "\n"
-            |> sprintf "=== Constraint sort order ===\n%s"
+            }
+            """
         | ConstraintVariableNotFound (c, eqs) -> 
-            c
+            $"""=== Constraint Variable not found ===
+            {c
             |> sprintf "Constraint %A cannot be set"
             |> (fun s -> 
                 eqs
@@ -95,19 +88,23 @@ module SolverLogging =
                 |> String.concat "\n"
                 |> sprintf "%s\In equations:\%s" s
             )
-            |> sprintf "=== Constraint Variable not found ===\n%s"
+            }
+            """
         | ConstraintLimitSetToVariable (l, var) -> ""
         | ConstraintVariableApplied (c, var) -> 
-            c
+            $"""=== Constraint apply Variable ===
+            {c
             |> Constraint.toString
             |> fun s -> 
                 var
                 |> Variable.getName
                 |> Name.toString
                 |> sprintf "%s apply to %s" s
-            |> sprintf "=== Constraint apply Variable ===\n%s"
+            }
+            """
         | ConstrainedEquationsSolved (c, eqs) -> 
-            c 
+            $"""=== Equations solved ===
+            {c 
             |> Constraint.toString
             |> fun s ->
                 eqs
@@ -115,7 +112,9 @@ module SolverLogging =
                 |> List.map (Equation.toString true)
                 |> String.concat "\n"
                 |> sprintf "Constraint: %s applied to\n%s" s
-            |> sprintf "=== Equations solved ===\n%s"
+
+            }
+            """
         | ApiSetVariable (var, eqs) -> ""
         | ApiEquationsSolved eqs -> ""
         | ApiAppliedConstraints (cs, eqs) -> ""
@@ -127,12 +126,7 @@ module SolverLogging =
                 fun { TimeStamp = _; Level = _; Message = msg } ->
                     match msg with
                     | :? Logging.SolverMessage as m ->
-                        m 
-                        |> printMsg
-                        |> f
-                    | _ -> 
-                        msg
-                        |> sprintf "cannot print msg: %A" 
-                        |> f
+                        m |> printMsg |> f
+                    | _ -> $"cannot print msg: {msg}" |> f 
                         
         }

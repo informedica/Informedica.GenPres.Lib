@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenSolver.Lib
+namespace Informedica.GenSolver.Lib
 
 
 /// Public funtions to use the library
@@ -53,13 +53,14 @@ module Api =
                     if vr |> Variable.count > l then
                         vr
                         |> Variable.getValueRange
-                        |> ValueRange.getValueSet
+                        |> ValueRange.getValSet
                         |> function
-                        | Some vs -> 
+                        | Some (ValueSet vs) -> 
                             vs 
                             |> Seq.sort 
-                            |> Seq.take l 
-                            |> ValueRange.ValueSet.create
+                            |> Seq.take l
+                            |> Set.ofSeq
+                            |> ValueRange.createValSet
                             |> Variable.setValueRange vr
                         | None -> vr
 
@@ -133,4 +134,3 @@ module Api =
             |> Logging.logInfo log
 
             eqs
-        

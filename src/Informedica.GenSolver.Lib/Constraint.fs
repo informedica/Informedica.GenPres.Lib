@@ -1,5 +1,4 @@
-﻿namespace Informedica.GenSolver.Lib
-
+namespace Informedica.GenSolver.Lib
 
 
 module Props =
@@ -11,11 +10,12 @@ module Props =
     let matchProp p =
 
         match p with
-        | MinInclProp v -> v |> ValueRange.createMinRange true 
-        | MinExclProp v -> v |> ValueRange.createMinRange false 
-        | MaxInclProp v -> v |> ValueRange.createMaxRange true 
-        | MaxExclProp v -> v |> ValueRange.createMaxRange false 
-        | ValsProp vs ->  vs |> ValueRange.ValueSet.create
+        | MinInclProp v -> v |> ValueRange.createMin true 
+        | MinExclProp v -> v |> ValueRange.createMin false 
+        | MaxInclProp v -> v |> ValueRange.createMax true 
+        | MaxExclProp v -> v |> ValueRange.createMax false
+        | IncrProp vs -> vs |> ValueRange.createIncr
+        | ValsProp vs -> vs |> ValueRange.createValSet
 
 
     let getMin = function
@@ -43,8 +43,7 @@ module Constraint =
     let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name  
 
 
-    let toString { Name = n; Property = p; Limit = l} =
-        sprintf "%s: %A %A" (n |> Name.toString) p l
+    let toString { Name = n; Property = p; Limit = l} = $"{n |> Name.toString}: {p} {l}" 
 
 
     let scoreConstraint c =
@@ -118,9 +117,9 @@ module Constraint =
             else
                 vr
                 |> Variable.getValueRange
-                |> ValueRange.getValueSet
+                |> ValueRange.getValSet
                 |> function
-                | Some vs ->
+                | Some (ValueSet vs) ->
                     vs
                     |> Set.toList
                     |> fun xs -> 
@@ -128,7 +127,7 @@ module Constraint =
                         else xs |> List.sortDescending
                     |> List.take l
                     |> Set.ofList
-                    |> ValueRange.ValueSet.create
+                    |> ValueRange.createValSet
                     |> Variable.setValueRange vr
                 | None -> vr
 
@@ -181,5 +180,3 @@ module Constraint =
                 |> Logging.logInfo log
 
                 eqs
-
-

@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenSolver.Lib
+namespace Informedica.GenSolver.Lib
+
 
 
 /// Functions that handle the `Equation` type that
@@ -385,4 +386,3 @@ module Equation =
             let fs = c false 
             
             e |> apply fp fs
-
