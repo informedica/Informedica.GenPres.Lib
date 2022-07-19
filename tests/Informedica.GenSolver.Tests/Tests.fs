@@ -1,4 +1,4 @@
-﻿module Tests
+module Tests
 
 open MathNet.Numerics
 
@@ -83,21 +83,23 @@ module ValueRange =
     module Maximum = ValueRange.Maximum
     module DTO = Variable.Dto
 
-    let getMin  = ValueRange.getMin >> Option.bind (Minimum.minToBigRational >> Some)
-    let getMax  = ValueRange.getMax >> Option.bind (Maximum.maxToBigRational >> Some)
+    let getMin  = ValueRange.getMin >> Option.bind (Minimum.toBigRational >> Some)
+    let getMax  = ValueRange.getMax >> Option.bind (Maximum.toBigRational >> Some)
 
-    let createMinIncl = Minimum.createMin true
-    let createMinExcl = Minimum.createMin false
-    let createMaxIncl = Maximum.createMax true
-    let createMaxExcl = Maximum.createMax false
+    let createMinIncl = Minimum.create true
+    let createMinExcl = Minimum.create false
+    let createMaxIncl = Maximum.create true
+    let createMaxExcl = Maximum.create false
 
     let contains v vr = vr |> ValueRange.contains v
 
-    let isBetweenMinMax min max  = ValueRange.isBetween min max 
+    let isBetweenMinMax min max  = ValueRange.isBetweenMinMax min max 
 
     let createMinMax succ fail min max vs  = 
-        try 
-            ValueRange.create min max vs
+        try
+            vs
+            |> Option.map ValueRange.ValueSet.create
+            |> ValueRange.create min None max
             |> succ
         with
         | e -> 
@@ -142,8 +144,8 @@ module ValueRange =
                         else None
 
                     let succ vr = 
-                        if n > 0 then vr |> ValueRange.count = n
-                        else vr |> ValueRange.count = 0
+                        if n > 0 then vr |> ValueRange.cardinality = n
+                        else vr |> ValueRange.cardinality = 0
                     let fail _ = false
 
                     createMinMax succ fail min max vs
@@ -162,7 +164,7 @@ module ValueRange =
                     createMinMax succ fail vs min max
                 |> testCase "Creating a ValueRange returns an unrestricted ValueRange"        
     
-                let succ vr = test <@ vr |> ValueRange.count = 0 @>
+                let succ vr = test <@ vr |> ValueRange.cardinality = 0 @>
                 let fail _  = test <@ false @>
 
                 fun _ ->
@@ -170,7 +172,7 @@ module ValueRange =
                 |> testCase "Counting returns zero"
     
                 fun  x -> 
-                    let vr = ValueRange.create None None None
+                    let vr = ValueRange.create None None None None
                     vr |> contains x
                 |> testProp "The ValueRange can contain any Value"
             ]
@@ -194,7 +196,7 @@ module ValueRange =
                 |> testCase "Both Min and Max are the Inclusive and that Value"
     
                 fun _ ->
-                    let succ vr = test <@ vr |> ValueRange.count = 1 @>
+                    let succ vr = test <@ vr |> ValueRange.cardinality = 1 @>
                     let fail _  = test <@ false @>
                     createMinMax succ fail min max vs
                 |> testCase "Counting returns one"
@@ -229,14 +231,14 @@ module ValueRange =
                     let maxExcl = 2N |> createMaxExcl
                     test <@ min |> Option.get |> Minimum.minSTEmin minExcl @>                     // min incl 1 < min incl 1
                     test <@ min |> Option.get |> ValueRange.minSTEmax maxExcl  @>                    // min incl 1 < max incl 2
-                    test <@ min |> Option.get |> ValueRange.minLTmax (1N |> createMaxExcl) @>        // min incl 1 > max incl 1
+                    test <@ min |> Option.get |> ValueRange.minGTmax (1N |> createMaxExcl) @>        // min incl 1 > max incl 1
 
-                    test <@ min |> Option.get |> ValueRange.minLTmax (1N |> createMaxIncl) |> not @> // min incl 1 > max incl 1 is false
-                    test <@ min |> Option.get |> Minimum.minLTmin (1N |> createMinIncl) |> not @> // min incl 1 > min incl 1 is false
+                    test <@ min |> Option.get |> ValueRange.minGTmax (1N |> createMaxIncl) |> not @> // min incl 1 > max incl 1 is false
+                    test <@ min |> Option.get |> Minimum.minGTmin (1N |> createMinIncl) |> not @> // min incl 1 > min incl 1 is false
                 |> testCase "Min is ST Min Excl 1 and ST Max Incl 2 but LT Max Excl 1"
     
                 fun _ ->
-                    let succ vr = test <@ vr |> ValueRange.count = 0 @>
+                    let succ vr = test <@ vr |> ValueRange.cardinality = 0 @>
                     let fail _  = test <@ false @>
                     createMinMax succ fail min max vs
                 |> testCase "The count is zero"
@@ -246,7 +248,7 @@ module ValueRange =
                         test <@ vr |> ValueRange.getMin = min && 
                                 vr |> ValueRange.getMin 
                                    |> Option.get 
-                                   |> Minimum.isMinExcl 
+                                   |> Minimum.isExcl 
                                    |> not @>
                     let fail _  = test <@false@>
                     createMinMax succ fail min max vs
@@ -280,7 +282,7 @@ module ValueRange =
                 |> testProp "The isBetween function returns true for any Value STE to 1"
     
                 fun _ ->
-                    let succ vr = test <@ vr |> ValueRange.count = 0 @>
+                    let succ vr = test <@ vr |> ValueRange.cardinality = 0 @>
                     let fail _  = test <@ false @>
                     createMinMax succ fail min max vs
                 |> testCase "Count returns zero"
@@ -290,7 +292,7 @@ module ValueRange =
                         test <@ vr |> ValueRange.getMax = max && 
                                 vr |> ValueRange.getMax 
                                    |> Option.get 
-                                   |> Maximum.isMaxExcl 
+                                   |> Maximum.isExcl 
                                    |> not @>
                     let fail _  = ()
                     createMinMax succ fail min max vs
@@ -325,7 +327,7 @@ module ValueRange =
 
     
                 fun _ ->
-                    let succ vr = test <@ vr |> ValueRange.count = 0 @>
+                    let succ vr = test <@ vr |> ValueRange.cardinality = 0 @>
                     let fail _  = test <@ false @>
                     createMinMax succ fail min max vs
                 |> testCase "Count returns zero"
@@ -349,7 +351,7 @@ module ValueRange =
 
                 let create incl v = 
                     ValueRange.create  
-                        (v |> Minimum.createMin incl |> Some) None None
+                        (v |> Minimum.create incl |> Some) None None None
 
                 let test op pred v1 incl1 v2 incl2 =
                     let vr1 = v1 |> create incl1 
@@ -360,7 +362,7 @@ module ValueRange =
     
     
                 fun v1 incl1 v2 incl2 ->
-                    let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 * v2) |> Minimum.createMin (incl1 && incl2))
+                    let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 * v2) |> Minimum.create (incl1 && incl2))
                     test (^*) pred v1 incl1 v2 incl2
                 |> testProp "When multiplied the result has min that is the multiple"
     
@@ -370,7 +372,7 @@ module ValueRange =
                 |> testProp "When divided the result has a Min None"
 
                 fun v1 incl1 v2 incl2 ->
-                    let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 + v2) |> Minimum.createMin (incl1 && incl2))
+                    let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 + v2) |> Minimum.create (incl1 && incl2))
                     test (^+) pred v1 incl1 v2 incl2
                 |> testProp "When added the result has min that is the addition"
     
@@ -383,8 +385,8 @@ module ValueRange =
 
             testList "Given a calculation with ValueRange with a Min and a ValueRange with a Max" [
 
-                let createVrMin incl v = ValueRange.create (v |> Minimum.createMin incl |> Some) None None
-                let createVrMax incl v = ValueRange.create None (v |> Maximum.createMax incl |> Some) None
+                let createVrMin incl v = ValueRange.create (v |> Minimum.create incl |> Some) None None None
+                let createVrMax incl v = ValueRange.create None None (v |> Maximum.create incl |> Some) None
 
                 let prop op predMin predMax v1 incl1 v2 incl2 =
                     let vr1 = v1 |> createVrMin incl1 
@@ -407,7 +409,7 @@ module ValueRange =
                     let predMin v1 v2 _ _ m =
                         if v2 >= 0N then m = None
                         else
-                            m |> Option.get = (v1 / v2 |> Minimum.createMin (incl1 && incl2))
+                            m |> Option.get = (v1 / v2 |> Minimum.create (incl1 && incl2))
                     let predMax _ v2 _ _ m =
                         if v2 > 0N then true else m = None
                     prop (^/) predMin predMax v1 incl1 v2 incl2
@@ -420,7 +422,7 @@ module ValueRange =
     
                 fun v1 v2 incl1 incl2 ->
                         let predMin v1 v2 incl1 incl2 m =
-                            m = (v1 - v2 |> Minimum.createMin (incl1 && incl2) |> Some) 
+                            m = (v1 - v2 |> Minimum.create (incl1 && incl2) |> Some) 
                         let predMax _ _ _ _ m = m = None
                         prop (^-) predMin predMax v1 incl1 v2 incl2
                 |> testProp "When subtracting the result has Min is Max - Min and Max None"        
@@ -453,8 +455,8 @@ module ValueRange =
             
             testList "Given calculation with ValueRange with a Max and a ValueRange with a Min" [
 
-                let createVrMin incl v = ValueRange.create (v |> Minimum.createMin incl |> Some) None None
-                let createVrMax incl v = ValueRange.create None (v |> Maximum.createMax incl |> Some) None
+                let createVrMin incl v = ValueRange.create (v |> Minimum.create incl |> Some) None None None
+                let createVrMax incl v = ValueRange.create None None (v |> Maximum.create incl |> Some) None
 
                 let prop op predMin predMax v1 incl1 v2 incl2 =
                     let vr1 = v1 |> createVrMax incl1 
@@ -482,7 +484,7 @@ module ValueRange =
     
                 fun v1 v2 incl1 incl2 ->
                     let predMax v1 v2 incl1 incl2 m =
-                        m = (v1 - v2 |> Maximum.createMax (incl1 && incl2) |> Some)
+                        m = (v1 - v2 |> Maximum.create (incl1 && incl2) |> Some)
                     let predMin _ _ _ _ m = m = None
                     prop (^-) predMin predMax v1 incl1 v2 incl2
                 |> testProp "When subtracting the result has Max is Max - Min and Min is None"        
@@ -496,7 +498,7 @@ module ValueRange =
                     |> List.map BigRational.fromInt
                     |> Set.ofList
 
-                let create = createVals >> ValueRange.ValueSet
+                let create = createVals >> ValueRange.ValueSet.create >> ValSet
 
                 let checkAdd l1 l2 =
                     // Only values > 0
@@ -518,7 +520,7 @@ module ValueRange =
                             |> Seq.toList
                         let l1' = l1 |> create
                         let l2' = l2 |> create
-                        (l1' ^+ l2') |> ValueRange.count = add.Length
+                        (l1' ^+ l2') |> ValueRange.cardinality = add.Length
 
                 let checkMult l1 l2 =
                     // Only values > 0
@@ -540,7 +542,7 @@ module ValueRange =
                             |> Seq.toList
                         let l1' = l1 |> create
                         let l2' = l2 |> create
-                        (l1' ^* l2') |> ValueRange.count = mult.Length
+                        (l1' ^* l2') |> ValueRange.cardinality = mult.Length
 
                 let checkDiv l1 l2 =
                     // Only values > 0
@@ -553,7 +555,7 @@ module ValueRange =
                     | [], _ -> true
                     |_ ->
 
-                        let create = Set.ofList >> ValueRange.ValueSet
+                        let create = Set.ofList >> ValueRange.ValueSet.create >> ValSet
 
                         let div =
                             [ for x1 in l1 do
@@ -566,7 +568,7 @@ module ValueRange =
                         let l1' = l1 |> create
                         let l2' = l2 |> create
 
-                        (l1' ^/ l2') |> ValueRange.count = div.Length
+                        (l1' ^/ l2') |> ValueRange.cardinality = div.Length
 
                 testProp "With addition, resultset will be a distinct set of calculated values" checkAdd
                 testProp "With multiplication, resultset will be a distinct set of calculated values" checkMult
@@ -608,7 +610,7 @@ module ValueRange =
                             |> Seq.toList
                         let l1' = l1 |> create
                         let l2' = l2 |> create
-                        (l1' ^+ l2') |> ValueRange.count = subtr.Length
+                        (l1' ^+ l2') |> ValueRange.cardinality = subtr.Length
                 |> testProp "The resultset will be a distinct set of only positive values"
 
             ]

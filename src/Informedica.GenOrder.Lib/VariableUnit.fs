@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 /// Functions that deal with the `VariableUnit` type
 module VariableUnit =
@@ -36,8 +36,8 @@ module VariableUnit =
         
     /// Create a `VariableUnit` with preset values
     let create n vs min max un =
-
-        ValueRange.create min max vs
+        // ToDo: add incr
+        ValueRange.create min None max vs
         |> function
         | vlr ->
             let var = Variable.create id n vlr        
@@ -144,11 +144,11 @@ module VariableUnit =
 
 
     let setMinIncl =
-        setValue (Minimum.createMin true) ValueRange.setMin
+        setValue (Minimum.create true) ValueRange.setMin
         
 
     let setMaxIncl =
-        setValue (Maximum.createMax true) ValueRange.setMax
+        setValue (Maximum.create true) ValueRange.setMax
 
 
     let setVals vs vru =
@@ -156,11 +156,12 @@ module VariableUnit =
             vs
             |> List.map (fun v -> vru |> valueToBase v)
             |> Set.ofList
+            |> ValueRange.ValueSet.create
 
         vru
         |> getVar
         |> Variable.getValueRange
-        |> ValueRange.setValues vs
+        |> ValueRange.setValueSet vs
         |> fun vr ->
             { vru with 
                 Variable = 
@@ -184,9 +185,9 @@ module VariableUnit =
     let getBaseValues =
         getVar
         >> Variable.getValueRange
-        >> Variable.ValueRange.getValueSet
+        >> Variable.ValueRange.getValSet
         >> function
-        | Some vs -> vs 
+        | Some (ValueSet vs) -> vs 
         | None -> Set.empty
     
 
@@ -226,9 +227,9 @@ module VariableUnit =
         |> get
         |> getVar
         |> Variable.getValueRange
-        |> Variable.ValueRange.getValueSet
+        |> Variable.ValueRange.getValSet
         |> function 
-        | Some vs ->
+        | Some (ValueSet vs) ->
             vs
             |> Seq.map (fun vs -> 
                 vs, x |> get |> getUnit
@@ -349,12 +350,13 @@ module VariableUnit =
                 | _ ->
                     dto.Vals
                     |> List.map toBase 
-                    |> Set.ofList 
+                    |> Set.ofList
+                    |> ValueRange.ValueSet.create
                     |> Some
 
-            let min  = dto.Min  |> map  (toBase >> Minimum.createMin  dto.MinIncl)
+            let min  = dto.Min  |> map  (toBase >> Minimum.create  dto.MinIncl)
 
-            let max  = dto.Max  |> map  (toBase >> Maximum.createMax  dto.MaxIncl)
+            let max  = dto.Max  |> map  (toBase >> Maximum.create  dto.MaxIncl)
 
             create n vals min max un
 
@@ -374,9 +376,9 @@ module VariableUnit =
                 |> function 
                 | Some m -> 
                     m 
-                    |> Minimum.minToBigRational
+                    |> Minimum.toBigRational
                     |> toUnit
-                    |> Some, m |> Minimum.isMinIncl
+                    |> Some, m |> Minimum.isIncl
                 | None -> None, false
             let max, inclMax = 
                 vr 
@@ -384,10 +386,10 @@ module VariableUnit =
                 |> function 
                 | Some m -> 
                     m 
-                    |> Maximum.maxToBigRational
+                    |> Maximum.toBigRational
                     |> toUnit
                     |> Some, 
-                    m |> Maximum.isMaxIncl
+                    m |> Maximum.isIncl
                 | None -> None, false
 
             dto.Name <- 
@@ -396,9 +398,9 @@ module VariableUnit =
                 vu |> getUnit |> ValueUnit.unitToString
             dto.Vals <-
                 vr
-                |> ValueRange.getValueSet
+                |> ValueRange.getValSet
                 |> function
-                | Some vs ->
+                | Some (ValueSet vs) ->
                     vs
                     |> Set.toList
                     |> List.map toUnit

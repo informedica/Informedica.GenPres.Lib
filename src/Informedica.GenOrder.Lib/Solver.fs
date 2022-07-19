@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 /// Helper functions to 
 /// facilitate the use of the
@@ -277,6 +277,7 @@ module Solver =
         | MinExclProp v -> v  |> valToBase MinExclProp
         | MaxInclProp v -> v  |> valToBase MaxInclProp
         | MaxExclProp v -> v  |> valToBase MaxExclProp
+        | IncrProp vs   -> vs |> setToBase IncrProp
         | ValsProp vs   -> vs |> setToBase ValsProp
 
 
