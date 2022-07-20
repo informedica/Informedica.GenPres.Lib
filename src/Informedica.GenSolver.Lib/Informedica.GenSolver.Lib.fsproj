@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -16,10 +16,10 @@
     <Compile Include="Constraint.fs" />
     <Compile Include="Api.fs" />
     <Compile Include="SolverLogging.fs" />
-    <None Include="Scripts/load-utils.fsx" />
     <None Include="Scripts/load.fsx" />
     <None Include="Scripts/Api.fsx" />
-    <None Include="Scripts/DrugExample.fsx" />
+      <None Include="Scripts/GenSolver3.fsx" />
+      <None Include="Scripts/DrugExample.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />

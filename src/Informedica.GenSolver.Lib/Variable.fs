@@ -136,7 +136,14 @@ module Variable =
                 | true, br -> br |> BigRational.minInclMultipleOf incr
                 | false, br -> br |> BigRational.minExclMultipleOf incr
                 |> fun (b, br) -> create b br
+
                 
+            let restrict newMin oldMin =
+                if newMin |> minGTmin oldMin then
+                    newMin
+                else
+                    oldMin
+
 
         module Maximum =
 
@@ -203,6 +210,13 @@ module Variable =
                 |> fun (b, br) -> create b br
 
 
+            let restrict newMax oldMax =
+                if newMax |> maxSTmax oldMax then
+                    newMax
+                else
+                    oldMax
+
+
         module Increment =
 
 
@@ -220,37 +234,51 @@ module Variable =
             let intersect (Increment incr1) (Increment incr2) =
                 incr1 |> Set.intersect incr2 |> create
 
+            let calc op incr1 incr2 =
+                match op with
+                // y.incr = x1.incr * x2.incr
+                | BigRational.Mult ->
+                    Seq.allPairs incr1 incr2
+                    |> Seq.map (fun (x1, x2) -> x1 |> op <| x2)
+                    |> Set.ofSeq
+                    |> create
+                    |> Some
+
+                // when y = x1 + x2 then y.incr = gcd of x1.incr and x2.incr
+                | BigRational.Add | BigRational.Subtr ->
+                    Seq.append incr1 incr2
+                    |> Seq.fold (fun acc x ->
+                        BigRational.gcd x acc
+                    ) 1N
+                    |> Set.singleton
+                    |> create
+                    |> Some
+                // incr cannot be calculated based on division or subtraction
+                |  _ -> None
+
             /// Calculate an increment with
             /// **incr1** of x1 and **incr2** of x2
             /// in an equation: y = x1 **op** x2
             let calcOpt op incr1 incr2 =
                 match incr1, incr2 with
                 | Some (Increment i1), Some (Increment i2) ->
-                    match op with
-                    // y.incr = x1.incr * x2.incr
-                    | BigRational.Mult ->
-                        Seq.allPairs i1 i2
-                        |> Seq.map (fun (x1, x2) -> x1 |> op <| x2)
-                        |> Set.ofSeq
-                        |> create
-                        |> Some
-
-                    // when y = x1 + x2 then y.incr = gcd of x1.incr and x2.incr
-                    | BigRational.Add | BigRational.Subtr ->
-                        Seq.append i1 i2
-                        |> Seq.fold (fun acc x ->
-                            BigRational.gcd x acc
-                        ) 1N
-                        |> Set.singleton
-                        |> create
-                        |> Some
-                    // incr cannot be calculated based on division or subtraction
-                    |  _ -> None
-
+                    calc op i1 i2
                 | _ -> None
 
 
             let toList (Increment incr) = incr |> Set.toList
+
+
+            let isEmpty (Increment incr) = incr |> Set.isEmpty
+
+
+            let count (Increment incr) = incr |> Set.count
+
+
+            let restrict newIncr oldIncr =
+                match oldIncr |> intersect newIncr with
+                | i when i |> isEmpty -> oldIncr
+                | i -> i
 
 
         module ValueSet =
@@ -666,11 +694,7 @@ module Variable =
         /// If minimum cannot be set the original `Minimum` is returned.
         /// So, it always returns a more restrictive, i.e. larger, or equal `Minimum`.
         let setMin newMin (vr: ValueRange) =
-            let restrict min =
-                if newMin |> Minimum.minGTmin min then
-                    newMin
-                else
-                    min
+            let restrict = Minimum.restrict newMin
 
             let fMin = restrict >> Min
 
@@ -705,7 +729,7 @@ module Variable =
         /// If increment cannot be set the original is returned.
         /// So, the resulting increment is always more restrictive as the previous one
         let setIncr newIncr vr =
-            let restrict incr = incr |> Increment.intersect newIncr
+            let restrict = Increment.restrict newIncr
 
             let fMin min = minIncrToValueRange min newIncr
 
@@ -737,11 +761,7 @@ module Variable =
 
 
         let setMax newMax (vr: ValueRange) =
-            let restrict max =
-                if newMax |> Maximum.maxGTmax max then
-                    newMax
-                else
-                    max
+            let restrict = Maximum.restrict newMax
 
             let fMin min = minMaxToValueRange min newMax
 
@@ -1368,6 +1388,9 @@ module Variable =
         /// making sure the `Unr` is set to `false`.
         let setVals vals dto = { dto with Unr = false; Vals = vals }
 
+
+        let setIncr incr dto = { dto with Unr = false; Incr = incr }
+
         /// Set a `min` to an **dto** that is either inclusive `incl` true or exclusive `false`
         let setMin  min incl dto = { dto with Unr = false; Min = min; MinIncl = incl }
 
@@ -1375,9 +1398,10 @@ module Variable =
         let setMax  max incl dto = { dto with Unr = false; Max = max; MaxIncl = incl }
 
         /// Match a string **p** to a field of `Dto`
-        let (|Vals|MinIncl|MinExcl|MaxIncl|MaxExcl|NoProp|) p =
+        let (|Vals|Incr|MinIncl|MinExcl|MaxIncl|MaxExcl|NoProp|) p =
             match p |> String.toLower with
             | "vals"     -> Vals
+            | "incr"     -> Incr
             | "minincl"  -> MinIncl
             | "minexcl"  -> MinExcl
             | "maxincl"  -> MaxIncl
@@ -1395,6 +1419,7 @@ module Variable =
 
             match p with
             | Vals     -> dto |> setVals vs
+            | Incr     -> dto |> setIncr vs
             | MinIncl  -> dto |> setMin  (vs |> getVal) true
             | MinExcl  -> dto |> setMin  (vs |> getVal) false
             | MaxIncl  -> dto |> setMax  (vs |> getVal) true
@@ -1435,7 +1460,12 @@ module Variable =
 
             let min = dto.Min |> Option.bind (fun v -> v |> Minimum.create dto.MinIncl |> Some)
             let max = dto.Max |> Option.bind (fun v -> v |> Maximum.create dto.MaxIncl |> Some)
-            let incr = dto.Incr |> Set.ofList |> ValueRange.Increment.create |> Some
+            let incr =
+                if dto.Incr |> List.isEmpty then None
+                else
+                    dto.Incr
+                    |> Set.ofList |> ValueRange.Increment.create
+                    |> Some
 
             let vr = ValueRange.create min incr max vs  
 
@@ -1461,7 +1491,12 @@ module Variable =
 
             let min = dto.Min |> Option.bind (fun v -> v |> Minimum.create dto.MinIncl |> Some)
             let max = dto.Max |> Option.bind (fun v -> v |> Maximum.create dto.MaxIncl |> Some)
-            let incr = dto.Incr |> Set.ofList |> ValueRange.Increment.create |> Some
+            let incr =
+                if dto.Incr |> List.isEmpty then None
+                else
+                    dto.Incr
+                    |> Set.ofList |> ValueRange.Increment.create
+                    |> Some
 
             try
                 let vr = ValueRange.create min incr max vs

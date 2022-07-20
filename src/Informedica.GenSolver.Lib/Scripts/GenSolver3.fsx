@@ -214,7 +214,6 @@ module Tests =
 
 
         module ValueRangeTests =
-
             
             module MinimumTests =
             
@@ -291,11 +290,23 @@ module Tests =
                                 min1 = min2
                             else true
                         |> Generators.testProp "multipleOf run multiple times returns identical"
+
+                        fun b m ->
+                            let oldMin = create b m
+                            let newMin = create b m
+                            oldMin |> restrict newMin = oldMin
+                        |> Generators.testProp "restrict eq min"
+
+
+                        fun b1 m1 b2 m2 ->
+                            let oldMin = create b1 m1
+                            let newMin = create b2 m2
+                            oldMin |> restrict newMin |> minGTEmin oldMin
+                        |> Generators.testProp "restrict different min"
                     ]
             
                 let run () = tests |> Generators.run
             
-
 
             module MaximumTests =
 
@@ -371,11 +382,24 @@ module Tests =
                                 max1 = max2
                             else true
                         |> Generators.testProp "multipleOf run multiple times returns identical"
+
+                        fun b m ->
+                            let oldMax = create b m
+                            let newMax = create b m
+                            oldMax |> restrict newMax = oldMax
+                        |> Generators.testProp "restrict eq max"
+
+
+                        fun b1 m1 b2 m2 ->
+                            let oldMax = create b1 m1
+                            let newMax = create b2 m2
+                            oldMax |> restrict newMax |> maxSTEmax oldMax
+                        |> Generators.testProp "restrict different max"
+
                     ]
 
 
                 let run () = tests |> Generators.run
-
 
 
             module IncrementTests =
@@ -434,13 +458,89 @@ module Tests =
                         |> Generators.testProp "calc add with one gives gcd which is <= original incr"
 
                     ]
+
+                    testList "restrict increment" [
+                        fun xs ->
+                            try
+                                let newIncr = xs |> create 
+                                let oldIncr = xs |> create
+                                (oldIncr |> restrict newIncr) = newIncr
+                            with
+                            | _ -> true
+                        |> Generators.testProp "setting an incr with eq incr"
+
+                        fun xs1 xs2 ->
+                            try
+                                let newIncr = xs1 |> create 
+                                let oldIncr = xs2 |> create
+                                (oldIncr |> restrict newIncr |> count) <= (newIncr |> count)
+                            with
+                            | _ -> true
+                        |> Generators.testProp "setting an incr with different incr"
+
+                    ]
+
                 ]
 
 
                 let run () = tests |> Generators.run
 
 
-        
+            open Variable.ValueRange
+
+            [<Tests>]
+            let tests = testList "valuerange" [
+                testList "between min and max" [
+                    fun bMin minV bMax maxV v ->
+                        let min = Minimum.create bMin minV |> Some
+                        let max = Maximum.create bMax maxV |> Some
+                        let op1 = if bMin then (<=) else (<)
+                        let op2 = if bMax then (<=) else (<)
+                        (minV |> op1 <| v && v |> op2 <| maxV) = (v |> isBetweenMinMax min max)
+                    |> Generators.testProp "v between min and max"
+
+                    fun bMin minV v ->
+                        let min = Minimum.create bMin minV |> Some
+                        let max = None
+                        let op1 = if bMin then (<=) else (<)
+                        (minV |> op1 <| v) = (v |> isBetweenMinMax min max)
+                    |> Generators.testProp "v between min and none"
+
+                    fun bMax maxV v ->
+                        let min = None
+                        let max = Maximum.create bMax maxV |> Some
+                        let op2 = if bMax then (<=) else (<)
+                        (v |> op2 <| maxV) = (v |> isBetweenMinMax min max)
+                    |> Generators.testProp "v between none and max"
+
+                    fun v ->
+                        let min = None
+                        let max = None
+                        v |> isBetweenMinMax min max
+                    |> Generators.testProp "v between none and none"
+                ]
+
+                testList "is multiple of"  [
+                    fun v xs ->
+                        try
+                            let incr = xs |> Increment.create
+                            let isMult =
+                                xs
+                                |> Set.exists (fun i -> (v / i).Denominator = 1I)
+                            v |> isMultipleOfIncr (Some incr) = isMult
+                        with
+                        | _ -> true
+                    |> Generators.testProp "v is multiple of one of incr"
+
+                    fun v ->
+                        v |> isMultipleOfIncr None
+                    |> Generators.testProp "is always multiple of none incr"
+                ]
+            ]
+
+
+            let run () = tests |> Generators.run
+
 
 open Tests
 open UtilsTests
@@ -449,11 +549,13 @@ open ValueRangeTests
 
 
 BigRationalTests.run ()
-ListTests.run()
-SetTests.run()
-MinimumTests.run()
-MaximumTests.run()
-IncrementTests.run()
+ListTests.run ()
+SetTests.run ()
+MinimumTests.run ()
+MaximumTests.run ()
+IncrementTests.run ()
+ValueRangeTests.run ()
+
 
 open MathNet.Numerics
 open Informedica.Utils.Lib.BCL
