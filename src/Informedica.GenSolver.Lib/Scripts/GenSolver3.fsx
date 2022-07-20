@@ -28,16 +28,21 @@ open Informedica.GenSolver.Lib
 /// Create the necessary test generators
 module Generators =
 
+    open Types
     open Expecto
     open FsCheck
     open MathNet.Numerics
+    open Informedica.Utils.Lib.BCL
 
 
     let bigRGen (n, d) = 
         let d = if d = 0 then 1 else d
         let n = abs(n) |> BigRational.FromInt
         let d = abs(d) |> BigRational.FromInt
-        n/d
+        n / d
+
+    let bigRGenOpt (n, d) = bigRGen (n, 1) |> Some
+
 
     let bigRGenerator =
         gen {
@@ -46,6 +51,60 @@ module Generators =
             return bigRGen(n, d)
         }
 
+    let varGenerator =
+        let mapToBr min max xs =
+            xs
+            |> List.map (fun (x1, x2) -> x1, 1)
+            |> List.map bigRGen
+            |> List.filter (fun x ->
+                x > 0N &&
+                match min, max with
+                | None, None -> x > 0N
+                | Some min, None -> x > min
+                | Some min, Some max -> x > min && x < max
+                | None, Some max -> x < max
+            ) |> List.distinct
+
+        let minMax min max minIncl maxIncl =
+            match min |> bigRGenOpt, max |> bigRGenOpt with
+            | Some min, Some max when min > max -> Some max, Some min
+            | Some min, Some max when min = max ->
+                if minIncl && maxIncl then Some min, Some max
+                else None, None
+            | min, max -> min, max
+
+        gen {
+            let! minIsNone = Arb.generate<bool>
+            let! maxIsNone = Arb.generate<bool>
+            let! n = Arb.generate<int>
+            let! min = Arb.generate<int * int>
+            let! max = Arb.generate<int * int>
+            let! incr = Arb.generate<(int * int) list>
+            let! vs = Arb.generate<(int * int) list>
+            let! minIncl = Arb.generate<bool>
+            let! maxIncl = Arb.generate<bool>
+            let min, max = minMax min max minIncl maxIncl
+            let incr = incr |> mapToBr min max
+            let vs =
+                vs
+                |> mapToBr min max
+                |> List.filter (fun x ->
+                    incr
+                    |> List.exists (fun i ->
+                        x |> BigRational.isMultiple i
+                    )
+                )
+
+            return
+                Variable.Dto.createDto
+                    $"var_{(abs n).ToString()}"
+                    (if minIsNone then None else min)
+                    minIncl
+                    incr
+                    (if maxIsNone then None else max)
+                    maxIncl
+                    vs
+        }
 
     type BigRGenerator () =
         static member BigRational () =
@@ -54,9 +113,19 @@ module Generators =
             }
 
 
+    type VarDtoGenerator () =
+        static member Variable () =
+            { new Arbitrary<Variable.Dto.Dto>() with
+                override x.Generator = varGenerator
+            }
+
+
     let config = { 
         FsCheckConfig.defaultConfig with 
-            arbitrary = [typeof<BigRGenerator>]
+            arbitrary = [
+                typeof<BigRGenerator>
+                typeof<VarDtoGenerator>
+            ]
             maxTest = 1000
         }
 
@@ -541,6 +610,33 @@ module Tests =
 
             let run () = tests |> Generators.run
 
+        open Variable
+
+        [<Tests>]
+        let tests = testList "variable dto" [
+            fun (dto: Dto.Dto) ->
+                try
+                    dto
+                    |> Dto.fromDto
+                    |> ignore
+                    true
+                with
+                | e ->
+                    printfn $"cannot create var from because {e.ToString()}"
+                    false
+            |> Generators.testProp "can create random"
+
+        ]
+
+        let run () = tests |> Generators.run
+
+    module EquationTests =
+
+        [<Tests>]
+        let tests = testList "product equation" [
+            
+            ]
+
 
 open Tests
 open UtilsTests
@@ -555,23 +651,49 @@ MinimumTests.run ()
 MaximumTests.run ()
 IncrementTests.run ()
 ValueRangeTests.run ()
+VariableTests.run ()
 
 
 open MathNet.Numerics
 open Informedica.Utils.Lib.BCL
 
-let incr = set [1N/3N; 1N/4N; 1N/5N] |> Set.removeBigRationalMultiples
-let min = Variable.ValueRange.Minimum.create false 0N
-min |> Variable.ValueRange.Minimum.multipleOf incr
-    |> fun min1 -> min1 |> Variable.ValueRange.Minimum.minGTmin min
+open Expecto
+open FsCheck
+open Types
+open Variable.Operators
 
-(1N/2N) |> BigRational.gcd 1N
+let generateVars n =
+    (Generators.varGenerator |> Arb.fromGen).Generator.Sample(1000, n)
+    |> List.filter (fun dto ->
+        dto.Vals |> List.length < 5 
+    )
+    |> List.map Variable.Dto.fromDto
+    |> List.filter (fun var ->
+        var |> Variable.count <= 5
+    )
+    |> List.distinctBy (fun var ->
+        var.Values
+    )
 
-set [1N] |> Set.removeBigRationalMultiples
+let vars1 = generateVars 100
+let vars2 = generateVars 100
 
-let testMinGTMax () =
-    let min = Variable.ValueRange.Minimum.create false 1N
-    let max = Variable.ValueRange.Maximum.create false 1N
 
-    min |> Variable.ValueRange.minGTmax max
-testMinGTMax ()
+Seq.allPairs vars1 vars2
+|> Seq.collect (fun (var1, var2) ->
+    [
+        var1, var2, var1 ^* var2, "x"
+        var1, var2, var1 ^/ var2, "/"
+        var1, var2, var1 ^+ var2, "+"
+        var1, var2, var1 ^- var2, "-"
+    ]
+)
+|> Seq.distinctBy (fun (_, _, r, o) -> r, o)
+|> Seq.iteri (fun i (var1, var2, res, op) ->
+    let toStr = Variable.ValueRange.toString true
+    let x = var1.Values |> toStr
+    let z = var2.Values |> toStr
+    let y = res.Values |> toStr
+    $"{i}. {x} {op} {z} = {y}"
+    |> printfn "%s"
+)

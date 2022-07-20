@@ -70,7 +70,7 @@ module Solve =
             )
             |> Option.get
 
-        match var.Values |> ValueRange.getValueSet with
+        match var.Values |> ValueRange.getValSet with
         | None    -> 
             match incr with
             | None -> eqs
@@ -81,8 +81,8 @@ module Solve =
                 match min, max with
                 | Some min, Some max ->
                     let (incl_min, min), (incl_max, max) = 
-                        min |> ValueRange.Minimum.minToBoolBigRational,
-                        max |> ValueRange.Maximum.maxToBoolBigRational
+                        min |> ValueRange.Minimum.toBoolBigRational,
+                        max |> ValueRange.Maximum.toBoolBigRational
                     let min =
                         if min = 0N then incr
                         else 
@@ -102,7 +102,7 @@ module Solve =
                         | TakeFromMax x -> [min..incr..max] |> List.rev |> List.take x
                     eqs |> solveValues s vs
                 | _ -> eqs
-        | Some vs ->
+        | Some (ValueSet vs) ->
             match take with
             | TakeFromMin x -> 
                     let x = if x > vs.Count then vs.Count else x

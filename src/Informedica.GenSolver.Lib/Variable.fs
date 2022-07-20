@@ -244,16 +244,13 @@ module Variable =
                     |> create
                     |> Some
 
-                // when y = x1 + x2 then y.incr = gcd of x1.incr and x2.incr
+                // when y = x1 + x2 then y.incr = x1.incr and x2.incr
                 | BigRational.Add | BigRational.Subtr ->
                     Seq.append incr1 incr2
-                    |> Seq.fold (fun acc x ->
-                        BigRational.gcd x acc
-                    ) 1N
-                    |> Set.singleton
+                    |> Set.ofSeq
                     |> create
                     |> Some
-                // incr cannot be calculated based on division or subtraction
+                // incr cannot be calculated based on division
                 |  _ -> None
 
             /// Calculate an increment with
@@ -815,7 +812,7 @@ module Variable =
                     |> List.map (if exact then BigRational.toString
                                  else BigRational.toFloat >> sprintf "%A")
 
-                $"""[ {vals |> String.concat ", "}"""
+                $"""{vals |> String.concat ", "}"""
 
             let printRange min incr max =
                 if unr then "<..>"
@@ -832,27 +829,23 @@ module Variable =
                             |> BigRational.toFloat
                             |> sprintf "%A"
 
-                    match min, incr, max with
-                    | Some min, _, None     when incr |> List.isEmpty ->
-                        $"{left}{min |> brToStr}..>"
-                    | Some min, _, Some max when incr |> List.isEmpty ->
-                        $"{left}{min |> brToStr}..{right}{max |> brToStr}"
-                    | None,     _, Some max when incr |> List.isEmpty ->
-                        $"<..{max |> brToStr}{right}"
-                    | Some min, incr, None     ->
-                        $"{left}{min |> brToStr}..{incr |> printVals}..>"
-                    | None,     incr, Some max ->
-                        $"<..{incr |> printVals}..{max |> brToStr}{right}"
-                    | Some min, incr, Some max ->
-                        $"{left}{min |> brToStr}..{incr |> printVals}..{max |> brToStr}{right}"
-                    | _ -> "[]"
+                    match min, incr |> List.isEmpty, max with
+                    | None,     true,  None     -> "<..>"                    
+                    | Some min, true,  None     -> $"{left}{min |> brToStr}..>"
+                    | Some min, true,  Some max -> $"{left}{min |> brToStr}..{max |> brToStr}{right}"
+                    | None,     true,  Some max -> $"<..{max |> brToStr}{right}"
+                    | None,     false, None     -> $"<..{incr |> printVals}..>"
+                    | Some min, false, None     -> $"{left}{min |> brToStr}..{incr |> printVals}..>"
+                    | None,     false, Some max -> $"<..{incr |> printVals}..{max |> brToStr}{right}"
+                    | Some min, false, Some max -> $"{left}{min |> brToStr}..{incr |> printVals}..{max |> brToStr}{right}"
 
             let vals =
-                if vals |> List.isEmpty |> not then vals |> printVals
+                if vals |> List.isEmpty |> not then
+                    $"[{vals |> printVals}]"
                 else
                     printRange min incr max
 
-            sprintf "%s" vals
+            $"{vals}"
 
 
         /// Convert a `ValueRange` to a `string`.
@@ -895,13 +888,6 @@ module Variable =
                 let maxincl, max = max |> Maximum.toBoolBigRational
 
                 print (Some min) minincl [] (Some max) maxincl
-
-            let fMinIncrMax (min, incr, max) =
-                let maxincl, min = min |> Minimum.toBoolBigRational
-                let minincl, max = max |> Maximum.toBoolBigRational
-                let incr = incr |> Increment.toList
-
-                print (Some min) minincl incr (Some max) maxincl
 
             vr
             |> apply
@@ -1088,16 +1074,13 @@ module Variable =
 
             // A set with an increment results in a new set of increment
             // Need to match all scenarios with a valueset and an increment
+            | ValSet s, Incr i
+            | Incr i, ValSet s
+
             | ValSet s, MinIncr(_, i)
             | MinIncr(_, i), ValSet s
 
             | ValSet s, IncrMax(i, _)
-            | IncrMax(i, _), ValSet s
-
-            | ValSet s, MinIncr(_, i)
-            | IncrMax(i, _), ValSet s
-
-            | ValSet s, MinIncr(_, i)
             | IncrMax(i, _), ValSet s ->
 
                 let min1, max1 = x1 |> getMin, x1 |> getMax
@@ -1356,7 +1339,6 @@ module Variable =
         type Dto =
             {
                 Name: string
-                Unr: bool
                 Min: BigRational option
                 MinIncl: bool
                 Incr : BigRational list
@@ -1365,11 +1347,14 @@ module Variable =
                 Vals: BigRational list
             }
 
+        let isUnr (dto : Dto) =
+            dto.Min = None && dto.Max = None &&
+            dto.Incr |> List.isEmpty && dto.Vals |> List.isEmpty
+
         /// Create a `Dto`
-        let createDto n unr min minincl incr max maxincl vals =  
+        let createDto n min minincl incr max maxincl vals =
             {
                 Name = n
-                Unr = unr
                 Vals = vals
                 Min = min
                 MinIncl = minincl
@@ -1379,23 +1364,23 @@ module Variable =
             }
 
         /// Create an *empty* *new* `Dto` with only a name **n**
-        let createNew n = createDto n true None false [] None false []
+        let createNew n = createDto n None false [] None false []
 
         /// Apply `f` to an `Dto` `d`
         let apply f (d: Dto) = f d
 
         /// Apply an array of `vals` to an **dto**
         /// making sure the `Unr` is set to `false`.
-        let setVals vals dto = { dto with Unr = false; Vals = vals }
+        let setVals vals dto = { dto with Vals = vals }
 
 
-        let setIncr incr dto = { dto with Unr = false; Incr = incr }
+        let setIncr incr dto = { dto with Incr = incr }
 
         /// Set a `min` to an **dto** that is either inclusive `incl` true or exclusive `false`
-        let setMin  min incl dto = { dto with Unr = false; Min = min; MinIncl = incl }
+        let setMin  min incl dto = { dto with Min = min; MinIncl = incl }
 
         /// Set a `max` to an **dto** that is either inclusive `incl` true or exclusive `false`
-        let setMax  max incl dto = { dto with Unr = false; Max = max; MaxIncl = incl }
+        let setMax  max incl dto = { dto with Max = max; MaxIncl = incl }
 
         /// Match a string **p** to a field of `Dto`
         let (|Vals|Incr|MinIncl|MinExcl|MaxIncl|MaxExcl|NoProp|) p =
@@ -1427,19 +1412,16 @@ module Variable =
             | _   -> dto
 
         /// Return a `string` representation of a `Dto`
-        let toString
-                    exact
-                    { Name = name
-                      Unr = unr
-                      Vals = vals
-                      Min = min
-                      MinIncl = minincl
-                      Incr = incr
-                      Max = max
-                      MaxIncl = maxincl } =
-
-            let vals = ValueRange.print exact unr min minincl incr max maxincl vals 
-            sprintf "%s%s" name vals
+        let toString exact dto =
+            let unr = dto |> isUnr
+            let vals =
+                ValueRange.print
+                    exact unr
+                    dto.Min dto.MinIncl
+                    dto.Incr
+                    dto.Max dto.MaxIncl
+                    dto.Vals 
+            $"{dto.Name} {vals}"
 
 
         /// Create a `Variable` from a `Dto` and
@@ -1512,8 +1494,6 @@ module Variable =
 
             let dto = createNew (let (Name.Name n) = v.Name in n)
 
-            let unr = v.Values |> ValueRange.isUnrestricted
-
             let minincl =
                 match v.Values |> ValueRange.getMin with
                 | Some m -> m |> Minimum.isExcl |> not | None -> false
@@ -1540,7 +1520,6 @@ module Variable =
                 | None -> []
 
             { dto with
-                Unr = unr
                 Vals = vals
                 Min = min
                 MinIncl = minincl
