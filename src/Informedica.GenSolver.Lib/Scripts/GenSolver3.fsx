@@ -663,7 +663,7 @@ open Types
 open Variable.Operators
 
 let generateVars n =
-    (Generators.varGenerator |> Arb.fromGen).Generator.Sample(1000, n)
+    (Generators.varGenerator |> Arb.fromGen).Generator.Sample(10, n)
     |> List.filter (fun dto ->
         dto.Vals |> List.length < 5 
     )
@@ -681,19 +681,55 @@ let vars2 = generateVars 100
 
 Seq.allPairs vars1 vars2
 |> Seq.collect (fun (var1, var2) ->
-    [
-        var1, var2, var1 ^* var2, "x"
-        var1, var2, var1 ^/ var2, "/"
-        var1, var2, var1 ^+ var2, "+"
-        var1, var2, var1 ^- var2, "-"
-    ]
+    try
+        [
+            var1, var2, var1 ^* var2, "x"
+            var1, var2, var1 ^/ var2, "/"
+            var1, var2, var1 ^+ var2, "+"
+            var1, var2, var1 ^- var2, "-"
+        ]
+    with
+    | _ ->
+//        printfn $"cannot calculate {var1}, {var2}"
+        []
 )
-|> Seq.distinctBy (fun (_, _, r, o) -> r, o)
+|> Seq.distinctBy (fun (x1, x2, _, o) -> set [x1, x2], o)
 |> Seq.iteri (fun i (var1, var2, res, op) ->
     let toStr = Variable.ValueRange.toString true
     let x = var1.Values |> toStr
     let z = var2.Values |> toStr
     let y = res.Values |> toStr
-    $"{i}. {x} {op} {z} = {y}"
+    $"{i}. {y} = {x} {op} {z}"
+    |> printfn "%s"    
+)
+
+let vars3 = generateVars 1000
+
+
+Seq.allPairs vars1 vars2
+|> Seq.allPairs vars3
+|> Seq.distinct
+|> Seq.collect (fun (y, (x1, x2)) ->
+    try
+        [
+            y, y <== (x1 ^* x2), x1, x2, "x"
+            y, y <== (x1 ^/ x2), x1, x2, "/"
+            y, y <== (x1 ^+ x2), x1, x2, "+"
+            y, y <== (x1 ^- x2), x1, x2, "-"
+        ]
+    with
+    | _ -> []
+)
+|> Seq.filter (fun (y0, y1, _, _, _) -> y0.Values <> y1.Values)
+|> Seq.distinctBy (fun (y0, y1, _, _, _) -> y0.Values, y1.Values)
+//|> Seq.take 5000
+|> Seq.iteri (fun i (y0, y1, x1, x2, o) ->
+    let toStr = Variable.ValueRange.toString true
+    let x = x1.Values |> toStr
+    let z = x2.Values |> toStr
+    let y0 = y0.Values |> toStr
+    let y1 = y1.Values |> toStr
+    $"{i}. {y0} -> {y1} = {x} {o} {z}"
     |> printfn "%s"
 )
+
