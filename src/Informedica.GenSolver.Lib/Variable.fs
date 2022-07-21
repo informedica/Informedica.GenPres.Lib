@@ -87,6 +87,12 @@ module Variable =
                 | MinIncl(m) -> m |> fincl
                 | MinExcl(m) -> m |> fexcl
 
+
+            let map fIncl fExcl =
+                apply
+                    (fIncl >> (create true))
+                    (fExcl >> (create false))
+
             /// Checks whether `Minimum` **m2** > **m1**
             /// Note that the fact that a Minimum is inclusive or exclusive 
             /// must be taken into account.
@@ -145,18 +151,34 @@ module Variable =
                     oldMin
 
 
-        module Maximum =
+            let toString exact min =
+                let toStr =
+                    if not exact then BigRational.toString
+                    else
+                        (BigRational.fixPrecision 3) >> string
+                let b, br =
+                    min |> toBoolBigRational
+                $"""{if b then "[" else "<"}{br |> toStr}"""
 
-            /// Apply **f** to the bigrational
-            /// value of `Maximum`
-            let apply fincl fexcl = function
-            | MaxIncl(m) -> m |> fincl
-            | MaxExcl(m) -> m |> fexcl
+
+        module Maximum =
 
 
             /// Create a `Maximum` that is
             /// either inclusive or exclusive.
             let create isIncl m = if isIncl then m |> MaxIncl else m |> MaxExcl
+
+            /// Apply **f** to the bigrational
+            /// value of `Maximum`
+            let apply fIncl fExcl = function
+            | MaxIncl(m) -> m |> fIncl
+            | MaxExcl(m) -> m |> fExcl
+
+
+            let map fIncl fExcl =
+                apply
+                    (fIncl >> (create true))
+                    (fExcl >> (create false))
 
 
             /// Checks whether `Maximum` **m2** > **m1**
@@ -217,6 +239,16 @@ module Variable =
                     oldMax
 
 
+            let toString exact max =
+                let toStr =
+                    if not exact then BigRational.toString
+                    else
+                        (BigRational.fixPrecision 3) >> string
+                let b, br =
+                    max |> toBoolBigRational
+                $"""{br |> toStr}{if b then "]" else ">"}"""
+
+
         module Increment =
 
 
@@ -231,8 +263,12 @@ module Variable =
                         |> Exceptions.raiseExc
 
 
+            let map f (Increment incr) = incr |> Set.map f |> create
+
+
             let intersect (Increment incr1) (Increment incr2) =
                 incr1 |> Set.intersect incr2 |> create
+
 
             let calc op incr1 incr2 =
                 match op with
@@ -278,6 +314,14 @@ module Variable =
                 | i -> i
 
 
+            let toString exact (Increment incr) =
+                let toStr =
+                    if not exact then BigRational.toString
+                    else
+                        (BigRational.fixPrecision 3) >> string
+                $"""{incr |> Set.map toStr |> String.concat ", "}"""
+
+
         module ValueSet =
 
 
@@ -293,6 +337,12 @@ module Variable =
                     |> ValueSet
 
 
+            let toSet (ValueSet vs) = vs
+
+
+            let map f (ValueSet vs) = vs |> Set.map f |> create
+
+
             let getMin (ValueSet vs) = vs |> Minimum.getSetMin
 
 
@@ -300,6 +350,9 @@ module Variable =
 
 
             let count (ValueSet vs) = vs |> Set.count
+
+
+            let isEmpty (ValueSet vs) = vs |> Set.isEmpty
 
 
             let contains v (ValueSet vs) = vs |> Set.contains v
@@ -324,6 +377,14 @@ module Variable =
                     Seq.allPairs s1 s2
                     |> Seq.map (fun (x1, x2) -> x1 |> op <| x2)
                     |> create
+
+
+            let toString exact (ValueSet vs) =
+                let toStr =
+                    if not exact then BigRational.toString
+                    else
+                        (BigRational.fixPrecision 3) >> string
+                $"""[{vs |> Set.map toStr |> String.concat ", "}]"""
 
 
 
@@ -803,91 +864,48 @@ module Variable =
         /// Create a string (to print) representation of a `ValueRange`. 
         /// `Exact` true prints exact bigrationals, when false
         /// print as floating numbers
-        let print exact unr min minincl incr max maxincl vals =
-
-            let printVals vals =
-                let vals =
-                    vals
-                    |> List.sort
-                    |> List.map (if exact then BigRational.toString
-                                 else BigRational.toFloat >> sprintf "%A")
-
-                $"""{vals |> String.concat ", "}"""
+        let print exact min incr max vs =
 
             let printRange min incr max =
-                if unr then "<..>"
-                else
-                    let left  = if minincl then "[" else "<"
-                    let right = if maxincl then "]" else ">"
+                let minToStr = Minimum.toString exact
+                let maxToStr = Maximum.toString exact
+                let incrToStr = Increment.toString exact
 
-                    let brToStr br =
-                        if exact then
-                            br
-                            |> sprintf "%A"
-                        else
-                            br
-                            |> BigRational.toFloat
-                            |> sprintf "%A"
+                match min, incr, max with
+                | None,     None,  None     -> "<..>"                    
+                | Some min, None,  None     -> $"{min |> minToStr}..>"
+                | Some min, None,  Some max -> $"{min |> minToStr}..{max |> maxToStr}"
+                | None,     None,  Some max -> $"<..{max |> maxToStr}"
+                | None,     Some incr, None     -> $"<..{incr |> incrToStr}..>"
+                | Some min, Some incr, None     -> $"{min |> minToStr}..{incr |> incrToStr}..>"
+                | None,     Some incr, Some max -> $"<..{incr |> incrToStr}..{max |> maxToStr}"
+                | Some min, Some incr, Some max -> $"{min |> minToStr}..{incr |> incrToStr}..{max |> maxToStr}"
 
-                    match min, incr |> List.isEmpty, max with
-                    | None,     true,  None     -> "<..>"                    
-                    | Some min, true,  None     -> $"{left}{min |> brToStr}..>"
-                    | Some min, true,  Some max -> $"{left}{min |> brToStr}..{max |> brToStr}{right}"
-                    | None,     true,  Some max -> $"<..{max |> brToStr}{right}"
-                    | None,     false, None     -> $"<..{incr |> printVals}..>"
-                    | Some min, false, None     -> $"{left}{min |> brToStr}..{incr |> printVals}..>"
-                    | None,     false, Some max -> $"<..{incr |> printVals}..{max |> brToStr}{right}"
-                    | Some min, false, Some max -> $"{left}{min |> brToStr}..{incr |> printVals}..{max |> brToStr}{right}"
-
-            let vals =
-                if vals |> List.isEmpty |> not then
-                    $"[{vals |> printVals}]"
-                else
-                    printRange min incr max
-
-            $"{vals}"
+            match vs with
+            | Some vs -> $"{vs |> ValueSet.toString exact}"
+            | None -> printRange min incr max
 
 
         /// Convert a `ValueRange` to a `string`.
         let toString exact vr =
-            let fVs (ValueSet vs) =
-                vs |> Set.toList
-                |> print exact false None false [] None false 
+            let fVs vs =
+                print exact None None None (Some vs)
 
-            let unr = print exact true None false [] None false []
+            let unr = print exact None None None None
 
-            let print min minincl incr max maxincl =
-                print exact false min minincl incr max maxincl []
+            let print min incr max = print exact min incr max None
 
-            let fMin min =
-                let incl, min = min |> Minimum.toBoolBigRational
-                print (Some min) incl [] None false
+            let fMin min = print (Some min) None None
 
-            let fMax max =
-                let incl, max = max |> Maximum.toBoolBigRational
+            let fMax max = print None None (Some max)
 
-                print None false [] (Some max) incl
+            let fIncr incr = print None (Some incr) None
 
-            let fIncr incr =
-                print None false (incr |> Increment.toList) None false
+            let fMinIncr (min, incr)  = print (Some min) (Some incr) None
 
-            let fMinIncr (min, incr)  =
-                let incl, min = min |> Minimum.toBoolBigRational
-                let incr = incr |> Increment.toList
+            let fIncrMax (incr, max)  = print None (Some incr) (Some max)
 
-                print (Some min) incl incr None false
-
-            let fIncrMax (incr, max)  =
-                let incl, max = max |> Maximum.toBoolBigRational
-                let incr = incr |> Increment.toList
-
-                print None false incr (Some max) incl
-
-            let fMinMax (min, max) =
-                let minincl, min = min |> Minimum.toBoolBigRational
-                let maxincl, max = max |> Maximum.toBoolBigRational
-
-                print (Some min) minincl [] (Some max) maxincl
+            let fMinMax (min, max) = print (Some min) None (Some max)
 
             vr
             |> apply
@@ -1411,18 +1429,6 @@ module Variable =
             | MaxExcl  -> dto |> setMax  (vs |> getVal) false
             | _   -> dto
 
-        /// Return a `string` representation of a `Dto`
-        let toString exact dto =
-            let unr = dto |> isUnr
-            let vals =
-                ValueRange.print
-                    exact unr
-                    dto.Min dto.MinIncl
-                    dto.Incr
-                    dto.Max dto.MaxIncl
-                    dto.Vals 
-            $"{dto.Name} {vals}"
-
 
         /// Create a `Variable` from a `Dto` and
         /// raise a `DtoException` if this fails.
@@ -1453,6 +1459,8 @@ module Variable =
 
             create succ n vr
 
+        /// Return a `string` representation of a `Dto`
+        let toString exact = fromDto >> toString exact
 
         /// Create a `Variable` option from a `Dto` and
         /// return `None` when this fails.

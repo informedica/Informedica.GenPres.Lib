@@ -9,46 +9,44 @@ module ValueRange =
 
     /// Convert a `ValueRange` to a `string`.
     let toStringWithUnit exact un vr =
-        let fVs (ValueSet vs) = 
-            let vs = 
-                vs 
-                |> Set.toList
-                |> List.map (ValueUnit.create un)
-                |> List.map ValueUnit.toUnit
+        let toUnit = ValueUnit.create un >> ValueUnit.toUnit
 
-            print exact false None false [] None false vs 
+        let fVs vs = 
+            vs 
+            |> ValueSet.map toUnit
+            |> Some
+            |> print exact None None None
     
-        let some =
-            ValueUnit.create un
-            >> ValueUnit.toUnit
-            >> Some
+        let unr = print exact None None None None
 
-        let unr = print exact true None false [] None false []
-
-        let print min minincl max maxincl = print exact false min minincl [] max maxincl []
+        let print min incr max = print exact min incr max None
 
         let fMin min =
-            let incl, min = min |> Minimum.toBoolBigRational
-            print (some min) incl None false
+            print (min |> Minimum.map toUnit toUnit |> Some) None None
 
         let fMax max =
-            let incl, max = max |> Maximum.toBoolBigRational
-
-            print None false (some max) incl
+            print None None (max |> Maximum.map toUnit toUnit |> Some) 
 
         let fMinMax (min, max) =
-            let maxincl, min = min |> Minimum.toBoolBigRational
-            let minincl, max = max |> Maximum.toBoolBigRational
+            print
+                (min |> Minimum.map toUnit toUnit |> Some)
+                None
+                (max |> Maximum.map toUnit toUnit |> Some) 
 
-            print (some min) minincl (some max) maxincl
-        // ToDo: replace print nothing
-        let printNothing _ = ""
+        let fIncr incr =
+            print None (incr |> Increment.map toUnit |> Some) None
 
-        let fIncr = printNothing
+        let fMinIncr (min, incr) =
+            print
+                (min |> Minimum.map toUnit toUnit |> Some)
+                (incr |> Increment.map toUnit |> Some)
+                None
 
-        let fMinIncr = printNothing
-
-        let fIncrMax = printNothing
+        let fIncrMax (incr, max) =
+            print
+                None
+                (incr |> Increment.map toUnit |> Some)
+                (max |> Maximum.map toUnit toUnit |> Some)
     
         vr |> apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fVs 
 

@@ -75,6 +75,12 @@ module BigRational =
     let toString v = (v |> id).ToString()
 
 
+    let toDouble br = BigRational.ToDouble(br)
+
+
+    let fixPrecision n = toDouble >> (Double.fixPrecision n)
+
+
     /// Convert an optional `BigRational` to a `string`.
     /// If `None` then return empty `string`.
     let optToString = function

@@ -695,7 +695,7 @@ Seq.allPairs vars1 vars2
 )
 |> Seq.distinctBy (fun (x1, x2, _, o) -> set [x1, x2], o)
 |> Seq.iteri (fun i (var1, var2, res, op) ->
-    let toStr = Variable.ValueRange.toString true
+    let toStr = Variable.ValueRange.toString false
     let x = var1.Values |> toStr
     let z = var2.Values |> toStr
     let y = res.Values |> toStr
@@ -733,3 +733,8 @@ Seq.allPairs vars1 vars2
     |> printfn "%s"
 )
 
+
+open Variable.ValueRange
+
+Minimum.create false (1N/3N)
+|> Minimum.toString false
