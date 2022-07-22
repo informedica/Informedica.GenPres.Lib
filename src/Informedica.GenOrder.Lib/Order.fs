@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 /// Types and functions that deal with an order.
 /// An `Order` models the `Prescription` of an 
@@ -87,7 +87,7 @@ module Order =
 
     module ValueRange = Informedica.GenSolver.Lib.Variable.ValueRange
     module Equation = Informedica.GenSolver.Lib.Equation
-    module Props = Informedica.GenSolver.Lib.Props
+    module Property = Informedica.GenSolver.Lib.Property
     module Quantity = VariableUnit.Quantity
     module Frequency = VariableUnit.Frequency
     module Concentration = VariableUnit.Concentration
@@ -362,7 +362,7 @@ module Order =
                     |> List.map Solver.productEq
                     |> List.append (sum |> List.map Solver.sumEq)
 
-                |> Solver.solve log None n (v |> Set.singleton |> ValsProp)
+                |> Solver.solve log None n (v |> Set.singleton |> Property.createValsProp)
                 |> fromEqs o
                 |> Some
             with

@@ -388,6 +388,7 @@ module Variable =
 
 
 
+
         let apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fValueSet = function
             | Unrestricted -> unr
             | Min min -> min |> fMin
@@ -1139,6 +1140,19 @@ module Variable =
             | ValSet s1, ValSet s2 ->
                 s2 |> ValueSet.isSubset s1
             | _ -> false
+
+
+        //let diff vr1 vr2 =
+        //    if vr1 = vr2 then []
+        //    else
+        //        let min1, min2 = vr1 |> getMin, vr2 |> getMin
+        //        let max1, max2 = vr1 |> getMax, vr2 |> getMax
+        //        let incr1, incr2 = vr1 |> getIncr, vr2 |> getIncr
+        //        let vs1, vs2 = vr1 |> getValSet, vr2 |> getValSet
+
+        //    [
+        //        if min1 = min2 then [] else  
+        //    ]
 
 
         /// Set a `ValueRange` expr to a `ValueRange` y.

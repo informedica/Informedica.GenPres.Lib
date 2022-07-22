@@ -57,6 +57,13 @@ module Types =
     /// `ValueRange`.
     type Variable = { Name: Name; Values: ValueRange }
 
+    /// Represents a property of a `Variable`.
+    type Property =
+        | MinProp of Minimum
+        | MaxProp of Maximum
+        | IncrProp of Increment
+        | ValsProp of ValueSet
+
     /// An equation is either a `ProductEquation`
     /// or a `Sumequation`, the first variable is the
     /// dependent variable, i.e. the result of the
@@ -66,22 +73,6 @@ module Types =
         | ProductEquation of Variable * Variable list
         | SumEquation of Variable * Variable list
 
-    /// Represents a property of a `Variable`.
-    ///
-    /// - `MinIncl`: An inclusive minimum
-    /// - `MinExcl`: An exclusive minimum
-    /// - `MaxIncl`: An inclusive maximum
-    /// - `MaxExcl`: An exclusive maximum
-    /// - `RangeProp`: A delta with multiples
-    /// - `Vals`: A set of distinct values
-    type Property =
-        | MinInclProp of BigRational
-        | MinExclProp of BigRational
-        | MaxInclProp of BigRational
-        | MaxExclProp of BigRational
-        | IncrProp of BigRational Set
-        | ValsProp of BigRational Set
-
     /// The `Result` of solving an `Equation`
     /// is that either the `Equation` is the
     /// same or has `Changed`.
@@ -89,7 +80,7 @@ module Types =
         | UnChanged
         | Changed of Change list
 
-    and Change = Change of change: Property * variable: Variable
+    and Change = Change of  variable: Variable * property: Property
 
 
     /// A limitation of the maximum number

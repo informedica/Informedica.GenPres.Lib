@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 
 // Creating a drug order
@@ -54,8 +54,9 @@ module DrugOrder =
 
         module Name = WrappedString.Name
         module Mapping = Order.Mapping
-        module Props = Informedica.GenSolver.Lib.Props
+        module Property = Informedica.GenSolver.Lib.Property
         module Constraint = Informedica.GenSolver.Lib.Constraint
+        module ValueSet = Informedica.GenSolver.Lib.Variable.ValueRange.ValueSet
 
         open Informedica.GenSolver.Lib.Types
         open Types 
@@ -96,81 +97,81 @@ module DrugOrder =
             // list of general orderable constraints
             [
                 // ALL
-                c OrderAdjustQty (MaxInclProp 650N) NoLimit 
+                c OrderAdjustQty (Property.createMaxInclProp 650N) NoLimit 
                   AnyRouteShape AnyOrder
-                c OrderAdjustQty (MinInclProp (250N/1000N)) NoLimit 
+                c OrderAdjustQty (Property.createMinInclProp (250N/1000N)) NoLimit 
                   AnyRouteShape AnyOrder
                 // c OrderAdjustQty ((50N/1000N) |> Set.singleton |> IncrProp) NoLimit 
                 //   AnyRouteShape AnyOrder
                 // == Oral Solid ==
                 // == Discontinuous ==
                 // give max 10 pieces each time
-                c OrderableDoseQty (MaxInclProp 10N) NoLimit 
+                c OrderableDoseQty (Property.createMaxInclProp 10N) NoLimit 
                   OralSolid DiscontinuousOrder
                 // == Rectal Solid ==
                 // == Discontinuous ==
                 // Give 1 piece each time
-                c OrderableDoseQty (MaxInclProp 1N) NoLimit 
+                c OrderableDoseQty (Property.createMaxInclProp 1N) NoLimit 
                   RectalSolid DiscontinuousOrder
                 // == Oral Fluid ==
                 // == Discontinuous ==
                 // give the total orderable quantity each time
-                c OrderableDoseCount (1N |> Set.singleton |> ValsProp) NoLimit 
+                c OrderableDoseCount (1N |> Set.singleton |> Property.createValsProp) NoLimit 
                     OralFluid DiscontinuousOrder
                 // give max 500 ml each time
-                c OrderableDoseQty (MaxInclProp 500N) NoLimit 
+                c OrderableDoseQty (Property.createMaxInclProp 500N) NoLimit 
                   OralFluid DiscontinuousOrder
                 // give max 10 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 10N) NoLimit 
+                c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 10N) NoLimit 
                   OralFluid DiscontinuousOrder
                 // == Oral Fluid ==
                 // == Timed ==
                 // Give max 500 ml each time
-                c OrderableDoseQty (MaxInclProp 500N) NoLimit
+                c OrderableDoseQty (Property.createMaxInclProp 500N) NoLimit
                   OralFluid TimedOrder
                 // give max 10 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 10N) NoLimit 
+                c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 10N) NoLimit 
                   OralFluid TimedOrder
                 // == Oral Fluid ==
                 // == Continuous ==
                 // Max dose rate is 200 ml/hour
-                c OrderableDoseRate (MaxInclProp 200N) NoLimit
+                c OrderableDoseRate (Property.createMaxInclProp 200N) NoLimit
                   OralFluid ContinuousOrder
                 // Max dose rate per kg is 5 ml/kg/hour
-                c OrderableDoseRate (MaxInclProp 5N) NoLimit
+                c OrderableDoseRate (Property.createMaxInclProp 5N) NoLimit
                   OralFluid ContinuousOrder
                 // Set dose rate values
-                c OrderableDoseRate (ValsProp dr) NoLimit
+                c OrderableDoseRate (Property.createValsProp dr) NoLimit
                   OralFluid ContinuousOrder
                 // == Intravenuous Fluid ==
                 // == Discontinuous ==
                 // Give max 1000 ml each time
-                c OrderableDoseQty (MaxInclProp 1000N) NoLimit
+                c OrderableDoseQty (Property.createMaxInclProp 1000N) NoLimit
                   IntravenousFluid DiscontinuousOrder
                 // Give max 20 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 20N) NoLimit
+                c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 20N) NoLimit
                   IntravenousFluid DiscontinuousOrder
                 // == Intravenuous Fluid ==
                 // == Timed ==
                 // Give max 1000 ml each time
-                c OrderableDoseQty (MaxInclProp 1000N) NoLimit
+                c OrderableDoseQty (Property.createMaxInclProp 1000N) NoLimit
                   IntravenousFluid TimedOrder
                 // Give max 20 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 20N) NoLimit
+                c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 20N) NoLimit
                   IntravenousFluid TimedOrder
                 // Select 1 possible value from dose rates
-                c OrderableDoseRate (ValsProp dr) (MinLim 10)
+                c OrderableDoseRate (Property.createValsProp dr) (MinLim 10)
                   IntravenousFluid TimedOrder
                 // == Intravenuous Fluid ==
                 // == Continuous ==
                 // Max dose rate is 200 ml/hour
-                c OrderableDoseRate (MaxInclProp 200N) NoLimit
+                c OrderableDoseRate (Property.createMaxInclProp 200N) NoLimit
                   IntravenousFluid ContinuousOrder
                 // Max dose rate per kg is 5 ml/kg/hour
-                c OrderableDoseRate (MaxInclProp 5N) NoLimit
+                c OrderableDoseRate (Property.createMaxInclProp 5N) NoLimit
                   IntravenousFluid ContinuousOrder
                 // Set dose rate values
-                c OrderableDoseRate (ValsProp dr) NoLimit
+                c OrderableDoseRate (Property.createValsProp dr) NoLimit
                   IntravenousFluid ContinuousOrder
             ]
 
@@ -181,7 +182,7 @@ module DrugOrder =
             let ot = o |> OrderType.map
 
             let propHasVals = function
-            | ValsProp vs -> vs |> Set.isEmpty |> not
+            | ValsProp vs -> vs |> ValueSet.isEmpty |> not
 //            | IncrProp vs -> vs |> Set.isEmpty |> not
             | _ -> true
 
@@ -212,7 +213,7 @@ module DrugOrder =
     module ODto = Orderable.Dto
 
     module Mapping = Order.Mapping
-    module Props = Informedica.GenSolver.Lib.Props
+    module Property = Informedica.GenSolver.Lib.Property
     module Constraint = Informedica.GenSolver.Lib.Constraint
     module Name = WrappedString.Name
 
@@ -404,20 +405,20 @@ module DrugOrder =
             >|> [ 
                     // ALL set possible orderable quantities
                     cstr OrderableOrderableQty 
-                        (d.Quantities |> Set.ofList |> ValsProp) 
+                        (d.Quantities |> Set.ofList |> Property.createValsProp) 
                         NoLimit
                         AnyRouteShape AnyOrder
 
                     // RECTAL SOLID give max 1 piece from rectal solid 
                     cstr OrderableDoseQty 
-                        (1N |> Set.singleton |> ValsProp) 
+                        (1N |> Set.singleton |> Property.createValsProp) 
                         NoLimit
                         RectalSolid DiscontinuousOrder
 
                     // ORAL SOLID give max 10 pieces from oral solid
                     cstr OrderableDoseQty 
                         ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
-                            |> Set.ofList |> ValsProp)
+                            |> Set.ofList |> Property.createValsProp)
                         NoLimit
                         OralSolid DiscontinuousOrder
 
@@ -477,14 +478,14 @@ module DrugOrder =
                             // ALL set possible component quantities
                             DrugConstraint.create n 
                                 ComponentComponentQty 
-                                (p.Quantities |> Set.ofList |> ValsProp) 
+                                (p.Quantities |> Set.ofList |> Property.createValsProp) 
                                 NoLimit
                                 AnyRouteShape AnyOrder
                             // give max 10 solid oral each time
                             //DrugConstraint.create n 
                             //    ComponentOrderableQty 
                             //    ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
-                            //     |> Set.ofList |> ValsProp)
+                            //     |> Set.ofList |> Property.createValsProp)
                             //    NoLimit
                             //    OralSolid DiscontinuousOrder
                             // give max 
@@ -493,7 +494,7 @@ module DrugOrder =
                             DrugConstraint.create n 
                                 ComponentOrderableQty 
                                 ([ 1N / d.Divisible.. 1N / d.Divisible ..250N ]
-                                    |> Set.ofList |> ValsProp)
+                                    |> Set.ofList |> Property.createValsProp)
                                 NoLimit
                                 OralFluid AnyOrder
                             // DrugConstraint.create n 
@@ -527,14 +528,14 @@ module DrugOrder =
                             DrugConstraint.create n 
                                 ComponentOrderableQty 
                                 ([ 1N / d.Divisible.. 1N / d.Divisible ..500N ]
-                                    |> Set.ofList |> ValsProp)
+                                    |> Set.ofList |> Property.createValsProp)
                                 NoLimit
                                 IntravenousFluid AnyOrder
 
                             // RECTAL SOLID
                             DrugConstraint.create n 
                                 ComponentOrderableQty 
-                                (1N |> Set.singleton |> ValsProp)  
+                                (1N |> Set.singleton |> Property.createValsProp)  
                                 NoLimit
                                 RectalSolid DiscontinuousOrder
 
@@ -542,7 +543,7 @@ module DrugOrder =
                             if d.Products |> List.length = 1 then
                                 DrugConstraint.create n
                                     ComponentOrderableConc
-                                    (1N |> Set.singleton |> ValsProp)  
+                                    (1N |> Set.singleton |> Property.createValsProp)  
                                     NoLimit
                                     AnyRouteShape AnyOrder
                         ]
@@ -556,18 +557,18 @@ module DrugOrder =
                             // ALL set concentrations and quanties
                             DrugConstraint.create n 
                                 ItemComponentConc 
-                                (s.Concentrations |> Set.ofList |> ValsProp) 
+                                (s.Concentrations |> Set.ofList |> Property.createValsProp) 
                                 NoLimit
                                 AnyRouteShape AnyOrder
                             DrugConstraint.create n 
                                 ItemOrderableQty 
-                                (s.OrderableQuantities |> Set.ofList |> ValsProp) 
+                                (s.OrderableQuantities |> Set.ofList |> Property.createValsProp) 
                                 NoLimit
                                 AnyRouteShape AnyOrder
                             if d.Products |> List.length = 1 then
                                 DrugConstraint.create n
                                     ItemOrderableConc
-                                    (s.Concentrations |> Set.ofList |> ValsProp) 
+                                    (s.Concentrations |> Set.ofList |> Property.createValsProp) 
                                     NoLimit
                                     AnyRouteShape AnyOrder
                                     
@@ -627,7 +628,7 @@ module DrugOrder =
                 let drc =
                     DrugConstraint.create dl.Name 
                         OrderableDoseRate  
-                        (dl.Rates |> Set.ofList |> ValsProp)
+                        (dl.Rates |> Set.ofList |> Property.createValsProp)
                         NoLimit AnyRouteShape ContinuousOrder 
                         
                 cs 
@@ -637,25 +638,25 @@ module DrugOrder =
         >|> [ 
                 DrugConstraint.create dl.Name
                     PresFreq 
-                    (dl.Frequencies |> Set.ofList |> ValsProp) 
+                    (dl.Frequencies |> Set.ofList |> Property.createValsProp) 
                     NoLimit AnyRouteShape DiscontinuousOrder 
                 DrugConstraint.create dl.Name 
                     PresFreq  
-                    (dl.Frequencies |> Set.ofList |> ValsProp)
+                    (dl.Frequencies |> Set.ofList |> Property.createValsProp)
                     NoLimit AnyRouteShape TimedOrder 
             ]
-        |> cr ItemDoseQty MaxInclProp dl.MaxDoseQuantity
-        |> cr ItemDoseQty MinInclProp dl.MinDoseQuantity
-        |> cr ItemDoseAdjustQtyAdjust MaxInclProp dl.MaxDoseQuantityAdjust
-        |> cr ItemDoseAdjustQtyAdjust MinInclProp dl.MinDoseQuantityAdjust
-        |> cr ItemDoseTotal MaxInclProp dl.MaxDoseTotal
-        |> cr ItemDoseTotal MinInclProp dl.MinDoseTotal
-        |> cr ItemDoseAdjustTotalAdjust MaxInclProp dl.MaxDoseTotalAdjust
-        |> cr ItemDoseAdjustTotalAdjust MinInclProp dl.MinDoseTotalAdjust
-        |> cr ItemDoseRate MaxInclProp dl.MaxDoseRate
-        |> cr ItemDoseRate MinInclProp dl.MinDoseRate
-        |> cr ItemDoseAdjustRateAdjust MaxInclProp dl.MaxDoseRateAdjust
-        |> cr ItemDoseAdjustRateAdjust MinInclProp dl.MinDoseRateAdjust
+        |> cr ItemDoseQty Property.createMaxInclProp dl.MaxDoseQuantity
+        |> cr ItemDoseQty Property.createMinInclProp dl.MinDoseQuantity
+        |> cr ItemDoseAdjustQtyAdjust Property.createMaxInclProp dl.MaxDoseQuantityAdjust
+        |> cr ItemDoseAdjustQtyAdjust Property.createMinInclProp dl.MinDoseQuantityAdjust
+        |> cr ItemDoseTotal Property.createMaxInclProp dl.MaxDoseTotal
+        |> cr ItemDoseTotal Property.createMinInclProp dl.MinDoseTotal
+        |> cr ItemDoseAdjustTotalAdjust Property.createMaxInclProp dl.MaxDoseTotalAdjust
+        |> cr ItemDoseAdjustTotalAdjust Property.createMinInclProp dl.MinDoseTotalAdjust
+        |> cr ItemDoseRate Property.createMaxInclProp dl.MaxDoseRate
+        |> cr ItemDoseRate Property.createMinInclProp dl.MinDoseRate
+        |> cr ItemDoseAdjustRateAdjust Property.createMaxInclProp dl.MaxDoseRateAdjust
+        |> cr ItemDoseAdjustRateAdjust Property.createMinInclProp dl.MinDoseRateAdjust
 
 
     let setSolutionLimits (sl : SolutionLimits) 
@@ -674,13 +675,13 @@ module DrugOrder =
                     DrugConstraint.create 
                         sl.Name 
                         OrderableDoseCount 
-                        (sl.DoseCount |> Option.get |> Set.singleton |> ValsProp) 
+                        (sl.DoseCount |> Option.get |> Set.singleton |> Property.createValsProp) 
                         NoLimit AnyRouteShape AnyOrder
             ]
-        |> set sl.Name ItemOrderableConc MinInclProp sl.MinConcentration
-        |> set sl.Name ItemOrderableConc MaxInclProp sl.MaxConcentration
-        |> set sl.Name PresTime MinInclProp sl.MinTime
-        |> set sl.Name PresTime MaxInclProp sl.MaxTime
+        |> set sl.Name ItemOrderableConc Property.createMinInclProp sl.MinConcentration
+        |> set sl.Name ItemOrderableConc Property.createMaxInclProp sl.MaxConcentration
+        |> set sl.Name PresTime Property.createMinInclProp sl.MinTime
+        |> set sl.Name PresTime Property.createMaxInclProp sl.MaxTime
 
 
 
@@ -690,7 +691,7 @@ module DrugOrder =
                 DrugConstraint.create 
                     n 
                     OrderAdjustQty 
-                    (a |> Set.singleton |> ValsProp) 
+                    (a |> Set.singleton |> Property.createValsProp) 
                     NoLimit
                     AnyRouteShape AnyOrder 
             ]

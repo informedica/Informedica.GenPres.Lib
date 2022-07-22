@@ -204,7 +204,7 @@ module Solver =
 
 
     /// Turn a set of values `vs` to base values 
-    let toBase n eqs vs = 
+    let toBase n eqs v = 
 
         eqs 
         |> toVariableUnits
@@ -214,9 +214,9 @@ module Solver =
             vru
             |> VariableUnit.getUnit
             |> fun u -> 
-                vs
-                |> Set.map (ValueUnit.create u)
-                |> Set.map ValueUnit.toBase
+                v
+                |> ValueUnit.create u
+                |> ValueUnit.toBase
 
         | None -> 
             sprintf "could not find %A in toBase n eqs vs" n
@@ -263,25 +263,9 @@ module Solver =
         )
 
 
-    let propToBase n eqs p = 
-        let setToBase c vs = vs |> toBase n eqs |> c
-        let valToBase c v = 
-            v
-            |> Set.singleton
-            |> toBase n eqs
-            |> Seq.head 
-            |> c
-
-        match p with
-        | MinInclProp v -> v  |> valToBase MinInclProp
-        | MinExclProp v -> v  |> valToBase MinExclProp
-        | MaxInclProp v -> v  |> valToBase MaxInclProp
-        | MaxExclProp v -> v  |> valToBase MaxExclProp
-        | IncrProp vs   -> vs |> setToBase IncrProp
-        | ValsProp vs   -> vs |> setToBase ValsProp
+    let propToBase n eqs p = p |> Property.mapValue (toBase n eqs)
 
 
-        
     // Solve a set of equations setting a property `p` with
     // name `n`, to a valueset `vs`.
     let applySolve sortQue log lim n p eqs = 

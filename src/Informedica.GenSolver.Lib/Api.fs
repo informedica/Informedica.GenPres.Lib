@@ -45,7 +45,7 @@ module Api =
         | vr::_ ->
 
             p
-            |> Props.matchProp
+            |> Property.matchProp
             |> Variable.setValueRange vr
             |> fun vr ->
                 match lim with

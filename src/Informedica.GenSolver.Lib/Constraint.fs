@@ -1,35 +1,56 @@
 namespace Informedica.GenSolver.Lib
 
 
-module Props =
+module Property =
 
     open Types
 
     module ValueRange = Variable.ValueRange
+    module Minimum = ValueRange.Minimum
+    module Maximum = ValueRange.Maximum
+    module Increment = ValueRange.Increment
+    module ValueSet = ValueRange.ValueSet
+                
+
+    let createMinProp b v = v |> Minimum.create b |> MinProp
+    let createMinInclProp = createMinProp true
+    let createMinExclProp = createMinProp false
+    let createMaxProp b v = v |> Maximum.create b |> MaxProp
+    let createMaxInclProp = createMaxProp true
+    let createMaxExclProp = createMaxProp false
+    let createIncrProp vs = vs |> Increment.create |> IncrProp
+    let createValsProp vs = vs |> ValueSet.create |> ValsProp
+
+
+    let mapValue f = function
+        | MinProp min -> min |> Minimum.map f f |> MinProp
+        | MaxProp max -> max |> Maximum.map f f |> MaxProp
+        | IncrProp incr -> incr |> Increment.map f |> IncrProp
+        | ValsProp vs -> vs |> ValueSet.map f |> ValsProp
+
 
     let matchProp p =
 
         match p with
-        | MinInclProp v -> v |> ValueRange.createMin true 
-        | MinExclProp v -> v |> ValueRange.createMin false 
-        | MaxInclProp v -> v |> ValueRange.createMax true 
-        | MaxExclProp v -> v |> ValueRange.createMax false
-        | IncrProp vs -> vs |> ValueRange.createIncr
-        | ValsProp vs -> vs |> ValueRange.createValSet
+        | MinProp min -> min |> Min
+        | MaxProp max -> max |> Max
+        | IncrProp incr -> incr |> Incr
+        | ValsProp vs -> vs |> ValSet
 
 
     let getMin = function
-    | MinInclProp v | MinExclProp v -> v |> Some
+    | MinProp min -> min |> Some
     | _ -> None
 
 
     let getMax = function
-    | MaxInclProp v | MaxExclProp v -> v |> Some
+    | MaxProp max -> max |> Some
     | _ -> None
 
-    // let getIncr = function
-    // | IncrProp vs -> vs |> Some
-    // | _ -> None
+
+    let getIncr = function
+    | IncrProp incr -> incr |> Some
+    | _ -> None
 
 
 
@@ -38,6 +59,7 @@ module Constraint =
     open Types
 
     module ValueRange = Variable.ValueRange
+    module ValueSet = ValueRange.ValueSet
     module Name = Variable.Name
 
     let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name  
@@ -49,12 +71,11 @@ module Constraint =
     let scoreConstraint c =
             match c.Property with
             | ValsProp vs -> 
-                let n = vs |> Set.count
+                let n = vs |> ValueSet.count
                 if n = 1 then    -3, c
                 else              n, c
-            | MinInclProp _
-            | MinExclProp _   -> -5, c
-//            | IncrProp _      -> -4, c
+            | MinProp _   -> -5, c
+            | IncrProp _      -> -4, c
             | _               -> -2, c
 
 
@@ -64,14 +85,14 @@ module Constraint =
         |> List.fold (fun acc c ->
             match c.Property with
             | ValsProp vs ->
-                if vs |> Set.count <= 1 then [c] |> List.append acc
+                if vs |> ValueSet.count <= 1 then [c] |> List.append acc
                 else
-                    let min = vs |> Set.minElement |> MinInclProp
-                    let max = vs |> Set.maxElement |> MaxInclProp
+                    let min = vs |> ValueSet.getMin |> Option.map MinProp 
+                    let max = vs |> ValueSet.getMax |> Option.map MaxProp
                     [
                         c
-                        { c with Property = min ; Limit = NoLimit }
-                        { c with Property = max ; Limit = NoLimit }
+                        if min.IsSome then { c with Property = min.Value ; Limit = NoLimit }
+                        if max.IsSome then { c with Property = max.Value ; Limit = NoLimit }
                     ]
                     |> List.append acc
             | _ -> [c] |> List.append acc
@@ -144,7 +165,7 @@ module Constraint =
         | vr::_ ->
 
             c.Property
-            |> Props.matchProp
+            |> Property.matchProp
             |> Variable.setValueRange vr
             |> fun vr ->
                 match c.Limit with
