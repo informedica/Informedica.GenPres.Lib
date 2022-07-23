@@ -1481,6 +1481,9 @@ module Variable =
     let eqName v1 v2 = v1 |> getName = (v2 |> getName)
 
 
+    let eqValues var1 var2 =
+        var1 |> getValueRange = (var2 |> getValueRange)
+ 
     /// Checks whether a `Variable` **v** is solved,
     /// i.e. there is but one possible value left.
     let isSolved v =
@@ -1541,6 +1544,51 @@ module Variable =
         let inline (^-) v1 v2 = (?<-) Subtr v1 v2
 
         let inline (<==) v1 v2 = (?<-) Expr v1 v2
+
+        /// Constant 0
+        let zero =
+            [0N]
+            |> ValueRange.createValSet 
+            |> createSucc (Name.createExc "zero")
+
+        /// Constant 1
+        let one = 
+            [1N]
+            |> ValueRange.createValSet 
+            |> createSucc (Name.createExc "one")
+
+        /// Constant 2
+        let two =
+            [2N]
+            |> ValueRange.createValSet 
+            |> createSucc (Name.createExc "two")
+
+        /// Constant 3
+        let three =
+            [3N]
+            |> ValueRange.createValSet 
+            |> createSucc (Name.createExc "three")
+
+        /// Check whether the operator is subtraction
+        let opIsSubtr op = (three |> op <| two) |> eqValues (three ^- two) // = 1
+
+        /// Check whether the operator is addition
+        let opIsAdd op   = (three |> op <| two) |> eqValues (three ^+ two) // = 5
+
+        /// Check whether the operator is multiplication
+        let opIsMult op  = (three |> op <| two) |> eqValues (three ^* two) // = 6
+
+        /// Check whether the operator is divsion
+        let opIsDiv op   = (three |> op <| two) |> eqValues (three ^/ two) // = 3/2
+
+
+        let toString op =
+            match op with
+            | _ when op |> opIsMult  -> "x"
+            | _ when op |> opIsDiv   -> "/"
+            | _ when op |> opIsAdd   -> "+"
+            | _ when op |> opIsSubtr -> "-"
+            | _ -> ""
 
 
     /// Handle the creation of a `Variable` from a `Dto` and

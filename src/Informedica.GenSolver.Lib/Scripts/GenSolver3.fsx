@@ -227,6 +227,12 @@ module Equation =
 
         else true
 
+    let calculationToString op1 op2 x y xs =
+        let varToStr = Variable.toString true
+        let opToStr op  = $" {op |> Variable.Operators.toString} "
+        let filter x xs = xs |> List.filter (Variable.eqName x >> not)
+
+        $"""{x |> varToStr} = {y |> varToStr}{op2 |> opToStr}{xs |> filter x |> List.map varToStr |> String.concat (op1 |> opToStr)} """
 
     /// Solve an equation **e**, return a list of
     /// changed `Variable`s. 
@@ -234,6 +240,10 @@ module Equation =
         eq
         |> Events.EquationStartedSolving
         |> Logging.logInfo log
+
+        let filter x xs = xs |> List.filter (Variable.eqName x >> not)
+        let replAdd x xs = xs |> List.replaceOrAdd(Variable.eqName x) x
+        let calcToStr = calculationToString
 
         if eq |> isSolved then eq, Unchanged
         else
@@ -252,12 +262,13 @@ module Equation =
 
                     changed, xs
                 | x::tail ->
-                    let xs  = xs |> List.filter (Variable.eqName x >> not)
-
                     let newX =
                         match xs with
                         | [] -> x <== y 
-                        | _  -> x <== (y |> op2 <| (xs |> List.reduce op1))
+                        | _  ->
+                            calcToStr op1 op2 x y xs
+                            |> printfn "calculating: %s"
+                            x <== (y |> op2 <| (xs |> filter x |> List.reduce op1))
 
                     if x = newX then changed 
                     else
@@ -270,18 +281,19 @@ module Equation =
                             (fst >> Variable.eqName newX)
                             (newX, newX.Values |> ValueRange.diffWith x.Values)
 
-                    |> calc op1 op2 y (newX::xs) tail
+                    |> calc op1 op2 y (xs |> replAdd newX) tail
 
             // op1 = (*) or (+) and op2 = (/) or (-)
             let rec loop op1 op2 y xs changed =
             
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
                 let ychanged, y =
-                    printfn "=== Calculating y ==="
                     (y::xs)
                     |> Events.EquationStartedCalculation
                     |> Logging.logInfo log
 
+                    calcToStr op1 op1 y (xs |> List.head) (xs |> List.tail)
+                    |> printfn "calculating: %s"
                     let newY = y <== (xs |> List.reduce op1)
 
                     if newY = y then [], y
@@ -1055,6 +1067,7 @@ let generateVars n =
     |> List.filter (fun var ->
         var |> Variable.count <= 5
     )
+    |> List.map (Variable.setNonZeroOrNegative)
     |> List.distinctBy (fun var ->
         var.Values
     )
@@ -1149,33 +1162,38 @@ vars1
 
 
 let resultToString = function
-    | (eq, Unchanged) -> "Unchanged"
+    | (eq, Unchanged)  -> "Unchanged"
     | (eq, Changed cs) ->
         let toStr (var : Variable, props)  =
-            $"""{eq |> Equation.toString true} changes: {var.Name |> Variable.Name.toString}: {props |> Set.map (Property.toString true) |> String.concat ", "}"""
-        $"""{cs |> List.map toStr}"""
-       
+            $"""changes: {var.Name |> Variable.Name.toString}: {props |> Set.map (Property.toString true) |> String.concat ", "}"""
+        $"""
+{eq |> Equation.toString true} {if cs |> List.isEmpty then "" else cs |> List.map toStr |> String.concat ", "}
+    """       
 
 
 vars1
 |> Seq.allPairs vars2
 |> Seq.allPairs vars3
-|> Seq.take 5000
 |> Seq.choose (fun (y, (x1, x2)) ->
     try
         Equation.create ProductEquation Some (fun _ -> None) (y, [x1; x2])
         |> function
         | Some eq ->
-            //printfn $"{y ^/ x1 |> Variable.toString true}"
+            printfn $"== start solving equation"
             (eq, eq |> Equation.solve ({ Log = ignore })) |> Some
         | None -> None
     with
-    | _ -> None
+    | _ ->
+        printfn "== cannot solve equation"
+        None
 )
+|> Seq.take 1000
 |> Seq.iteri (fun i (eq, res) ->
-    $"{i}. {eq |> Equation.toString true} ==> {res |> resultToString}"
+    printfn $"== finished solving equation {i}"
+    $"{eq |> Equation.toString true} ==> {res |> resultToString}"
     |> printfn "%s"
 )
+
 
 Property.createMinInclProp 1N
 |> Property.toString true
@@ -1188,14 +1206,14 @@ let var0 =
     |> Variable.Dto.fromDto
 
 
-let var2 =
+let var1 =
     Variable.Dto.createNew "x1"
     |> Variable.Dto.setIncr [2N]
 //    |> Variable.Dto.setMax (Some 0N) true
     |> Variable.Dto.fromDto
 
 
-let var1 =
+let var2 =
     Variable.Dto.createNew "x2"
     |> Variable.Dto.setMin (Some 3N) false
     |> Variable.Dto.fromDto
