@@ -362,14 +362,18 @@ module ValueRange =
     
     
                 fun v1 incl1 v2 incl2 ->
-                    let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 * v2) |> Minimum.create (incl1 && incl2))
+                    // test doesn't properly calculate incl
+                    let pred v1 v2 _ _ m =
+                        let vPred = v1 * v2
+                        let vObs = m |> Option.map Minimum.toBigRational |> Option.get
+                        vPred = vObs
                     test (^*) pred v1 incl1 v2 incl2
                 |> testProp "When multiplied the result has min that is the multiple"
     
                 fun v1 incl1 v2 incl2 ->
-                    let pred _ _ _ _ m = m = None 
+                    let pred _ _ _ _ m = m |> Option.isSome
                     test (^/) pred v1 incl1 v2 incl2
-                |> testProp "When divided the result has a Min None"
+                |> testProp "When divided the result has some Min"
 
                 fun v1 incl1 v2 incl2 ->
                     let pred v1 v2 incl1 incl2 m = m |> Option.get = ((v1 + v2) |> Minimum.create (incl1 && incl2))
@@ -457,12 +461,12 @@ module ValueRange =
 
                 let createVrMin incl v = ValueRange.create (v |> Minimum.create incl |> Some) None None None
                 let createVrMax incl v = ValueRange.create None None (v |> Maximum.create incl |> Some) None
-
+                // test doesn't properly test inclusive and exclusive
                 let prop op predMin predMax v1 incl1 v2 incl2 =
-                    let vr1 = v1 |> createVrMax incl1 
-                    let vr2 = v2 |> createVrMin incl2
-                    (vr1 |> op <| vr2) |> ValueRange.getMin |> predMin v1 v2 incl1 incl2 &&
-                    (vr1 |> op <| vr2) |> ValueRange.getMax |> predMax v1 v2 incl1 incl2
+                    let vr1 = v1 |> createVrMax true 
+                    let vr2 = v2 |> createVrMin true
+                    (vr1 |> op <| vr2) |> ValueRange.getMin |> predMin v1 v2 true true &&
+                    (vr1 |> op <| vr2) |> ValueRange.getMax |> predMax v1 v2 true true
     
     
                 fun v1 v2 incl1 incl2 ->

@@ -38,8 +38,8 @@ module Generators =
     let bigRGen (n, d) =
         let d = 1
 //        let d = if d = 0 then 1 else d
-        let n = abs(n) |> BigRational.FromInt
-        let d = abs(d) |> BigRational.FromInt
+        let n = n |> BigRational.FromInt
+        let d = d |> BigRational.FromInt
         n / d
 
 
@@ -174,7 +174,9 @@ module MinMaxCalcultor =
             0N |> c incl1 |> Some 
         | Some v, _
         | _, Some v when op |> BigRational.opIsMult && v = 0N ->
-            0N |> c incl |> Some 
+            0N |> c incl |> Some
+        | Some _, None when op |> BigRational.opIsDiv ->
+            0N |> c incl |> Some
         | Some (v1), Some (v2) ->
             if op |> BigRational.opIsDiv && v2 = 0N then None
             else 
@@ -188,6 +190,28 @@ module MinMaxCalcultor =
 
     /// Calculate an optional `Maximum`
     let calcMax = calc Maximum.create
+
+
+    let minimize min1 min2 =
+        match min1, min2 with
+        | None,    None     -> None
+        | Some _,  None 
+        | None,    Some _   -> None
+        | Some m1, Some m2 ->
+            if m1 |> Minimum.minSTmin m2 then m1
+            else m2
+            |> Some
+
+
+    let maximize max1 max2 =
+        match max1, max2 with
+        | None,    None     -> None
+        | Some _,  None 
+        | None,    Some _   -> None
+        | Some m1, Some m2 ->
+            if m1 |> Maximum.maxGTmax m2 then m1
+            else m2
+            |> Some
 
 
     /// Match a min, max tuple **min**, **max**
@@ -211,6 +235,7 @@ module MinMaxCalcultor =
             $"{min} = {max} = 0" |> failwith
         | Some min, Some max when min >= 0N && max < 0N ->
             $"{min} > {max}" |> failwith
+        | _ -> $"could not handle {min} {max}" |> failwith
 
 
     /// Calculate `Minimum` option and
@@ -245,7 +270,7 @@ module MinMaxCalcultor =
         | PP, NZ -> // min = max1 * min2, max = min1 * max2
             calcMin (*) max1 min2, calcMax (*) min1 max2
         | PP, NP -> // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
+            calcMin (*) max1 min2, calcMax (*) max1 max2
 
         | ZP, PP ->  // min = min1 * min2, max = max1 * max2
             calcMin (*) min1 min2, calcMax (*) max1 max2
@@ -287,9 +312,11 @@ module MinMaxCalcultor =
         | NP, NN -> // min = max1 * min2, max = min1 * min2
             calcMin (*) max1 min2, calcMax (*) min1 min2
         | NP, NZ -> // min = max1 * min2, max = min1 * min2
-            calcMin (*) max1 min2, calcMax (*) min1 min2
+            minimize (calcMin (*) min1 max2) (calcMin (*) min2 max1),
+            maximize (calcMax (*) max1 max2) (calcMax (*) min1 min2)
         | NP, NP -> // min = min1 * max2, max = max1 * max2
-            calcMin (*) min1 max2, calcMax (*) max1 max2
+            minimize (calcMin (*) min1 max2) (calcMin (*) min2 max1),
+            maximize (calcMax (*) max1 max2) (calcMax (*) min1 min2)
 
 
     /// Calculate `Minimum` option and
@@ -301,21 +328,31 @@ module MinMaxCalcultor =
             calcMin (/) min1 max2, calcMax (/) max1 min2
         | PP, NN -> // min = max1 / max2	, max = min1 / min2
             calcMin (/) max1 max2, calcMax (/) min1 min2
+        | PP, ZP ->
+            calcMin (/) min1 max2, calcMax (/) max1 min2
 
         | ZP, PP -> // min = min1 / max2, max =	max1 / min2
             calcMin (/) min1 max2, calcMax (/) max1 min2
         | ZP, NN -> // min = max1 / max2	, max = min1 / min2
             calcMin (/) max1 max2, calcMax (/) min1 min2
+        | ZP, ZP ->
+            calcMin (/) min1 max2, calcMax (/) max1 min2
 
         | NN, PP -> // min = min1 / min2, max = max1 / max2
             calcMin (/) min1 min2, calcMax (/) max1 max2
         | NN, NN -> // min = max1 / min2	, max = min1 / max2
             calcMin (/) max1 min2, calcMax (/) min1 max2
+        | NN, NZ ->
+            calcMin (/) max1 min2, calcMax (/) min1 max2
+        | NN, ZP ->
+            calcMin (/) min1 min2, calcMax (/) max1 max2
 
         | NZ, PP -> // min = min1 / min2, max = max1 / max2
             calcMin (/) min1 min2, calcMax (/) max1 max2
         | NZ, NN -> // min = max1 / min2	, max = min1 / max2
             calcMin (/) max1 min2, calcMax (/) min1 max2
+        | NZ, NZ ->
+            calcMin (/) max1 min2, calcMax (/) min2 max2
 
         | NP, PP -> // min = min1 / min2, max = max1 / min2
             calcMin (/) min1 min2, calcMax (/) max1 min2
@@ -328,16 +365,12 @@ module MinMaxCalcultor =
         | NZ, NP
         | ZP, NP
 
-        | NN, ZP
-        | PP, ZP
+//        | NN, ZP
         | NP, ZP 
         | NZ, ZP
-        | ZP, ZP
 
-        | NN, NZ
         | PP, NZ
         | NP, NZ
-        | NZ, NZ
         | ZP, NZ -> None, None
 
 
@@ -394,16 +427,22 @@ let generateMinMax n =
     min
     |> List.zip max
     |> List.map (fun ((br1, incl1), (br2, incl2)) ->
-        if br1 <= br2 && (incl1 = incl2 || incl2) then (br1, incl1), (br2, incl2)
-        else
-           (br2, incl2), (br1, incl1) 
+        match br1, br2 with
+        | Some _, Some _ ->
+            if br1 > br2 then (br2, incl2), (br1, incl1)
+            else
+                if br1 = br2 && (incl1 = incl2 || (not incl2)) then (br2, incl2), (br1, incl1)
+                else
+                   (br1, incl1), (br2, incl2)
+        | _ -> (br1, incl1), (br2, incl2)
     )
 
 
 let minMax1 = generateMinMax 100
 let minMax2 = generateMinMax 100
 
-let test s op =
+
+let testCalc s op =
     minMax1
     |> List.allPairs minMax2
     |> List.map (fun ((min1, max1), (min2, max2)) ->
@@ -439,4 +478,50 @@ let test s op =
     |> List.iteri (printfn "%i. %s")
 
 
-test "/" (/)
+testCalc "*" (*)
+testCalc "/" (/)
+testCalc "*" (*)
+testCalc "*" (*)
+
+
+open MinMaxCalcultor
+
+let testMatch () =
+    minMax1
+    |> List.allPairs minMax2
+    |> List.map (fun ((min1, max1), (min2, max2)) ->
+        try
+            match (min1 |> fst, max1 |> fst), (min2 |> fst, max2 |> fst) with
+            | NN, NN
+            | NN, NP
+            | NN, PP
+            | NN, NZ
+            | NN, ZP
+            | NP, NN
+            | NP, NP
+            | NP, PP
+            | NP, NZ
+            | NP, ZP
+            | PP, NN
+            | PP, NP
+            | PP, PP
+            | PP, NZ
+            | PP, ZP
+            | NZ, NN
+            | NZ, NP
+            | NZ, PP
+            | NZ, NZ
+            | NZ, ZP
+            | ZP, NN
+            | ZP, NP
+            | ZP, PP
+            | ZP, NZ
+            | ZP, ZP -> "can match"
+        with
+        | _ -> $"cannot match {min1}, {max1},{min2}, {max2}"
+    )
+
+testMatch ()
+|> List.distinct
+
+
