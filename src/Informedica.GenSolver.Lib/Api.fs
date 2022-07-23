@@ -13,7 +13,8 @@ module Api =
     module VRD = Variable.Dto
     module EQD = Equation.Dto
     
-    module ValueRange = Variable.ValueRange 
+    module ValueRange = Variable.ValueRange
+    module Property = ValueRange.Property
     module Name = Variable.Name
 
 

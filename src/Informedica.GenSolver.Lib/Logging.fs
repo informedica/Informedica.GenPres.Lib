@@ -33,3 +33,6 @@ module Logging =
         |> ExceptionMessage
         |> create Error
         |> logger.Log
+
+
+    let ignore = { Log = ignore }

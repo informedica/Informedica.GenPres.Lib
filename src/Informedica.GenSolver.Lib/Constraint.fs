@@ -1,64 +1,13 @@
 namespace Informedica.GenSolver.Lib
 
 
-module Property =
-
-    open Types
-
-    module ValueRange = Variable.ValueRange
-    module Minimum = ValueRange.Minimum
-    module Maximum = ValueRange.Maximum
-    module Increment = ValueRange.Increment
-    module ValueSet = ValueRange.ValueSet
-                
-
-    let createMinProp b v = v |> Minimum.create b |> MinProp
-    let createMinInclProp = createMinProp true
-    let createMinExclProp = createMinProp false
-    let createMaxProp b v = v |> Maximum.create b |> MaxProp
-    let createMaxInclProp = createMaxProp true
-    let createMaxExclProp = createMaxProp false
-    let createIncrProp vs = vs |> Increment.create |> IncrProp
-    let createValsProp vs = vs |> ValueSet.create |> ValsProp
-
-
-    let mapValue f = function
-        | MinProp min -> min |> Minimum.map f f |> MinProp
-        | MaxProp max -> max |> Maximum.map f f |> MaxProp
-        | IncrProp incr -> incr |> Increment.map f |> IncrProp
-        | ValsProp vs -> vs |> ValueSet.map f |> ValsProp
-
-
-    let matchProp p =
-
-        match p with
-        | MinProp min -> min |> Min
-        | MaxProp max -> max |> Max
-        | IncrProp incr -> incr |> Incr
-        | ValsProp vs -> vs |> ValSet
-
-
-    let getMin = function
-    | MinProp min -> min |> Some
-    | _ -> None
-
-
-    let getMax = function
-    | MaxProp max -> max |> Some
-    | _ -> None
-
-
-    let getIncr = function
-    | IncrProp incr -> incr |> Some
-    | _ -> None
-
-
 
 module Constraint =
 
     open Types
 
     module ValueRange = Variable.ValueRange
+    module Property = ValueRange.Property
     module ValueSet = ValueRange.ValueSet
     module Name = Variable.Name
 

@@ -1,6 +1,6 @@
 namespace Informedica.GenSolver.Lib
 
-
+[<AutoOpen>]
 module Types =
 
     open System
@@ -77,10 +77,8 @@ module Types =
     /// is that either the `Equation` is the
     /// same or has `Changed`.
     type Result =
-        | UnChanged
-        | Changed of Change list
-
-    and Change = Change of  variable: Variable * property: Property
+        | Unchanged
+        | Changed of List<Variable * Property Set>
 
 
     /// A limitation of the maximum number

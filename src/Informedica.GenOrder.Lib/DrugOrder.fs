@@ -54,7 +54,7 @@ module DrugOrder =
 
         module Name = WrappedString.Name
         module Mapping = Order.Mapping
-        module Property = Informedica.GenSolver.Lib.Property
+        module Property = Informedica.GenSolver.Lib.Variable.ValueRange.Property
         module Constraint = Informedica.GenSolver.Lib.Constraint
         module ValueSet = Informedica.GenSolver.Lib.Variable.ValueRange.ValueSet
 
@@ -213,7 +213,7 @@ module DrugOrder =
     module ODto = Orderable.Dto
 
     module Mapping = Order.Mapping
-    module Property = Informedica.GenSolver.Lib.Property
+    module Property = Informedica.GenSolver.Lib.Variable.ValueRange.Property
     module Constraint = Informedica.GenSolver.Lib.Constraint
     module Name = WrappedString.Name
 

@@ -153,7 +153,7 @@ module Variable =
 
             let toString exact min =
                 let toStr =
-                    if not exact then BigRational.toString
+                    if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
                 let b, br =
@@ -241,7 +241,7 @@ module Variable =
 
             let toString exact max =
                 let toStr =
-                    if not exact then BigRational.toString
+                    if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
                 let b, br =
@@ -316,7 +316,7 @@ module Variable =
 
             let toString exact (Increment incr) =
                 let toStr =
-                    if not exact then BigRational.toString
+                    if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
                 $"""{incr |> Set.map toStr |> String.concat ", "}"""
@@ -381,14 +381,63 @@ module Variable =
 
             let toString exact (ValueSet vs) =
                 let toStr =
-                    if not exact then BigRational.toString
+                    if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
                 $"""[{vs |> Set.map toStr |> String.concat ", "}]"""
 
 
+        module Property =
 
 
+            let createMinProp b v = v |> Minimum.create b |> MinProp
+            let createMinInclProp = createMinProp true
+            let createMinExclProp = createMinProp false
+            let createMaxProp b v = v |> Maximum.create b |> MaxProp
+            let createMaxInclProp = createMaxProp true
+            let createMaxExclProp = createMaxProp false
+            let createIncrProp vs = vs |> Increment.create |> IncrProp
+            let createValsProp vs = vs |> ValueSet.create |> ValsProp
+
+
+            let mapValue f = function
+                | MinProp min -> min |> Minimum.map f f |> MinProp
+                | MaxProp max -> max |> Maximum.map f f |> MaxProp
+                | IncrProp incr -> incr |> Increment.map f |> IncrProp
+                | ValsProp vs -> vs |> ValueSet.map f |> ValsProp
+
+
+            let matchProp p =
+
+                match p with
+                | MinProp min -> min |> Min
+                | MaxProp max -> max |> Max
+                | IncrProp incr -> incr |> Incr
+                | ValsProp vs -> vs |> ValSet
+
+
+            let getMin = function
+            | MinProp min -> min |> Some
+            | _ -> None
+
+
+            let getMax = function
+            | MaxProp max -> max |> Some
+            | _ -> None
+
+
+            let getIncr = function
+            | IncrProp incr -> incr |> Some
+            | _ -> None
+
+
+            let toString exact = function
+                | MinProp min -> $"{min |> Minimum.toString exact}.."
+                | MaxProp max -> $"..{max |> Maximum.toString exact}"
+                | IncrProp incr -> $"..{incr |> Increment.toString exact}.."
+                | ValsProp vs -> vs |> ValueSet.toString exact
+
+    
         let apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fValueSet = function
             | Unrestricted -> unr
             | Min min -> min |> fMin
@@ -941,12 +990,15 @@ module Variable =
             /// the result is inclusive. Use constructor **c** to
             /// create the optional result.
             let calc c op (x1, incl1) (x2, incl2) =
+                let opIsMultOrDiv = (op |> BigRational.opIsMult || op |> BigRational.opIsDiv)
+
                 let incl = 
                     match incl1, incl2 with
                     | true, true -> true
-                    | _          -> false
+                    | _ -> false
 
                 match x1, x2 with
+                | Some v, _  when opIsMultOrDiv && v = 0N -> 0N |> c incl1 |> Some 
                 | Some (v1), Some (v2) ->
                     if op |> BigRational.opIsDiv && v2 = 0N then None
                     else 
@@ -1142,17 +1194,39 @@ module Variable =
             | _ -> false
 
 
-        //let diff vr1 vr2 =
-        //    if vr1 = vr2 then []
-        //    else
-        //        let min1, min2 = vr1 |> getMin, vr2 |> getMin
-        //        let max1, max2 = vr1 |> getMax, vr2 |> getMax
-        //        let incr1, incr2 = vr1 |> getIncr, vr2 |> getIncr
-        //        let vs1, vs2 = vr1 |> getValSet, vr2 |> getValSet
+        let toProperties vr =
+            let unr = set []
 
-        //    [
-        //        if min1 = min2 then [] else  
-        //    ]
+            let fMin min = set [ min |> MinProp ]
+
+            let fMax max = set [ max |> MaxProp ]
+
+            let fMinMax (min, max) = set [ min |> MinProp; max |> MaxProp ]
+
+            let fIncr incr = set [ incr |> IncrProp ]
+
+            let fMinIncr (min, incr) = set [ min |> MinProp; incr |> IncrProp ]
+
+            let fIncrMax (incr, max) = set [ incr |> IncrProp; max |> MaxProp ]
+
+            let fVs vs = set [ vs |> ValsProp ]
+
+            vr
+            |> apply
+                unr
+                fMin
+                fMax
+                fMinMax
+                fIncr
+                fMinIncr
+                fIncrMax
+                fVs
+
+
+        let diffWith vr1 vr2 =
+            vr1
+            |> toProperties
+            |> Set.difference (vr2 |> toProperties)
 
 
         /// Set a `ValueRange` expr to a `ValueRange` y.
@@ -1165,7 +1239,7 @@ module Variable =
 
             match expr with
             | Unrestricted -> y
-            | ValSet vs  -> y |> setValueSet vs
+            | ValSet vs    -> y |> setValueSet vs
             | _ ->
                 y
                 |> set getMin setMin

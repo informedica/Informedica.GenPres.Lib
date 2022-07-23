@@ -14,6 +14,7 @@ module Solver =
     module Name = Variable.Name
     module Api = Api
     module ValueRange = Variable.ValueRange
+    module Property = ValueRange.Property
     module Logging = Informedica.GenOrder.Lib.Logging
 
 

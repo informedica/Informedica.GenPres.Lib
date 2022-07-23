@@ -47,6 +47,7 @@ module Equation =
         /// Raise an `EquationException` with `Message` `m`.
         let raiseExc m = m |> EquationException |> raise
 
+
     /// Create an `Equation` with an **y** and
     /// **xs**. Fails if a variable is added more
     /// than one time using the **fail** function.
@@ -234,103 +235,102 @@ module Equation =
         |> Events.EquationStartedSolving
         |> Logging.logInfo log
 
-        // let runOnce y xs =
-        //     let c1 =
-        //         y::xs 
-        //         |> List.filter (Variable.getValueRange >> ValueRange.isValueSet)
-        //         |> List.length
-        //     let c2 =  (y::xs |> List.length)
-            
-        //     (c2 - c1 <= 1) 
-
-        if eq |> isSolved then  []
+        if eq |> isSolved then eq, Unchanged
         else
-            let rec calc changed op1 op2 y xs rest =
+            let rec calc op1 op2 y xs rest changed =
                 (y::xs)
                 |> Events.EquationStartedCalculation
                 |> Logging.logInfo log
 
                 match rest with 
                 | []  -> 
-                    (changed, xs)
+                    //(changed, xs)
+                    //need to change this!
+                    ([], xs)
                     |> Events.EquationFinishedCalculation
                     |> Logging.logInfo log
 
                     changed, xs
                 | x::tail ->
-                    let xs'  = xs |> List.filter ((<>) x)
+                    let xs  = xs |> List.filter (Variable.eqName x >> not)
 
-                    let x' =
-                        match xs' with
+                    let newX =
+                        match xs with
                         | [] -> x <== y 
-                        | _  -> x <== (y |> op2 <| (xs' |> List.reduce op1))
+                        | _  -> x <== (y |> op2 <| (xs |> List.reduce op1))
 
-                    let changed = 
-                        if x = x' then changed 
-                        else
-                            x'
-                            |> Events.EquationVariableChanged
-                            |> Logging.logInfo log
+                    if x = newX then changed 
+                    else
+                        newX
+                        |> Events.EquationVariableChanged
+                        |> Logging.logInfo log
                             
-                            changed 
-                            |> List.replaceOrAdd (Variable.eqName x') x'
+                        changed
+                        |> List.replaceOrAdd
+                            (fst >> Variable.eqName newX)
+                            (newX, newX.Values |> ValueRange.diffWith x.Values)
 
-                    tail |> calc changed op1 op2 y (x'::xs')
+                    |> calc op1 op2 y (newX::xs) tail
 
             // op1 = (*) or (+) and op2 = (/) or (-)
-            let rec loop b op1 op2 y xs changed =
-                let x   = xs |> List.head
-                let xs' = xs |> List.filter ((<>) x)
+            let rec loop op1 op2 y xs changed =
             
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
-                let ychanged, y' = calc [] op1 op1 x xs' [y]
+                let ychanged, y =
+                    printfn "=== Calculating y ==="
+                    (y::xs)
+                    |> Events.EquationStartedCalculation
+                    |> Logging.logInfo log
+
+                    let newY = y <== (xs |> List.reduce op1)
+
+                    if newY = y then [], y
+                    else
+                        [ newY, newY.Values |> ValueRange.diffWith y.Values ], newY
+                    //let x = xs  |> List.head
+                    //let xs = xs |> List.filter ((<>) x)
+                    //calc op1 op1 x xs [y] []
             
                 // Replace y with the new y with is in a list
-                let y = y' |> List.head
+                // let y = ys |> List.head
             
                 // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
                 //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
                 //       etc..
-                let xchanged, xs = calc [] op1 op2 y xs xs
+                let xchanged, xs = calc op1 op2 y xs xs []
 
                 // If something has changed restart until nothing changes anymore
                 // or only has to run once
                 match ychanged @ xchanged with
                 | [] ->
                     changed
+                    |> List.map fst
                     |> Events.EquationFinishedSolving
                     |> Logging.logInfo  log
 
-                    changed
-                | _  ->
-                    ychanged @ xchanged
-                    |> List.fold (fun acc v ->  
-                        acc |> List.replaceOrAdd (Variable.eqName v) v
-                    ) changed
-                    |> fun changed ->
-                        // only run once so now is ready
-                        if b then changed
-                        else
-                            (b, y, xs, changed)
-                            |> Events.EquationLoopedSolving
-                            |> Logging.logInfo log
+                    let eq =
+                        match eq with
+                        | ProductEquation _ -> createProductEqExc (y, xs)
+                        | SumEquation _     -> createSumEqExc (y, xs)
+                    eq, Changed changed
+                | _ ->
+                    let changed = changed @ ychanged @ xchanged
+                    (false, y, xs, [])
+                    |> Events.EquationLoopedSolving
+                    |> Logging.logInfo log
 
-                            let b = false // runOnce y xs
-                            loop b op1 op2 y xs changed
+                    loop op1 op2 y xs changed
             
-            let b, y, xs, op1, op2 =
+            let y, xs, op1, op2 =
                 match eq with
                 | ProductEquation (y, xs) -> y, xs, (^*), (^/)
                 | SumEquation     (y, xs) -> y, xs, (^+), (^-)
-                |> fun (y, xs, op1, op2) ->
-                    // run only once when all but one is a value set
-                    false, y, xs, op1, op2// runOnce y xs, y, xs, op1, op2
                         
             match xs with 
-            | [] -> []
+            | [] -> eq, Unchanged
             | _  ->
                 try 
-                    loop b op1 op2 y xs  []
+                    loop op1 op2 y xs []
                 with
                 | Variable.Exceptions.VariableException m -> 
                     m 
@@ -1043,6 +1043,8 @@ open FsCheck
 open Types
 open Variable.Operators
 
+module Property = Variable.ValueRange.Property
+
 
 let generateVars n =
     (Generators.varGenerator |> Arb.fromGen).Generator.Sample(10, n)
@@ -1060,6 +1062,7 @@ let generateVars n =
 
 let vars1 = generateVars 100
 let vars2 = generateVars 100
+let vars3 = generateVars 100
 
 
 Seq.allPairs vars1 vars2
@@ -1086,8 +1089,6 @@ Seq.allPairs vars1 vars2
     |> printfn "%s"    
 )
 
-
-let vars3 = generateVars 1000
 
 
 Seq.allPairs vars1 vars2
@@ -1118,8 +1119,104 @@ Seq.allPairs vars1 vars2
 )
 
 
-open Variable.ValueRange
+vars1
+|> Seq.map (fun vr ->
+    vr.Values, vr.Values |> Variable.ValueRange.toProperties
+)
+|> Seq.distinct
+|> Seq.iteri (fun i (vr, props) ->
+    printfn $"{i}. {vr |> Variable.ValueRange.toString true} -> {props}"
+)
 
-Minimum.create false (1N/3N)
-|> Minimum.toString false
 
+
+vars1
+|> Seq.collect (fun var ->
+    try
+    let max = Variable.ValueRange.Maximum.create true 2N
+    let v =
+        var.Values
+        |> Variable.ValueRange.setMax max
+        |> Variable.setValueRange var
+    [ var.Values, v.Values, v.Values |> Variable.ValueRange.diffWith var.Values ]
+    with
+    | _ -> []
+)
+|> Seq.distinct
+|> Seq.iteri (fun i (vr1, vr2, props) ->
+    printfn $"{i}. {vr1 |> Variable.ValueRange.toString true} -> {vr2 |> Variable.ValueRange.toString true} diff = {props}"
+)
+
+
+let resultToString = function
+    | (eq, Unchanged) -> "Unchanged"
+    | (eq, Changed cs) ->
+        let toStr (var : Variable, props)  =
+            $"""{eq |> Equation.toString true} changes: {var.Name |> Variable.Name.toString}: {props |> Set.map (Property.toString true) |> String.concat ", "}"""
+        $"""{cs |> List.map toStr}"""
+       
+
+
+vars1
+|> Seq.allPairs vars2
+|> Seq.allPairs vars3
+|> Seq.take 5000
+|> Seq.choose (fun (y, (x1, x2)) ->
+    try
+        Equation.create ProductEquation Some (fun _ -> None) (y, [x1; x2])
+        |> function
+        | Some eq ->
+            //printfn $"{y ^/ x1 |> Variable.toString true}"
+            (eq, eq |> Equation.solve ({ Log = ignore })) |> Some
+        | None -> None
+    with
+    | _ -> None
+)
+|> Seq.iteri (fun i (eq, res) ->
+    $"{i}. {eq |> Equation.toString true} ==> {res |> resultToString}"
+    |> printfn "%s"
+)
+
+Property.createMinInclProp 1N
+|> Property.toString true
+
+
+let var0 =
+    Variable.Dto.createNew "y"
+    |> Variable.Dto.setMin (Some 3N) true
+    |> Variable.Dto.setMax (Some 4N) true
+    |> Variable.Dto.fromDto
+
+
+let var2 =
+    Variable.Dto.createNew "x1"
+    |> Variable.Dto.setIncr [2N]
+//    |> Variable.Dto.setMax (Some 0N) true
+    |> Variable.Dto.fromDto
+
+
+let var1 =
+    Variable.Dto.createNew "x2"
+    |> Variable.Dto.setMin (Some 3N) false
+    |> Variable.Dto.fromDto
+
+
+// var_8 [3..4] = var_10 <..2..> * var_7 <3..> ==> [var_10: ..0]]
+Equation.createProductEqExc (var0, [var1; var2])
+|> fun eq ->
+    printfn $"{eq |> Equation.toString true}"
+    eq
+|> Equation.solve ({ Log = printfn "%A" })
+|> resultToString
+|> printfn "%s"
+
+
+Variable.ValueRange.MinMaxCalcultor.calcMinMax
+    (*)
+    (Some 3N, false)
+    (None, false)
+    (None, false)
+    (Some 0N, true)
+
+
+var0 <== var2 ^* var1

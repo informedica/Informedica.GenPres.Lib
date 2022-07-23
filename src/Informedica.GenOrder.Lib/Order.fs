@@ -87,7 +87,7 @@ module Order =
 
     module ValueRange = Informedica.GenSolver.Lib.Variable.ValueRange
     module Equation = Informedica.GenSolver.Lib.Equation
-    module Property = Informedica.GenSolver.Lib.Property
+    module Property = ValueRange.Property
     module Quantity = VariableUnit.Quantity
     module Frequency = VariableUnit.Frequency
     module Concentration = VariableUnit.Concentration
