@@ -17,6 +17,10 @@ open Types
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
 
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module ValueSet = ValueRange.ValueSet
+
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -44,11 +48,11 @@ module Solve =
             eqs 
 
 
-    let solveMinIncl n min = solve n (MinInclProp min)
-    let solveMinExcl n min = solve n (MinExclProp min)
-    let solveMaxIncl n max = solve n (MaxInclProp max)
-    let solveMaxExcl n max = solve n (MaxExclProp max)
-    let solveValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
+    let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+    let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+    let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+    let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+    let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
 
     let init     = Api.init
@@ -70,7 +74,7 @@ module Solve =
             )
             |> Option.get
 
-        match var.Values |> ValueRange.getValueSet with
+        match var.Values |> ValueRange.getValSet with
         | None    -> 
             match incr with
             | None -> eqs
@@ -81,8 +85,8 @@ module Solve =
                 match min, max with
                 | Some min, Some max ->
                     let (incl_min, min), (incl_max, max) = 
-                        min |> ValueRange.Minimum.minToBoolBigRational,
-                        max |> ValueRange.Maximum.maxToBoolBigRational
+                        min |> ValueRange.Minimum.toBoolBigRational,
+                        max |> ValueRange.Maximum.toBoolBigRational
                     let min =
                         if min = 0N then incr
                         else 
@@ -102,7 +106,7 @@ module Solve =
                         | TakeFromMax x -> [min..incr..max] |> List.rev |> List.take x
                     eqs |> solveValues s vs
                 | _ -> eqs
-        | Some vs ->
+        | Some (ValueSet vs) ->
             match take with
             | TakeFromMin x -> 
                     let x = if x > vs.Count then vs.Count else x
@@ -357,7 +361,7 @@ gentaEqs
 |> printEqs
 // pick the optimal scenario
 |> pick "orb_dos_qty" (Some (1N)) (TakeFromMin 10) // pick between min and max
-//|> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
+|> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
 |> pick "gentamicin_dos_tot_adj" None (TakeFromMax 2) // choose from list
 |> printEqs
 |> ignore

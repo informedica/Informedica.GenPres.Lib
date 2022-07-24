@@ -80,7 +80,7 @@ module Constraint =
             |> List.map snd 
 
 
-    let apply log sortQue (c : Constraint) eqs =
+    let apply log (c : Constraint) eqs =
 
         let lim l b vr =
             if vr |> Variable.count <= l then vr
@@ -114,7 +114,7 @@ module Constraint =
         | vr::_ ->
 
             c.Property
-            |> Property.matchProp
+            |> Property.toValueRange
             |> Variable.setValueRange vr
             |> fun vr ->
                 match c.Limit with
@@ -136,14 +136,21 @@ module Constraint =
                 | _ -> vr
             |> Some
         |> function
-        | None -> eqs
-        | Some vr ->
-            (c, vr)
+        | None -> eqs, None
+        | Some var ->
+            (c, var)
             |> Events.ConstraintVariableApplied
             |> Logging.logInfo log
 
+            eqs, Some var 
+
+
+    let solve log sortQue (c : Constraint) eqs =
+        match apply log c eqs with
+        | eqs, None -> eqs
+        | eqs, Some var ->
             eqs 
-            |> Solver.solve log sortQue vr
+            |> Solver.solve log sortQue var
             |> fun eqs ->
                 (c, eqs)
                 |> Events.ConstrainedEquationsSolved

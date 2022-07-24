@@ -402,12 +402,13 @@ module DrugOrder =
             let co = (DrugConstraint.constraints (o.Orderable.Name |> Name.toString), o)
             // adding orderable constraints
             co 
-            >|> [ 
-                    // ALL set possible orderable quantities
-                    cstr OrderableOrderableQty 
-                        (d.Quantities |> Set.ofList |> Property.createValsProp) 
-                        NoLimit
-                        AnyRouteShape AnyOrder
+            >|> [
+                    if d.Quantities |> List.isEmpty |> not then
+                        // ALL set possible orderable quantities
+                        cstr OrderableOrderableQty 
+                            (d.Quantities |> Set.ofList |> Property.createValsProp) 
+                            NoLimit
+                            AnyRouteShape AnyOrder
 
                     // RECTAL SOLID give max 1 piece from rectal solid 
                     cstr OrderableDoseQty 
@@ -415,12 +416,13 @@ module DrugOrder =
                         NoLimit
                         RectalSolid DiscontinuousOrder
 
-                    // ORAL SOLID give max 10 pieces from oral solid
-                    cstr OrderableDoseQty 
-                        ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
-                            |> Set.ofList |> Property.createValsProp)
-                        NoLimit
-                        OralSolid DiscontinuousOrder
+                    if [ 1N / d.Divisible.. 1N / d.Divisible ..10N ] |> List.isEmpty |> not then
+                        // ORAL SOLID give max 10 pieces from oral solid
+                        cstr OrderableDoseQty 
+                            ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
+                                |> Set.ofList |> Property.createValsProp)
+                            NoLimit
+                            OralSolid DiscontinuousOrder
 
                     // ORAL FLUID increment
                     // cstr OrderableDoseQty 
@@ -555,17 +557,19 @@ module DrugOrder =
                     co
                     >|> [ 
                             // ALL set concentrations and quanties
-                            DrugConstraint.create n 
-                                ItemComponentConc 
-                                (s.Concentrations |> Set.ofList |> Property.createValsProp) 
-                                NoLimit
-                                AnyRouteShape AnyOrder
-                            DrugConstraint.create n 
-                                ItemOrderableQty 
-                                (s.OrderableQuantities |> Set.ofList |> Property.createValsProp) 
-                                NoLimit
-                                AnyRouteShape AnyOrder
-                            if d.Products |> List.length = 1 then
+                            if s.Concentrations |> List.isEmpty |> not then
+                                DrugConstraint.create n 
+                                    ItemComponentConc 
+                                    (s.Concentrations |> Set.ofList |> Property.createValsProp) 
+                                    NoLimit
+                                    AnyRouteShape AnyOrder
+                            if s.OrderableQuantities |> List.isEmpty |> not then
+                                DrugConstraint.create n 
+                                    ItemOrderableQty 
+                                    (s.OrderableQuantities |> Set.ofList |> Property.createValsProp) 
+                                    NoLimit
+                                    AnyRouteShape AnyOrder
+                            if d.Products |> List.length = 1 && s.Concentrations |> List.isEmpty |> not then
                                 DrugConstraint.create n
                                     ItemOrderableConc
                                     (s.Concentrations |> Set.ofList |> Property.createValsProp) 
@@ -632,18 +636,21 @@ module DrugOrder =
                         NoLimit AnyRouteShape ContinuousOrder 
                         
                 cs 
-                |> List.replace (fun c -> c.Mapping = OrderableDoseRate &&
-                                            c.OrderType = ContinuousOrder) drc
+                |> List.replace (fun c ->
+                    c.Mapping = OrderableDoseRate &&
+                    c.OrderType = ContinuousOrder
+                ) drc
                 , o
-        >|> [ 
-                DrugConstraint.create dl.Name
-                    PresFreq 
-                    (dl.Frequencies |> Set.ofList |> Property.createValsProp) 
-                    NoLimit AnyRouteShape DiscontinuousOrder 
-                DrugConstraint.create dl.Name 
-                    PresFreq  
-                    (dl.Frequencies |> Set.ofList |> Property.createValsProp)
-                    NoLimit AnyRouteShape TimedOrder 
+        >|> [
+                if dl.Frequencies |> List.isEmpty |> not then
+                    DrugConstraint.create dl.Name
+                        PresFreq 
+                        (dl.Frequencies |> Set.ofList |> Property.createValsProp) 
+                        NoLimit AnyRouteShape DiscontinuousOrder 
+                    DrugConstraint.create dl.Name 
+                        PresFreq  
+                        (dl.Frequencies |> Set.ofList |> Property.createValsProp)
+                        NoLimit AnyRouteShape TimedOrder 
             ]
         |> cr ItemDoseQty Property.createMaxInclProp dl.MaxDoseQuantity
         |> cr ItemDoseQty Property.createMinInclProp dl.MinDoseQuantity

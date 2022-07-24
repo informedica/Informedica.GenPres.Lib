@@ -16,7 +16,9 @@ open Types
 
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
-
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module ValueSet = ValueRange.ValueSet
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -44,11 +46,7 @@ module Solve =
             eqs 
 
 
-    let solveMinIncl n min = solve n (MinInclProp min)
-    let solveMinExcl n min = solve n (MinExclProp min)
-    let solveMaxIncl n max = solve n (MaxInclProp max)
-    let solveMaxExcl n max = solve n (MaxExclProp max)
-    let solveValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
+    let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
 
     let init     = Api.init

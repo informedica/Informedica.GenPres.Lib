@@ -22,6 +22,9 @@ module Api = Informedica.GenSolver.Lib.Api
 module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module ValueSet = ValueRange.ValueSet
 
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -44,11 +47,11 @@ module Solve =
             )
         | None -> eqs
 
-    let setMinIncl n min = set n (MinInclProp min)
-    let setMinExcl n min = set n (MinExclProp min)
-    let setMaxIncl n max = set n (MaxInclProp max)
-    let setMaxExcl n max = set n (MaxExclProp max)
-    let setValues n vals = set n (ValsProp (vals |> Set.ofSeq))
+    let setMinIncl n min = min |> Minimum.create true |> MinProp |> set n 
+    let setMinExcl n min = min |> Minimum.create false |> MinProp |> set n 
+    let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> set n 
+    let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> set n 
+    let setValues n vals = vals |> ValueSet.create |> ValsProp |> set n 
 
 
     let printEqs = Solver.printEqs true procss
@@ -62,17 +65,17 @@ module Solve =
             |> Api.solve Solver.sortQue logger None (n |> Name.createExc) p
         with
         | :? Variable.Exceptions.VariableException as e ->
-            printfn $"{e.Data0}"
+            // printfn $"{e.Data0}"
             raise e
         | :? Solver.Exception.SolverException as e ->
-            printfn $"{e.Data0}"
+            // printfn $"{e.Data0}"
             raise e
 
-    let solveMinIncl n min = solve n (MinInclProp min)
-    let solveMinExcl n min = solve n (MinExclProp min)
-    let solveMaxIncl n max = solve n (MaxInclProp max)
-    let solveMaxExcl n max = solve n (MaxExclProp max)
-    let solveValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
+    let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+    let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+    let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+    let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+    let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
     let init     = Api.init
     let nonZeroNegative = Api.nonZeroNegative
@@ -90,9 +93,9 @@ module Solve =
             )
             |> Option.get
 
-        match var.Values |> ValueRange.getValueSet with
+        match var.Values |> ValueRange.getValSet with
         | None    -> ()
-        | Some vs ->
+        | Some (ValueSet vs) ->
             for v in vs do
                 try
                     eqs
@@ -126,7 +129,7 @@ open Solve
 
 
 failEqs
-//|> solveValues "z" [1N]
+|> solveValues "z" [1N]
 |> solveMinIncl "b" 1N
 |> printEqs
 |> solveMinIncl "c" 1N
@@ -141,32 +144,42 @@ failEqs
 |> printEqs
 |> solveMaxIncl "a" 30N
 |> printEqs
-|> solveMaxIncl "d" 5N // a = 5/4*c_{max}
+|> solveMaxIncl "d" 15N // a = 5/4*c_{max}
 |> printEqs
 |> ignore
 
 
-failEqs
-|> nonZeroNegative
-|> solveMinIncl "b" 1N
-|> printEqs
-// |> solveMinIncl "c" 1N
-// |> printEqs
-|> solveMaxIncl "c" 20N
-|> printEqs
-|> solveMinIncl "e" 10N
-|> printEqs
-|> solveMaxIncl "e" 20N
-|> printEqs
-|> solveMaxIncl "f" 2N
-|> printEqs
-//|> solveMaxIncl "b" (20N/9N) // passes with 25
-|> solveMaxIncl "a" 30N // passes with 25
-|> printEqs
-|> ignore
+let calcFail eqs n =
+    eqs
+    |> nonZeroNegative
+    |> solveMinIncl "b" 1N
+    // |> printEqs
+    // |> solveMinIncl "c" 1N
+    // |> printEqs
+    |> solveMaxIncl "c" 20N
+    //|> printEqs
+    |> solveMinIncl "e" 10N
+    //|> printEqs
+    |> solveMaxIncl "e" 20N
+    //|> printEqs
+    |> solveMaxIncl "f" 2N
+    |> printEqs
+    //|> solveMaxIncl "b" (20N/9N) // passes with 25
+    |> solveMaxIncl "a" n //passes with 25 fails with 30
+    |> printEqs
+    |> ignore
 
 
+for i in [5N..30N] do
+    printfn $"trying {i}"
+    calcFail failEqs i
 
+
+48828126N/1953125N
+|> BigRational.toDouble
+
+28571437007N/1000000000N
+|> BigRational.toDouble
 
 
 failEqs
@@ -192,28 +205,25 @@ failEqs
 |> ignore
 
 
+// fails with 20!
+let failEqs2 n =
+    try
+        failEqs
+        |> solveValues "c" [20N]
+        |> solveValues "e" [20N]
+        |> solveValues "f" [10N]
+        |> printEqs
+        |> solveValues "a" [n]
+        |> printEqs
+        |> ignore
+        printfn $"passed with {n}"
+    with
+    | _ ->
+        printfn $"failed with {n}"
+        ()
 
-failEqs
-//|> solveValues "b" [1N]
-//|> printEqs
-//|> solveValues "c" [1N]
-//|> printEqs
-|> solveValues "c" [20N]
-|> printEqs
-//|> solveValues "e" [10N]
-//|> printEqs
-|> solveValues "e" [20N]
-|> printEqs
-//|> solveMinExcl "f" 1N
-//|> printEqs
-|> solveValues "f" [2N]
-|> printEqs
-//|> solveMaxExcl "a" 10N // this doesn't start a loop
-//|> solveMaxExcl "a" 25N // this doesn't start a loop
-//|> solveMaxExcl "a" 26N // this starts a loop
-|> solveValues "a" [30N] // this starts a loop
-|> printEqs
-|> ignore
+failEqs2 20N
+for i in [1N .. 200N] do failEqs2 i
 
 
 failEqs
@@ -234,3 +244,20 @@ failEqs
 |> ignore
 
 //b_max x  e_max > a_max x f_max
+
+
+let maxEqs =
+    failEqs
+    |> List.map Equation.nonZeroOrNegative
+    |> setMaxIncl "a" 25N
+    |> setMaxIncl "b" 1N
+    |> setMaxIncl "c" 20N
+    |> setMaxIncl "f" 20N
+    |> setMaxIncl "e" 2N
+
+
+maxEqs
+|> printEqs
+|> solveMaxIncl "d" 10N
+|> solveValues "d" [2N]
+|> printEqs

@@ -164,7 +164,8 @@ module OrderLogger =
                 h.Adjust
                 |> Quantity.toValueUnitStringList None
                 |> Seq.map snd
-                |> Seq.head
+                |> Seq.tryHead
+                |> Option.defaultValue ""
             | _ -> ""
 
         printfn "\n\n=== SCENARIOS for Weight: %s ===" w

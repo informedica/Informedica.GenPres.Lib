@@ -407,7 +407,7 @@ module Variable =
                 | ValsProp vs -> vs |> ValueSet.map f |> ValsProp
 
 
-            let matchProp p =
+            let toValueRange p =
 
                 match p with
                 | MinProp min -> min |> Min

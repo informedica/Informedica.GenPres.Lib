@@ -43,16 +43,16 @@ module Api =
         |> function
         | [] -> None
 
-        | vr::_ ->
+        | var::_ ->
 
             p
-            |> Property.matchProp
-            |> Variable.setValueRange vr
-            |> fun vr ->
+            |> Property.toValueRange
+            |> Variable.setValueRange var
+            |> fun var ->
                 match lim with
                 | Some l ->
-                    if vr |> Variable.count > l then
-                        vr
+                    if var |> Variable.count > l then
+                        var
                         |> Variable.getValueRange
                         |> ValueRange.getValSet
                         |> function
@@ -62,11 +62,11 @@ module Api =
                             |> Seq.take l
                             |> Set.ofSeq
                             |> ValueRange.createValSet
-                            |> Variable.setValueRange vr
-                        | None -> vr
+                            |> Variable.setValueRange var
+                        | None -> var
 
-                    else vr
-                | None -> vr
+                    else var
+                | None -> var
                 |> Some
 
 
@@ -85,13 +85,13 @@ module Api =
         |> setVariableValues lim n p
         |> function
         | None -> eqs
-        | Some vr -> 
-            (vr, eqs)
+        | Some var -> 
+            (var, eqs)
             |> Events.ApiSetVariable
             |> Logging.logInfo log
                         
             eqs 
-            |> Solver.solve log sortQue vr
+            |> Solver.solve log sortQue var
             |> fun eqs ->
                 eqs
                 |> Events.ApiEquationsSolved
@@ -108,11 +108,12 @@ module Api =
         |> List.map Equation.nonZeroOrNegative
 
 
+    // ToDo: need to clean this code up
     let solveConstraints log cs eqs = 
         let apply = 
             fun c eqs ->
                 try
-                    Constraint.apply log Solver.sortQue c eqs
+                    Constraint.apply log c eqs
                 with
                 | Variable.Exceptions.VariableException m -> 
                     m
@@ -128,7 +129,14 @@ module Api =
         |> List.fold (fun acc c ->
             acc
             |> apply c
+            |> fun (_, var) ->
+                match var with
+                | None -> acc
+                | Some var ->
+                    acc
+                    |> List.map (Equation.replace var)
         ) eqs
+        |> Solver.solveAll log
         |> fun eqs ->
             (cs, eqs)
             |> Events.ApiAppliedConstraints

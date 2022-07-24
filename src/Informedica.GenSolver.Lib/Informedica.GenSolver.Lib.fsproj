@@ -22,6 +22,7 @@
         <None Include="Scripts/MinMax.fsx" />
         <None Include="Scripts/DrugExample.fsx" />
         <None Include="Scripts/Circular.fsx" />
+        <None Include="Scripts/GentaEquations.fsx" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />

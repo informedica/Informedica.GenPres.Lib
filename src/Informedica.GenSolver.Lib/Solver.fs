@@ -89,7 +89,7 @@ module Solver =
     /// product equation and a sum equation solver
     /// and function to determine whether an 
     /// equation is solved
-    let solve log sortQue vr eqs =
+    let solveOpt log sortQue vr eqs =
 
         let solveE = Equation.solve log
             
@@ -136,7 +136,8 @@ module Solver =
                     // equations) so start new
                     | eq, Changed cs ->
                         let vars = cs |> List.map fst
-                        let eq = [ eq ] |> replace vars |> fst
+                        // don't need to do this anymore
+                        //let eq = [ eq ] |> replace vars |> fst
 
                         // find all eqs with vars in acc and put these back on que
                         acc
@@ -154,7 +155,7 @@ module Solver =
                                     |> List.append rpl
 
                             rst
-                            |> List.append eq
+                            |> List.append [ eq ]
                             |> loop (n + 1) que 
 
                     // Equation did not in fact change, so put it to
@@ -164,9 +165,18 @@ module Solver =
                         |> List.append acc
                         |> loop (n + 1) tail
 
-        eqs 
-        |> replace [vr]
-        |> function 
-        | (rpl, rst) -> loop 0 rpl rst 
+        match vr with
+        | None -> loop 0 eqs []
+        | Some var ->
+            eqs 
+            |> replace [var]
+            |> function 
+            | (rpl, rst) -> loop 0 rpl rst
             
     
+    let solve log sortQue vr eqs =
+        solveOpt log sortQue (Some vr) eqs
+
+
+    let solveAll log eqs =
+        solveOpt log sortQue None eqs

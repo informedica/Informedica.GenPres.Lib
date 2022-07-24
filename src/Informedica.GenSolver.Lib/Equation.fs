@@ -255,7 +255,7 @@ module Equation =
                     changed, xs
                 | x::tail ->
                     let newX =
-                        match xs with
+                        match xs |> filter x with
                         | [] -> x <== y 
                         | _  ->
                             calcToStr op1 op2 x y xs
