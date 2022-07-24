@@ -76,7 +76,7 @@ module Types =
     /// The `Result` of solving an `Equation`
     /// is that either the `Equation` is the
     /// same or has `Changed`.
-    type Result =
+    type SolveResult =
         | Unchanged
         | Changed of List<Variable * Property Set>
 
@@ -104,9 +104,10 @@ module Types =
     module Events =
 
         type Event =
-            | EquationCouldNotBeSolved of Equation
-            | EquationStartedCalculation of Variable list
             | EquationStartedSolving of Equation
+            | EquationStartedCalculation of Variable list
+            | EquationCalculation of string
+            | EquationCouldNotBeSolved of Equation
             | EquationFinishedCalculation of Variable list * Variable list
             | EquationVariableChanged of Variable
             | EquationFinishedSolving of Variable list

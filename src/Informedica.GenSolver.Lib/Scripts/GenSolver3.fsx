@@ -25,8 +25,6 @@
 open Informedica.GenSolver.Lib
 
 
-
-
 /// Functions that handle the `Equation` type that
 /// either represents a `ProductEquation` </br>
 /// y = x1 \* x2 * ... \* xn </br>
@@ -46,6 +44,23 @@ module Equation =
 
         /// Raise an `EquationException` with `Message` `m`.
         let raiseExc m = m |> EquationException |> raise
+
+
+    module SolveResult =
+
+
+        module Property = Variable.ValueRange.Property
+
+        let toString = function
+            | Unchanged -> "Unchanged"
+            | Changed cs ->
+                let toStr (var : Variable, props)  =
+                    $"""changes: {var.Name |> Variable.Name.toString}: {props |> Set.map (Property.toString true) |> String.concat ", "}"""
+                if cs |> List.isEmpty then ""
+                else
+                    cs
+                    |> List.map toStr
+                    |> String.concat ", "     
 
 
     /// Create an `Equation` with an **y** and
@@ -240,7 +255,7 @@ module Equation =
         eq
         |> Events.EquationStartedSolving
         |> Logging.logInfo log
-
+        // helper functions
         let filter x xs = xs |> List.filter (Variable.eqName x >> not)
         let replAdd x xs = xs |> List.replaceOrAdd(Variable.eqName x) x
         let calcToStr = calculationToString
@@ -267,71 +282,43 @@ module Equation =
                         | [] -> x <== y 
                         | _  ->
                             calcToStr op1 op2 x y xs
-                            |> printfn "calculating: %s"
+                            |> Events.EquationCalculation
+                            |> Logging.logInfo log
+
                             x <== (y |> op2 <| (xs |> filter x |> List.reduce op1))
 
-                    if x = newX then changed 
-                    else
-                        newX
-                        |> Events.EquationVariableChanged
-                        |> Logging.logInfo log
-                            
-                        changed
-                        |> List.replaceOrAdd
-                            (fst >> Variable.eqName newX)
-                            (newX, newX.Values |> ValueRange.diffWith x.Values)
-
+                    x.Values <> newX.Values
                     |> calc op1 op2 y (xs |> replAdd newX) tail
 
             // op1 = (*) or (+) and op2 = (/) or (-)
-            let rec loop op1 op2 y xs changed =
+            let rec loop op1 op2 y xs =
             
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
-                let ychanged, y =
+                let yChanged, y =
                     (y::xs)
                     |> Events.EquationStartedCalculation
                     |> Logging.logInfo log
 
                     calcToStr op1 op1 y (xs |> List.head) (xs |> List.tail)
-                    |> printfn "calculating: %s"
+                    |> Events.EquationCalculation
+                    |> Logging.logInfo log
                     let newY = y <== (xs |> List.reduce op1)
 
-                    if newY = y then [], y
-                    else
-                        [ newY, newY.Values |> ValueRange.diffWith y.Values ], newY
-                    //let x = xs  |> List.head
-                    //let xs = xs |> List.filter ((<>) x)
-                    //calc op1 op1 x xs [y] []
-            
-                // Replace y with the new y with is in a list
-                // let y = ys |> List.head
+                    newY.Values <> y.Values, newY
             
                 // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
                 //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
                 //       etc..
-                let xchanged, xs = calc op1 op2 y xs xs []
+                let xChanged, xs = calc op1 op2 y xs xs false
 
                 // If something has changed restart until nothing changes anymore
-                // or only has to run once
-                match ychanged @ xchanged with
-                | [] ->
-                    changed
-                    |> List.map fst
-                    |> Events.EquationFinishedSolving
-                    |> Logging.logInfo  log
-
-                    let eq =
-                        match eq with
-                        | ProductEquation _ -> createProductEqExc (y, xs)
-                        | SumEquation _     -> createSumEqExc (y, xs)
-                    eq, Changed changed
-                | _ ->
-                    let changed = changed @ ychanged @ xchanged
+                if not (yChanged || xChanged) then (y, xs)
+                else
                     (false, y, xs, [])
                     |> Events.EquationLoopedSolving
                     |> Logging.logInfo log
 
-                    loop op1 op2 y xs changed
+                    loop op1 op2 y xs
             
             let y, xs, op1, op2 =
                 match eq with
@@ -342,7 +329,28 @@ module Equation =
             | [] -> eq, Unchanged
             | _  ->
                 try 
-                    loop op1 op2 y xs []
+                    loop op1 op2 y xs
+                    |> fun (y, xs) ->
+                        let changed =
+                            let vars = eq |> toVars
+
+                            y::xs
+                            |> List.map (fun v2 ->
+                                vars
+                                |> List.find (Variable.eqName v2)
+                                |> fun v1 ->
+                                    v2, v2.Values
+                                    |> Variable.ValueRange.diffWith v1.Values
+                            )
+                            |> List.filter (snd >> Set.isEmpty >> not)
+                            |> Changed
+
+                        let eq =
+                            match eq with
+                            | ProductEquation _ -> createProductEqExc (y, xs)
+                            | SumEquation _ -> createSumEqExc (y, xs)
+
+                        eq, changed
                 with
                 | Variable.Exceptions.VariableException m -> 
                     m 
@@ -1067,7 +1075,12 @@ let generateVars n =
     |> List.filter (fun var ->
         var |> Variable.count <= 5
     )
-    |> List.map (Variable.setNonZeroOrNegative)
+    |> List.map (fun var ->
+        try
+            var |> Variable.setNonZeroOrNegative
+        with
+        | _ -> var
+    )
     |> List.distinctBy (fun var ->
         var.Values
     )
@@ -1162,13 +1175,24 @@ vars1
 
 
 let resultToString = function
-    | (eq, Unchanged)  -> "Unchanged"
-    | (eq, Changed cs) ->
-        let toStr (var : Variable, props)  =
-            $"""changes: {var.Name |> Variable.Name.toString}: {props |> Set.map (Property.toString true) |> String.concat ", "}"""
-        $"""
-{eq |> Equation.toString true} {if cs |> List.isEmpty then "" else cs |> List.map toStr |> String.concat ", "}
-    """       
+    | (eq, cs) ->
+        $"{eq |> Equation.toString true} {cs |> Equation.SolveResult.toString}"
+
+
+let logger : Logging.Logger =
+    {
+        Log =
+            fun { TimeStamp = _; Level = _; Message = msg } ->
+                match msg with
+                | :? Logging.SolverMessage as m ->
+                    match m with
+                    | Logging.SolverMessage m ->
+                        match m with
+                        | Events.EquationCalculation s -> printfn $"{s}"
+                        | _ -> ()
+                    | _ -> ()
+                | _ -> ()
+    }
 
 
 vars1
@@ -1180,17 +1204,18 @@ vars1
         |> function
         | Some eq ->
             printfn $"== start solving equation"
-            (eq, eq |> Equation.solve ({ Log = ignore })) |> Some
+            (eq, eq |> Equation.solve logger) |> Some
         | None -> None
     with
     | _ ->
         printfn "== cannot solve equation"
         None
 )
-|> Seq.take 1000
+|> Seq.take 2000
 |> Seq.iteri (fun i (eq, res) ->
     printfn $"== finished solving equation {i}"
-    $"{eq |> Equation.toString true} ==> {res |> resultToString}"
+    $"""{eq |> Equation.toString true} ==>
+{res |> resultToString}"""
     |> printfn "%s"
 )
 
