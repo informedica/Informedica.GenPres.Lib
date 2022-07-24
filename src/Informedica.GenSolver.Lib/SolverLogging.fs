@@ -51,7 +51,8 @@ module SolverLogging =
         | EquationCouldNotBeSolved eq -> 
             $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}" 
         | EquationStartedCalculation vars -> ""
-        | EquationCalculation s ->
+        | EquationCalculation (op1, op2, y, x, xs) ->
+            let s = Equation.calculationToString op1 op2 y x xs
             $"calculating: {s}"
         | EquationStartedSolving eq -> 
             $"=== Start solving Equation ===\n{eq |> Equation.toString true}"

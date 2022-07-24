@@ -20,10 +20,8 @@
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
     <Compile Include="OrderLogger.fs" />
+    <None Include="Scripts\Examples.fsx" />
     <None Include="Scripts\load.fsx" />
-    <None Include="Scripts\Order.fsx" />
-    <None Include="Scripts\ValueUnit.fsx" />
-    <None Include="Scripts\Drug2.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />

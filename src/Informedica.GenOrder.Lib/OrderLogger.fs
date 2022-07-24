@@ -73,6 +73,8 @@ module OrderLogger =
         }
 
 
+    let noLogger : Logger = { Log = ignore }
+
     // Create the logger agent 
     let logger =
 

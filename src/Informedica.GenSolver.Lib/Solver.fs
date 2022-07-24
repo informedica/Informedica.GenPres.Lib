@@ -89,12 +89,12 @@ module Solver =
     /// product equation and a sum equation solver
     /// and function to determine whether an 
     /// equation is solved
-    let solveOpt log sortQue vr eqs =
+    let solveOpt log sortQue var eqs =
 
         let solveE = Equation.solve log
             
         let rec loop n que acc =
-            if n > ((que @ acc |> List.length) * 10) then
+            if n > ((que @ acc |> List.length) * 1000) then
                 (que @ acc)
                 |> Exceptions.SolverLooped
                 |> Logging.logError log
@@ -165,7 +165,7 @@ module Solver =
                         |> List.append acc
                         |> loop (n + 1) tail
 
-        match vr with
+        match var with
         | None -> loop 0 eqs []
         | Some var ->
             eqs 

@@ -106,7 +106,12 @@ module Types =
         type Event =
             | EquationStartedSolving of Equation
             | EquationStartedCalculation of Variable list
-            | EquationCalculation of string
+            | EquationCalculation of
+                op1: (Variable -> Variable -> Variable) *
+                op2: (Variable -> Variable -> Variable) *
+                x: Variable *
+                y: Variable *
+                xs: Variable List
             | EquationCouldNotBeSolved of Equation
             | EquationFinishedCalculation of Variable list * Variable list
             | EquationVariableChanged of Variable

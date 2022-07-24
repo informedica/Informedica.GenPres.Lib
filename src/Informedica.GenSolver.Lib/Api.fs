@@ -69,9 +69,6 @@ module Api =
                 | None -> var
                 |> Some
 
-
-
-
     /// Solve an `Equations` list with
     ///
     /// * f: function used to process string message

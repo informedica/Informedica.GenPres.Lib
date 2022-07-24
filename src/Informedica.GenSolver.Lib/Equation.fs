@@ -235,7 +235,6 @@ module Equation =
         // helper functions
         let filter x xs = xs |> List.filter (Variable.eqName x >> not)
         let replAdd x xs = xs |> List.replaceOrAdd(Variable.eqName x) x
-        let calcToStr = calculationToString
 
         if eq |> isSolved then eq, Unchanged
         else
@@ -258,7 +257,7 @@ module Equation =
                         match xs |> filter x with
                         | [] -> x <== y 
                         | _  ->
-                            calcToStr op1 op2 x y xs
+                            (op1, op2, x, y, xs)
                             |> Events.EquationCalculation
                             |> Logging.logInfo log
 
@@ -276,7 +275,7 @@ module Equation =
                     |> Events.EquationStartedCalculation
                     |> Logging.logInfo log
 
-                    calcToStr op1 op1 y (xs |> List.head) (xs |> List.tail)
+                    (op1, op1, y, (xs |> List.head), (xs |> List.tail))
                     |> Events.EquationCalculation
                     |> Logging.logInfo log
                     let newY = y <== (xs |> List.reduce op1)

@@ -26,18 +26,18 @@ module Solver =
     | h::tail -> (h, tail) |> OrderSumEquation
     | _ -> "not a valid sum equation" |> failwith
     
-    [<Literal>]
-    let vals = "vals"
-    [<Literal>]
-    let minincl = "minincl"
-    [<Literal>]
-    let minexcl = "minexcl"
-    [<Literal>]
-    let incr = "incr"
-    [<Literal>]
-    let maxincl = "maxincl"
-    [<Literal>]
-    let maxexcl = "maxexcl"
+    //[<Literal>]
+    //let vals = "vals"
+    //[<Literal>]
+    //let minincl = "minincl"
+    //[<Literal>]
+    //let minexcl = "minexcl"
+    //[<Literal>]
+    //let incr = "incr"
+    //[<Literal>]
+    //let maxincl = "maxincl"
+    //[<Literal>]
+    //let maxexcl = "maxexcl"
 
 
     /// Create an `Equation` using a constructor **cr**
