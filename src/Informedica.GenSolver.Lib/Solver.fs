@@ -47,13 +47,6 @@ module Solver =
     /// contains an `Equation` **eq**
     let contains eq eqs = eqs |> List.exists ((=) eq)
 
-    /// The `Result` of solving an `Equation`
-    /// is that either the `Equation` is the 
-    /// same or has `Changed`.
-    type Result =
-        | UnChanged
-        | Changed   of Variable list
-
 
     /// Replace a list of `Variable` **vs**
     /// in a list of `Equation` **es**, return
@@ -73,19 +66,6 @@ module Solver =
             |> List.map (Equation.replace v)
         ) rpl
         , rst
-
-    /// Solve the equation `e` and return 
-    /// the set of equations `es` it belongs 
-    /// to either as `Changed` or `Unchanged`
-    let solveEquation log e = 
-
-        let changed = 
-            e 
-            |> Equation.solve log
-
-        if changed |> List.length > 0 then 
-            changed |> Changed 
-        else UnChanged
 
 
     let memSolve f =
@@ -111,7 +91,7 @@ module Solver =
     /// equation is solved
     let solve log sortQue vr eqs =
 
-        let solveE = solveEquation log
+        let solveE = Equation.solve log
             
         let rec loop n que acc =
             if n > ((que @ acc |> List.length) * 10) then
@@ -132,7 +112,7 @@ module Solver =
             match que with
             | [] -> 
                 match acc |> List.filter (Equation.check >> not) with
-                | []   -> acc
+                | []      -> acc
                 | invalid -> 
                     let msg =
                         invalid
@@ -148,15 +128,14 @@ module Solver =
                     [ eq ] 
                     |> List.append acc
                     |> loop (n + 1) tail
-
                 // Else go solve the equation
                 else
                     match eq |> solveE with
                     // Equation is changed, so every other equation can 
                     // be changed as well (if changed vars are in the other
                     // equations) so start new
-                    | Changed vars ->
-
+                    | eq, Changed cs ->
+                        let vars = cs |> List.map fst
                         let eq = [ eq ] |> replace vars |> fst
 
                         // find all eqs with vars in acc and put these back on que
@@ -180,7 +159,7 @@ module Solver =
 
                     // Equation did not in fact change, so put it to
                     // the accumulated equations and go on with the rest
-                    | UnChanged ->
+                    | eq, Unchanged ->
                         [eq] 
                         |> List.append acc
                         |> loop (n + 1) tail
