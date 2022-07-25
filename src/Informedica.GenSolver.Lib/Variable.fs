@@ -372,6 +372,11 @@ module Variable =
                 if s1 |> Set.isEmpty || s2 |> Set.isEmpty then
                     Exceptions.ValueRangeEmptyValueSet
                     |> Exceptions.raiseExc
+                // make sure the calculation doesn't take too long
+                if (s1 |> Set.count) + (s2 |> Set.count) > Constants.MAX_CALC_COUNT then
+                    (s1 |> Set.count) + (s2 |> Set.count)
+                    |> Exceptions.ValueRangeTooManyValues
+                    |> Exceptions.raiseExc
 
                 else
                     Seq.allPairs s1 s2
@@ -1486,16 +1491,14 @@ module Variable =
  
     /// Checks whether a `Variable` **v** is solved,
     /// i.e. there is but one possible value left.
-    let isSolved v =
-        (v |> count = 1) &&
-        (v |> getValueRange |> ValueRange.isValueSet)
-
+    let isSolved var =
+        (var |> getValueRange |> ValueRange.isValueSet) &&
+        (var |> count = 1)
 
     /// Checks whether a `Variable` is *solvable*
     /// i.e. can be further restricted to one value
     /// (or no values at all)
     let isSolvable = isSolved >> not
-
 
     /// Checks whether there are no restrictions to
     /// possible values a `Variable` can contain
@@ -1505,9 +1508,8 @@ module Variable =
     /// Apply the operator **op** to **v1** and **v2**
     /// return an intermediate *result* `Variable`.
     let calc op (v1, v2) =
-
-        (v1 |> getValueRange) |> op <| (v2 |> getValueRange) |> createRes
-
+        (v1 |> getValueRange) |> op <| (v2 |> getValueRange)
+        |> createRes
 
     /// Extend type with basic arrhythmic operations.
     type VariableCalc =

@@ -20,7 +20,12 @@ module Equation =
         exception EquationException of Exceptions.Message
 
         /// Raise an `EquationException` with `Message` `m`.
-        let raiseExc m = m |> EquationException |> raise
+        let raiseExc log m =
+            match log with
+            | Some log -> m |> Logging.logError log
+            | None -> ()
+
+            m |> EquationException |> raise
 
 
     module SolveResult =
@@ -70,12 +75,12 @@ module Equation =
     /// Create an `ProductEquation` with an **y** and
     /// **xs**. Fails if a variable is added more
     /// than one time raising an exception.
-    let createProductEqExc = createProductEq id Exception.raiseExc 
+    let createProductEqExc = createProductEq id (Exception.raiseExc None)
 
     /// Create an `SumEquation` with an **y** and
     /// **xs**. Fails if a variable is added more
     /// than one time raising an exception.
-    let createSumEqExc = createSumEq id Exception.raiseExc
+    let createSumEqExc = createSumEq id (Exception.raiseExc None)
 
     /// Apply **fp** to a `ProductEquation` and
     /// **fs** to a `SumEquation`.
@@ -247,54 +252,54 @@ module Equation =
                 | []  -> 
                     //(changed, xs)
                     //need to change this!
-                    ([], xs)
+                    (y::xs, changed)
                     |> Events.EquationFinishedCalculation
                     |> Logging.logInfo log
-
-                    changed, xs
+                    // return the result and wether this is changed
+                    xs, changed
                 | x::tail ->
                     let newX =
                         match xs |> filter x with
                         | [] -> x <== y 
                         | _  ->
-                            (op1, op2, x, y, xs)
-                            |> Events.EquationCalculation
-                            |> Logging.logInfo log
+                            if x |> Variable.isSolved then x
+                            else
+                                (op1, op2, x, y, xs)
+                                |> Events.EquationCalculation
+                                |> Logging.logInfo log
 
-                            x <== (y |> op2 <| (xs |> filter x |> List.reduce op1))
+                                x <== (y |> op2 <| (xs |> filter x |> List.reduce op1))
 
-                    x.Values <> newX.Values
+                    (changed || x.Values <> newX.Values)
                     |> calc op1 op2 y (xs |> replAdd newX) tail
-
             // op1 = (*) or (+) and op2 = (/) or (-)
-            let rec loop op1 op2 y xs =
-            
+            let rec loop op1 op2 y xs changed =
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
-                let yChanged, y =
+                let y, yChanged =
                     (y::xs)
                     |> Events.EquationStartedCalculation
                     |> Logging.logInfo log
 
-                    (op1, op1, y, (xs |> List.head), (xs |> List.tail))
-                    |> Events.EquationCalculation
-                    |> Logging.logInfo log
-                    let newY = y <== (xs |> List.reduce op1)
+                    if y |> Variable.isSolved then y, false
+                    else
+                        (op1, op1, y, (xs |> List.head), (xs |> List.tail))
+                        |> Events.EquationCalculation
+                        |> Logging.logInfo log
 
-                    newY.Values <> y.Values, newY
-            
+                        let newY = y <== (xs |> List.reduce op1)
+                        newY, newY.Values <> y.Values
                 // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
                 //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
                 //       etc..
-                let xChanged, xs = calc op1 op2 y xs xs false
-
+                let xs, xChanged = calc op1 op2 y xs xs false
                 // If something has changed restart until nothing changes anymore
-                if not (yChanged || xChanged) then (y, xs)
+                if not (yChanged || xChanged) then (y, xs, changed)
                 else
                     (false, y, xs, [])
                     |> Events.EquationLoopedSolving
                     |> Logging.logInfo log
-
-                    loop op1 op2 y xs
+                    // equation has changed so loop
+                    loop op1 op2 y xs true
             
             let y, xs, op1, op2 =
                 match eq with
@@ -305,39 +310,36 @@ module Equation =
             | [] -> eq, Unchanged
             | _  ->
                 try 
-                    loop op1 op2 y xs
-                    |> fun (y, xs) ->
-                        let changed =
-                            let vars = eq |> toVars
+                    loop op1 op2 y xs false
+                    |> fun (y, xs, isChanged) ->
+                        let result =
+                            // nothing has changed!
+                            if not isChanged then Unchanged
+                            // calculate the changes
+                            else
+                                let vars = eq |> toVars
 
-                            y::xs
-                            |> List.map (fun v2 ->
-                                vars
-                                |> List.find (Variable.eqName v2)
-                                |> fun v1 ->
-                                    v2, v2.Values
-                                    |> Variable.ValueRange.diffWith v1.Values
-                            )
-                            |> List.filter (snd >> Set.isEmpty >> not)
-                            |> Changed
+                                y::xs
+                                |> List.map (fun v2 ->
+                                    vars
+                                    |> List.find (Variable.eqName v2)
+                                    |> fun v1 ->
+                                        v2, v2.Values
+                                        |> Variable.ValueRange.diffWith v1.Values
+                                )
+                                |> List.filter (snd >> Set.isEmpty >> not)
+                                |> Changed
 
                         let eq =
                             match eq with
                             | ProductEquation _ -> createProductEqExc (y, xs)
-                            | SumEquation _ -> createSumEqExc (y, xs)
+                            | SumEquation _     -> createSumEqExc (y, xs)
 
-                        eq, changed
+                        eq, result
                 with
-                | Variable.Exceptions.VariableException m -> 
-                    m 
-                    |> Logging.logError log
-
-                    eq
-                    |> Events.EquationCouldNotBeSolved
-                    |> Logging.logWarning log
-
-                    m 
-                    |> Variable.Exceptions.raiseExc
+                | Variable.Exceptions.VariableException m
+                | Variable.ValueRange.Exceptions.ValueRangeException m -> 
+                    m |> Exception.raiseExc (Some log)
 
 
     module Dto =
@@ -375,7 +377,7 @@ module Equation =
         /// Create a `Dto` and raise an exception if it fails
         let fromDto dto =
             let succ = id
-            let fail = Exception.raiseExc
+            let fail = Exception.raiseExc None
 
             match dto.Vars |> Array.toList with
             | [] -> Exceptions.EquationEmptyVariableList |> fail

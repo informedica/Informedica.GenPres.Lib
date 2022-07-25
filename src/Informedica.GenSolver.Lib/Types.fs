@@ -113,7 +113,7 @@ module Types =
                 y: Variable *
                 xs: Variable List
             | EquationCouldNotBeSolved of Equation
-            | EquationFinishedCalculation of Variable list * Variable list
+            | EquationFinishedCalculation of Variable list * changed: bool
             | EquationVariableChanged of Variable
             | EquationFinishedSolving of Variable list
             | EquationLoopedSolving of
@@ -140,12 +140,13 @@ module Types =
             | ValueRangeMinLargerThanMax of Minimum * Maximum
             | ValueRangeNotAValidOperator
             | ValueRangeEmptyValueSet
+            | ValueRangeTooManyValues of int
             | ValueRangeEmptyIncrement
             | VariableCannotSetValueRange of (Variable * ValueRange)
             | EquationDuplicateVariables of Variable list
             | EquationEmptyVariableList
             | SolverInvalidEquations of Equation list
-            | SolverLooped of Equation list
+            | SolverTooManyLoops of Equation list
 
 
     module Logging =

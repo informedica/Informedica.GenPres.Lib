@@ -16,7 +16,12 @@ module Solver =
         exception SolverException of Exceptions.Message
 
         /// Raise an `EquationException` with `Message` `m`.
-        let raiseExc m = m |> SolverException |> raise
+        let raiseExc log m =
+            match log with
+            | Some log -> m |> Logging.logError log
+            | None -> ()
+
+            m |> SolverException |> raise
 
 
     let sortByName eqs =
@@ -94,14 +99,10 @@ module Solver =
         let solveE = Equation.solve log
             
         let rec loop n que acc =
-            if n > ((que @ acc |> List.length) * 1000) then
+            if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
                 (que @ acc)
-                |> Exceptions.SolverLooped
-                |> Logging.logError log
-
-                (que @ acc)
-                |> Exceptions.SolverLooped
-                |> Exception.raiseExc
+                |> Exceptions.SolverTooManyLoops
+                |> Exception.raiseExc (Some log)
 
             let que = que |> sortQue
 
@@ -114,12 +115,9 @@ module Solver =
                 match acc |> List.filter (Equation.check >> not) with
                 | []      -> acc
                 | invalid -> 
-                    let msg =
-                        invalid
-                        |> Exceptions.SolverInvalidEquations
-                    
-                    msg |> Logging.logError log
-                    msg |> Exception.raiseExc
+                    invalid
+                    |> Exceptions.SolverInvalidEquations
+                    |> Exception.raiseExc (Some log)
                 
             | eq::tail ->
                 // If the equation is already solved, or not solvable 

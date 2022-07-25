@@ -35,11 +35,13 @@ module SolverLogging =
         "A name cannot be a blank string"
     | Exceptions.VariableCannotSetValueRange (var, vlr) ->
         $"This variable:\n{var |> Variable.toString true}\ncannot be set with this range:{vlr |> ValueRange.toString true}\n"
-    | Exceptions.SolverLooped eqs ->
-        $"""The following equations are looped
+    | Exceptions.SolverTooManyLoops eqs ->
+        $"""The following equations are looped more than {Constants.MAX_LOOP_COUNT} times the equation list count
         {eqs |> List.map (Equation.toString true) |> String.concat "\n"}
         """
     | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
+    | Exceptions.ValueRangeTooManyValues c ->
+        $"Trying to calculate with {c} values, which is higher than the max calc count {Constants.MAX_CALC_COUNT}"
 
 
     let printMsg = function
@@ -56,13 +58,12 @@ module SolverLogging =
             $"calculating: {s}"
         | EquationStartedSolving eq -> 
             $"=== Start solving Equation ===\n{eq |> Equation.toString true}"
-        | EquationFinishedCalculation (changed, _) -> 
+        | EquationFinishedCalculation (xs, changed) -> 
             $"""=== Equation finished calculation ===
-            {changed |> List.map (Variable.getName >> Name.toString)
-                     |> String.concat ", "
-                     |> fun s ->
-                        if s |> String.isNullOrWhiteSpace then "No changed vars"
-                        else s
+            {
+                if (not changed) then "No changes"
+                else
+                    xs |> List.map (Variable.toString true) |> String.concat ", "
             }
             """
         | EquationVariableChanged var -> 

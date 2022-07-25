@@ -1,5 +1,4 @@
 
-
 // #I __SOURCE_DIRECTORY__
 // The above directive doesn't work anymore, instead
 // the fsi will silent cd to the present script directory
@@ -451,7 +450,7 @@ module Examples =
 
 
     // gentamicin
-    let gentamicinIV weight =
+    let gentamicinIV logger weight =
         let w = weight |> toBigRational
         {
             DrugOrder.drugOrder with
@@ -536,7 +535,7 @@ module Examples =
                     MaxTime = Some (1N/2N)
 
             }
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         |> printScenarios false ["gentamicin"]
 
 
@@ -546,15 +545,15 @@ Examples.cotrimoxazolDrink 3.4
 Examples.cotrimoxazolTablet 12.
 Examples.dopaminStandardConcentrations 7.4
 Examples.dopaminFixedRate 1.3
-Examples.gentamicinIV 20.
-
+Examples.gentamicinIV OrderLogger.logger.Logger 20.
 
 
 // Start the logger at an informative level
-logger.Start Level.Error
+logger.Start Level.Informative
 // report output to the fsi
 logger.Report ()
 
 // write results to the test.txt in this folder
 $"{__SOURCE_DIRECTORY__}/test.txt"
 |> logger.Write
+

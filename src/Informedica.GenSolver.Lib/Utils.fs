@@ -3,6 +3,14 @@ namespace Informedica.GenSolver.Lib
 [<AutoOpen>]
 module Utils =
 
+    module Constants =
+
+
+        let MAX_LOOP_COUNT = 100
+
+
+        let MAX_CALC_COUNT = 5000
+
 
     /// Helper functions for `BigRational`
     [<RequireQualifiedAccess>]

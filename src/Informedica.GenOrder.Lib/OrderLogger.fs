@@ -46,8 +46,8 @@ module OrderLogger =
 
     // Catches a message and will dispatch this to the appropiate
     // print function
-    let printMsg (msg : IMessage) = 
-        match msg with
+    let printMsg (msg : Informedica.GenSolver.Lib.Types.Logging.Message) = 
+        match msg.Message with
         | :? SolverMessage as m -> 
             m 
             |> SolverLogging.printMsg
@@ -75,6 +75,10 @@ module OrderLogger =
 
     let noLogger : Logger = { Log = ignore }
 
+
+    let printLogger : Logger = { Log = (printMsg >> (printfn "%s")) }
+
+
     // Create the logger agent 
     let logger =
 
@@ -93,9 +97,13 @@ module OrderLogger =
                                 ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
                                 |> loop timer level
 
-                        | Received m -> 
-                            if m.Level = level then
+                        | Received m ->
+                            match level with
+                            | Level.Informative ->
                                 msgs.Add(timer.Elapsed.TotalSeconds, m)
+                            | _ when m.Level = level ->
+                                msgs.Add(timer.Elapsed.TotalSeconds, m)
+                            | _ -> ()
                             return! loop timer level msgs
 
                         | Report ->
@@ -106,7 +114,7 @@ module OrderLogger =
                             
                             msgs 
                             |> Seq.iteri (fun i (t, m) ->
-                                m.Message
+                                m
                                 |> printMsg
                                 |> function 
                                 | s when s |> String.IsNullOrEmpty -> ()
@@ -119,7 +127,7 @@ module OrderLogger =
                         | Write path ->
                             msgs 
                             |> Seq.iteri (fun i (t, m) ->
-                                m.Message
+                                m
                                 |> printMsg
                                 |> function 
                                 | s when s |> String.IsNullOrEmpty -> ()

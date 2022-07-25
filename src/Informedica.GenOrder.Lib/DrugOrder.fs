@@ -70,6 +70,8 @@ module DrugOrder =
 
         let vals vs = vs |> Set.ofSeq |> Property.createValsProp
 
+        let toString = Property.toString true
+
 
     module DrugConstraint =
 
@@ -105,7 +107,7 @@ module DrugOrder =
 
 
         let toString (c : DrugConstraint) =
-            sprintf "%A %A %A %A" c.Name c.Mapping c.Property
+            $"{c.Name} {c.Mapping} {c.Property |> Props.toString}"
 
 
         let constraints n =
@@ -159,9 +161,6 @@ module DrugOrder =
                 // Max dose rate is 200 ml/hour
                 c OrderableDoseRate (Props.maxIncl 200N) NoLimit
                   OralFluid ContinuousOrder
-                // Max dose rate per kg is 5 ml/kg/hour
-                c OrderableDoseRate (Props.maxIncl 5N) NoLimit
-                  OralFluid ContinuousOrder
                 // Set dose rate values
                 c OrderableDoseRate (Props.vals dr) NoLimit
                   OralFluid ContinuousOrder
@@ -181,8 +180,8 @@ module DrugOrder =
                 // Give max 20 ml/kg each time
                 c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 20N) NoLimit
                   IntravenousFluid TimedOrder
-                // Select 1 possible value from dose rates
-                c OrderableDoseRate (Property.createValsProp dr) (MinLim 10)
+                // Set dose rate values
+                c OrderableDoseRate (Property.createValsProp dr) NoLimit
                   IntravenousFluid TimedOrder
                 // == Intravenuous Fluid ==
                 // == Continuous ==
