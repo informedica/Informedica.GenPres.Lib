@@ -444,7 +444,7 @@ module Order =
         c.Items
         |> Seq.collect (fun i ->
             i.ComponentConcentration
-            |> Concentration.toValueUnitStringList None
+            |> Concentration.toValueUnitStringList (Some 1)
             |> Seq.map (fun (_, s) ->
                 $"{s} {i.Name |> Name.toString}"
             )
@@ -456,7 +456,7 @@ module Order =
         o.Orderable.Components
         |> Seq.map (fun c ->
             c.OrderableQuantity
-            |> Quantity.toValueUnitStringList None
+            |> Quantity.toValueUnitStringList (Some 1)
             |> Seq.map (fun (_, q) ->
                 $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
             )
@@ -469,7 +469,7 @@ module Order =
         |> Dose.get
         |> fun (qt, _, _) ->
             qt
-            |> Quantity.toValueUnitStringList None
+            |> Quantity.toValueUnitStringList (Some 2)
             |> Seq.map snd
             |> String.concat ""
 
@@ -514,13 +514,13 @@ module Order =
                 o
                 |> printItem 
                     (fun i -> i.Dose |> Dose.get |> (fun (dq, _, _) -> dq))
-                    (VariableUnit.Quantity.toValueUnitStringList None)
+                    (VariableUnit.Quantity.toValueUnitStringList (Some 3))
 
             let dt =
                 o
                 |> printItem 
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
-                    (VariableUnit.TotalAdjust.toValueUnitStringList None)
+                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
 
             let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
             let a = $"{fr} {o |> printOrderableDoseQuantity}"
@@ -535,13 +535,13 @@ module Order =
                 |> Dose.get 
                 |> fun (_, _, dr) ->
                     dr
-                    |> Rate.toValueUnitStringList None
+                    |> Rate.toValueUnitStringList (Some 1)
                     |> Seq.map snd
                     |> String.concat ""
 
             let oq =
                 o.Orderable.OrderableQuantity
-                |> Quantity.toValueUnitStringList None
+                |> Quantity.toValueUnitStringList (Some 2)
                 |> Seq.map snd
                 |> String.concat ""
 
@@ -549,7 +549,7 @@ module Order =
                 o
                 |> printItem
                     (fun i -> i.OrderableQuantity)
-                    (Quantity.toValueUnitStringList None)
+                    (Quantity.toValueUnitStringList (Some 2))
 
             let dr =
                 o
@@ -583,7 +583,7 @@ module Order =
                 |> Dose.get 
                 |> fun (_, _, dr) ->
                     dr
-                    |> Rate.toValueUnitStringList None
+                    |> Rate.toValueUnitStringList (Some 1)
                     |> Seq.map snd
                     |> String.concat ""
 
@@ -591,13 +591,13 @@ module Order =
                 o
                 |> printItem 
                     (fun i -> i.Dose |> Dose.get |> (fun (dq, _, _) -> dq))
-                    (VariableUnit.Quantity.toValueUnitStringList None)
+                    (VariableUnit.Quantity.toValueUnitStringList (Some 3))
 
             let dt =
                 o
                 |> printItem 
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
-                    (VariableUnit.TotalAdjust.toValueUnitStringList None)
+                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
 
             let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"  
             let d = o |> printComponentQuantity

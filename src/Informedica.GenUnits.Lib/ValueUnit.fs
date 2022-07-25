@@ -580,6 +580,14 @@ module ValueUnit =
                 | _ -> (u1, OpPer, u2) |> CombiUnit
             | OpTimes ->
                 match u1, u2 with
+                | _ when u1 |> Group.eqsGroup count &&
+                         u2 |> Group.eqsGroup count ->
+                    let v1 = u1 |> getUnitValue
+                    let v2 = u2 |> getUnitValue
+                    match v1, v2 with
+                    | Some x1, Some x2 ->
+                        u1 |> setUnitValue (x1 * x2)
+                    | _ -> u1
                 | _ when u1 |> Group.eqsGroup count ->
                     let v1 = u1 |> getUnitValue
                     let v2 = u2 |> getUnitValue
@@ -588,14 +596,6 @@ module ValueUnit =
                         u2 |> setUnitValue (x1 * x2)
                     | _ -> u2
                 | _ when u2 |> Group.eqsGroup count ->
-                    let v1 = u1 |> getUnitValue
-                    let v2 = u2 |> getUnitValue
-                    match v1, v2 with
-                    | Some x1, Some x2 ->
-                        u1 |> setUnitValue (x1 * x2)
-                    | _ -> u1
-                | _ when u1 |> Group.eqsGroup count &&
-                         u2 |> Group.eqsGroup count ->
                     let v1 = u1 |> getUnitValue
                     let v2 = u2 |> getUnitValue
                     match v1, v2 with
@@ -719,7 +719,7 @@ module ValueUnit =
                     match ds with
                     | [] -> (b, u)
                     | _ ->
-                        // TODO Was the List.rev needed here (times is comutative?)
+                        // TODO Was the List.rev needed here (times is commutative?)
                         let d = ds |> List.reduce times
                         if u = NoUnit then
                             Count(Times 1N) |> per d
@@ -729,6 +729,7 @@ module ValueUnit =
                     if ds |> List.exists (Group.eqsGroup h) then
                         build tail (ds |> List.removeFirst (Group.eqsGroup h)) (true, u)
                     else
+                        let b = b || ((u |> Group.eqsGroup count) || (h |> Group.eqsGroup count)) 
                         if u = NoUnit then h
                         else u |> times h
                         |> fun u -> build tail ds (b, u)

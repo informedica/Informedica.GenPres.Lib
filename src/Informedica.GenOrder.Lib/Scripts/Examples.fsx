@@ -92,23 +92,6 @@ module Examples =
         |> printScenarios false ["paracetamol"]
 
 
-    let printItemConcentration = Order.printItemConcentration
-    open Informedica.GenSolver.Lib.Variable
-
-    let printComponentQuantity o =
-        o.Orderable.Components
-        |> Seq.map (fun c ->
-            $"mapping component: %A{c.OrderableQuantity}" |> printfn "%s"
-            c.OrderableQuantity
-            |> Quantity.toValueUnitStringList None
-            |> fun xs -> $"ValueUnit string list:\n%A{xs}" |> printfn "%s"; xs
-            |> Seq.map (fun (_, q) ->
-                $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
-            )
-            |> String.concat ""
-        ) |> String.concat " + "
-
-
     let cotrimoxazolTablet weight =
         let w = weight |> toBigRational
 
@@ -175,11 +158,6 @@ module Examples =
                     MaxDoseTotalAdjust = Some 6N
             }
         |> DrugOrder.evaluate logger.Logger
-        |> fun xs ->
-            xs |> List.iteri (fun i x -> 
-                x |> printComponentQuantity |> (printfn "%i. %s" (i + 1))
-            )
-            xs
         |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
 
 
@@ -231,8 +209,6 @@ module Examples =
         |> DrugOrder.evaluate logger.Logger
         //|> List.length
         |> printScenarios false ["paracetamol"]
-
-
 
     // Drug with multiple items
     // cotrimoxazol drink for infection
@@ -292,8 +268,6 @@ module Examples =
         |> DrugOrder.evaluate logger.Logger
         //|> List.length
         |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
-
-
     
     // Dopamin infusion calculate scenario's 
     // with a number of standard solutions
@@ -448,7 +422,6 @@ module Examples =
         |> DrugOrder.evaluate logger.Logger
         |> printScenarios false ["dopamin"]
 
-
     // gentamicin
     let gentamicinIV logger weight =
         let w = weight |> toBigRational
@@ -456,7 +429,7 @@ module Examples =
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "gentamicin"
-                Quantities = [ 50N ]
+                Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
                 Divisible = 1N 
                 Unit = "ml"
                 TimeUnit = "day"
@@ -531,7 +504,7 @@ module Examples =
                     MinConcentration = Some 1N
                     MaxConcentration = Some 2N
                     DoseCount = Some (1N)
-                    //MinTime = (Some (1N/2N))
+                    MinTime = Some (1N/4N)
                     MaxTime = Some (1N/2N)
 
             }
@@ -545,7 +518,7 @@ Examples.cotrimoxazolDrink 3.4
 Examples.cotrimoxazolTablet 12.
 Examples.dopaminStandardConcentrations 7.4
 Examples.dopaminFixedRate 1.3
-Examples.gentamicinIV OrderLogger.logger.Logger 20.
+Examples.gentamicinIV OrderLogger.logger.Logger 50.
 
 
 // Start the logger at an informative level
