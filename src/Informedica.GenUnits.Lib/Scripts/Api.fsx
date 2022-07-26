@@ -22,6 +22,7 @@ let vu =
 //|> ValueUnit.toStringEngShort
 vu
 |> ValueUnit.simplify
+|> ValueUnit.toStringEngShort
 |> ignore
 
 
@@ -33,4 +34,10 @@ Api.eval "1 piece[General]/kg[Weight]/day[Time]"
 4. / (2. / 2.)
 
 // (mg / kg) * (x / day) = mg / kg * day = mg / kg / day
+
+Api.eval "100 mg[Mass]/1 kg[Weight]"
+|> fun vu ->
+    vu / (Api.eval "1 day[Time]/1 times[Count]")
+    |> ValueUnit.simplify
+    |> ValueUnit.toStringEngShort
 

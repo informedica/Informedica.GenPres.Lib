@@ -164,12 +164,23 @@ module Solver =
                         |> loop (n + 1) tail
 
         match var with
-        | None -> loop 0 eqs []
+        | None -> (eqs, [])
         | Some var ->
             eqs 
             |> replace [var]
-            |> function 
-            | (rpl, rst) -> loop 0 rpl rst
+        |> function 
+        | (rpl, rst) ->
+            rpl
+            |> Events.SolverStartSolving
+            |> Logging.logInfo log
+
+            loop 0 rpl rst
+            |> fun eqs ->
+                eqs
+                |> Events.SolverFinishedSolving
+                |> Logging.logInfo log
+
+                eqs
             
     
     let solve log sortQue vr eqs =

@@ -12,6 +12,9 @@ module SolverLogging =
     module Name = Variable.Name
     module ValueRange = Variable.ValueRange
 
+    let private eqsToStr (eqs : Equation list) =
+        $"""{eqs |> List.map (Equation.toString true) |> String.concat "\n"}"""
+
     let printException = function
     | Exceptions.ValueRangeEmptyValueSet -> 
         "ValueRange cannot have an empty value set"
@@ -68,10 +71,19 @@ module SolverLogging =
             """
         | EquationVariableChanged var -> 
             $"=== Equation Variable changed ===\n{var |> Variable.toString true}"
-        | EquationFinishedSolving vars -> ""
+        | EquationFinishedSolving (eq, b) ->
+            $"""=== Equation Finished Solving ===
+{eq |> Equation.toString true}
+{b |> Equation.SolveResult.toString}
+"""
         | EquationLoopedSolving (b, var, changed, vars) -> 
-            "=== Equation loop solving"
-        | SolverLoopedQue eqs -> ""
+            "=== Equation loop solving ==="
+        | SolverStartSolving eqs ->
+            $"=== Solver Start Solving ===\n{eqs |> eqsToStr}"
+        | SolverFinishedSolving eqs ->
+            $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
+        | SolverLoopedQue eqs ->
+            $"=== Solver looped que\nwith {eqs |> List.length} equations"
         | ConstraintSortOrder cs -> 
             $"""=== Constraint sort order ===
             { cs |> List.map (fun (i, c) ->

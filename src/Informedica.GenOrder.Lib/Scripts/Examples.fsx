@@ -512,8 +512,8 @@ module Examples =
         |> printScenarios false ["gentamicin"]
 
 
-Examples.paracetamolDrink 3.
 Examples.paracetamolSupp 5.
+Examples.paracetamolDrink 3.
 Examples.cotrimoxazolDrink 3.4
 Examples.cotrimoxazolTablet 12.
 Examples.dopaminStandardConcentrations 7.4

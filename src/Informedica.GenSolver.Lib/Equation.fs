@@ -250,7 +250,6 @@ module Equation =
 
                 match rest with 
                 | []  -> 
-                    //(changed, xs)
                     //need to change this!
                     (y::xs, changed)
                     |> Events.EquationFinishedCalculation
@@ -334,6 +333,10 @@ module Equation =
                             match eq with
                             | ProductEquation _ -> createProductEqExc (y, xs)
                             | SumEquation _     -> createSumEqExc (y, xs)
+
+                        (eq, result)
+                        |> Events.EquationFinishedSolving
+                        |> Logging.logInfo log
 
                         eq, result
                 with

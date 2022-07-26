@@ -106,6 +106,7 @@ module Types =
         type Event =
             | EquationStartedSolving of Equation
             | EquationStartedCalculation of Variable list
+            | EquationFinishedCalculation of Variable list * changed : bool
             | EquationCalculation of
                 op1: (Variable -> Variable -> Variable) *
                 op2: (Variable -> Variable -> Variable) *
@@ -113,15 +114,16 @@ module Types =
                 y: Variable *
                 xs: Variable List
             | EquationCouldNotBeSolved of Equation
-            | EquationFinishedCalculation of Variable list * changed: bool
             | EquationVariableChanged of Variable
-            | EquationFinishedSolving of Variable list
+            | EquationFinishedSolving of Equation * SolveResult
             | EquationLoopedSolving of
                 bool *
                 Variable *
                 Variable list *
                 Variable list
+            | SolverStartSolving of Equation list
             | SolverLoopedQue of Equation list
+            | SolverFinishedSolving of Equation list
             | ConstraintSortOrder of (int * Constraint) list
             | ConstraintVariableNotFound of Constraint * Equation list
             | ConstraintLimitSetToVariable of Limit * Variable
