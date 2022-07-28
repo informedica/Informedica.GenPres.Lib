@@ -105,22 +105,22 @@ module Types =
 
         type Event =
             | EquationStartedSolving of Equation
-            | EquationStartedCalculation of Variable list
-            | EquationFinishedCalculation of Variable list * changed : bool
+//            | EquationStartedCalculation of Variable list
             | EquationCalculation of
                 op1: (Variable -> Variable -> Variable) *
                 op2: (Variable -> Variable -> Variable) *
                 x: Variable *
                 y: Variable *
                 xs: Variable List
+//            | EquationVariableChanged of Variable
+            | EquationFinishedCalculation of Variable list * changed : bool
             | EquationCouldNotBeSolved of Equation
-            | EquationVariableChanged of Variable
             | EquationFinishedSolving of Equation * SolveResult
-            | EquationLoopedSolving of
-                bool *
-                Variable *
-                Variable list *
-                Variable list
+            //| EquationLoopedSolving of
+            //    bool *
+            //    Variable *
+            //    Variable list *
+            //    Variable list
             | SolverStartSolving of Equation list
             | SolverLoopedQue of Equation list
             | SolverFinishedSolving of Equation list

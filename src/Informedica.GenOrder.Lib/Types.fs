@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 open System
 open MathNet.Numerics
@@ -369,6 +369,16 @@ module Types =
             DoseCount : BigRational option
             MinTime : BigRational option
             MaxTime : BigRational option
+        }
+
+
+    type Scenario =
+        {
+            No : int
+            Route : string
+            Prescription : string
+            Preparation : string
+            Administration : string
         }
 
 

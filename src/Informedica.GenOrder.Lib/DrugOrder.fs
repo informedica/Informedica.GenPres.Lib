@@ -141,7 +141,7 @@ module DrugOrder =
                 // == Discontinuous ==
                 // give the total orderable quantity each time
                 c OrderableDoseCount (Props.singleVal 1N) NoLimit 
-                    OralFluid DiscontinuousOrder
+                    AnyRouteShape DiscontinuousOrder
                 // give max 500 ml each time
                 c OrderableDoseQty (Props.maxIncl 500N) NoLimit 
                   OralFluid DiscontinuousOrder

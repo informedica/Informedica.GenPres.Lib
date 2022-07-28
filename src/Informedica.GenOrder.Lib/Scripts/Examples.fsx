@@ -42,7 +42,7 @@ module Examples =
 
     let paracetamolSupp weight =
         let w = weight |> toBigRational
-
+        let logger = OrderLogger.logger.Logger
         // Paracetamol supp example
         // First define the drug order
         {
@@ -88,12 +88,13 @@ module Examples =
                     MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
             }
         |> DrugOrder.setAdjust "paracetamol" w          // Now calculate the scenarios for 10 kg
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         |> printScenarios false ["paracetamol"]
 
 
     let cotrimoxazolTablet weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
 
         // Drug with multiple items
         // cotrimoxazol for infection
@@ -157,13 +158,15 @@ module Examples =
                     MaxDoseTotal = Some 320N
                     MaxDoseTotalAdjust = Some 6N
             }
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
 
 
     // Paracetamol drink
     let paracetamolDrink weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
+
         {
             DrugOrder.drugOrder with
                 Id = "1"
@@ -206,7 +209,7 @@ module Examples =
                     MinDoseTotalAdjust = Some 40N
                     MaxDoseTotalAdjust = Some 90N
             }
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         //|> List.length
         |> printScenarios false ["paracetamol"]
 
@@ -214,6 +217,8 @@ module Examples =
     // cotrimoxazol drink for infection
     let cotrimoxazolDrink weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
+
         {
             DrugOrder.drugOrder with
                 Id = "1"
@@ -265,7 +270,7 @@ module Examples =
                     MaxDoseTotalAdjust = Some 30N
             }
         |> DrugOrder.setAdjust "cotrimoxazol" w
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         //|> List.length
         |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
     
@@ -273,6 +278,8 @@ module Examples =
     // with a number of standard solutions
     let dopaminStandardConcentrations weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
+
         {
             DrugOrder.drugOrder with
                 Id = "1"
@@ -342,7 +349,7 @@ module Examples =
                     MinDoseRateAdjust = Some 2N
                     MaxDoseRateAdjust = Some 20N
             }
-        |> DrugOrder.evaluate { Log = ignore } //logger.Logger
+        |> DrugOrder.evaluate logger
         //|> Order.calcScenarios2
         |> printScenarios false ["dopamin"]
 
@@ -350,6 +357,7 @@ module Examples =
     // with a a fixed infusion - dose rate
     let dopaminFixedRate weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
         {
             DrugOrder.drugOrder with
                 Id = "1"
@@ -419,12 +427,13 @@ module Examples =
                     MaxDoseRateAdjust = Some 20N
             }
         |> DrugOrder.setAdjust "dopamin infusion" w
-        |> DrugOrder.evaluate logger.Logger
+        |> DrugOrder.evaluate logger
         |> printScenarios false ["dopamin"]
 
     // gentamicin
     let gentamicinIV logger weight =
         let w = weight |> toBigRational
+        let logger = OrderLogger.logger.Logger
         {
             DrugOrder.drugOrder with
                 Id = "1"
@@ -518,7 +527,7 @@ Examples.cotrimoxazolDrink 3.4
 Examples.cotrimoxazolTablet 12.
 Examples.dopaminStandardConcentrations 7.4
 Examples.dopaminFixedRate 1.3
-Examples.gentamicinIV OrderLogger.logger.Logger 50.
+Examples.gentamicinIV 50.
 
 
 // Start the logger at an informative level

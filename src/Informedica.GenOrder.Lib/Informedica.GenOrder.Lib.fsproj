@@ -20,6 +20,8 @@
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
     <Compile Include="OrderLogger.fs" />
+    <Compile Include="Demo.fs" />
+    <None Include="Scripts\Demo.fsx" />
     <None Include="Scripts\Examples.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>

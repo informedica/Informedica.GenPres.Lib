@@ -12,37 +12,51 @@ module SolverLogging =
     module Name = Variable.Name
     module ValueRange = Variable.ValueRange
 
-    let private eqsToStr (eqs : Equation list) =
+
+    let private eqsToStr eqs =
         $"""{eqs |> List.map (Equation.toString true) |> String.concat "\n"}"""
+
+
+    let private varsToStr vars =
+        $"""{vars |> List.map (Variable.toString true) |> String.concat ", "}"""
+
 
     let printException = function
     | Exceptions.ValueRangeEmptyValueSet -> 
         "ValueRange cannot have an empty value set"
+
     | Exceptions.EquationEmptyVariableList -> 
         "An equation should at least contain one variable"
+
     | Exceptions.SolverInvalidEquations eqs ->
-        $"""The following equations are invalid
-        {eqs |> List.map (Equation.toString true) |> String.concat "\n"}
-        """
+        $"The following equations are invalid {eqs |> eqsToStr} "
+
     | Exceptions.ValueRangeMinLargerThanMax (min, max) ->
         $"{min} is larger than {max}"
+
     | Exceptions.ValueRangeNotAValidOperator ->
         "The value range operator was invalid or unknown"
-    | Exceptions.EquationDuplicateVariables vrs ->
+
+    | Exceptions.EquationDuplicateVariables vars ->
         $"""The list of variables for the equation contains duplicates
-        {vrs |> List.map (Variable.getName >> Name.toString) |> String.concat ", "}
-        """
+{vars |> List.map (Variable.getName >> Name.toString) |> String.concat ", "}
+"""
+
     | Exceptions.NameLongerThan1000 s ->
         $"This name contains more than 1000 chars: {s}"
+
     | Exceptions.NameNullOrWhiteSpaceException ->
         "A name cannot be a blank string"
+
     | Exceptions.VariableCannotSetValueRange (var, vlr) ->
         $"This variable:\n{var |> Variable.toString true}\ncannot be set with this range:{vlr |> ValueRange.toString true}\n"
+
     | Exceptions.SolverTooManyLoops eqs ->
         $"""The following equations are looped more than {Constants.MAX_LOOP_COUNT} times the equation list count
-        {eqs |> List.map (Equation.toString true) |> String.concat "\n"}
-        """
+{eqs |> eqsToStr}
+"""
     | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
+
     | Exceptions.ValueRangeTooManyValues c ->
         $"Trying to calculate with {c} values, which is higher than the max calc count {Constants.MAX_CALC_COUNT}"
 
@@ -55,35 +69,33 @@ module SolverLogging =
         match m with
         | EquationCouldNotBeSolved eq -> 
             $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}" 
-        | EquationStartedCalculation vars -> ""
+
         | EquationCalculation (op1, op2, y, x, xs) ->
-            let s = Equation.calculationToString op1 op2 y x xs
-            $"calculating: {s}"
+            $"calculating: {Equation.calculationToString op1 op2 y x xs}"
+
         | EquationStartedSolving eq -> 
             $"=== Start solving Equation ===\n{eq |> Equation.toString true}"
+
         | EquationFinishedCalculation (xs, changed) -> 
             $"""=== Equation finished calculation ===
-            {
-                if (not changed) then "No changes"
-                else
-                    xs |> List.map (Variable.toString true) |> String.concat ", "
-            }
-            """
-        | EquationVariableChanged var -> 
-            $"=== Equation Variable changed ===\n{var |> Variable.toString true}"
+{if (not changed) then "No changes" else xs |> varsToStr}
+"""
+
         | EquationFinishedSolving (eq, b) ->
             $"""=== Equation Finished Solving ===
 {eq |> Equation.toString true}
 {b |> Equation.SolveResult.toString}
 """
-        | EquationLoopedSolving (b, var, changed, vars) -> 
-            "=== Equation loop solving ==="
+
         | SolverStartSolving eqs ->
             $"=== Solver Start Solving ===\n{eqs |> eqsToStr}"
+
         | SolverFinishedSolving eqs ->
             $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
+
         | SolverLoopedQue eqs ->
             $"=== Solver looped que\nwith {eqs |> List.length} equations"
+
         | ConstraintSortOrder cs -> 
             $"""=== Constraint sort order ===
             { cs |> List.map (fun (i, c) ->
@@ -94,6 +106,7 @@ module SolverLogging =
             |> String.concat "\n"
             }
             """
+
         | ConstraintVariableNotFound (c, eqs) -> 
             $"""=== Constraint Variable not found ===
             {c
@@ -107,6 +120,7 @@ module SolverLogging =
             }
             """
         | ConstraintLimitSetToVariable (l, var) -> ""
+
         | ConstraintVariableApplied (c, var) -> 
             $"""=== Constraint apply Variable ===
             {c
@@ -118,6 +132,7 @@ module SolverLogging =
                 |> sprintf "%s apply to %s" s
             }
             """
+
         | ConstrainedEquationsSolved (c, eqs) -> 
             $"""=== Equations solved ===
             {c 
@@ -132,7 +147,9 @@ module SolverLogging =
             }
             """
         | ApiSetVariable (var, eqs) -> ""
+
         | ApiEquationsSolved eqs -> ""
+
         | ApiAppliedConstraints (cs, eqs) -> ""
 
 

@@ -368,8 +368,7 @@ module Order =
             with
             | e -> 
                 e.ToString()
-                |> sprintf "could not solve %A: %A\n%s" v n 
-                |> failwith
+                |> printfn "could not solve %A: %A\n%s" v n 
                 None
 
         let smallest o =
@@ -522,11 +521,11 @@ module Order =
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
                     (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
 
-            let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
-            let a = $"{fr} {o |> printOrderableDoseQuantity}"
-            let d = o |> printComponentQuantity
+            let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
+            let adm = $"{fr} {o |> printOrderableDoseQuantity}"
+            let prep = $"{o |> printComponentQuantity}"
 
-            p, a, d
+            pres, prep, adm
 
         | Prescription.Continuous ->
             // infusion rate
@@ -557,11 +556,11 @@ module Order =
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, _, dr) -> dr))
                     (VariableUnit.RateAdjust.toValueUnitStringList (Some 2))
 
-            let p = $"""{sn |> String.concat " + "} {dr}"""
-            let a = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
-            let d = o |> printComponentQuantity
+            let pres = $"""{sn |> String.concat " + "} {dr}"""
+            let adm = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
+            let prep = o |> printComponentQuantity
         
-            p, a, d
+            pres, prep, adm
 
         | Prescription.Timed (fr, tme) ->
 
@@ -599,11 +598,11 @@ module Order =
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
                     (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
 
-            let p = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"  
-            let d = o |> printComponentQuantity
-            let a = $"{fr} {o |> printOrderableDoseQuantity} in {tme}, {rt}"
+            let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"  
+            let prep = o |> printComponentQuantity
+            let adm = $"{fr} {o |> printOrderableDoseQuantity} in {tme}, {rt}"
 
-            p, a, d
+            pres, prep, adm
  
 
         | Prescription.Process ->

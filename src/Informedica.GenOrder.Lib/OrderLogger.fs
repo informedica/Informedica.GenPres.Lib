@@ -141,7 +141,7 @@ module OrderLogger =
                     }
                 
                 let timer = Stopwatch.StartNew()
-                loop timer Level.Error msgs
+                loop timer Level.Informative msgs
             
         {
             Start = 

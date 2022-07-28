@@ -244,13 +244,12 @@ module Equation =
         if eq |> isSolved then eq, Unchanged
         else
             let rec calc op1 op2 y xs rest changed =
-                (y::xs)
-                |> Events.EquationStartedCalculation
-                |> Logging.logInfo log
+                //(y::xs)
+                //|> Events.EquationStartedCalculation
+                //|> Logging.logInfo log
 
                 match rest with 
                 | []  -> 
-                    //need to change this!
                     (y::xs, changed)
                     |> Events.EquationFinishedCalculation
                     |> Logging.logInfo log
@@ -275,9 +274,9 @@ module Equation =
             let rec loop op1 op2 y xs changed =
                 // Calculate y = x1 op1 x2 op1 .. op1 xn
                 let y, yChanged =
-                    (y::xs)
-                    |> Events.EquationStartedCalculation
-                    |> Logging.logInfo log
+                    //(y::xs)
+                    //|> Events.EquationStartedCalculation
+                    //|> Logging.logInfo log
 
                     if y |> Variable.isSolved then y, false
                     else
@@ -286,7 +285,12 @@ module Equation =
                         |> Logging.logInfo log
 
                         let newY = y <== (xs |> List.reduce op1)
-                        newY, newY.Values <> y.Values
+                        let yChanged = newY.Values <> y.Values 
+                        (newY::xs, yChanged)
+                        |> Events.EquationFinishedCalculation
+                        |> Logging.logInfo log
+
+                        newY, yChanged
                 // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
                 //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
                 //       etc..
@@ -294,9 +298,9 @@ module Equation =
                 // If something has changed restart until nothing changes anymore
                 if not (yChanged || xChanged) then (y, xs, changed)
                 else
-                    (false, y, xs, [])
-                    |> Events.EquationLoopedSolving
-                    |> Logging.logInfo log
+                    //(false, y, xs, [])
+                    //|> Events.EquationLoopedSolving
+                    //|> Logging.logInfo log
                     // equation has changed so loop
                     loop op1 op2 y xs true
             
