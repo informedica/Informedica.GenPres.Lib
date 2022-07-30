@@ -6,7 +6,7 @@
 
 #load "../../../src/Informedica.GenUnits.Lib/Scripts/load.fsx"
 
-#load "../ValueUnit.fs"
+#load "../Tests.fs"
 
 open Expecto
 open Expecto.Flip
