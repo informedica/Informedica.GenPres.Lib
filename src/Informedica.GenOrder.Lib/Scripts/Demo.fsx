@@ -8,9 +8,19 @@ open Informedica.GenOrder.Lib
 Demo.getIndications ()
 
 
+Examples.listOrders ()
+
+
 Demo.create
-    50.
-    "behandeling PJP"
+    15.
+    "chronische pijn"
+    None
+    None
+
+
+Demo.create
+    30.
+    "behandeling PJP > 5 jaar"
     None //(Some "cotrimoxazol")
     None //(Some "intraveneus")
 
@@ -21,25 +31,6 @@ Demo.create
     None
     None //(Some "intraveneus")
 
-
-let doseIV w =
-    Demo.filterIndications
-        "acute pijn/post operatief"
-        (Some "paracetamol")
-        (Some "intraveneus")
-    |> List.head
-    |> fun (_, _, _, d, c) -> c w d
-
-let doseOR w =
-    Demo.filterIndications
-        "acute pijn/post operatief"
-        (Some "paracetamol")
-        (Some "oraal")
-    |> List.head
-    |> fun (_, _, _, d, c) -> c w d
-
-doseIV 10.
-doseOR 10.
 
 
 OrderLogger.logger.Start Informedica.GenSolver.Lib.Types.Logging.Level.Informative

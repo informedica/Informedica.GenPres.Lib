@@ -48,8 +48,485 @@ module Examples =
             |> failwith
 
 
+    let setDoses doses o =
+        doses
+        |> List.fold (fun acc dose ->
+            acc
+            |> DrugOrder.setDoseLimits dose
+        ) o
+        
+
+    let orders =
+        [
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "paracetamol"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "paracetamol"
+                                    Quantities = [ 100N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "paracetamol"
+                                                    Concentrations = [ 24N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "drink"
+                    Route = "or"
+                    OrderType = DiscontinuousOrder
+            }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "paracetamol"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "paracetamol"
+                                    Quantities = [ 1N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "paracetamol"
+                                                    Concentrations = 
+                                                        [ 60N; 120N; 240N; 500N; 1000N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "piece"
+                    TimeUnit = "day"
+                    Shape = "supp"
+                    Route = "rect"
+                    OrderType = DiscontinuousOrder
+            }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "paracetamol"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "paracetamol"
+                                    Quantities = [ 100N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "paracetamol"
+                                                    Concentrations = 
+                                                        [ 10N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    OrderType = DiscontinuousOrder
+            }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "cotrimoxazol"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "cotrimoxazol"
+                                    Quantities = [ 1N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sulfamethoxazol"
+                                                    Concentrations = 
+                                                        [ 100N; 400N; 800N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "trimethoprim"
+                                                    Concentrations = 
+                                                        [ 20N; 80N; 160N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "piece"
+                    TimeUnit = "day"
+                    Shape = "tablet"
+                    Route = "or"
+                    OrderType = DiscontinuousOrder
+            }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "cotrimoxazol"
+                    Divisible = 2N
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "cotrimoxazol"
+                                    Quantities = [ 1N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sulfamethoxazol"
+                                                    Concentrations = 
+                                                        [ 40N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "trimethoprim"
+                                                    Concentrations = 
+                                                        [ 8N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "drink"
+                    Route = "or"
+                    OrderType = DiscontinuousOrder
+            }
+            
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "cotrimoxazol"
+                    Divisible = 2N
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "cotrimoxazol"
+                                    Quantities = [ 5N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sulfamethoxazol"
+                                                    Concentrations = 
+                                                        [ 80N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "trimethoprim"
+                                                    Concentrations = 
+                                                        [ 16N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "proplyleenglycol"
+                                                    Concentrations = 
+                                                        [ 410N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    OrderType = DiscontinuousOrder
+            }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "dopamin infusion"
+                    Quantities = [ 50N ]
+                    Divisible = 1N
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "dopamin"
+                                    Quantities = [ 5N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "dopamin"
+                                                    Concentrations = [ 40N ]
+                                                    OrderableQuantities = [ 80N; 200N; 400N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mcg"
+                                                    TimeUnit = "min"
+                                            }
+                                        ]
+
+                            }
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "saline"
+                                    Quantities = [ 5000N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sodium"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "chloride"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+                        ]
+                    OrderType = ContinuousOrder
+            }
+            
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "dopamin infusion"
+                    Quantities = [ 50N ]
+                    Divisible = 1N
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "dopamin"
+                                    Quantities = [ 5N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "dopamin"
+                                                    Concentrations = [ 40N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mcg"
+                                                    TimeUnit = "min"
+                                            }
+                                        ]
+
+                            }
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "saline"
+                                    Quantities = [ 5000N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sodium"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "chloride"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+                        ]
+                    OrderType = ContinuousOrder
+            }
+            
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "gentamicin"
+                    Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
+                    Divisible = 1N 
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "gentamicin"
+                                    Quantities = [ 2N; 10N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "gentamicin"
+                                                    Concentrations = [ 10N; 40N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "saline"
+                                    Quantities = [ 5000N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sodium"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "chloride"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+
+                        ]
+                    OrderType = TimedOrder
+                }
+
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "cotrimoxazol (Rokiprim)"
+                    Divisible = 2N
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "cotrimoxazol"
+                                    Quantities = [ 5N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sulfamethoxazol"
+                                                    Concentrations = 
+                                                        [ 80N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "trimethoprim"
+                                                    Concentrations = 
+                                                        [ 16N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusion fluid"
+                    Route = "iv"
+                    OrderType = DiscontinuousOrder
+            }
+        ]
+
+
+    let listOrders () =
+        orders
+        |> List.map (fun o ->
+            o.Name, o.Shape, o.Route
+        )
+
+
+    let getOrders n r =
+        orders
+        |> List.filter (fun o -> o.Name = n && o.Route = r)
+
+
     // Paracetamol drink
-    let paracetamolDrink weight dose =
+    let paracetamolDrink weight doses =
         let w = weight |> toBigRational
 
         {
@@ -84,11 +561,22 @@ module Examples =
         }
         |> DrugOrder.create
         |> DrugOrder.setAdjust "paracetamol" w
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> evaluate ["paracetamol"]
 
+    /// calculate the scenarios for a drug order
+    /// o with substancenames ns and doses doses
+    let calculate weight ns doses o =
+        let w = weight |> toBigRational
 
-    let paracetamolSupp weight dose =
+        o
+        |> DrugOrder.create
+        |> DrugOrder.setAdjust o.Name w
+        |> setDoses doses
+        |> evaluate ns
+
+
+    let paracetamolSupp weight doses =
         let w = weight |> toBigRational
 
         // Paracetamol supp example
@@ -125,12 +613,12 @@ module Examples =
                 OrderType = DiscontinuousOrder
         }
         |> DrugOrder.create 
-        |> DrugOrder.setDoseLimits dose
         |> DrugOrder.setAdjust "paracetamol" w          // Now calculate the scenarios for 10 kg
+        |> setDoses doses
         |> evaluate ["paracetamol"]
 
 
-    let paracetamolIV weight dose =
+    let paracetamolIV weight doses =
         let w = weight |> toBigRational
 
         // Paracetamol supp example
@@ -167,12 +655,12 @@ module Examples =
                 OrderType = DiscontinuousOrder
         }
         |> DrugOrder.create 
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setAdjust "paracetamol" w          // Now calculate the scenarios for 10 kg
         |> evaluate ["paracetamol"]
 
 
-    let cotrimoxazolTablet weight dose =
+    let cotrimoxazolTablet weight doses =
         let w = weight |> toBigRational
 
         // Drug with multiple items
@@ -218,23 +706,13 @@ module Examples =
                 OrderType = DiscontinuousOrder
         }
         |> DrugOrder.create
-        // setting dose limits for infection
-        |> DrugOrder.setDoseLimits
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 2N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 1600N
-                    MaxDoseTotalAdjust = Some 30N
-            }
         |> DrugOrder.setAdjust "cotrimoxazol" w
-        // is not be necessary when a single product is chosen
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> evaluate ["sulfamethoxazol"; "trimethoprim"]
 
     // Drug with multiple items
     // cotrimoxazol drink for infection
-    let cotrimoxazolDrink weight dose =
+    let cotrimoxazolDrink weight doses =
         let w = weight |> toBigRational
 
         {
@@ -279,15 +757,14 @@ module Examples =
                 OrderType = DiscontinuousOrder
         }
         |> DrugOrder.create
-        // setting dose limits for infection
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setAdjust "cotrimoxazol" w
         |> evaluate ["sulfamethoxazol"; "trimethoprim"]
     
 
     // Drug with multiple items
     // cotrimoxazol drink for infection
-    let cotrimoxazolIV weight dose =
+    let cotrimoxazolIV weight doses =
         let w = weight |> toBigRational
 
         {
@@ -342,20 +819,14 @@ module Examples =
         }
         |> DrugOrder.create
         // setting dose limits for infection
-        |> DrugOrder.setDoseLimits
-            { DrugOrder.doseLimits with
-                Name = "cotrimoxazol"
-                SubstanceName = "proplyleenglycol"
-                MaxDoseTotalAdjust = Some 50N
-            }
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setAdjust "cotrimoxazol" w
         |> evaluate ["sulfamethoxazol"; "trimethoprim"]
 
 
     // Drug with multiple items
     // cotrimoxazol drink for infection
-    let cotrimoxazolRokiIV weight dose =
+    let cotrimoxazolRokiIV weight doses =
         let w = weight |> toBigRational
 
         {
@@ -401,13 +872,13 @@ module Examples =
         }
         |> DrugOrder.create
         // setting dose limits for infection
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setAdjust "cotrimoxazol" w
         |> evaluate ["sulfamethoxazol"; "trimethoprim"]
 
     // Dopamin infusion calculate scenario's 
     // with a number of standard solutions
-    let dopaminStandardConcentrations weight dose =
+    let dopaminStandardConcentrations weight doses =
         let w = weight |> toBigRational
 
         {
@@ -472,12 +943,12 @@ module Examples =
         }
         |> DrugOrder.create
         |> DrugOrder.setAdjust "dopamin infusion" w
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> evaluate ["dopamin"]
 
     // Dopamin infusion calculate scenario's 
     // with a a fixed infusion - dose rate
-    let dopaminFixedRate weight dose =
+    let dopaminFixedRate weight doses =
         let w = weight |> toBigRational
 
         {
@@ -540,12 +1011,12 @@ module Examples =
                 OrderType = ContinuousOrder
         }
         |> DrugOrder.create
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setAdjust "dopamin infusion" w
         |> evaluate ["dopamin"]
 
     // gentamicin
-    let gentamicinIV weight dose =
+    let gentamicinIV weight doses =
         let w = weight |> toBigRational
 
         {
@@ -610,7 +1081,7 @@ module Examples =
             }
         |> DrugOrder.create
         |> DrugOrder.setAdjust "gentamicin" w
-        |> DrugOrder.setDoseLimits dose
+        |> setDoses doses
         |> DrugOrder.setSolutionLimits 
             {
                 DrugOrder.solutionLimits with
@@ -645,178 +1116,240 @@ module Demo =
 
     let indications =
         [
-            "chronische pijn", "paracetamol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "paracetamol"
-                    Frequencies = [ 3N; 4N ]            // Allowed frequencies are 3 or 4 per day
-                    SubstanceName = "paracetamol"
-                    MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-                    MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
-                    MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
-                    MaxDoseTotalAdjust = Some 70N       // Max adjusted daily dose = 70 mg/kg/day
-            }, Examples.paracetamolDrink
+            "chronische pijn", "paracetamol", "oraal",[
+                {   DrugOrder.doseLimits with
+                        Name = "paracetamol"
+                        Frequencies = [ 3N; 4N ]            // Allowed frequencies are 3 or 4 per day
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
+                        MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
+                        MaxDoseTotalAdjust = Some 70N       // Max adjusted daily dose = 70 mg/kg/day
+                }
+            ], [ "paracetamol" ]
 
-            "chronische pijn", "paracetamol", "rectaal",
-            {   DrugOrder.doseLimits with
-                    Name = "paracetamol"
-                    Frequencies = [ 3N; 4N ]            // Allowed frequencies are 3 or 4 per day
-                    SubstanceName = "paracetamol"
-                    MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-                    MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
-                    MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
-                    MaxDoseTotalAdjust = Some 70N       // Max adjusted daily dose = 70 mg/kg/day
-            }, Examples.paracetamolSupp
+            "chronische pijn", "paracetamol", "rectaal", [
+                {   DrugOrder.doseLimits with
+                        Name = "paracetamol"
+                        Frequencies = [ 3N; 4N ]            // Allowed frequencies are 3 or 4 per day
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
+                        MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
+                        MaxDoseTotalAdjust = Some 70N       // Max adjusted daily dose = 70 mg/kg/day
+                }
+            ], [ "paracetamol" ]
 
-            "acute pijn/post operatief", "paracetamol", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "paracetamol"
-                    Frequencies = [ 4N ]            // Allowed frequencies are 3 or 4 per day
-                    SubstanceName = "paracetamol"
-                    MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-                    MaxDoseTotal = Some 4000N           // Max daily dose = 3000 mg/day
-                    MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
-                    MaxDoseTotalAdjust = Some 60N       // Max adjusted daily dose = 70 mg/kg/day
-            }, Examples.paracetamolIV
+            "acute pijn/post operatief", "paracetamol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "paracetamol"
+                        Frequencies = [ 4N ]            // Allowed frequencies are 3 or 4 per day
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 4000N           // Max daily dose = 3000 mg/day
+                        MinDoseTotalAdjust = Some 50N       // Min adjusted dose = 50 mg/kg/day
+                        MaxDoseTotalAdjust = Some 60N       // Max adjusted daily dose = 70 mg/kg/day
+                }
+            ], [ "paracetamol" ]
 
-            "acute pijn/post operatief", "paracetamol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "paracetamol"
-                    Frequencies = [ 4N ]            // Allowed frequencies are 3 or 4 per day
-                    SubstanceName = "paracetamol"
-                    MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-                    MaxDoseTotal = Some 4000N           // Max daily dose = 3000 mg/day
-                    MinDoseTotalAdjust = Some 70N       // Min adjusted dose = 50 mg/kg/day
-                    MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 70 mg/kg/day
-            }, Examples.paracetamolDrink
+            "acute pijn/post operatief", "paracetamol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "paracetamol"
+                        Frequencies = [ 4N ]            // Allowed frequencies are 3 or 4 per day
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 4000N           // Max daily dose = 3000 mg/day
+                        MinDoseTotalAdjust = Some 70N       // Min adjusted dose = 50 mg/kg/day
+                        MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 70 mg/kg/day
+                }
+            ], [ "paracetamol" ]
 
-            "acute pijn/post operatief", "paracetamol", "rectaal",
-            {   DrugOrder.doseLimits with
-                    Name = "paracetamol"
-                    Frequencies = [ 3N ]            // Allowed frequencies are 3 or 4 per day
-                    SubstanceName = "paracetamol"
-                    MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-                    MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
-                    MinDoseTotalAdjust = Some 70N       // Min adjusted dose = 50 mg/kg/day
-                    MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 70 mg/kg/day
-            }, Examples.paracetamolSupp
+            "acute pijn/post operatief", "paracetamol", "rectaal", [
+                {   DrugOrder.doseLimits with
+                        Name = "paracetamol"
+                        Frequencies = [ 3N ]            // Allowed frequencies are 3 or 4 per day
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 3000N           // Max daily dose = 3000 mg/day
+                        MinDoseTotalAdjust = Some 70N       // Min adjusted dose = 50 mg/kg/day
+                        MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 70 mg/kg/day
+                }
+            ], [ "paracetamol" ]
 
-            "bloeddruk verhoging", "dopamin", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "dopamin infusion"
-                    Rates = [ 1N ]
-                    SubstanceName = "dopamin"
-                    MinDoseRateAdjust = Some 2N
-                    MaxDoseRateAdjust = Some 20N
-            }, Examples.dopaminStandardConcentrations
+            "bloeddruk verhoging", "dopamin", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "dopamin infusion"
+                        Rates = [ 1N ]
+                        SubstanceName = "dopamin"
+                        MinDoseRateAdjust = Some 2N
+                        MaxDoseRateAdjust = Some 20N
+                }
+            ], [ "dopamin" ]
 
-            "bloeddruk verhoging", "dopamin", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "dopamin infusion"
-                    Rates = [ 1N ]
-                    SubstanceName = "dopamin"
-                    MinDoseRateAdjust = Some 2N
-                    MaxDoseRateAdjust = Some 20N
-            }, Examples.dopaminFixedRate
+            "bloeddruk verhoging", "dopamin", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "dopamin infusion"
+                        Rates = [ 1N ]
+                        SubstanceName = "dopamin"
+                        MinDoseRateAdjust = Some 2N
+                        MaxDoseRateAdjust = Some 20N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "infecties", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
+            "infecties", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 2N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 1600N
+                        MinDoseTotalAdjust = Some 25N
+                        MaxDoseTotalAdjust = Some 35N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "infecties", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 2N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 1600N
+                        MinDoseTotalAdjust = Some 25N
+                        MaxDoseTotalAdjust = Some 35N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "infecties < 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 2N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 1600N
+                        MinDoseTotalAdjust = Some 25N
+                        MaxDoseTotalAdjust = Some 35N
+                }
+
+                { DrugOrder.doseLimits with
                     Name = "cotrimoxazol"
-                    Frequencies = [ 2N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 1600N
-                    MinDoseTotalAdjust = Some 25N
-                    MaxDoseTotalAdjust = Some 35N
-            }, Examples.cotrimoxazolDrink
+                    SubstanceName = "proplyleenglycol"
+                    MaxDoseTotalAdjust = Some 50N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "infecties", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
+            "infecties < 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 2N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 1600N
+                        MinDoseTotalAdjust = Some 25N
+                        MaxDoseTotalAdjust = Some 35N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "infecties >= 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 2N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 1600N
+                        MinDoseTotalAdjust = Some 25N
+                        MaxDoseTotalAdjust = Some 35N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "behandeling PJP", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 3N; 4N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 4800N
+                        MinDoseTotalAdjust = Some 90N
+                        MaxDoseTotalAdjust = Some 100N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "behandeling PJP", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 3N; 4N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 4800N
+                        MinDoseTotalAdjust = Some 90N
+                        MaxDoseTotalAdjust = Some 100N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
+
+            "behandeling PJP < 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 3N; 4N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 4800N
+                        MinDoseTotalAdjust = Some 90N
+                        MaxDoseTotalAdjust = Some 100N
+                }
+
+                { DrugOrder.doseLimits with
                     Name = "cotrimoxazol"
-                    Frequencies = [ 2N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 1600N
-                    MinDoseTotalAdjust = Some 25N
-                    MaxDoseTotalAdjust = Some 35N
-            }, Examples.cotrimoxazolTablet
+                    SubstanceName = "proplyleenglycol"
+                    MaxDoseTotalAdjust = Some 50N
+                }
 
-            "infecties", "cotrimoxazol", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 2N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 1600N
-                    MinDoseTotalAdjust = Some 25N
-                    MaxDoseTotalAdjust = Some 35N
-            }, Examples.cotrimoxazolIV
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "behandeling PJP", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 3N; 4N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 4800N
-                    MinDoseTotalAdjust = Some 90N
-                    MaxDoseTotalAdjust = Some 100N
-            }, Examples.cotrimoxazolDrink
+            "behandeling PJP > 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 3N; 4N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 4800N
+                        MinDoseTotalAdjust = Some 90N
+                        MaxDoseTotalAdjust = Some 100N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "behandeling PJP", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 3N; 4N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 4800N
-                    MinDoseTotalAdjust = Some 90N
-                    MaxDoseTotalAdjust = Some 100N
-            }, Examples.cotrimoxazolTablet
+            "behandeling PJP < 5 jaar", "cotrimoxazol", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 3N; 4N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 4800N
+                        MinDoseTotalAdjust = Some 90N
+                        MaxDoseTotalAdjust = Some 100N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "behandeling PJP", "cotrimoxazol", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 3N; 4N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 4800N
-                    MinDoseTotalAdjust = Some 90N
-                    MaxDoseTotalAdjust = Some 100N
-            }, Examples.cotrimoxazolIV
+            "profylaxe", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 1N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 800N
+                        MinDoseTotalAdjust = Some 15N
+                        MaxDoseTotalAdjust = Some 25N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "behandeling PJP", "cotrimoxazol", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 3N; 4N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 4800N
-                    MinDoseTotalAdjust = Some 90N
-                    MaxDoseTotalAdjust = Some 100N
-            }, Examples.cotrimoxazolRokiIV
+            "profylaxe", "cotrimoxazol", "oraal", [
+                {   DrugOrder.doseLimits with
+                        Name = "cotrimoxazol"
+                        Frequencies = [ 1N ]
+                        SubstanceName = "sulfamethoxazol"
+                        MaxDoseTotal = Some 800N
+                        MinDoseTotalAdjust = Some 15N
+                        MaxDoseTotalAdjust = Some 25N
+                }
+            ], ["sulfamethoxazol"; "trimethoprim"]
 
-            "profylaxe", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 1N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 800N
-                    MinDoseTotalAdjust = Some 15N
-                    MaxDoseTotalAdjust = Some 25N
-            }, Examples.cotrimoxazolDrink
-
-            "profylaxe", "cotrimoxazol", "oraal",
-            {   DrugOrder.doseLimits with
-                    Name = "cotrimoxazol"
-                    Frequencies = [ 1N ]
-                    SubstanceName = "sulfamethoxazol"
-                    MaxDoseTotal = Some 800N
-                    MinDoseTotalAdjust = Some 15N
-                    MaxDoseTotalAdjust = Some 25N
-            }, Examples.cotrimoxazolTablet
-
-
-            "ernstige infecties", "gentamicine", "intraveneus",
-            {   DrugOrder.doseLimits with
-                    Name = "gentamicin"
-                    Frequencies = [ 1N ]
-                    SubstanceName = "gentamicin"
-                    MinDoseTotalAdjust = Some (65N/10N)
-                    MaxDoseTotalAdjust = Some (75N/10N)
-            }, Examples.gentamicinIV
+            "ernstige infecties", "gentamicin", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "gentamicin"
+                        Frequencies = [ 1N ]
+                        SubstanceName = "gentamicin"
+                        MinDoseTotalAdjust = Some (65N/10N)
+                        MaxDoseTotalAdjust = Some (75N/10N)
+                }
+            ], [ "gentamicin" ]
 
         ]
 
@@ -848,11 +1381,21 @@ module Demo =
         )
 
 
+    let mapRoute = function
+        | s when s = "oraal" -> "or"
+        | s when s = "intraveneus" -> "iv"
+        | s when s = "rectaal" -> "rect"
+        | _ -> ""
+
+
     let create w ind med route =
         filterIndications ind med route
-        |> List.collect (fun (_, _, r, d, c) ->
+        |> List.collect (fun (_, m, r, d, ns) ->
             try
-                c w d
+                r
+                |> mapRoute
+                |> Examples.getOrders m 
+                |> List.collect (Examples.calculate w ns d)
                 |> List.map (fun sc -> { sc with Route = r })
             with
             | _ -> []
