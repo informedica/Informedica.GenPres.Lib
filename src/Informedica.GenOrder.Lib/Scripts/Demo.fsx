@@ -16,6 +16,7 @@ Demo.create
     "chronische pijn"
     None
     None
+|> List.iter (printfn "%s")
 
 
 Demo.create
@@ -23,6 +24,7 @@ Demo.create
     "behandeling PJP > 5 jaar"
     None //(Some "cotrimoxazol")
     None //(Some "intraveneus")
+|> List.iter (printfn "%s")
 
 
 Demo.create
@@ -30,6 +32,7 @@ Demo.create
     "bloeddruk verhoging"
     None
     None //(Some "intraveneus")
+|> List.iter (printfn "%s")
 
 
 

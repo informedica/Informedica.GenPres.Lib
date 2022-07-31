@@ -15,6 +15,7 @@ module Examples =
     module Units = ValueUnit.Units
     module DrugConstraint = DrugOrder.DrugConstraint
     module Quantity = VariableUnit.Quantity
+    module Name = Informedica.GenSolver.Lib.Variable.Name
 
     open OrderLogger
 
@@ -27,6 +28,8 @@ module Examples =
             |> fun (pres, prep, adm) ->
                 {
                     No = i
+                    Name = o.Orderable.Name |> Name.toString
+                    Shape = o.Orderable.Shape
                     Route = ""
                     Prescription = pres
                     Preparation = prep
@@ -84,7 +87,7 @@ module Examples =
                         ]
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "drink"
+                    Shape = "drank"
                     Route = "or"
                     OrderType = DiscontinuousOrder
             }
@@ -116,7 +119,7 @@ module Examples =
                         ]
                     Unit = "piece"
                     TimeUnit = "day"
-                    Shape = "supp"
+                    Shape = "zetpil"
                     Route = "rect"
                     OrderType = DiscontinuousOrder
             }
@@ -148,7 +151,7 @@ module Examples =
                         ]
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     OrderType = DiscontinuousOrder
             }
@@ -231,7 +234,7 @@ module Examples =
                         ]
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "drink"
+                    Shape = "drank"
                     Route = "or"
                     OrderType = DiscontinuousOrder
             }
@@ -282,7 +285,7 @@ module Examples =
                         ]
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     OrderType = DiscontinuousOrder
             }
@@ -290,25 +293,25 @@ module Examples =
             {
                 DrugOrder.drugOrder with
                     Id = "1"
-                    Name = "dopamin infusion"
+                    Name = "dopamine infusion"
                     Quantities = [ 50N ]
                     Divisible = 1N
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     Products = 
                         [
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "dopamin"
+                                    Name = "dopamine"
                                     Quantities = [ 5N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "dopamin"
+                                                    Name = "dopamine"
                                                     Concentrations = [ 40N ]
                                                     OrderableQuantities = [ 80N; 200N; 400N ]
                                                     Unit = "mg"
@@ -320,14 +323,14 @@ module Examples =
                             }
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "saline"
+                                    Name = "NaCl 0,9%"
                                     Quantities = [ 5000N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "sodium"
+                                                    Name = "natrium"
                                                     Concentrations = [ 155N / 1000N ]
                                                     Unit = "mmol"
                                                     DoseUnit = "mmol"
@@ -351,25 +354,25 @@ module Examples =
             {
                 DrugOrder.drugOrder with
                     Id = "1"
-                    Name = "dopamin infusion"
+                    Name = "dopamine infusion"
                     Quantities = [ 50N ]
                     Divisible = 1N
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     Products = 
                         [
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "dopamin"
+                                    Name = "dopamine"
                                     Quantities = [ 5N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "dopamin"
+                                                    Name = "dopamine"
                                                     Concentrations = [ 40N ]
                                                     Unit = "mg"
                                                     DoseUnit = "mcg"
@@ -380,14 +383,14 @@ module Examples =
                             }
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "saline"
+                                    Name = "NaCl 0,9%"
                                     Quantities = [ 5000N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "sodium"
+                                                    Name = "natrium"
                                                     Concentrations = [ 155N / 1000N ]
                                                     Unit = "mmol"
                                                     DoseUnit = "mmol"
@@ -416,7 +419,7 @@ module Examples =
                     Divisible = 1N 
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     Products = 
                         [
@@ -440,14 +443,14 @@ module Examples =
                             }
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "saline"
+                                    Name = "NaCl 0,9%"
                                     Quantities = [ 5000N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "sodium"
+                                                    Name = "natrium"
                                                     Concentrations = [ 155N / 1000N ]
                                                     Unit = "mmol"
                                                     DoseUnit = "mmol"
@@ -506,7 +509,7 @@ module Examples =
                         ]
                     Unit = "ml"
                     TimeUnit = "day"
-                    Shape = "infusion fluid"
+                    Shape = "infusievloeistof"
                     Route = "iv"
                     OrderType = DiscontinuousOrder
             }
@@ -522,10 +525,14 @@ module Examples =
 
     let getOrders n r =
         orders
-        |> List.filter (fun o -> o.Name = n && o.Route = r)
+        |> List.filter (fun o ->
+            (o.Name = n  ||
+            o.Products
+            |> List.exists (fun p -> p.Name = n)) && o.Route = r
+        )
 
 
-    // Paracetamol drink
+    // Paracetamol drank
     let paracetamolDrink weight doses =
         let w = weight |> toBigRational
 
@@ -555,7 +562,7 @@ module Examples =
                     ]
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "drink"
+                Shape = "drank"
                 Route = "or"
                 OrderType = DiscontinuousOrder
         }
@@ -579,7 +586,7 @@ module Examples =
     let paracetamolSupp weight doses =
         let w = weight |> toBigRational
 
-        // Paracetamol supp example
+        // Paracetamol zetpil example
         // First define the drug order
         {
             DrugOrder.drugOrder with
@@ -608,7 +615,7 @@ module Examples =
                     ]
                 Unit = "piece"
                 TimeUnit = "day"
-                Shape = "supp"
+                Shape = "zetpil"
                 Route = "rect"
                 OrderType = DiscontinuousOrder
         }
@@ -621,7 +628,7 @@ module Examples =
     let paracetamolIV weight doses =
         let w = weight |> toBigRational
 
-        // Paracetamol supp example
+        // Paracetamol zetpil example
         // First define the drug order
         {
             DrugOrder.drugOrder with
@@ -650,7 +657,7 @@ module Examples =
                     ]
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 OrderType = DiscontinuousOrder
         }
@@ -711,7 +718,7 @@ module Examples =
         |> evaluate ["sulfamethoxazol"; "trimethoprim"]
 
     // Drug with multiple items
-    // cotrimoxazol drink for infection
+    // cotrimoxazol drank for infection
     let cotrimoxazolDrink weight doses =
         let w = weight |> toBigRational
 
@@ -752,7 +759,7 @@ module Examples =
                     ]
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "drink"
+                Shape = "drank"
                 Route = "or"
                 OrderType = DiscontinuousOrder
         }
@@ -763,7 +770,7 @@ module Examples =
     
 
     // Drug with multiple items
-    // cotrimoxazol drink for infection
+    // cotrimoxazol drank for infection
     let cotrimoxazolIV weight doses =
         let w = weight |> toBigRational
 
@@ -813,7 +820,7 @@ module Examples =
                     ]
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 OrderType = DiscontinuousOrder
         }
@@ -825,7 +832,7 @@ module Examples =
 
 
     // Drug with multiple items
-    // cotrimoxazol drink for infection
+    // cotrimoxazol drank for infection
     let cotrimoxazolRokiIV weight doses =
         let w = weight |> toBigRational
 
@@ -866,7 +873,7 @@ module Examples =
                     ]
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 OrderType = DiscontinuousOrder
         }
@@ -884,25 +891,25 @@ module Examples =
         {
             DrugOrder.drugOrder with
                 Id = "1"
-                Name = "dopamin infusion"
+                Name = "dopamine infusion"
                 Quantities = [ 50N ]
                 Divisible = 1N
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 Products = 
                     [
                         { 
                             DrugOrder.productComponent with
-                                Name = "dopamin"
+                                Name = "dopamine"
                                 Quantities = [ 5N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "dopamin"
+                                                Name = "dopamine"
                                                 Concentrations = [ 40N ]
                                                 OrderableQuantities = [ 80N; 200N; 400N ]
                                                 Unit = "mg"
@@ -914,14 +921,14 @@ module Examples =
                         }
                         { 
                             DrugOrder.productComponent with
-                                Name = "saline"
+                                Name = "NaCl 0,9%"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "sodium"
+                                                Name = "natrium"
                                                 Concentrations = [ 155N / 1000N ]
                                                 Unit = "mmol"
                                                 DoseUnit = "mmol"
@@ -942,9 +949,9 @@ module Examples =
                 OrderType = ContinuousOrder
         }
         |> DrugOrder.create
-        |> DrugOrder.setAdjust "dopamin infusion" w
+        |> DrugOrder.setAdjust "dopamine infusion" w
         |> setDoses doses
-        |> evaluate ["dopamin"]
+        |> evaluate ["dopamine"]
 
     // Dopamin infusion calculate scenario's 
     // with a a fixed infusion - dose rate
@@ -954,25 +961,25 @@ module Examples =
         {
             DrugOrder.drugOrder with
                 Id = "1"
-                Name = "dopamin infusion"
+                Name = "dopamine pomp"
                 Quantities = [ 50N ]
                 Divisible = 1N
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 Products = 
                     [
                         { 
                             DrugOrder.productComponent with
-                                Name = "dopamin"
+                                Name = "dopamine"
                                 Quantities = [ 5N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "dopamin"
+                                                Name = "dopamine"
                                                 Concentrations = [ 40N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mcg"
@@ -983,14 +990,14 @@ module Examples =
                         }
                         { 
                             DrugOrder.productComponent with
-                                Name = "saline"
+                                Name = "NaCl 0,9%"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "sodium"
+                                                Name = "natrium"
                                                 Concentrations = [ 155N / 1000N ]
                                                 Unit = "mmol"
                                                 DoseUnit = "mmol"
@@ -1012,8 +1019,8 @@ module Examples =
         }
         |> DrugOrder.create
         |> setDoses doses
-        |> DrugOrder.setAdjust "dopamin infusion" w
-        |> evaluate ["dopamin"]
+        |> DrugOrder.setAdjust "dopamine infusion" w
+        |> evaluate ["dopamine"]
 
     // gentamicin
     let gentamicinIV weight doses =
@@ -1022,25 +1029,25 @@ module Examples =
         {
             DrugOrder.drugOrder with
                 Id = "1"
-                Name = "gentamicin"
+                Name = "gentamicine"
                 Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
                 Divisible = 1N 
                 Unit = "ml"
                 TimeUnit = "day"
-                Shape = "infusion fluid"
+                Shape = "infusievloeistof"
                 Route = "iv"
                 Products = 
                     [
                         { 
                             DrugOrder.productComponent with
-                                Name = "gentamicin"
+                                Name = "gentamicine"
                                 Quantities = [ 2N; 10N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "gentamicin"
+                                                Name = "gentamicine"
                                                 Concentrations = [ 10N; 40N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -1051,14 +1058,14 @@ module Examples =
                         }
                         { 
                             DrugOrder.productComponent with
-                                Name = "saline"
+                                Name = "NaCl 0,9%"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
                                         {
                                             DrugOrder.substanceItem with
-                                                Name = "sodium"
+                                                Name = "natrium"
                                                 Concentrations = [ 155N / 1000N ]
                                                 Unit = "mmol"
                                                 DoseUnit = "mmol"
@@ -1085,8 +1092,8 @@ module Examples =
         |> DrugOrder.setSolutionLimits 
             {
                 DrugOrder.solutionLimits with
-                    Name = "gentamicin"
-                    Component = "gentamicin"
+                    Name = "gentamicine"
+                    Component = "gentamicine"
                     MinConcentration = Some 1N
                     MaxConcentration = Some 2N
                     DoseCount = Some (1N)
@@ -1176,25 +1183,25 @@ module Demo =
                 }
             ], [ "paracetamol" ]
 
-            "bloeddruk verhoging", "dopamin", "intraveneus", [
+            "bloeddruk verhoging", "dopamine", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "dopamin infusion"
+                        Name = "dopamine infusion"
                         Rates = [ 1N ]
-                        SubstanceName = "dopamin"
+                        SubstanceName = "dopamine"
                         MinDoseRateAdjust = Some 2N
                         MaxDoseRateAdjust = Some 20N
                 }
-            ], [ "dopamin" ]
+            ], [ "dopamine" ]
 
-            "bloeddruk verhoging", "dopamin", "intraveneus", [
+            "bloeddruk verhoging", "dopamine", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "dopamin infusion"
+                        Name = "dopamine infusion"
                         Rates = [ 1N ]
-                        SubstanceName = "dopamin"
+                        SubstanceName = "dopamine"
                         MinDoseRateAdjust = Some 2N
                         MaxDoseRateAdjust = Some 20N
                 }
-            ], ["sulfamethoxazol"; "trimethoprim"]
+            ], ["dopamine"]
 
             "infecties", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
@@ -1388,6 +1395,28 @@ module Demo =
         | _ -> ""
 
 
+    let translate sc : Scenario =
+        let trans s =
+            s
+            |> String.replace "day" "dag"
+            |> String.replace "hour" "uur"
+            |> String.replace "piece" "stuk"
+            
+        { sc with
+            Prescription = sc.Prescription |> trans
+            Preparation =sc.Preparation |> trans
+            Administration =sc.Administration |> trans
+        }
+
+    let toString (sc : Scenario) =
+        $""""
+{sc.No}. {sc.Name} {sc.Shape} {sc.Route}
+Voorschrift: {sc.Prescription}
+Bereiding: {sc.Preparation}
+Toediening: {sc.Administration}
+"""
+
+
     let create w ind med route =
         filterIndications ind med route
         |> List.collect (fun (_, m, r, d, ns) ->
@@ -1401,4 +1430,6 @@ module Demo =
             | _ -> []
         )
         |> List.distinct
+        |> List.map translate
         |> List.mapi (fun i sc -> { sc with No = i + 1 })
+        |> List.map toString

@@ -522,8 +522,8 @@ module Order =
                     (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
 
             let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
-            let adm = $"{fr} {o |> printOrderableDoseQuantity}"
             let prep = $"{o |> printComponentQuantity}"
+            let adm = $"{fr} {o |> printOrderableDoseQuantity}"
 
             pres, prep, adm
 
@@ -557,8 +557,8 @@ module Order =
                     (VariableUnit.RateAdjust.toValueUnitStringList (Some 2))
 
             let pres = $"""{sn |> String.concat " + "} {dr}"""
-            let adm = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
             let prep = o |> printComponentQuantity
+            let adm = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
         
             pres, prep, adm
 

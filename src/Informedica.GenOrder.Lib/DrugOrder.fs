@@ -42,6 +42,8 @@ module DrugOrder =
                 "or", "drink", OralFluid
                 "or", "drank", OralFluid
                 "iv", "infusion fluid", IntravenousFluid
+                "iv", "infusievloeistof", IntravenousFluid
+                "intraveneus", "infusievloeistof", IntravenousFluid
             ]
 
         let map route shape =

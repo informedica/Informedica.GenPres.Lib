@@ -375,6 +375,8 @@ module Types =
     type Scenario =
         {
             No : int
+            Name : string
+            Shape : string
             Route : string
             Prescription : string
             Preparation : string
