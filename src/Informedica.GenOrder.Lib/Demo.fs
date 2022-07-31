@@ -61,6 +61,7 @@ module Examples =
 
     let orders =
         [
+            // paracetamol drank
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -91,7 +92,7 @@ module Examples =
                     Route = "or"
                     OrderType = DiscontinuousOrder
             }
-
+            // paracetamol zetpil
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -123,7 +124,7 @@ module Examples =
                     Route = "rect"
                     OrderType = DiscontinuousOrder
             }
-
+            // paracetamol infuusvloeistof
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -155,7 +156,7 @@ module Examples =
                     Route = "iv"
                     OrderType = DiscontinuousOrder
             }
-
+            // cotrimoxazol tablet
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -196,7 +197,7 @@ module Examples =
                     Route = "or"
                     OrderType = DiscontinuousOrder
             }
-
+            // contrimoxazol drank
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -238,7 +239,7 @@ module Examples =
                     Route = "or"
                     OrderType = DiscontinuousOrder
             }
-            
+            // contrimoxazol infuusvloeistof
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -289,11 +290,114 @@ module Examples =
                     Route = "iv"
                     OrderType = DiscontinuousOrder
             }
-
+            // cotrimoxazol Rokiprim infuusvloeistof
             {
                 DrugOrder.drugOrder with
                     Id = "1"
-                    Name = "dopamine infusion"
+                    Name = "cotrimoxazol (Rokiprim)"
+                    Divisible = 2N
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with 
+                                    Name = "cotrimoxazol"
+                                    Quantities = [ 5N ]
+                                    TimeUnit = "day"
+                                    Substances =
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "sulfamethoxazol"
+                                                    Concentrations = 
+                                                        [ 80N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "trimethoprim"
+                                                    Concentrations = 
+                                                        [ 16N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+                            }
+                        ]
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusievloeistof"
+                    Route = "iv"
+                    OrderType = DiscontinuousOrder
+            }
+            // morfine standaard concentraties
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "morfine pomp"
+                    Quantities = [ 50N ]
+                    Divisible = 1N
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusievloeistof"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "morfine"
+                                    Quantities = [ 1N; 5N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "morfine"
+                                                    Concentrations = [ 1N; 10N; ]
+                                                    OrderableQuantities = [ 2N; 5N; 10N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mcg"
+                                                    TimeUnit = "hour"
+                                            }
+                                        ]
+
+                            }
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "NaCl 0,9%"
+                                    Quantities = [ 5000N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "natrium"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "chloride"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+                        ]
+                    OrderType = ContinuousOrder
+            }
+            // dopamine standaard concentraties
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "dopamine pomp"
                     Quantities = [ 50N ]
                     Divisible = 1N
                     Unit = "ml"
@@ -350,11 +454,11 @@ module Examples =
                         ]
                     OrderType = ContinuousOrder
             }
-            
+            // dopamine standaard loopsnelheid
             {
                 DrugOrder.drugOrder with
                     Id = "1"
-                    Name = "dopamine infusion"
+                    Name = "dopamine pomp"
                     Quantities = [ 50N ]
                     Divisible = 1N
                     Unit = "ml"
@@ -410,7 +514,7 @@ module Examples =
                         ]
                     OrderType = ContinuousOrder
             }
-            
+            // gentamicine infuusvloeistof
             {
                 DrugOrder.drugOrder with
                     Id = "1"
@@ -470,49 +574,8 @@ module Examples =
 
                         ]
                     OrderType = TimedOrder
-                }
-
-            {
-                DrugOrder.drugOrder with
-                    Id = "1"
-                    Name = "cotrimoxazol (Rokiprim)"
-                    Divisible = 2N
-                    Products = 
-                        [
-                            { 
-                                DrugOrder.productComponent with 
-                                    Name = "cotrimoxazol"
-                                    Quantities = [ 5N ]
-                                    TimeUnit = "day"
-                                    Substances =
-                                        [
-                                            {
-                                                DrugOrder.substanceItem with
-                                                    Name = "sulfamethoxazol"
-                                                    Concentrations = 
-                                                        [ 80N ]
-                                                    Unit = "mg"
-                                                    DoseUnit = "mg"
-                                                    TimeUnit = "day"
-                                            }
-                                            {
-                                                DrugOrder.substanceItem with
-                                                    Name = "trimethoprim"
-                                                    Concentrations = 
-                                                        [ 16N ]
-                                                    Unit = "mg"
-                                                    DoseUnit = "mg"
-                                                    TimeUnit = "day"
-                                            }
-                                        ]
-                            }
-                        ]
-                    Unit = "ml"
-                    TimeUnit = "day"
-                    Shape = "infusievloeistof"
-                    Route = "iv"
-                    OrderType = DiscontinuousOrder
             }
+
         ]
 
 
@@ -1123,6 +1186,7 @@ module Demo =
 
     let indications =
         [
+            // chronische pijn
             "chronische pijn", "paracetamol", "oraal",[
                 {   DrugOrder.doseLimits with
                         Name = "paracetamol"
@@ -1146,7 +1210,7 @@ module Demo =
                         MaxDoseTotalAdjust = Some 70N       // Max adjusted daily dose = 70 mg/kg/day
                 }
             ], [ "paracetamol" ]
-
+            // acute pijn
             "acute pijn/post operatief", "paracetamol", "intraveneus", [
                 {   DrugOrder.doseLimits with
                         Name = "paracetamol"
@@ -1183,9 +1247,19 @@ module Demo =
                 }
             ], [ "paracetamol" ]
 
+            "acute pijn/post operatief", "morfine", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "morfine pomp"
+                        SubstanceName = "morfine"
+                        Rates = [1N]
+                        MaxDoseRateAdjust = Some 10N
+                        MinDoseRateAdjust = Some 40N
+                }
+            ], [ "paracetamol" ]
+            // bloeddruk verhoging
             "bloeddruk verhoging", "dopamine", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "dopamine infusion"
+                        Name = "dopamine pomp"
                         Rates = [ 1N ]
                         SubstanceName = "dopamine"
                         MinDoseRateAdjust = Some 2N
@@ -1195,14 +1269,14 @@ module Demo =
 
             "bloeddruk verhoging", "dopamine", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "dopamine infusion"
+                        Name = "dopamine pomp"
                         Rates = [ 1N ]
                         SubstanceName = "dopamine"
                         MinDoseRateAdjust = Some 2N
                         MaxDoseRateAdjust = Some 20N
                 }
             ], ["dopamine"]
-
+            // infecties
             "infecties", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
                         Name = "cotrimoxazol"
@@ -1213,7 +1287,7 @@ module Demo =
                         MaxDoseTotalAdjust = Some 35N
                 }
             ], ["sulfamethoxazol"; "trimethoprim"]
-
+            
             "infecties", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
                         Name = "cotrimoxazol"
@@ -1263,7 +1337,7 @@ module Demo =
                         MaxDoseTotalAdjust = Some 35N
                 }
             ], ["sulfamethoxazol"; "trimethoprim"]
-
+            // behandeling PJP
             "behandeling PJP", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
                         Name = "cotrimoxazol"
@@ -1325,7 +1399,7 @@ module Demo =
                         MaxDoseTotalAdjust = Some 100N
                 }
             ], ["sulfamethoxazol"; "trimethoprim"]
-
+            // profylaxe
             "profylaxe", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
                         Name = "cotrimoxazol"
@@ -1347,7 +1421,7 @@ module Demo =
                         MaxDoseTotalAdjust = Some 25N
                 }
             ], ["sulfamethoxazol"; "trimethoprim"]
-
+            // ernstige infecties
             "ernstige infecties", "gentamicin", "intraveneus", [
                 {   DrugOrder.doseLimits with
                         Name = "gentamicin"
@@ -1429,7 +1503,8 @@ Toediening: {sc.Administration}
             with
             | _ -> []
         )
-        |> List.distinct
+        // correct for roundig problem. admin should not be rounded!
+        |> List.distinctBy (fun sc -> sc.Route, sc.Administration)
         |> List.map translate
         |> List.mapi (fun i sc -> { sc with No = i + 1 })
         |> List.map toString

@@ -13,6 +13,14 @@ Examples.listOrders ()
 
 Demo.create
     15.
+    "acute pijn/post operatief"
+    (Some "morfine")
+    None
+|> List.iter (printfn "%s")
+
+
+Demo.create
+    15.
     "chronische pijn"
     None
     None
