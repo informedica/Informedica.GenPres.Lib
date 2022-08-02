@@ -514,11 +514,73 @@ module Examples =
                         ]
                     OrderType = ContinuousOrder
             }
+            // noradrenaline standaard loopsnelheid
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "noradrenaline pomp"
+                    Quantities = [ 50N ]
+                    Divisible = 1N
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusievloeistof"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "noradrenaline"
+                                    Quantities = [ 1N; 5N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "noradrenaline"
+                                                    Concentrations = [ 1N ]
+                                                    OrderableQuantities = [1N; 2N; 5N]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mcg"
+                                                    TimeUnit = "min"
+                                            }
+                                        ]
+
+                            }
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "NaCl 0,9%"
+                                    Quantities = [ 5000N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "natrium"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "chloride"
+                                                    Concentrations = [ 155N / 1000N ]
+                                                    Unit = "mmol"
+                                                    DoseUnit = "mmol"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+                        ]
+                    OrderType = ContinuousOrder
+            }
+
             // gentamicine infuusvloeistof
             {
                 DrugOrder.drugOrder with
                     Id = "1"
-                    Name = "gentamicin"
+                    Name = "gentamicine"
                     Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
                     Divisible = 1N 
                     Unit = "ml"
@@ -529,14 +591,14 @@ module Examples =
                         [
                             { 
                                 DrugOrder.productComponent with
-                                    Name = "gentamicin"
+                                    Name = "gentamicine"
                                     Quantities = [ 2N; 10N ]
                                     TimeUnit = "day"
                                     Substances = 
                                         [
                                             {
                                                 DrugOrder.substanceItem with
-                                                    Name = "gentamicin"
+                                                    Name = "gentamicine"
                                                     Concentrations = [ 10N; 40N ]
                                                     Unit = "mg"
                                                     DoseUnit = "mg"
@@ -574,6 +636,40 @@ module Examples =
 
                         ]
                     OrderType = TimedOrder
+            }
+
+            // ceftriaxon infuusvloeistof
+            {
+                DrugOrder.drugOrder with
+                    Id = "1"
+                    Name = "ceftriaxon"
+                    Unit = "ml"
+                    TimeUnit = "day"
+                    Shape = "infusievloeistof"
+                    Route = "iv"
+                    Products = 
+                        [
+                            { 
+                                DrugOrder.productComponent with
+                                    Name = "ceftriaxon"
+                                    Quantities = [ 40N ]
+                                    TimeUnit = "day"
+                                    Substances = 
+                                        [
+                                            {
+                                                DrugOrder.substanceItem with
+                                                    Name = "ceftriaxon"
+                                                    Concentrations = [ 50N ]
+                                                    Unit = "mg"
+                                                    DoseUnit = "mg"
+                                                    TimeUnit = "day"
+                                            }
+                                        ]
+
+                            }
+
+                        ]
+                    OrderType = DiscontinuousOrder
             }
 
         ]
@@ -1252,10 +1348,10 @@ module Demo =
                         Name = "morfine pomp"
                         SubstanceName = "morfine"
                         Rates = [1N]
-                        MaxDoseRateAdjust = Some 10N
-                        MinDoseRateAdjust = Some 40N
+                        MinDoseRateAdjust = Some 10N
+                        MaxDoseRateAdjust = Some 40N
                 }
-            ], [ "paracetamol" ]
+            ], [ "morfine" ]
             // bloeddruk verhoging
             "bloeddruk verhoging", "dopamine", "intraveneus", [
                 {   DrugOrder.doseLimits with
@@ -1267,15 +1363,15 @@ module Demo =
                 }
             ], [ "dopamine" ]
 
-            "bloeddruk verhoging", "dopamine", "intraveneus", [
+            "bloeddruk verhoging", "noradrenaline", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "dopamine pomp"
+                        Name = "noradrenaline pomp"
                         Rates = [ 1N ]
-                        SubstanceName = "dopamine"
-                        MinDoseRateAdjust = Some 2N
-                        MaxDoseRateAdjust = Some 20N
+                        SubstanceName = "noradrenaline"
+                        MinDoseRateAdjust = Some (5N/100N)
+                        MaxDoseRateAdjust = Some (5N/10N)
                 }
-            ], ["dopamine"]
+            ], ["noradrenaline"]
             // infecties
             "infecties", "cotrimoxazol", "oraal", [
                 {   DrugOrder.doseLimits with
@@ -1422,44 +1518,54 @@ module Demo =
                 }
             ], ["sulfamethoxazol"; "trimethoprim"]
             // ernstige infecties
-            "ernstige infecties", "gentamicin", "intraveneus", [
+            "ernstige infecties", "gentamicine", "intraveneus", [
                 {   DrugOrder.doseLimits with
-                        Name = "gentamicin"
+                        Name = "gentamicine"
                         Frequencies = [ 1N ]
-                        SubstanceName = "gentamicin"
+                        SubstanceName = "gentamicine"
                         MinDoseTotalAdjust = Some (65N/10N)
                         MaxDoseTotalAdjust = Some (75N/10N)
                 }
-            ], [ "gentamicin" ]
+            ], [ "gentamicine" ]
+
+            "ernstige infecties", "ceftriaxon", "intraveneus", [
+                {   DrugOrder.doseLimits with
+                        Name = "ceftriaxon"
+                        Frequencies = [ 1N ]
+                        SubstanceName = "ceftriaxon"
+                        MinDoseTotalAdjust = Some (90N)
+                        MaxDoseTotalAdjust = Some (100N)
+                }
+            ], [ "ceftriaxon" ]
 
         ]
 
 
-    let getIndications () =
+    let filter ind med route =
         indications
+        |> List.filter (fun (i, m, r, _, _) ->
+            (ind |> Option.isNone || ind = Some i) &&
+            (med |> Option.isNone || med = Some m) &&
+            (route |> Option.isNone || route = Some r)
+        )
+
+
+    let filterIndications med route =
+        filter None med route
         |> List.map (fun (i, _, _, _, _) -> i)
         |> List.distinct
 
 
-    let getMedications () =
-        indications
+    let filterMedications ind route =
+        filter ind None route
         |> List.map (fun (_, m, _, _, _) -> m)
         |> List.distinct
 
 
-    let getRoutes () =
-        indications
+    let filterRoutes ind med =
+        filter ind med None
         |> List.map (fun (_, _, r, _, _) -> r)
         |> List.distinct
-
-
-    let filterIndications ind med route =
-        indications
-        |> List.filter (fun (i, m, r, _, _) ->
-            ind = i &&
-            (med |> Option.isNone || med = Some m) &&
-            (route |> Option.isNone || route = Some r)
-        )
 
 
     let mapRoute = function
@@ -1482,8 +1588,9 @@ module Demo =
             Administration =sc.Administration |> trans
         }
 
+
     let toString (sc : Scenario) =
-        $""""
+        $"""
 {sc.No}. {sc.Name} {sc.Shape} {sc.Route}
 Voorschrift: {sc.Prescription}
 Bereiding: {sc.Preparation}
@@ -1492,7 +1599,7 @@ Toediening: {sc.Administration}
 
 
     let create w ind med route =
-        filterIndications ind med route
+        filter ind med route
         |> List.collect (fun (_, m, r, d, ns) ->
             try
                 r

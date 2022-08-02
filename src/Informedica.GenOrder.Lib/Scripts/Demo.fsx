@@ -4,6 +4,8 @@
 
 open Informedica.GenOrder.Lib
 
+#time
+
 
 Demo.getIndications ()
 
@@ -14,7 +16,7 @@ Examples.listOrders ()
 Demo.create
     15.
     "acute pijn/post operatief"
-    (Some "morfine")
+    None
     None
 |> List.iter (printfn "%s")
 
@@ -36,11 +38,18 @@ Demo.create
 
 
 Demo.create
-    10.
+    50.
     "bloeddruk verhoging"
     None
     None //(Some "intraveneus")
 |> List.iter (printfn "%s")
+
+
+Demo.create
+    10.
+    "ernstige infecties"
+    None
+    None
 
 
 
@@ -48,3 +57,4 @@ OrderLogger.logger.Start Informedica.GenSolver.Lib.Types.Logging.Level.Informati
 
 // write results to the test.txt in this folder
 $"{__SOURCE_DIRECTORY__}/test.txt" |> OrderLogger.logger.Write
+
