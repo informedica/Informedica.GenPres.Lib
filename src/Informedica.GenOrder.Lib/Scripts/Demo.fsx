@@ -7,15 +7,16 @@ open Informedica.GenOrder.Lib
 #time
 
 
-Demo.getIndications ()
+Demo.filterIndications (Some "cotrimoxazol") None
 
+Demo.filterMedications None None
 
 Examples.listOrders ()
 
 
 Demo.create
     15.
-    "acute pijn/post operatief"
+    (Some "acute pijn/post operatief")
     None
     None
 |> List.iter (printfn "%s")
@@ -23,7 +24,7 @@ Demo.create
 
 Demo.create
     15.
-    "chronische pijn"
+    (Some "chronische pijn")
     None
     None
 |> List.iter (printfn "%s")
@@ -31,7 +32,7 @@ Demo.create
 
 Demo.create
     30.
-    "behandeling PJP > 5 jaar"
+    (Some "behandeling PJP > 5 jaar")
     None //(Some "cotrimoxazol")
     None //(Some "intraveneus")
 |> List.iter (printfn "%s")
@@ -39,7 +40,7 @@ Demo.create
 
 Demo.create
     50.
-    "bloeddruk verhoging"
+    (Some "bloeddruk verhoging")
     None
     None //(Some "intraveneus")
 |> List.iter (printfn "%s")
@@ -47,13 +48,17 @@ Demo.create
 
 Demo.create
     10.
-    "ernstige infecties"
+    (Some "ernstige infecties")
     None
     None
 
+
+Demo.create 10. None None None
+|> List.iter (printfn "%s")
 
 
 OrderLogger.logger.Start Informedica.GenSolver.Lib.Types.Logging.Level.Informative
+
 
 // write results to the test.txt in this folder
 $"{__SOURCE_DIRECTORY__}/test.txt" |> OrderLogger.logger.Write
