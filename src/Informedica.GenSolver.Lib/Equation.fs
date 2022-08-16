@@ -107,15 +107,15 @@ module Equation =
         ) 0
 
     let countProduct eq = 
-        match eq with
-        | SumEquation _ -> -1
-        | _ ->
-            eq
-            |> toVars
-            |> List.fold (fun acc v ->
-                let c = v |> Variable.count
-                (if c = 0 then 1 else c) * acc
-            ) 1
+        //match eq with
+        //| SumEquation _ -> -1
+        //| _ ->
+        eq
+        |> toVars
+        |> List.fold (fun acc v ->
+            let c = v |> Variable.count
+            (if c = 0 then 1 else c) * acc
+        ) 1
 
 
     let toString exact eq = 
@@ -270,14 +270,8 @@ module Equation =
 
                     (changed || x.Values <> newX.Values)
                     |> calc op1 op2 y (xs |> replAdd newX) tail
-            // op1 = (*) or (+) and op2 = (/) or (-)
-            let rec loop op1 op2 y xs changed =
-                // Calculate y = x1 op1 x2 op1 .. op1 xn
-                let y, yChanged =
-                    //(y::xs)
-                    //|> Events.EquationStartedCalculation
-                    //|> Logging.logInfo log
 
+            let calcY op1 y xs = 
                     if y |> Variable.isSolved then y, false
                     else
                         (op1, op1, y, (xs |> List.head), (xs |> List.tail))
@@ -291,10 +285,29 @@ module Equation =
                         |> Logging.logInfo log
 
                         newY, yChanged
-                // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
-                //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
-                //       etc..
-                let xs, xChanged = calc op1 op2 y xs xs false
+
+            // op1 = (*) or (+) and op2 = (/) or (-)
+            let rec loop op1 op2 y xs changed =
+                let y, yChanged, xs, xChanged =
+                    if xs |> List.forall (Variable.count >> ((<) (y |> Variable.count))) then
+                        // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
+                        //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
+                        //       etc..
+                        let xs, xChanged = calc op1 op2 y xs xs false
+                        // Calculate y = x1 op1 x2 op1 .. op1 xn
+                        let y, yChanged = calcY op1 y xs
+
+                        y, yChanged, xs, xChanged
+                    else
+                        // Calculate y = x1 op1 x2 op1 .. op1 xn
+                        let y, yChanged = calcY op1 y xs
+                        // Calculate x1 = y op2 (x2 op1 x3 .. op1 xn)
+                        //       and x2 = y op2 (x1 op1 x3 .. op1 xn)
+                        //       etc..
+                        let xs, xChanged = calc op1 op2 y xs xs false
+
+                        y, yChanged, xs, xChanged
+
                 // If something has changed restart until nothing changes anymore
                 if not (yChanged || xChanged) then (y, xs, changed)
                 else

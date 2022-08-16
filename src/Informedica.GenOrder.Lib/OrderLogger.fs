@@ -146,6 +146,8 @@ module OrderLogger =
         {
             Start = 
                 fun level ->
+                    printfn $"start logging at level {level}"
+
                     level
                     |> Start
                     |> loggerAgent.Post

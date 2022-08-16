@@ -66,6 +66,17 @@ module SolverLogging =
         m 
         |> printException
     | SolverMessage m ->
+        let toString eq = 
+            let op = if eq |> Equation.isProduct then " * " else " + "
+            let varName = Variable.getName >> Variable.Name.toString
+
+            match eq |> Equation.toVars with
+            | [] -> ""
+            | _::[] -> ""
+            | y::xs ->
+                $"""{y |> varName } = {xs |> List.map varName |> String.concat op}"""
+
+
         match m with
         | EquationCouldNotBeSolved eq -> 
             $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}" 
@@ -73,8 +84,8 @@ module SolverLogging =
         | EquationCalculation (op1, op2, y, x, xs) ->
             $"calculating: {Equation.calculationToString op1 op2 y x xs}"
 
-        | EquationStartedSolving eq -> 
-            $"=== Start solving Equation ===\n{eq |> Equation.toString true}"
+        | EquationStartedSolving eq ->
+            $"=== Start solving Equation ===\n{eq |> toString}"
 
         | EquationFinishedCalculation (xs, changed) -> 
             $"""=== Equation finished calculation ===

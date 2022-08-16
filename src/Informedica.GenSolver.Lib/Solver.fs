@@ -87,7 +87,7 @@ module Solver =
         if que |> List.length = 0 then que
         else
             que 
-            |> List.sortBy Equation.countProduct
+            |> List.sortBy Equation.count //Equation.countProduct
 
         
     /// Create the equation solver using a 

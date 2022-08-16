@@ -143,7 +143,7 @@ module DrugOrder =
                 // == Discontinuous ==
                 // give the total orderable quantity each time
                 c OrderableDoseCount (Props.singleVal 1N) NoLimit 
-                    AnyRouteShape DiscontinuousOrder
+                    OralFluid DiscontinuousOrder
                 // give max 500 ml each time
                 c OrderableDoseQty (Props.maxIncl 500N) NoLimit 
                   OralFluid DiscontinuousOrder
@@ -620,7 +620,7 @@ module DrugOrder =
             Component = ""
             MinConcentration = None
             MaxConcentration = None
-            DoseCount = Some 1N
+            DoseCount = []
             MinTime = None
             MaxTime = None
         }
@@ -690,11 +690,11 @@ module DrugOrder =
 
         co
         >|> [
-                if sl.DoseCount |> Option.isSome then
+                if sl.DoseCount |> List.isEmpty |> not then
                     DrugConstraint.create 
                         sl.Name 
                         OrderableDoseCount 
-                        (sl.DoseCount |> Option.get |> Props.singleVal) 
+                        (sl.DoseCount |> Props.vals) 
                         NoLimit AnyRouteShape AnyOrder
             ]
         |> set sl.Name ItemOrderableConc Props.minIncl sl.MinConcentration

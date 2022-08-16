@@ -366,7 +366,7 @@ module Types =
             Component : string
             MinConcentration : BigRational option
             MaxConcentration : BigRational option
-            DoseCount : BigRational option
+            DoseCount : BigRational list
             MinTime : BigRational option
             MaxTime : BigRational option
         }

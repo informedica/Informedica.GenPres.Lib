@@ -389,7 +389,7 @@ module Variable =
                     if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
-                $"""[{vs |> Set.map toStr |> String.concat ", "}]"""
+                $"""[{vs |> Set.toList |> List.sort |> List.map toStr |> String.concat ", "}]"""
 
 
         module Property =

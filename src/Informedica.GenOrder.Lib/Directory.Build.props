@@ -11,6 +11,5 @@
         <Authors>halcwb</Authors>
         <Company>Informedica</Company>      
         <RepositoryUrl>https://github.com/informedica/Informedica.GenOrder.Lib</RepositoryUrl>
-        <!-- owners is not supported in MSBuild -->
     </PropertyGroup>
 </Project>

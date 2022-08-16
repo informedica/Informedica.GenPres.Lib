@@ -57,7 +57,14 @@ module Examples =
             acc
             |> DrugOrder.setDoseLimits dose
         ) o
-        
+
+    let setSolutions sols o =
+        sols
+        |> List.fold (fun acc sol ->
+            acc
+            |> DrugOrder.setSolutionLimits sol
+        ) o
+
 
     let orders =
         [
@@ -581,7 +588,7 @@ module Examples =
                 DrugOrder.drugOrder with
                     Id = "1"
                     Name = "gentamicine"
-                    Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
+                    Quantities = [ 5N; 10N; 20N; 50N; 100N ]
                     Divisible = 1N 
                     Unit = "ml"
                     TimeUnit = "day"
@@ -614,22 +621,22 @@ module Examples =
                                     TimeUnit = "day"
                                     Substances = 
                                         [
-                                            {
-                                                DrugOrder.substanceItem with
-                                                    Name = "natrium"
-                                                    Concentrations = [ 155N / 1000N ]
-                                                    Unit = "mmol"
-                                                    DoseUnit = "mmol"
-                                                    TimeUnit = "day"
-                                            }
-                                            {
-                                                DrugOrder.substanceItem with
-                                                    Name = "chloride"
-                                                    Concentrations = [ 155N / 1000N ]
-                                                    Unit = "mmol"
-                                                    DoseUnit = "mmol"
-                                                    TimeUnit = "day"
-                                            }
+                                            //{
+                                            //    DrugOrder.substanceItem with
+                                            //        Name = "natrium"
+                                            //        Concentrations = [ 155N / 1000N ]
+                                            //        Unit = "mmol"
+                                            //        DoseUnit = "mmol"
+                                            //        TimeUnit = "day"
+                                            //}
+                                            //{
+                                            //    DrugOrder.substanceItem with
+                                            //        Name = "chloride"
+                                            //        Concentrations = [ 155N / 1000N ]
+                                            //        Unit = "mmol"
+                                            //        DoseUnit = "mmol"
+                                            //        TimeUnit = "day"
+                                            //}
                                         ]
 
                             }
@@ -732,13 +739,14 @@ module Examples =
 
     /// calculate the scenarios for a drug order
     /// o with substancenames ns and doses doses
-    let calculate weight ns doses o =
+    let calculate weight ns doses sols o =
         let w = weight |> toBigRational
 
         o
         |> DrugOrder.create
         |> DrugOrder.setAdjust o.Name w
         |> setDoses doses
+        |> setSolutions sols
         |> evaluate ns
 
 
@@ -1218,7 +1226,7 @@ module Examples =
                         { 
                             DrugOrder.productComponent with
                                 Name = "NaCl 0,9%"
-                                Quantities = [ 5000N ]
+                                Quantities = [ 500N ]
                                 TimeUnit = "day"
                                 Substances = 
                                     [
@@ -1255,7 +1263,7 @@ module Examples =
                     Component = "gentamicine"
                     MinConcentration = Some 1N
                     MaxConcentration = Some 2N
-                    DoseCount = Some (1N)
+                    DoseCount = [1N/2N; 1N]
                     MinTime = Some (1N/3N)
                     MaxTime = Some (1N/2N)
 
@@ -1279,6 +1287,19 @@ module Demo =
     module Quantity = VariableUnit.Quantity
 
     open OrderLogger
+
+    let solutions =
+        [
+            "gentamicine",
+            { DrugOrder.solutionLimits with
+                Name = "gentamicine"
+                MinConcentration = Some (2N - 1N/4N)
+                MaxConcentration = Some (2N)
+                MinTime = Some (1N - 1N/5N)
+                MaxTime = Some (1N)
+                DoseCount = [] //[1N]
+            }
+        ]
 
     let indications =
         [
@@ -1602,10 +1623,15 @@ Toediening: {sc.Administration}
         filter ind med route
         |> List.collect (fun (_, m, r, d, ns) ->
             try
+                let sols =
+                    solutions
+                    |> List.filter (fst >> (=) m)
+                    |> List.map snd
+
                 r
                 |> mapRoute
                 |> Examples.getOrders m 
-                |> List.collect (Examples.calculate w ns d)
+                |> List.collect (Examples.calculate w ns d sols)
                 |> List.map (fun sc -> { sc with Route = r })
             with
             | _ -> []
