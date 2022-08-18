@@ -7,7 +7,7 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <PackageId>Informedica.GenOrder.Lib</PackageId>
-        <Version>1.0.4</Version>
+        <Version>1.0.5</Version>
         <Authors>halcwb</Authors>
         <Company>Informedica</Company>      
         <RepositoryUrl>https://github.com/informedica/Informedica.GenOrder.Lib</RepositoryUrl>
