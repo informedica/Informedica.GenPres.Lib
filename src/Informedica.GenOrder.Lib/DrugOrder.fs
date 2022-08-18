@@ -168,6 +168,9 @@ module DrugOrder =
                   OralFluid ContinuousOrder
                 // == Intravenuous Fluid ==
                 // == Discontinuous ==
+                // give the total orderable quantity each time
+                c OrderableDoseCount (Props.singleVal 1N) NoLimit 
+                    IntravenousFluid DiscontinuousOrder
                 // Give max 1000 ml each time
                 c OrderableDoseQty (Property.createMaxInclProp 1000N) NoLimit
                   IntravenousFluid DiscontinuousOrder

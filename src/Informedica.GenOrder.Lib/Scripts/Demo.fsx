@@ -6,6 +6,11 @@ open Informedica.GenOrder.Lib
 
 #time
 
+let create a w i m r =
+    Demo.create a w i m r
+    |> List.map Demo.toString
+
+
 
 Demo.filter (Some (6 * 365)) 30. None (Some "cotrimoxazol") None
 
@@ -20,16 +25,12 @@ Demo.filterMedications (Some (6 * 365)) 30. None None
 Examples.listOrders ()
 
 
-let create a w i m r =
-    Demo.create a w i m r
-    |> List.map Demo.toString
-
 create
     None
     10.
     (Some "acute pijn/post operatief")
-    None
-    None
+    (Some "paracetamol")
+    (Some "intraveneus")
 |> List.iter (printfn "%s")
 
 
