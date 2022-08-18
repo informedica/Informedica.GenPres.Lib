@@ -7,22 +7,34 @@ open Informedica.GenOrder.Lib
 #time
 
 
-Demo.filterIndications (Some "cotrimoxazol") None
+Demo.filter (Some (6 * 365)) 30. None (Some "cotrimoxazol") None
 
-Demo.filterMedications None None
+Demo.filter None 30. (Some "cotrimoxazol") None None
+
+Demo.filter None 30. None None None
+
+Demo.filterIndications (Some (6 * 365)) 30. (Some "cotrimoxazol") None
+
+Demo.filterMedications (Some (6 * 365)) 30. None None
 
 Examples.listOrders ()
 
 
-Demo.create
-    15.
+let create a w i m r =
+    Demo.create a w i m r
+    |> List.map Demo.toString
+
+create
+    None
+    10.
     (Some "acute pijn/post operatief")
     None
     None
 |> List.iter (printfn "%s")
 
 
-Demo.create
+create
+    None
     15.
     (Some "chronische pijn")
     None
@@ -30,31 +42,47 @@ Demo.create
 |> List.iter (printfn "%s")
 
 
-Demo.create
+create
+    (Some (10 * 365))
     30.
-    (Some "behandeling PJP > 5 jaar")
+    (Some "behandeling PJP")
     None //(Some "cotrimoxazol")
     None //(Some "intraveneus")
 |> List.iter (printfn "%s")
 
 
-Demo.create
-    50.
+create
+    None
+    3.
     (Some "bloeddruk verhoging")
     None
     None //(Some "intraveneus")
 |> List.iter (printfn "%s")
 
 
-Demo.create
-    10.
+create
+    None
+    2.
     (Some "ernstige infecties")
-    None
+    (Some "gentamicine")
     None
 
 
-Demo.create 10. None None None
-|> List.iter (printfn "%s")
+create
+    None
+    0.8
+    None
+    (Some "ondansetron")
+    (Some "intraveneus")
+
+
+create
+    None
+    4.
+    None
+    (Some "midazolam")
+    None
+
 
 
 OrderLogger.logger.Start Informedica.GenSolver.Lib.Types.Logging.Level.Informative

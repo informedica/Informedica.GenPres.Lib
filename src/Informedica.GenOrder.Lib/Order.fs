@@ -457,7 +457,15 @@ module Order =
             c.OrderableQuantity
             |> Quantity.toValueUnitStringList (Some 1)
             |> Seq.map (fun (_, q) ->
-                $"{q} {c.Name |> Name.toString} ({c |> printItemConcentration})"
+                let s =
+                    c
+                    |> printItemConcentration
+                    |> String.trim
+                    |> fun s ->
+                        if s |> String.isNullOrWhiteSpace then ""
+                        else
+                            $" ({s})"
+                $"{q} {c.Name |> Name.toString}{s}"
             )
             |> String.concat ""
         ) |> String.concat " + "
@@ -519,7 +527,7 @@ module Order =
                 o
                 |> printItem 
                     (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
-                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
+                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 2))
 
             let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
             let prep = $"{o |> printComponentQuantity}"

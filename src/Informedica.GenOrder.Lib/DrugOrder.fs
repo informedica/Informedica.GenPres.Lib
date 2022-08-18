@@ -179,6 +179,9 @@ module DrugOrder =
                 // Give max 1000 ml each time
                 c OrderableDoseQty (Property.createMaxInclProp 1000N) NoLimit
                   IntravenousFluid TimedOrder
+                // Prepare at least one dose
+                c OrderableDoseCount (Property.createMinInclProp 1N) NoLimit
+                  IntravenousFluid TimedOrder
                 // Give max 20 ml/kg each time
                 c OrderableDoseAdjustQtyAdjust (Property.createMaxInclProp 20N) NoLimit
                   IntravenousFluid TimedOrder
