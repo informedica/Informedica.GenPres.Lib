@@ -1,5 +1,7 @@
 namespace Informedica.Utils.Lib.BCL
 
+open System.Globalization
+
 
 module Double =
 
@@ -15,11 +17,11 @@ module Double =
 
     /// Check whether a `Double` is positive or
     /// negative infinity
-    let isInfinity n = (n = infinity) || (n = -infinity) 
+    let isInfinity n = (n = infinity) || (n = -infinity)
 
 
     /// Check whether a `Double` is valid
-    let isValid n = 
+    let isValid n =
         (isNaN n ||
          isInfinity n ||
          n >= Double.MaxValue ||
@@ -33,8 +35,11 @@ module Double =
 
     /// Get a `float Option` from a string
     let tryParse (s : string) =
-        let (b, n) = Double.TryParse(s)
-        if b then Some n else None
+        let style = NumberStyles.Any
+        let cult = CultureInfo.InvariantCulture
+        match Double.TryParse(s, style, cult) with
+        | true, v -> Some v
+        | false, _ -> None
 
 
     /// Get a `float32` from a string
@@ -46,8 +51,8 @@ module Double =
         | None -> 0.f
 
 
-    /// Calculates the number of decimal digits that 
-    /// should be shown according to a precision 
+    /// Calculates the number of decimal digits that
+    /// should be shown according to a precision
     /// number n that specifies the number of non
     /// zero digits in the decimals.
     /// * 66.666 |> getPrecision 1 = 0
@@ -90,7 +95,7 @@ module Double =
                     c + p
         with
         | e ->
-            printfn "cannot get precision %i for %f" n f 
+            printfn "cannot get precision %i for %f" n f
             printfn "catching error %A" e
             printfn "returning 1 as default value"
             1
@@ -118,15 +123,15 @@ module Double =
         Math.Round(f, f |> getPrecision n)
 
 
-    /// Check whether a float has any 
+    /// Check whether a float has any
     /// decimal digits
-    let floatHasDecimals (v: float) = 
+    let floatHasDecimals (v: float) =
         v <> 0. &&
-        (if v  > 0. then v > float(BigInteger v) 
+        (if v  > 0. then v > float(BigInteger v)
          else v < float(BigInteger v))
 
 
-    /// Return a float as a fraction of 
+    /// Return a float as a fraction of
     /// two `BigInteger`s
     let floatToFract v =
         if v = infinity || v = -infinity || v |> isNaN then None

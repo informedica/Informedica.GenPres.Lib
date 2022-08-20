@@ -27,10 +27,10 @@ Examples.listOrders ()
 
 create
     None
-    10.
-    (Some "acute pijn/post operatief")
+    3.
+    None
     (Some "paracetamol")
-    (Some "intraveneus")
+    (Some "rectaal")
 |> List.iter (printfn "%s")
 
 
@@ -63,10 +63,11 @@ create
 
 create
     None
-    2.
+    50.
     (Some "ernstige infecties")
     (Some "gentamicine")
     None
+|> List.iter (printfn "%s")
 
 
 create

@@ -11,6 +11,7 @@
 #load "../Types.fs"
 #load "../DateTime.fs"
 #load "../List.fs"
+#load "../Utils.fs"
 #load "../Logging.fs"
 #load "../WrappedString.fs"
 #load "../ValueUnit.fs"
@@ -22,5 +23,5 @@
 #load "../Order.fs"
 #load "../DrugOrder.fs"
 #load "../OrderLogger.fs"
-#load "../Demo.fs"
+//#load "../Demo.fs"
 

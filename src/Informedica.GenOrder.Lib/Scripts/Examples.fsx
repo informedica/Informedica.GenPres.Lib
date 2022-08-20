@@ -32,7 +32,7 @@ module Examples =
     open Informedica.Utils.Lib.BCL
 
 
-    let private toBigRational w =
+    let toBigRational w =
         match w |> BigRational.fromFloat with
         | Some br -> br
         | None ->
@@ -49,10 +49,10 @@ module Examples =
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "paracetamol"
-                Products = 
+                Products =
                     [
-                        { 
-                            DrugOrder.productComponent with 
+                        {
+                            DrugOrder.productComponent with
                                 Name = "paracetamol"
                                 Quantities = [ 1N ]
                                 TimeUnit = "day"
@@ -61,7 +61,7 @@ module Examples =
                                         {
                                             DrugOrder.substanceItem with
                                                 Name = "paracetamol"
-                                                Concentrations = 
+                                                Concentrations =
                                                     [ 60N; 120N; 240N; 500N; 1000N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -76,7 +76,7 @@ module Examples =
                 Route = "rect"
                 OrderType = DiscontinuousOrder
         }
-        |> DrugOrder.create 
+        |> DrugOrder.create
         |> DrugOrder.setDoseLimits
             {   DrugOrder.doseLimits with
                     Name = "paracetamol"
@@ -102,10 +102,10 @@ module Examples =
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "cotrimoxazol"
-                Products = 
+                Products =
                     [
-                        { 
-                            DrugOrder.productComponent with 
+                        {
+                            DrugOrder.productComponent with
                                 Name = "cotrimoxazol"
                                 Quantities = [ 1N ]
                                 TimeUnit = "day"
@@ -114,7 +114,7 @@ module Examples =
                                         {
                                             DrugOrder.substanceItem with
                                                 Name = "sulfamethoxazol"
-                                                Concentrations = 
+                                                Concentrations =
                                                     [ 100N; 400N; 800N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -123,7 +123,7 @@ module Examples =
                                         {
                                             DrugOrder.substanceItem with
                                                 Name = "trimethoprim"
-                                                Concentrations = 
+                                                Concentrations =
                                                     [ 20N; 80N; 160N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -171,10 +171,10 @@ module Examples =
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "paracetamol"
-                Products = 
+                Products =
                     [
-                        { 
-                            DrugOrder.productComponent with 
+                        {
+                            DrugOrder.productComponent with
                                 Name = "paracetamol"
                                 Quantities = [ 100N ]
                                 TimeUnit = "day"
@@ -223,10 +223,10 @@ module Examples =
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "cotrimoxazol"
-                Products = 
+                Products =
                     [
-                        { 
-                            DrugOrder.productComponent with 
+                        {
+                            DrugOrder.productComponent with
                                 Name = "cotrimoxazol"
                                 Quantities = [ 1N ]
                                 TimeUnit = "day"
@@ -235,7 +235,7 @@ module Examples =
                                         {
                                             DrugOrder.substanceItem with
                                                 Name = "sulfamethoxazol"
-                                                Concentrations = 
+                                                Concentrations =
                                                     [ 40N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -244,7 +244,7 @@ module Examples =
                                         {
                                             DrugOrder.substanceItem with
                                                 Name = "trimethoprim"
-                                                Concentrations = 
+                                                Concentrations =
                                                     [ 8N ]
                                                 Unit = "mg"
                                                 DoseUnit = "mg"
@@ -273,8 +273,8 @@ module Examples =
         |> DrugOrder.evaluate logger
         //|> List.length
         |> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
-    
-    // Dopamin infusion calculate scenario's 
+
+    // Dopamin infusion calculate scenario's
     // with a number of standard solutions
     let dopaminStandardConcentrations weight =
         let w = weight |> toBigRational
@@ -290,14 +290,14 @@ module Examples =
                 TimeUnit = "day"
                 Shape = "infusion fluid"
                 Route = "iv"
-                Products = 
+                Products =
                     [
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "dopamin"
                                 Quantities = [ 5N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -311,12 +311,12 @@ module Examples =
                                     ]
 
                         }
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "saline"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -353,7 +353,7 @@ module Examples =
         //|> Order.calcScenarios2
         |> printScenarios false ["dopamin"]
 
-    // Dopamin infusion calculate scenario's 
+    // Dopamin infusion calculate scenario's
     // with a a fixed infusion - dose rate
     let dopaminFixedRate weight =
         let w = weight |> toBigRational
@@ -368,14 +368,14 @@ module Examples =
                 TimeUnit = "day"
                 Shape = "infusion fluid"
                 Route = "iv"
-                Products = 
+                Products =
                     [
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "dopamin"
                                 Quantities = [ 5N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -388,12 +388,12 @@ module Examples =
                                     ]
 
                         }
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "saline"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -431,27 +431,27 @@ module Examples =
         |> printScenarios false ["dopamin"]
 
     // gentamicin
-    let gentamicinIV logger weight =
+    let gentamicinIV weight =
         let w = weight |> toBigRational
         let logger = OrderLogger.logger.Logger
         {
             DrugOrder.drugOrder with
                 Id = "1"
                 Name = "gentamicin"
-                Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N ]
-                Divisible = 1N 
+                Quantities = [ 1N; 2N; 5N; 10N; 50N; 100N; 500N ]
+                Divisible = 1N
                 Unit = "ml"
                 TimeUnit = "day"
                 Shape = "infusion fluid"
                 Route = "iv"
-                Products = 
+                Products =
                     [
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "gentamicin"
                                 Quantities = [ 2N; 10N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -465,12 +465,12 @@ module Examples =
                                     ]
 
                         }
-                        { 
+                        {
                             DrugOrder.productComponent with
                                 Name = "saline"
                                 Quantities = [ 5000N ]
                                 TimeUnit = "day"
-                                Substances = 
+                                Substances =
                                     [
                                         {
                                             DrugOrder.substanceItem with
@@ -505,14 +505,14 @@ module Examples =
                     MinDoseTotalAdjust = Some 4N
                     MaxDoseTotalAdjust = Some 6N
             }
-        |> DrugOrder.setSolutionLimits 
+        |> DrugOrder.setSolutionLimits
             {
                 DrugOrder.solutionLimits with
                     Name = "gentamicin"
                     Component = "gentamicin"
                     MinConcentration = Some 1N
                     MaxConcentration = Some 2N
-                    DoseCount = Some (1N)
+                    DoseCount = [1N]
                     MinTime = Some (1N/4N)
                     MaxTime = Some (1N/2N)
 

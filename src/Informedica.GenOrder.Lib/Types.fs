@@ -3,7 +3,7 @@ namespace Informedica.GenOrder.Lib
 open System
 open MathNet.Numerics
 
-
+[<AutoOpen>]
 module Types =
 
     open Informedica.GenUnits.Lib
@@ -12,7 +12,7 @@ module Types =
     type Unit = ValueUnit.Unit
 
 
-    /// A `VariableUnit` is the combination of 
+    /// A `VariableUnit` is the combination of
     /// an `Informedica.GenSolver.Lib.Variable` with
     /// an `Informedica.GenUnits.Lib.Unit`
     /// The `Variable` stores the base values according
@@ -23,7 +23,7 @@ module Types =
             Variable:  Variable
             /// Stores the unit group
             Unit: Unit
-        }  
+        }
 
 
     /// Type that represents a frequency
@@ -73,7 +73,7 @@ module Types =
     /// Type that represents an adjusted dose quantity, total and rate
     type DoseAdjust = DoseAdjust of QuantityAdjust * TotalAdjust * RateAdjust
 
-    /// An order equation is either a product equation or a 
+    /// An order equation is either a product equation or a
     /// sum equation
     type OrderEquation =
         | OrderProductEquation of VariableUnit * VariableUnit list
@@ -84,20 +84,20 @@ module Types =
 
 
     /// Models an `Item` in a `Component`
-    type Item = 
+    type Item =
         {
             /// The id of the Order
             OrderId: Id
             /// The name of the item
             Name: Name
             /// The quantity of an `Item` in a `Component`
-            ComponentQuantity: Quantity 
+            ComponentQuantity: Quantity
             /// The quantity of an `Item` in an `Orderable`
             OrderableQuantity: Quantity
             /// The `Item` concentration in a `Component`
-            ComponentConcentration: Concentration 
+            ComponentConcentration: Concentration
             /// The  `Item` concentration in an `Orderable`
-            OrderableConcentration: Concentration 
+            OrderableConcentration: Concentration
             /// The `Item` `Dose`, i.e. quanity, total and rate of `Item` administered
             Dose: Dose
             // The `Item` `DoseAdjust`,  i.e. adjusted quanity, total and rate of `Item` administered
@@ -107,7 +107,7 @@ module Types =
 
 
     /// Models in a `Component` in and `Orderable`
-    type Component = 
+    type Component =
         {
             /// The id of a `Component`
             OrderId: Id
@@ -125,10 +125,10 @@ module Types =
             OrderCount: Count
             /// The concentration of a `Component` in an `Orderable`
             OrderableConcentration: Concentration
-            // The `Component` `Dose`,  
+            // The `Component` `Dose`,
             /// i.e. quanity, total and rate of `Component` administered
             Dose: Dose
-            // The `Component` `DoseAdjust`,  
+            // The `Component` `DoseAdjust`,
             /// i.e. adjusted quanity, total and rate of `Component` administered
             DoseAdjust: DoseAdjust
             /// The `Item`s in a `Component`
@@ -136,10 +136,10 @@ module Types =
         }
 
 
-    /// Models an `Orderable` 
-    type Orderable = 
+    /// Models an `Orderable`
+    type Orderable =
         {
-            /// The order id of 
+            /// The order id of
             OrderId: Id
             /// The name of the orderable
             Name: Name
@@ -163,7 +163,7 @@ module Types =
 
 
     /// Type that represents a prescription
-    type Prescription = 
+    type Prescription =
         /// A process
         | Process
         /// A continuous infusion
@@ -183,7 +183,7 @@ module Types =
 
 
     /// Models an order
-    type Order = 
+    type Order =
         {
             /// The id of an order
             Id: Id
@@ -255,7 +255,7 @@ module Types =
     /// Constrained that can be applied to a
     /// variable in an equation.
     type DrugConstraint =
-        {
+       {
             Name : string
             Mapping : OrderMapping
             Property : Property
@@ -264,7 +264,7 @@ module Types =
             OrderType : OrderType
         }
 
-    /// The representation of a drug order that 
+    /// The representation of a drug order that
     /// can be derived by a drug product inventory
     /// and the related dose rule
     type DrugOrder =
@@ -286,40 +286,39 @@ module Types =
             RateUnit : string
             /// The shape of the products
             Shape : string
-            /// The "divisibility" of the products
-            /// Note: should be a product attribute
-            Divisible : BigRational
             /// The route by which the order is applied
             Route : string
             // The type of order
             OrderType : OrderType
         }
     /// The product components that are used by the drug order
-    and ProductComponent = 
-        { 
+    and ProductComponent =
+        {
             /// The name of the product
             Name : string
             /// The quantities of the product
             /// Note: measured in the same unit as
             /// the `DrugOrder` unit
             Quantities : BigRational list
+            /// The "divisibility" of the products
+            Divisible : BigRational
             /// The time unit used for frequency
             TimeUnit : string
-            /// The rate unit used for rate
+            /// The time unit used for rate
             RateUnit : string
             /// The list of substances contained in the product
-            Substances: SubstanceItem list 
+            Substances: SubstanceItem list
         }
-    and SubstanceItem = 
-        { 
+    and SubstanceItem =
+        {
             /// The name of the substance
             Name : string
-            /// The possible concentrations of the substance 
+            /// The possible concentrations of the substance
             /// in the products
             Concentrations : BigRational list
             /// The possible quantities of the substance in the orderable
             OrderableQuantities : BigRational list
-            /// The unit by which the substance is 
+            /// The unit by which the substance is
             /// measured.
             Unit : string
             /// The unit used for the dose
@@ -330,45 +329,116 @@ module Types =
             RateUnit : string
         }
 
-    /// The constraints that can be applied 
+    /// The constraints that can be applied
     /// and the order
     type ConstrainedOrder = (DrugConstraint list * Order)
 
     /// The dose limits that can be applied
     type DoseLimits =
         {
-            /// The name of the order variable to
-            /// which the 
-            Name : string
-            Frequencies : BigRational list
-            Rates : BigRational list
             /// The substance name to which the dose limits
             /// are applied
             SubstanceName : string
-            MaxDoseQuantity : BigRational option
+            /// maps to ItemDoseQty
             MinDoseQuantity : BigRational option
-            MaxDoseQuantityAdjust : BigRational option
+            /// maps to ItemDoseQty
+            MaxDoseQuantity : BigRational option
+            /// maps to ItemDoseAdjustQtyAdjust
             MinDoseQuantityAdjust : BigRational option
-            MaxDoseTotal : BigRational option
+            /// maps to ItemDoseAdjustQtyAdjust
+            MaxDoseQuantityAdjust : BigRational option
+            /// maps to ItemDoseTotal
             MinDoseTotal : BigRational option
-            MaxDoseTotalAdjust : BigRational option
+            /// maps to ItemDoseTotal
+            MaxDoseTotal : BigRational option
+            /// maps to ItemDoseAdjustTotalAdjust
             MinDoseTotalAdjust : BigRational option
-            MaxDoseRate : BigRational option
+            /// maps to ItemDoseAdjustTotalAdjust
+            MaxDoseTotalAdjust : BigRational option
+            /// maps to ItemDoseRate
             MinDoseRate : BigRational option
-            MaxDoseRateAdjust : BigRational option
+            /// maps to ItemDoseRate
+            MaxDoseRate : BigRational option
+            /// maps to ItemDoseAdjustRateAdjust
             MinDoseRateAdjust : BigRational option
+            /// maps to ItemDoseAdjustRateAdjust
+            MaxDoseRateAdjust : BigRational option
+        }
+
+
+    type DoseRule =
+        {
+            // selector properties
+            Indication : string
+            Medication : string
+            Shape : string
+            Route : string
+            Age : BigRational option * BigRational option
+            Weight : BigRational option * BigRational option
+            GestAge : BigRational option * BigRational option
+            PostAge : BigRational option * BigRational option
+            /// maps to OrderType
+            OrderType : OrderType
+            /// maps to PresFreq
+            Frequencies : BigRational list
+            /// maps to OrderableDoseRate
+            Rates : BigRational list
+            /// maps to PresTime
+            MinTime : BigRational option
+            /// maps to PresTime
+            MaxTime : BigRational option
+            DoseUnit : string
+            AdjUnit : string
+            TimeUnit : string
+            RateUnit : string
+            Limits : DoseLimits list
         }
 
 
     type SolutionLimits =
         {
-            Name : string
-            Component : string
+            SubstanceName : string
+            /// maps to ItemOrderableQty
+            Quantities : BigRational list
+            /// maps to ItemOrderableConc
             MinConcentration : BigRational option
+            /// maps to ItemOrderableConc
             MaxConcentration : BigRational option
+        }
+
+
+    type SolutionRule =
+        {
+            Medication : string
+            Age : BigRational option * BigRational option
+            Weight : BigRational option * BigRational option
+            Solution : string
+            /// maps to OrderableOrderableQty
+            Quantities : BigRational list
+            RateUnit : string
+            /// maps to OrderableDoseCount
             DoseCount : BigRational list
-            MinTime : BigRational option
-            MaxTime : BigRational option
+            Limits : SolutionLimits list
+        }
+
+
+    type Substance =
+        {
+            Name : string
+            Unit : string
+            Quantities : BigRational list
+            Concentrations : BigRational list
+        }
+
+
+    type Product =
+        {
+            Name : string
+            Shape : string
+            Unit : string
+            Divisible : BigRational option
+            Quantities : BigRational list
+            Substances : Substance list
         }
 
 

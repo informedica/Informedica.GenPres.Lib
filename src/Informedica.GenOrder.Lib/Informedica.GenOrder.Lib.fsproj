@@ -9,6 +9,7 @@
     <Compile Include="Types.fs" />
     <Compile Include="DateTime.fs" />
     <Compile Include="List.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="Logging.fs" />
     <Compile Include="WrappedString.fs" />
     <Compile Include="ValueUnit.fs" />
@@ -24,6 +25,7 @@
     <None Include="Scripts\Demo.fsx" />
     <None Include="Scripts\Examples.fsx" />
     <None Include="Scripts\load.fsx" />
+    <None Include="Scripts\Constraints.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
