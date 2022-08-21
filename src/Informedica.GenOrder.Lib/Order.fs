@@ -365,6 +365,7 @@ module Order =
 
             o
 
+
     let solveConstraints log cs o =
         // return eqs
         let toEql prod sum =

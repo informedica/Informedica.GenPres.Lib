@@ -412,7 +412,7 @@ module Types =
             Medication : string
             Age : BigRational option * BigRational option
             Weight : BigRational option * BigRational option
-            Solution : string
+            Solutions : string list
             /// maps to OrderableOrderableQty
             Quantities : BigRational list
             RateUnit : string

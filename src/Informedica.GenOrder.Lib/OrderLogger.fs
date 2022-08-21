@@ -1,5 +1,7 @@
 namespace Informedica.GenOrder.Lib
 
+open Microsoft.FSharp.Quotations
+
 module OrderLogger =
 
     open System
@@ -25,16 +27,17 @@ module OrderLogger =
     type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
     type Level = Informedica.GenSolver.Lib.Types.Logging.Level
 
+    module Name = Informedica.GenSolver.Lib.Variable.Name
 
     // To print all messages related to an order
-    let printOrderMsg msg = 
-        match msg with 
+    let printOrderMsg msg =
+        match msg with
         | Logging.OrderMessage m ->
             match m with
-            | Events.SolverReplaceUnit (n, u) -> 
-                $"replaced {n} with {u |> ValueUnit.unitToString}"
+            | Events.SolverReplaceUnit (n, u) ->
+                $"replaced {n |> Name.toString} unit with {u |> ValueUnit.unitToString}"
             | Events.OrderSolved o -> ""
-            | Events.OrderConstraintsSolved (o, cs) -> 
+            | Events.OrderConstraintsSolved (o, cs) ->
                 o
                 |> Order.toString
                 |> String.concat "\n"
@@ -46,17 +49,17 @@ module OrderLogger =
 
     // Catches a message and will dispatch this to the appropiate
     // print function
-    let printMsg (msg : Informedica.GenSolver.Lib.Types.Logging.Message) = 
+    let printMsg (msg : Informedica.GenSolver.Lib.Types.Logging.Message) =
         match msg.Message with
-        | :? SolverMessage as m -> 
-            m 
+        | :? SolverMessage as m ->
+            m
             |> SolverLogging.printMsg
         | :? OrderMessage  as m -> m |> printOrderMsg
-        | _ -> 
+        | _ ->
             sprintf ""
 
     // A message to send to the order logger agent
-    type Message =  
+    type Message =
         | Start of Level
         | Received of Informedica.GenSolver.Lib.Types.Logging.Message
         | Report
@@ -79,10 +82,10 @@ module OrderLogger =
     let printLogger : Logger = { Log = (printMsg >> (printfn "%s")) }
 
 
-    // Create the logger agent 
+    // Create the logger agent
     let logger =
 
-        let loggerAgent : Agent<Message> = 
+        let loggerAgent : Agent<Message> =
             Agent.Start <| fun inbox ->
                 let msgs = ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
 
@@ -91,9 +94,9 @@ module OrderLogger =
                         let! msg = inbox.Receive ()
 
                         match msg with
-                        | Start level -> 
+                        | Start level ->
                             let timer = Stopwatch.StartNew()
-                            return! 
+                            return!
                                 ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
                                 |> loop timer level
 
@@ -108,15 +111,15 @@ module OrderLogger =
 
                         | Report ->
                             printfn "=== Start Report ===\n"
-                            msgs 
+                            msgs
                             |> Seq.length
                             |> printfn "Total messages received: %i\n"
-                            
-                            msgs 
+
+                            msgs
                             |> Seq.iteri (fun i (t, m) ->
                                 m
                                 |> printMsg
-                                |> function 
+                                |> function
                                 | s when s |> String.IsNullOrEmpty -> ()
                                 | s -> printfn "\n%i. %f: %A\n%s" i t m.Level s
                             )
@@ -125,13 +128,13 @@ module OrderLogger =
                             return! loop timer level msgs
 
                         | Write path ->
-                            msgs 
+                            msgs
                             |> Seq.iteri (fun i (t, m) ->
                                 m
                                 |> printMsg
-                                |> function 
+                                |> function
                                 | s when s |> String.IsNullOrEmpty -> ()
-                                | s -> 
+                                | s ->
                                     let s = sprintf "\n%i. %f: %A\n%s" i t m.Level s
                                     System.IO.File.AppendAllLines(path, [s])
                             )
@@ -139,12 +142,12 @@ module OrderLogger =
 
                             return! loop timer level msgs
                     }
-                
+
                 let timer = Stopwatch.StartNew()
                 loop timer Level.Informative msgs
-            
+
         {
-            Start = 
+            Start =
                 fun level ->
                     printfn $"start logging at level {level}"
 
@@ -156,9 +159,9 @@ module OrderLogger =
                     fun msg ->
                         msg
                         |> Received
-                        |> loggerAgent.Post 
-            } 
-            Report = 
+                        |> loggerAgent.Post
+            }
+            Report =
                 fun _ ->
                     Report
                     |> loggerAgent.Post
@@ -171,8 +174,8 @@ module OrderLogger =
     // print an order list
     let printScenarios v n (sc : Order list) =
         let w =
-            match sc with 
-            | h::_ -> 
+            match sc with
+            | h::_ ->
                 h.Adjust
                 |> Quantity.toValueUnitStringList None
                 |> Seq.map snd
@@ -189,7 +192,7 @@ module OrderLogger =
                 printfn "%i\tprescription:\t%s" (i + 1) p
                 printfn "  \tdispensing:\t%s" a
                 printfn "  \tpreparation:\t%s" d
-            
+
             if v then
                 o
                 |> Order.toString

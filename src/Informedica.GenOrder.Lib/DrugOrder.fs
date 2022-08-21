@@ -280,7 +280,7 @@ module DrugOrder =
         |> sprintf "%s[%s]" u
 
 
-    let toConstrainedOrder (d : DrugOrder) : ConstrainedOrder =
+    let toConstrainedOrder fixedDose (d : DrugOrder) : ConstrainedOrder =
         let ou = d.Unit |> unitGroup
         let odto = ODto.dto d.Id d.Name d.Shape
 
@@ -334,12 +334,10 @@ module DrugOrder =
                         for s in p.Substances do
                             let su = s.Unit |> unitGroup
                             let du = s.DoseUnit |> unitGroup
-                            let tu = s.TimeUnit |> unitGroup
 
                             let idto = IDto.dto d.Id s.Name
 
-                            idto.ComponentConcentration.Unit <-
-                                $"{su}/{ou}"
+                            idto.ComponentConcentration.Unit <- $"{su}/{ou}"
                             idto.ComponentQuantity.Unit <- su
 
                             match d.OrderType with
@@ -347,21 +345,25 @@ module DrugOrder =
                             | ProcessOrder -> ()
                             | ContinuousOrder ->
                                 idto.DoseRateAdjust.Unit <-
-                                    $"{du}=/kg[Weight]/{tu}"
+                                    s.RateUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
                             | DiscontinuousOrder ->
                                 idto.DoseQuantity.Unit <- du
                                 idto.DoseTotalAdjust.Unit <-
-                                    p.TimeUnit
+                                    s.TimeUnit
                                     |> unitGroup
                                     |> sprintf "%s/kg[Weight]/%s" du
                             | TimedOrder ->
                                 idto.DoseQuantity.Unit <- du
                                 idto.DoseTotalAdjust.Unit <-
-                                    p.TimeUnit
+                                    s.TimeUnit
                                     |> unitGroup
                                     |> sprintf "%s/kg[Weight]/%s" du
                                 idto.DoseRateAdjust.Unit <-
-                                    $"{du}/kg[Weight]/{tu}"
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
 
                             idto
                     ]
@@ -400,7 +402,14 @@ module DrugOrder =
         |> Order.Dto.fromDto
         |> fun o ->
             // first add all general orderable constraints
-            let co = (DrugConstraint.constraints (o.Orderable.Name |> Name.toString), o)
+            let co =
+                DrugConstraint.constraints (o.Orderable.Name |> Name.toString)
+                // filter out OrderableDoseCount if fixedDose
+                |> List.filter (fun c ->
+                    match c.Mapping with
+                    | OrderableDoseCount -> not fixedDose
+                    | _ -> true
+                ), o
             // adding orderable constraints
             co
             >|> [
@@ -434,8 +443,13 @@ module DrugOrder =
                             DrugConstraint.create n
                                 ComponentComponentQty
                                 (p.Quantities |> Props.vals)
-                                NoLimit
-                                AnyRouteShape AnyOrder
+                                NoLimit AnyRouteShape AnyOrder
+
+                            if not fixedDose then
+                                DrugConstraint.create n
+                                    ComponentOrderableQty
+                                    (p.Divisible |> Props.singleIncr)
+                                    NoLimit AnyRouteShape AnyOrder
                             // // give max 10 solid oral each time
                             // DrugConstraint.create n
                             //     ComponentOrderableQty
@@ -471,8 +485,7 @@ module DrugOrder =
                                 DrugConstraint.create n
                                     ComponentOrderableConc
                                     (1N |> Props.singleVal)
-                                    NoLimit
-                                    AnyRouteShape AnyOrder
+                                    NoLimit AnyRouteShape AnyOrder
                         ]
 
                 p.Substances
@@ -505,33 +518,6 @@ module DrugOrder =
                 ) co
             ) co
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
-
-
-    let doseLimits =
-        {
-            SubstanceName = ""
-            MaxDoseQuantity = None
-            MinDoseQuantity = None
-            MinDoseQuantityAdjust = None
-            MaxDoseQuantityAdjust = None
-            MaxDoseTotal = None
-            MinDoseTotal = None
-            MaxDoseTotalAdjust = None
-            MinDoseTotalAdjust = None
-            MaxDoseRate = None
-            MinDoseRate = None
-            MaxDoseRateAdjust = None
-            MinDoseRateAdjust = None
-        }
-
-
-    let solutionLimits =
-        {
-            SubstanceName = ""
-            Quantities = []
-            MinConcentration = None
-            MaxConcentration = None
-        }
 
 
     let setDoseRule (dr : DoseRule) (co : ConstrainedOrder) : ConstrainedOrder =
@@ -569,6 +555,16 @@ module DrugOrder =
                         PresFreq
                         (dr.Frequencies |> Props.vals)
                         NoLimit AnyRouteShape TimedOrder
+                if dr.MinTime.IsSome then
+                    DrugConstraint.create dr.Medication
+                        PresTime
+                        (dr.MinTime.Value |> Props.minIncl)
+                        NoLimit AnyRouteShape TimedOrder
+                if dr.MaxTime.IsSome then
+                    DrugConstraint.create dr.Medication
+                        PresTime
+                        (dr.MaxTime.Value |> Props.maxIncl)
+                        NoLimit AnyRouteShape TimedOrder
         ]
         |> function
         | cs, o ->
@@ -588,11 +584,13 @@ module DrugOrder =
                 |> cr sn ItemDoseRate Props.maxIncl l.MaxDoseRate
                 |> cr sn ItemDoseAdjustRateAdjust Props.minIncl l.MinDoseRateAdjust
                 |> cr sn ItemDoseAdjustRateAdjust Props.maxIncl l.MaxDoseRateAdjust
+
             ) (cs,o)
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 
 
-    let setSolutionRule (sl : SolutionRule)
+    let setSolutionRule fixedDose
+                        (sl : SolutionRule)
                         (co : ConstrainedOrder) : ConstrainedOrder =
         let set n m c v co =
             match v with
@@ -603,7 +601,7 @@ module DrugOrder =
 
         co
         >|> [
-                if sl.DoseCount |> List.isEmpty |> not then
+                if sl.DoseCount |> List.isEmpty |> not && (not fixedDose) then
                     DrugConstraint.create
                         sl.Medication
                         OrderableDoseCount
@@ -618,8 +616,6 @@ module DrugOrder =
                 acc
                 |> set sn ItemOrderableConc Props.minIncl l.MinConcentration
                 |> set sn ItemOrderableConc Props.maxIncl l.MaxConcentration
-                // |> set sn PresTime Props.minIncl l.MinTime
-                // |> set sn PresTime Props.maxIncl l.MaxTime
             ) (cs, o)
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 

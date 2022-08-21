@@ -1,5 +1,7 @@
 namespace Informedica.GenOrder.Lib
 
+open System.Xml.Xsl
+
 
 module Api =
 
@@ -55,7 +57,59 @@ module Api =
         |> List.distinct
 
 
-    let createDrugOrder (doseRule : DoseRule) =
+    let tryHead m = (List.map m) >> List.tryHead >> (Option.defaultValue "")
+
+
+    let createProductComponent doseRule rateUnit noSubst (prods : Product list) =
+
+        { DrugOrder.productComponent with
+            Name = prods |> tryHead (fun p -> p.Name)
+            Quantities = prods |> List.collect (fun p -> p.Quantities)
+            TimeUnit = doseRule.TimeUnit
+            RateUnit = rateUnit //sols |> tryHead (fun s -> s.RateUnit)
+            Divisible =
+                prods
+                |> List.choose (fun p -> p.Divisible)
+                |> List.tryHead
+                |> Option.defaultValue 1N
+            Substances =
+                if noSubst then []
+                else
+                    prods
+                    |> List.collect (fun p -> p.Substances)
+                    |> List.groupBy (fun s -> s.Name)
+                    |> List.map (fun (n, xs) ->
+                        {
+                            Name = n
+                            Concentrations =
+                                xs
+                                |> List.collect (fun s -> s.Concentrations)
+                                |> List.distinct
+                            OrderableQuantities = []
+                            Unit = xs |> tryHead (fun x -> x.Unit)
+                            DoseUnit = doseRule.DoseUnit
+                            TimeUnit = doseRule.TimeUnit
+                            RateUnit = doseRule.RateUnit
+                        }
+                    )
+        }
+
+    let createDrugOrder rateUnit (prods : Product list) (doseRule : DoseRule) =
+
+        { DrugOrder.drugOrder with
+                Id = Guid.NewGuid().ToString()
+                Name = doseRule.Medication
+                Products = [ prods |> createProductComponent doseRule rateUnit false ]
+                Quantities = []
+                Unit = prods |> tryHead (fun p -> p.Unit)
+                TimeUnit = doseRule.TimeUnit
+                RateUnit = rateUnit //sols |> tryHead (fun s -> s.RateUnit)
+                Shape = doseRule.Shape
+                Route = doseRule.Route
+                OrderType = doseRule.OrderType
+        }
+
+    let createDrugOrders (solutionRule: SolutionRule option) (doseRule : DoseRule) =
         let prods =
             Data.getProducts ()
             |> List.filter (fun p ->
@@ -63,61 +117,24 @@ module Api =
                 p.Shape = doseRule.Shape
             )
 
-        let sols =
-            Data.getSolutions ()
-            |> List.filter (fun s ->
-                s.Medication = doseRule.Medication
-            )
-
-        let tryHead m = (List.map m) >> List.tryHead >> (Option.defaultValue "")
-
-        { DrugOrder.drugOrder with
-                Id = Guid.NewGuid().ToString()
-                Name = doseRule.Medication
-                Products = [
-                    { DrugOrder.productComponent with
-                        Name = prods |> tryHead (fun p -> p.Name)
-                        Quantities = prods |> List.collect (fun p -> p.Quantities)
-                        TimeUnit = doseRule.TimeUnit
-                        RateUnit = sols |> tryHead (fun s -> s.RateUnit)
-                        Divisible =
-                            prods
-                            |> List.choose (fun p -> p.Divisible)
-                            |> List.tryHead
-                            |> Option.defaultValue 1N
-                        Substances =
-                            prods
-                            |> List.collect (fun p -> p.Substances)
-                            |> List.groupBy (fun s -> s.Name)
-                            |> List.map (fun (n, xs) ->
-                                        {
-                                            Name = n
-                                            Concentrations =
-                                                xs
-                                                |> List.collect (fun s -> s.Concentrations)
-                                                |> List.distinct
-                                            OrderableQuantities = []
-                                            Unit = xs |> tryHead (fun x -> x.Unit)
-                                            DoseUnit = doseRule.DoseUnit
-                                            TimeUnit = doseRule.TimeUnit
-                                            RateUnit = doseRule.RateUnit
-                                        }
-                            )
+        match solutionRule with
+        | None -> [ createDrugOrder "" prods doseRule ]
+        | Some solRule ->
+            let rateUnit = solRule.RateUnit
+            solRule.Solutions
+            |> List.map (fun s ->
+                createDrugOrder rateUnit prods doseRule
+                |> fun drugOrder ->
+                    { drugOrder with
+                        Quantities = solRule.Quantities
+                        Products =
+                            Data.getProducts ()
+                            |> List.filter (fun p -> p.Name = s)
+                            |> createProductComponent doseRule rateUnit true
+                            |> List.singleton
+                            |> List.append drugOrder.Products
                     }
-
-                    // if sols |> List.isEmpty |> not then
-                    //     sols
-                    //     |> List.map (fun s ->
-                    //     )
-                ]
-                Quantities = []
-                Unit = prods |> tryHead (fun p -> p.Unit)
-                TimeUnit = doseRule.TimeUnit
-                RateUnit = sols |> tryHead (fun s -> s.RateUnit)
-                Shape = doseRule.Shape
-                Route = doseRule.Route
-                OrderType = doseRule.OrderType
-        }
+            )
 
 
     // print an order list
@@ -153,12 +170,47 @@ module Api =
             Administration =sc.Administration |> trans
         }
 
+    module Name = Informedica.GenSolver.Lib.Variable.Name
 
-    let evaluate age weight doseRule =
+
+    let calcFixedDose (doseRule : DoseRule) =
+        let eqs d1 d2 =
+            match d1, d2 with
+            | Some x1, Some x2 -> x1 = x2
+            | _ -> false
+
+        doseRule.Limits
+        |> List.exists (fun l ->
+            l.MinDoseQuantity |> eqs l.MaxDoseQuantity ||
+            l.MinDoseRate |> eqs l.MaxDoseRate ||
+            l.MinDoseTotal |> eqs l.MaxDoseTotal ||
+            l.MinDoseQuantityAdjust |> eqs l.MaxDoseQuantityAdjust ||
+            l.MinDoseTotalAdjust |> eqs l.MaxDoseTotalAdjust ||
+            l.MinDoseRateAdjust |> eqs l.MaxDoseRateAdjust
+        )
+
+
+    let evaluate age weight (doseRule : DoseRule) =
+        let solRule =
+            Data.getSolutions ()
+            |> List.tryFind (fun s -> s.Medication = doseRule.Medication)
+
+        let eqs d1 d2 =
+            match d1, d2 with
+            | Some x1, Some x2 -> x1 = x2
+            | _ -> false
+
+        let fixedDose = calcFixedDose doseRule
+
         doseRule
-        |> createDrugOrder
-        |> DrugOrder.toConstrainedOrder
-        |> DrugOrder.setDoseRule doseRule
-        |> DrugOrder.setAdjust doseRule.Medication weight
-        |> DrugOrder.evaluate OrderLogger.logger.Logger
+        |> createDrugOrders solRule
+        |> List.map (DrugOrder.toConstrainedOrder fixedDose)
+        |> List.map (DrugOrder.setDoseRule doseRule)
+        |> fun xs ->
+            if solRule.IsNone then xs
+            else
+                xs
+                |> List.map (DrugOrder.setSolutionRule fixedDose solRule.Value)
+        |> List.map (DrugOrder.setAdjust doseRule.Medication weight)
+        |> List.collect (DrugOrder.evaluate OrderLogger.logger.Logger)
         |> toScenarios doseRule.Indication (doseRule.Limits |> List.map (fun l -> l.SubstanceName))

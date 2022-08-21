@@ -1,14 +1,16 @@
 
+
 #load "load.fsx"
 
 open MathNet.Numerics
 open Informedica.GenOrder.Lib
 
 
-Api.filter None None None (Some "cotrimoxazol") (Some "drank") None
+Api.filter None None None (Some "gentamicine") (Some "infusievloeistof") None
 |> List.item 0
-|> Api.evaluate None 10N
+|> Api.evaluate None (6N)
 |> List.map Api.translate
+|> List.iter (printfn "%A")
 
 
 // Start the logger at an informative level
@@ -23,14 +25,28 @@ $"{__SOURCE_DIRECTORY__}/test.txt"
 |> OrderLogger.logger.Write
 
 
-Api.filter None None None (Some "paracetamol") (Some "zetpil") None
-|> List.item 1
+Api.filter None None None (Some "gentamicine") None None
+|> List.item 0
 |> fun dr ->
+    let solRule =
+        Data.getSolutions ()
+        |> List.tryFind (fun s -> s.Medication = dr.Medication)
     dr
-    |> Api.createDrugOrder
-    |> DrugOrder.toConstrainedOrder
-    |> DrugOrder.setDoseRule dr
-    |> DrugOrder.setAdjust dr.Medication 10N
-    |> fst
+    |> Api.createDrugOrders solRule
+    |> List.map (DrugOrder.toConstrainedOrder true)
+    |> List.map (DrugOrder.setDoseRule dr)
+    |> fun xs ->
+        if solRule.IsNone then xs
+        else
+            xs
+            |> List.map (DrugOrder.setSolutionRule true solRule.Value)
+    |> List.map (DrugOrder.setAdjust dr.Medication 10N)
+    |> List.collect fst
     |> List.sortBy (fun c -> c.Mapping)
     |> List.iteri (printfn "%i. %A")
+
+
+
+Api.filter None None None (Some "gentamicine") None None
+|> List.item 0
+|> calcFixedDose

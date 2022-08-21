@@ -6,7 +6,7 @@ module Utils =
     module Constants =
 
 
-        let MAX_LOOP_COUNT = 100
+        let MAX_LOOP_COUNT = 10
 
 
         let MAX_CALC_COUNT = 5000
@@ -14,14 +14,14 @@ module Utils =
 
     /// Helper functions for `BigRational`
     [<RequireQualifiedAccess>]
-    module BigRational = 
+    module BigRational =
 
         open MathNet.Numerics
         open Informedica.Utils.Lib.BCL
 
-        /// ToDo: doesn't return `NoOp` but fails, 
+        /// ToDo: doesn't return `NoOp` but fails,
         /// have to rewrite
-        /// 
+        ///
         /// Match an operator `op` to either
         /// multiplication, division, addition
         /// or subtraction, returns `NoOp` when
@@ -37,11 +37,11 @@ module Utils =
 
         let private toMultipleOf b d n  =
             if d = 0N then n
-            else 
+            else
                 let m = (n / d) |> BigRational.ToBigInt |> BigRational.FromBigInt
                 if b then
                     if m * d < n then (m + 1N) * d else m * d
-                else 
+                else
                     if m * d > n then (m - 1N) * d else m * d
 
 
@@ -50,7 +50,7 @@ module Utils =
 
         let toMaxMultipleOf = toMultipleOf false
 
-    
+
         let calcMinOrMaxToMultiple isMax isIncl incrs minOrMax =
             incrs
             |> Set.filter ((<) 0N) // only accept positive incrs
@@ -59,25 +59,25 @@ module Utils =
                 let nc = if isMax then (>) else (<)
                 let ad = if isMax then (-) else (+)
 
-                let m = 
+                let m =
                     if isMax then minOrMax |> toMaxMultipleOf i
                     else minOrMax |> toMinMultipleOf i
-            
-                let m = 
-                    if (isIncl |> not) && (m |> ec <| minOrMax) then 
-                        (m |> ad <| i) 
+
+                let m =
+                    if (isIncl |> not) && (m |> ec <| minOrMax) then
+                        (m |> ad <| i)
                     else m
-        
-                match acc with 
+
+                match acc with
                 | Some a -> if (m |> nc <| a) then (true, Some m) else (b, Some a)
                 | None   -> (true, Some m)
             ) (isIncl, None)
             |> fun (b, r) -> b, r |> Option.defaultValue minOrMax
 
 
-        let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
+        let maxInclMultipleOf = calcMinOrMaxToMultiple true true
 
-        let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
+        let maxExclMultipleOf = calcMinOrMaxToMultiple true false
 
         let minInclMultipleOf = calcMinOrMaxToMultiple false true
 
@@ -86,7 +86,7 @@ module Utils =
 
     /// Helper functions for `Option`
     [<RequireQualifiedAccess>]
-    module Option = 
+    module Option =
 
         let none _ = None
 
@@ -109,7 +109,7 @@ module Utils =
             else
                 xs
                 |> Set.fold (fun acc x1 ->
-                    acc 
+                    acc
                     |> Set.filter (fun x2 ->
                         x1 = x2 ||
                         x2 |> BigRational.isMultiple x1 |> not
