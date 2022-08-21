@@ -37,26 +37,31 @@ module DrugOrder =
 
     module RouteShape =
 
+        let fromString s =
+            match s with
+            | s when s = "RectalSolid" -> RectalSolid
+            | s when s = "OralSolid" -> OralSolid
+            | s when s = "OralFluid" -> OralFluid
+            | s when s = "IntravenousFluid" -> IntravenousFluid
+            | _ -> AnyRouteShape
+
+        
         let mapping =
-            [
-                "rect", "supp", RectalSolid
-                "rect", "zetpil", RectalSolid
-                "rectaal", "supp", RectalSolid
-                "rectaal", "zetpil", RectalSolid
-                "or", "tablet", OralSolid
-                "or", "pill", OralSolid
-                "or", "pil", OralSolid
-                "or", "capsule", OralSolid
-                "oraal", "tablet", OralSolid
-                "oraal", "pill", OralSolid
-                "oraal", "pil", OralSolid
-                "oraal", "capsule", OralSolid
-                "or", "drink", OralFluid
-                "or", "drank", OralFluid
-                "iv", "infusion fluid", IntravenousFluid
-                "iv", "infusievloeistof", IntravenousFluid
-                "intraveneus", "infusievloeistof", IntravenousFluid
-            ]
+            Web.getDataFromSheet "RouteShape"
+            |> fun data ->
+                let getColum =
+                    data
+                    |> Array.head
+                    |> Csv.getStringColumn
+
+                data
+                |> Array.tail
+                |> Array.map (fun r ->
+                    let get = getColum r
+                    get "Route", get "Shape", get "Mapping" |> fromString
+                )
+                |> Array.toList
+
 
         let map route shape =
             mapping
@@ -276,7 +281,7 @@ module DrugOrder =
         |> sprintf "%s[%s]" u
 
 
-    let create (d : DrugOrder) : ConstrainedOrder =
+    let toConstrainedOrder (d : DrugOrder) : ConstrainedOrder =
         let ou = d.Unit |> unitGroup
         let odto = ODto.dto d.Id d.Name d.Shape
 
@@ -298,12 +303,16 @@ module DrugOrder =
                 |> sprintf "%s/kg[Weight]/%s" ou
 
         | DiscontinuousOrder ->
+            odto.DoseQuantity.Unit <- ou
+            odto.DoseQuantityAdjust.Unit <- $"{ou}/kg[Weight]"
             odto.DoseTotal.Unit <-
                 d.TimeUnit
                 |> unitGroup
                 |> sprintf "%s/%s" ou
 
         | TimedOrder ->
+            odto.DoseQuantity.Unit <- ou
+            odto.DoseQuantityAdjust.Unit <- $"{ou}/kg[Weight]"
             odto.DoseTotal.Unit <-
                 d.TimeUnit
                 |> unitGroup

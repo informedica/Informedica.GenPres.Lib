@@ -20,12 +20,11 @@
     <Compile Include="Prescription.fs" />
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
+    <Compile Include="Data.fs" />
     <Compile Include="OrderLogger.fs" />
-    <Compile Include="Demo.fs" />
-    <None Include="Scripts\Demo.fsx" />
-    <None Include="Scripts\Examples.fsx" />
+    <Compile Include="Api.fs" />
     <None Include="Scripts\load.fsx" />
-    <None Include="Scripts\Constraints.fsx" />
+    <None Include="Scripts\Api.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
