@@ -45,7 +45,7 @@ module DrugOrder =
             | s when s = "IntravenousFluid" -> IntravenousFluid
             | _ -> AnyRouteShape
 
-        
+
         let mapping =
             Web.getDataFromSheet "RouteShape"
             |> fun data ->
@@ -166,7 +166,7 @@ module DrugOrder =
                             get "Values"
                             |> Props.fromString (get "Property")
                         Limit = Informedica.GenSolver.Lib.Types.NoLimit
-                        RouteShape = AnyRouteShape
+                        RouteShape = get "RouteShape" |> RouteShape.fromString
                         OrderType =
                                 get "OrderType" |> OrderType.fromString
                                 |> Option.defaultValue AnyOrder
@@ -194,14 +194,13 @@ module DrugOrder =
         let apply log cs (o : Order) =
             let cs =
                 cs
-                |> filter o
+//                |> filter o
                 |> List.map (mapToConstraint o)
 
             o
             |> Order.solveUnits log
             |> Order.solveConstraints log cs
-            |> fun o ->
-                Order.calcScenarios log o
+            |> Order.calcScenarios log
 
 
     module Item = Orderable.Item
@@ -409,8 +408,19 @@ module DrugOrder =
                         // ALL set possible orderable quantities
                         cstr OrderableOrderableQty
                             (d.Quantities |> Props.vals)
-                            NoLimit
-                            AnyRouteShape AnyOrder
+                            NoLimit AnyRouteShape AnyOrder
+                    else
+                        // set the divisible
+                        let divs =
+                            d.Products
+                            |> List.map (fun p -> p.Divisible)
+                            |> List.distinct
+                            |> Props.incr
+
+                        cstr OrderableOrderableQty
+                             divs
+                             NoLimit AnyRouteShape AnyOrder
+
                 ]
         |> fun co ->
             d.Products
@@ -426,35 +436,35 @@ module DrugOrder =
                                 (p.Quantities |> Props.vals)
                                 NoLimit
                                 AnyRouteShape AnyOrder
-                            // give max 10 solid oral each time
-                            DrugConstraint.create n
-                                ComponentOrderableQty
-                                ([ 1N / p.Divisible.. 1N / p.Divisible ..10N ]
-                                 |> Set.ofList |> Property.createValsProp)
-                                NoLimit
-                                OralSolid DiscontinuousOrder
-                            // give max
-
-                            // ORAL FLUID
-                            DrugConstraint.create n
-                                ComponentOrderableQty
-                                ([ 1N / p.Divisible.. 1N / p.Divisible ..250N ] |> Props.vals)
-                                NoLimit
-                                OralFluid AnyOrder
-
-                            // INRAVENOUS FLUID
-                            DrugConstraint.create n
-                                ComponentOrderableQty
-                                ([ 1N / p.Divisible.. 1N / p.Divisible ..500N ] |> Props.vals)
-                                NoLimit
-                                IntravenousFluid AnyOrder
-
-                            // RECTAL SOLID
-                            DrugConstraint.create n
-                                ComponentOrderableQty
-                                (1N |> Props.singleVal)
-                                NoLimit
-                                RectalSolid DiscontinuousOrder
+                            // // give max 10 solid oral each time
+                            // DrugConstraint.create n
+                            //     ComponentOrderableQty
+                            //     ([ 1N / p.Divisible.. 1N / p.Divisible ..10N ]
+                            //      |> Set.ofList |> Property.createValsProp)
+                            //     NoLimit
+                            //     OralSolid DiscontinuousOrder
+                            // // give max
+                            //
+                            // // ORAL FLUID
+                            // DrugConstraint.create n
+                            //     ComponentOrderableQty
+                            //     ([ 1N / p.Divisible.. 1N / p.Divisible ..250N ] |> Props.vals)
+                            //     NoLimit
+                            //     OralFluid AnyOrder
+                            //
+                            // // INRAVENOUS FLUID
+                            // DrugConstraint.create n
+                            //     ComponentOrderableQty
+                            //     ([ 1N / p.Divisible.. 1N / p.Divisible ..500N ] |> Props.vals)
+                            //     NoLimit
+                            //     IntravenousFluid AnyOrder
+                            //
+                            // // RECTAL SOLID
+                            // DrugConstraint.create n
+                            //     ComponentOrderableQty
+                            //     (1N |> Props.singleVal)
+                            //     NoLimit
+                            //     RectalSolid DiscontinuousOrder
 
                             // SINGLE COMPONENT
                             if d.Products |> List.length = 1 then
@@ -494,6 +504,7 @@ module DrugOrder =
                         ]
                 ) co
             ) co
+            |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 
 
     let doseLimits =
@@ -565,19 +576,20 @@ module DrugOrder =
             |> List.fold (fun acc l ->
                 let sn = l.SubstanceName
                 acc
-                |> cr sn ItemDoseQty Props.maxIncl l.MaxDoseQuantity
                 |> cr sn ItemDoseQty Props.minIncl l.MinDoseQuantity
-                |> cr sn ItemDoseAdjustQtyAdjust Props.maxIncl l.MaxDoseQuantityAdjust
+                |> cr sn ItemDoseQty Props.maxIncl l.MaxDoseQuantity
                 |> cr sn ItemDoseAdjustQtyAdjust Props.minIncl l.MinDoseQuantityAdjust
-                |> cr sn ItemDoseTotal Props.maxIncl l.MaxDoseTotal
+                |> cr sn ItemDoseAdjustQtyAdjust Props.maxIncl l.MaxDoseQuantityAdjust
                 |> cr sn ItemDoseTotal Props.minIncl l.MinDoseTotal
-                |> cr sn ItemDoseAdjustTotalAdjust Props.maxIncl l.MaxDoseTotalAdjust
+                |> cr sn ItemDoseTotal Props.maxIncl l.MaxDoseTotal
                 |> cr sn ItemDoseAdjustTotalAdjust Props.minIncl l.MinDoseTotalAdjust
-                |> cr sn ItemDoseRate Props.maxIncl l.MaxDoseRate
+                |> cr sn ItemDoseAdjustTotalAdjust Props.maxIncl l.MaxDoseTotalAdjust
                 |> cr sn ItemDoseRate Props.minIncl l.MinDoseRate
-                |> cr sn ItemDoseAdjustRateAdjust Props.maxIncl l.MaxDoseRateAdjust
+                |> cr sn ItemDoseRate Props.maxIncl l.MaxDoseRate
                 |> cr sn ItemDoseAdjustRateAdjust Props.minIncl l.MinDoseRateAdjust
+                |> cr sn ItemDoseAdjustRateAdjust Props.maxIncl l.MaxDoseRateAdjust
             ) (cs,o)
+            |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 
 
     let setSolutionRule (sl : SolutionRule)
@@ -609,6 +621,7 @@ module DrugOrder =
                 // |> set sn PresTime Props.minIncl l.MinTime
                 // |> set sn PresTime Props.maxIncl l.MaxTime
             ) (cs, o)
+            |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 
 
     let setAdjust n a (co : ConstrainedOrder) : ConstrainedOrder =

@@ -110,7 +110,7 @@ module Api =
                     //     |> List.map (fun s ->
                     //     )
                 ]
-                Quantities = prods |> List.collect (fun p -> p.Quantities)
+                Quantities = []
                 Unit = prods |> tryHead (fun p -> p.Unit)
                 TimeUnit = doseRule.TimeUnit
                 RateUnit = sols |> tryHead (fun s -> s.RateUnit)

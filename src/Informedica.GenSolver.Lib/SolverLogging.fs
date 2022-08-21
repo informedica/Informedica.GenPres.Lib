@@ -2,7 +2,7 @@ namespace Informedica.GenSolver.Lib
 
 
 module SolverLogging =
-    
+
     open Informedica.Utils.Lib.BCL
 
     open Types
@@ -14,6 +14,16 @@ module SolverLogging =
 
 
     let private eqsToStr eqs =
+        let eqs =
+            eqs
+            |> List.sortBy (fun e ->
+                e
+                |> Equation.toVars
+                |> List.tryHead
+                |> function
+                | Some v -> Some v.Name
+                | None -> None
+            )
         $"""{eqs |> List.map (Equation.toString true) |> String.concat "\n"}"""
 
 
@@ -22,10 +32,10 @@ module SolverLogging =
 
 
     let printException = function
-    | Exceptions.ValueRangeEmptyValueSet -> 
+    | Exceptions.ValueRangeEmptyValueSet ->
         "ValueRange cannot have an empty value set"
 
-    | Exceptions.EquationEmptyVariableList -> 
+    | Exceptions.EquationEmptyVariableList ->
         "An equation should at least contain one variable"
 
     | Exceptions.SolverInvalidEquations eqs ->
@@ -63,10 +73,10 @@ module SolverLogging =
 
     let printMsg = function
     | ExceptionMessage m ->
-        m 
+        m
         |> printException
     | SolverMessage m ->
-        let toString eq = 
+        let toString eq =
             let op = if eq |> Equation.isProduct then " * " else " + "
             let varName = Variable.getName >> Variable.Name.toString
 
@@ -78,8 +88,8 @@ module SolverLogging =
 
 
         match m with
-        | EquationCouldNotBeSolved eq -> 
-            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}" 
+        | EquationCouldNotBeSolved eq ->
+            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}"
 
         | EquationCalculation (op1, op2, y, x, xs) ->
             $"calculating: {Equation.calculationToString op1 op2 y x xs}"
@@ -87,7 +97,7 @@ module SolverLogging =
         | EquationStartedSolving eq ->
             $"=== Start solving Equation ===\n{eq |> toString}"
 
-        | EquationFinishedCalculation (xs, changed) -> 
+        | EquationFinishedCalculation (xs, changed) ->
             $"""=== Equation finished calculation ===
 {if (not changed) then "No changes" else xs |> varsToStr}
 """
@@ -107,7 +117,7 @@ module SolverLogging =
         | SolverLoopedQue eqs ->
             $"=== Solver looped que\nwith {eqs |> List.length} equations"
 
-        | ConstraintSortOrder cs -> 
+        | ConstraintSortOrder cs ->
             $"""=== Constraint sort order ===
             { cs |> List.map (fun (i, c) ->
                 c
@@ -118,11 +128,11 @@ module SolverLogging =
             }
             """
 
-        | ConstraintVariableNotFound (c, eqs) -> 
+        | ConstraintVariableNotFound (c, eqs) ->
             $"""=== Constraint Variable not found ===
             {c
             |> sprintf "Constraint %A cannot be set"
-            |> (fun s -> 
+            |> (fun s ->
                 eqs
                 |> List.map (Equation.toString true)
                 |> String.concat "\n"
@@ -132,11 +142,11 @@ module SolverLogging =
             """
         | ConstraintLimitSetToVariable (l, var) -> ""
 
-        | ConstraintVariableApplied (c, var) -> 
+        | ConstraintVariableApplied (c, var) ->
             $"""=== Constraint apply Variable ===
             {c
             |> Constraint.toString
-            |> fun s -> 
+            |> fun s ->
                 var
                 |> Variable.getName
                 |> Name.toString
@@ -144,9 +154,9 @@ module SolverLogging =
             }
             """
 
-        | ConstrainedEquationsSolved (c, eqs) -> 
+        | ConstrainedEquationsSolved (c, eqs) ->
             $"""=== Equations solved ===
-            {c 
+            {c
             |> Constraint.toString
             |> fun s ->
                 eqs
@@ -166,11 +176,11 @@ module SolverLogging =
 
     let logger f =
         {
-            Log = 
+            Log =
                 fun { TimeStamp = _; Level = _; Message = msg } ->
                     match msg with
                     | :? Logging.SolverMessage as m ->
                         m |> printMsg |> f
-                    | _ -> $"cannot print msg: {msg}" |> f 
-                        
+                    | _ -> $"cannot print msg: {msg}" |> f
+
         }
