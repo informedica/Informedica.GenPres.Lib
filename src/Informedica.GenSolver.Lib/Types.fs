@@ -105,24 +105,17 @@ module Types =
 
         type Event =
             | EquationStartedSolving of Equation
-//            | EquationStartedCalculation of Variable list
             | EquationCalculation of
                 op1: (Variable -> Variable -> Variable) *
                 op2: (Variable -> Variable -> Variable) *
                 x: Variable *
                 y: Variable *
                 xs: Variable List
-//            | EquationVariableChanged of Variable
             | EquationFinishedCalculation of Variable list * changed : bool
             | EquationCouldNotBeSolved of Equation
             | EquationFinishedSolving of Equation * SolveResult
-            //| EquationLoopedSolving of
-            //    bool *
-            //    Variable *
-            //    Variable list *
-            //    Variable list
             | SolverStartSolving of Equation list
-            | SolverLoopedQue of Equation list
+            | SolverLoopedQue of int * Equation list
             | SolverFinishedSolving of Equation list
             | ConstraintSortOrder of (int * Constraint) list
             | ConstraintVariableNotFound of Constraint * Equation list
@@ -144,6 +137,8 @@ module Types =
             | ValueRangeEmptyValueSet
             | ValueRangeTooManyValues of int
             | ValueRangeEmptyIncrement
+            | ValueRangeMinOverFlow of Minimum
+            | ValueRangeMaxOverFlow of Maximum
             | VariableCannotSetValueRange of (Variable * ValueRange)
             | EquationDuplicateVariables of Variable list
             | EquationEmptyVariableList

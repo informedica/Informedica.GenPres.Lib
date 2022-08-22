@@ -60,7 +60,7 @@ module OrderLogger =
 
     // A message to send to the order logger agent
     type Message =
-        | Start of Level
+        | Start of string option * Level
         | Received of Informedica.GenSolver.Lib.Types.Logging.Message
         | Report
         | Write of string
@@ -69,7 +69,7 @@ module OrderLogger =
     // catch a message and will proces this in an asynchronous way.
     type OrderLogger =
         {
-            Start : Level -> unit
+            Start : string option -> Level -> unit
             Logger: Logger
             Report: unit -> unit
             Write : string -> unit
@@ -85,29 +85,49 @@ module OrderLogger =
     // Create the logger agent
     let logger =
 
+        let write path i t m =
+            match path with
+            | None -> ()
+            | Some p ->
+                m
+                |> printMsg
+                |> function
+                | s when s |> String.IsNullOrEmpty -> ()
+                | s ->
+                    let text = [ $"{i}. {t}: {m.Level}"; s ]
+                    System.IO.File.AppendAllLines(p, text)
+
         let loggerAgent : Agent<Message> =
             Agent.Start <| fun inbox ->
                 let msgs = ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
 
-                let rec loop (timer : Stopwatch) level msgs =
+                let rec loop (timer : Stopwatch) path level msgs =
                     async {
                         let! msg = inbox.Receive ()
 
                         match msg with
-                        | Start level ->
+                        | Start (path, level) ->
                             let timer = Stopwatch.StartNew()
                             return!
                                 ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
-                                |> loop timer level
+                                |> loop timer path level
 
                         | Received m ->
                             match level with
                             | Level.Informative ->
+                                let t = timer.Elapsed.TotalSeconds
+                                let i = msgs.Count
+                                write path i t m
+
                                 msgs.Add(timer.Elapsed.TotalSeconds, m)
                             | _ when m.Level = level ->
+                                let t = timer.Elapsed.TotalSeconds
+                                let i = msgs.Count
+                                write path i t m
+
                                 msgs.Add(timer.Elapsed.TotalSeconds, m)
                             | _ -> ()
-                            return! loop timer level msgs
+                            return! loop timer path level msgs
 
                         | Report ->
                             printfn "=== Start Report ===\n"
@@ -125,33 +145,26 @@ module OrderLogger =
                             )
                             printfn "\n"
 
-                            return! loop timer level msgs
+                            return! loop timer path level msgs
 
                         | Write path ->
                             msgs
-                            |> Seq.iteri (fun i (t, m) ->
-                                m
-                                |> printMsg
-                                |> function
-                                | s when s |> String.IsNullOrEmpty -> ()
-                                | s ->
-                                    let s = sprintf "\n%i. %f: %A\n%s" i t m.Level s
-                                    System.IO.File.AppendAllLines(path, [s])
-                            )
-                            System.IO.File.AppendAllLines(path, ["\n"])
+                            |> Seq.iteri (fun i (t, m) -> write (Some path) i t m)
 
-                            return! loop timer level msgs
+                            return! loop timer (Some path) level msgs
                     }
 
                 let timer = Stopwatch.StartNew()
-                loop timer Level.Informative msgs
+                loop timer None Level.Informative msgs
 
         {
             Start =
-                fun level ->
+                fun path level ->
                     printfn $"start logging at level {level}"
+                    if path.IsSome then
+                        printfn $"immediate logging to {path}"
 
-                    level
+                    (path, level)
                     |> Start
                     |> loggerAgent.Post
             Logger = {

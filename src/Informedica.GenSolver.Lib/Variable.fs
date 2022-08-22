@@ -144,7 +144,16 @@ module Variable =
                 |> fun (b, br) -> create b br
 
 
+            let checkTooSmall min =
+                if (min |> toBigRational).Denominator > Constants.MAX_BIGINT then
+                    min
+                    |> Exceptions.ValueRangeMinOverFlow
+                    |> Exceptions.raiseExc
+
+                
             let restrict newMin oldMin =
+                newMin |> checkTooSmall
+
                 if newMin |> minGTmin oldMin then
                     newMin
                 else
@@ -232,7 +241,16 @@ module Variable =
                 |> fun (b, br) -> create b br
 
 
+            let checkTooLarge max =
+                if (max |> toBigRational).Numerator > Constants.MAX_BIGINT then
+                    max
+                    |> Exceptions.ValueRangeMaxOverFlow
+                    |> Exceptions.raiseExc
+
+
             let restrict newMax oldMax =
+                newMax |> checkTooLarge
+
                 if newMax |> maxSTmax oldMax then
                     newMax
                 else

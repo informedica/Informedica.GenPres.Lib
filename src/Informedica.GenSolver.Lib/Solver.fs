@@ -106,7 +106,7 @@ module Solver =
 
             let que = que |> sortQue
 
-            que
+            (n, que)
             |> Events.SolverLoopedQue
             |> Logging.logInfo log
 

@@ -6,7 +6,7 @@ open MathNet.Numerics
 open Informedica.GenOrder.Lib
 
 
-Api.filter None None None (Some "gentamicine") (Some "infusievloeistof") None
+Api.filter None None None (Some "paracetamol") (Some "infusievloeistof") None
 |> List.item 0
 |> Api.evaluate None (6N)
 |> List.map Api.translate
@@ -21,7 +21,7 @@ OrderLogger.logger.Report ()
 
 
 // write results to the test.txt in this folder
-$"{__SOURCE_DIRECTORY__}/test.txt"
+$"{__SOURCE_DIRECTORY__}/log.txt"
 |> OrderLogger.logger.Write
 
 
@@ -45,8 +45,3 @@ Api.filter None None None (Some "gentamicine") None None
     |> List.sortBy (fun c -> c.Mapping)
     |> List.iteri (printfn "%i. %A")
 
-
-
-Api.filter None None None (Some "gentamicine") None None
-|> List.item 0
-|> calcFixedDose

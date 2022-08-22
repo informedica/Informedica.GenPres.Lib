@@ -407,8 +407,8 @@ module Order =
                 |> Some
             with
             | e ->
-                e.ToString()
-                |> printfn "could not solve %A: %A\n%s" v n
+                //e.ToString()
+                //|> printfn "could not solve %A: %A\n%s" v n
                 None
 
         let smallest o =

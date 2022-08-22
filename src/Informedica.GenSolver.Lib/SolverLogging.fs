@@ -44,6 +44,12 @@ module SolverLogging =
     | Exceptions.ValueRangeMinLargerThanMax (min, max) ->
         $"{min} is larger than {max}"
 
+    | Exceptions.ValueRangeMinOverFlow min ->
+        $"Min overflow: {min}"
+
+    | Exceptions.ValueRangeMaxOverFlow max ->
+        $"Max overflow: {max}"
+
     | Exceptions.ValueRangeNotAValidOperator ->
         "The value range operator was invalid or unknown"
 
@@ -114,8 +120,8 @@ module SolverLogging =
         | SolverFinishedSolving eqs ->
             $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
 
-        | SolverLoopedQue eqs ->
-            $"=== Solver looped que\nwith {eqs |> List.length} equations"
+        | SolverLoopedQue (n, eqs) ->
+            $"=== Solver looped que {n} times\nwith {eqs |> List.length} equations"
 
         | ConstraintSortOrder cs ->
             $"""=== Constraint sort order ===

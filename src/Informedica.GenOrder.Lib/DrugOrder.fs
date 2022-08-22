@@ -405,10 +405,13 @@ module DrugOrder =
             let co =
                 DrugConstraint.constraints (o.Orderable.Name |> Name.toString)
                 // filter out OrderableDoseCount if fixedDose
-                |> List.filter (fun c ->
+                |> List.map (fun c ->
                     match c.Mapping with
-                    | OrderableDoseCount -> not fixedDose
-                    | _ -> true
+                    | OrderableDoseCount when fixedDose ->
+                        cstr OrderableDoseCount
+                            (1N |> Props.minIncl)
+                            NoLimit AnyRouteShape AnyOrder
+                    | _ -> c
                 ), o
             // adding orderable constraints
             co

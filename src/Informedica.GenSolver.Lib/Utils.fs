@@ -12,6 +12,10 @@ module Utils =
         let MAX_CALC_COUNT = 5000
 
 
+        let MAX_BIGINT = 1000000000000000000000I
+
+
+
     /// Helper functions for `BigRational`
     [<RequireQualifiedAccess>]
     module BigRational =
