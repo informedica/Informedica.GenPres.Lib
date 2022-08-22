@@ -3,10 +3,15 @@
 #load "load.fsx"
 
 open MathNet.Numerics
+open Informedica.GenSolver.Lib
 open Informedica.GenOrder.Lib
 
 
-Api.filter None None None (Some "paracetamol") (Some "infusievloeistof") None
+
+let path = Some "c:/temp/log.txt"
+
+
+Api.filter None None None (Some "gentamicine") (Some "infusievloeistof") None
 |> List.item 0
 |> Api.evaluate None (6N)
 |> List.map Api.translate
@@ -14,15 +19,11 @@ Api.filter None None None (Some "paracetamol") (Some "infusievloeistof") None
 
 
 // Start the logger at an informative level
-OrderLogger.logger.Start Informedica.GenSolver.Lib.Types.Logging.Level.Informative
+OrderLogger.logger.Start path Logging.Level.Error
 
 // report output to the fsi
 OrderLogger.logger.Report ()
 
-
-// write results to the test.txt in this folder
-$"{__SOURCE_DIRECTORY__}/log.txt"
-|> OrderLogger.logger.Write
 
 
 Api.filter None None None (Some "gentamicine") None None
