@@ -150,7 +150,7 @@ module Variable =
                     |> Exceptions.ValueRangeMinOverFlow
                     |> Exceptions.raiseExc
 
-                
+
             let restrict newMin oldMin =
                 newMin |> checkTooSmall
 
@@ -408,11 +408,19 @@ module Variable =
 
 
             let toString exact (ValueSet vs) =
-                let toStr =
-                    if exact then BigRational.toString
-                    else
-                        (BigRational.fixPrecision 3) >> string
-                $"""[{vs |> Set.toList |> List.sort |> List.map toStr |> String.concat ", "}]"""
+                let mapToStr =
+                    let toStr =
+                        if exact then BigRational.toString
+                        else
+                            (BigRational.fixPrecision 3) >> string
+                    List.map toStr
+                if exact || vs |> Set.count < 10 then
+                    $"""[{vs |> Set.toList |> List.sort |> mapToStr |> String.concat ", "}]"""
+                else
+                    let vs = vs |> Set.toList |> List.sort
+                    let first3 = vs |> List.take 3
+                    let last3 = vs |> List.rev |> List.take 3 |> List.rev
+                    $"""[{first3 |> mapToStr |> String.concat ", "} .. {last3 |> mapToStr |> String.concat ", "}]"""
 
 
         module Property =

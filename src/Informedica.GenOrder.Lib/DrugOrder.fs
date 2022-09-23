@@ -19,7 +19,7 @@ module DrugOrder =
             | Prescription.Process         -> ProcessOrder
             | Prescription.Discontinuous _ -> DiscontinuousOrder
             | Prescription.Continuous      -> ContinuousOrder
-            | Prescription.Timed (_, _)    -> TimedOrder
+            | Prescription.Timed _         -> TimedOrder
 
 
         let fromString = function
@@ -192,10 +192,7 @@ module DrugOrder =
             )
 
         let apply log cs (o : Order) =
-            let cs =
-                cs
-//                |> filter o
-                |> List.map (mapToConstraint o)
+            let cs = cs |> List.map (mapToConstraint o)
 
             o
             |> Order.solveUnits log

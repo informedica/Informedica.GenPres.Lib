@@ -45,6 +45,8 @@ module OrderLogger =
 
             | Events.OrderScenario s -> ""
             | Events.OrderScenerioWithNameValue (o, n, br) -> ""
+            | Events.OrderCouldNotBeSolved (_, o) ->
+                $"This order could not be solved:\n{o |> Order.toString}"
         | Logging.OrderException s -> s
 
     // Catches a message and will dispatch this to the appropiate

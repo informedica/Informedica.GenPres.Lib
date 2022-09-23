@@ -366,6 +366,23 @@ module Order =
             o
 
 
+    let applyConstraints log cs o =
+        // return eqs
+        let toEql prod sum =
+
+            prod
+            |> List.map Solver.productEq
+            |> List.append (sum |> List.map Solver.sumEq)
+
+        let prod, sum = o |> toEqs
+
+        let eqs = toEql prod sum
+
+        eqs
+        |> Solver.applyConstraints log cs
+        |> fromEqs o
+
+
     let solveConstraints log cs o =
         // return eqs
         let toEql prod sum =
@@ -389,7 +406,6 @@ module Order =
             o
 
 
-
     let calcScenarios log (o : Order) =
 
         let solve n v o =
@@ -407,9 +423,15 @@ module Order =
                 |> Some
             with
             | e ->
-                //e.ToString()
-                //|> printfn "could not solve %A: %A\n%s" v n
+                (e.ToString(), o)
+                |> Events.OrderCouldNotBeSolved
+                |> Logging.logInfo log
+
+                e.ToString()
+                |> Logging.logError log
+
                 None
+
 
         let smallest o =
             o

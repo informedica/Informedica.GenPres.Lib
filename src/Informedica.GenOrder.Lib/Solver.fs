@@ -1,6 +1,6 @@
 namespace Informedica.GenOrder.Lib
 
-/// Helper functions to 
+/// Helper functions to
 /// facilitate the use of the
 /// `Informedica.GenSolver.Lib`
 module Solver =
@@ -8,7 +8,7 @@ module Solver =
     open Informedica.Utils.Lib
     open Informedica.GenUnits.Lib
     open Informedica.GenSolver.Lib
-    
+
     open Types
 
     module Name = Variable.Name
@@ -25,30 +25,16 @@ module Solver =
     let sumEq = function
     | h::tail -> (h, tail) |> OrderSumEquation
     | _ -> "not a valid sum equation" |> failwith
-    
-    //[<Literal>]
-    //let vals = "vals"
-    //[<Literal>]
-    //let minincl = "minincl"
-    //[<Literal>]
-    //let minexcl = "minexcl"
-    //[<Literal>]
-    //let incr = "incr"
-    //[<Literal>]
-    //let maxincl = "maxincl"
-    //[<Literal>]
-    //let maxexcl = "maxexcl"
-
 
     /// Create an `Equation` using a constructor **cr**
-    /// a result `VariableUnit` **y** and a list of 
+    /// a result `VariableUnit` **y** and a list of
     /// `VariableUnit` list **xs**
-    let toEq cr y xs = 
-        (y |> VariableUnit.getVar, xs |> List.map VariableUnit.getVar) 
+    let toEq cr y xs =
+        (y |> VariableUnit.getVar, xs |> List.map VariableUnit.getVar)
         |> cr
 
     /// Create a `ProdEquation` from `VariableUnit`s
-    let toProdEq succ fail y xs = 
+    let toProdEq succ fail y xs =
         toEq (Equation.createProductEq succ fail) y xs
 
     /// Create a `SumEquation` from `VariableUnit`s
@@ -57,14 +43,14 @@ module Solver =
 
     let mapToSolverEqs =
         List.fold (fun acc eq ->
-            match eq with 
+            match eq with
             | OrderProductEquation (y, xs) -> toProdEq id (string >> exn >> raise) y xs
             | OrderSumEquation     (y, xs) -> toSumEq id  (string >> exn >> raise) y xs
             |> List.singleton
             |> List.append acc
         ) []
 
-    
+
     let replaceUnit log n u eqs =
         (n, u)
         |> Events.SolverReplaceUnit
@@ -77,8 +63,8 @@ module Solver =
                 vru,
                 vrus
                 |> List.map (fun vru ->
-                    if vru |> VariableUnit.getName = n then 
-                        vru 
+                    if vru |> VariableUnit.getName = n then
+                        vru
                         |> VariableUnit.setUnit u
                     else vru
                 )
@@ -110,15 +96,15 @@ module Solver =
                     if y::xs  |> List.hasExactlyOne noUnit then
                         if y |> noUnit then
                             let y =
-                                { y with 
+                                { y with
                                     Unit =
-                                        xs 
+                                        xs
                                         |> List.map VariableUnit.getUnit
                                         |> List.reduce (ValueUnit.calcUnit (*))
                                 }
                             let h = (y, xs) |> OrderProductEquation
                             // start from scratch
-                            h::tail 
+                            h::tail
                             |> List.append acc
                             |> replaceUnit log y.Variable.Name y.Unit
                             |> solve []
@@ -128,10 +114,10 @@ module Solver =
                                 // actually y = x
                                 if xs |> List.length = 1 then
                                     let x = xs.Head
-                                    [ x |> VariableUnit.setUnit y.Unit ], 
+                                    [ x |> VariableUnit.setUnit y.Unit ],
                                     Some x.Variable.Name, Some y.Unit
-                                // y = x1 * x2 ... so 
-                                // the x without a unit = y / multiple of all xs with units, i.e. (x1 * x2 .. ) 
+                                // y = x1 * x2 ... so
+                                // the x without a unit = y / multiple of all xs with units, i.e. (x1 * x2 .. )
                                 else
                                     xs
                                     |> List.fold (fun acc x ->
@@ -144,29 +130,29 @@ module Solver =
                                                         |> List.filter hasUnit
                                                         |> List.map VariableUnit.getUnit
                                                         |> List.reduce (ValueUnit.calcUnit (*))
-                                                        |> ValueUnit.calcUnit (/) 
+                                                        |> ValueUnit.calcUnit (/)
                                                             (y |> VariableUnit.getUnit)
                                                 }
                                             (x::xs', (Some x.Variable.Name), (Some x.Unit))
-                                        else 
+                                        else
                                             (x::xs', n, u)
                                     ) ([], None, None)
 
                             let h = (y, xs) |> OrderProductEquation
                             // start from scratch
-                            h::tail 
+                            h::tail
                             |> List.append acc
                             |> replaceUnit log (n |> Option.get) (u |> Option.get)
                             |> solve []
 
                     else
                         solve (h::acc) tail
-                
+
                 | OrderSumEquation (y, xs) ->
                     if y::xs |> List.forall hasUnit ||
-                       y::xs |> List.forall noUnit then 
+                       y::xs |> List.forall noUnit then
                         solve (h::acc) tail
-                    
+
                     else
                         // get the names of vrus with no unit
                         let ns =
@@ -174,11 +160,11 @@ module Solver =
                             |> List.filter noUnit
                             |> List.map (VariableUnit.getName)
                         // find the vru with a unit
-                        let x = 
-                            y::xs 
+                        let x =
+                            y::xs
                             |> List.find hasUnit
                         // start from scratch
-                        ({ y with Unit = x.Unit }, 
+                        ({ y with Unit = x.Unit },
                          xs |> List.map (VariableUnit.setUnit x.Unit))
                         |> OrderSumEquation
                         |> List.singleton
@@ -186,7 +172,7 @@ module Solver =
                         |> List.append acc
                         // make sure that all vrus in all eqs get the unit
                         |> (fun eqs ->
-                            ns 
+                            ns
                             |> List.fold (fun acc n ->
                                 acc |> replaceUnit log n x.Unit
                             ) eqs
@@ -194,54 +180,54 @@ module Solver =
                         |> solve []
 
         solve [] eqs
-        
+
 
     let toVariableUnits =
         List.map (fun eq ->
             match eq with
-            | OrderProductEquation (y, xs) 
+            | OrderProductEquation (y, xs)
             | OrderSumEquation     (y, xs) -> y::xs
         )
 
 
-    /// Turn a set of values `vs` to base values 
-    let toBase n eqs v = 
+    /// Turn a set of values `vs` to base values
+    let toBase n eqs v =
 
-        eqs 
+        eqs
         |> toVariableUnits
         |> List.tryFindInList (VariableUnit.getName >> ((=) n))
-        |> function 
+        |> function
         | Some vru ->
             vru
             |> VariableUnit.getUnit
-            |> fun u -> 
+            |> fun u ->
                 v
                 |> ValueUnit.create u
                 |> ValueUnit.toBase
 
-        | None -> 
+        | None ->
             sprintf "could not find %A in toBase n eqs vs" n
             |> failwith
 
 
     let mapFromSolverEqs orig eqs =
         let vrusl = orig |> toVariableUnits
-        let vars = 
+        let vars =
             eqs
-            |> List.collect Equation.toVars 
+            |> List.collect Equation.toVars
             |> List.distinct
 
         vrusl
         |> List.map (fun vrus ->
-            vrus 
+            vrus
             |> List.map (fun vru ->
-                { vru with 
+                { vru with
                     Variable =
                         vars
                         |> List.tryFind (fun v -> v.Name = vru.Variable.Name)
-                        |> function 
+                        |> function
                         | Some v -> v
-                        | None -> 
+                        | None ->
                             sprintf "could not find %A" vru.Variable.Name
                             |> failwith
                 }
@@ -253,14 +239,14 @@ module Solver =
     let setVals lim n p eqs =
         eqs
         |> Api.setVariableValues lim n p
-         
 
-    let filterEqsWithUnits = 
+
+    let filterEqsWithUnits =
         List.filter (fun eq ->
             match eq with
-            | OrderProductEquation (y, xs) 
+            | OrderProductEquation (y, xs)
             | OrderSumEquation     (y, xs) ->
-                y::xs |> List.forall VariableUnit.hasUnit       
+                y::xs |> List.forall VariableUnit.hasUnit
         )
 
 
@@ -269,8 +255,8 @@ module Solver =
 
     // Solve a set of equations setting a property `p` with
     // name `n`, to a valueset `vs`.
-    let applySolve sortQue log lim n p eqs = 
-    
+    let applySolve sortQue log lim n p eqs =
+
         let toBase = propToBase n eqs
 
         eqs
@@ -281,24 +267,41 @@ module Solver =
         |> mapFromSolverEqs eqs
 
 
-    let solve log lim = 
+    let solve log lim =
         let sortQue = Informedica.GenSolver.Lib.Solver.sortQue
         applySolve sortQue log lim //(printfn "%s") //|> memSolve
 
 
-    let solveConstraints log (cs : Constraint list) eqs =
-
+    let applyConstraints log (cs : Constraint list) eqs =
         let cs =
-            cs 
+            cs
             |> List.map (fun c ->
-                {
-                    c with
-                        Property = 
-                            c.Property 
-                            |> propToBase c.Name eqs
+                { c with
+                    Property =
+                        c.Property
+                        |> propToBase c.Name eqs
                 }
             )
-        
+
+        eqs
+        // use only eqs with all vrus have units
+        |> filterEqsWithUnits
+        |> mapToSolverEqs
+        |> fun eqs -> Api.applyConstraints log eqs cs
+        |> mapFromSolverEqs eqs
+
+
+    let solveConstraints log (cs : Constraint list) eqs =
+        let cs =
+            cs
+            |> List.map (fun c ->
+                { c with
+                    Property =
+                        c.Property
+                        |> propToBase c.Name eqs
+                }
+            )
+
         eqs
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
@@ -306,4 +309,3 @@ module Solver =
         |> Api.solveConstraints log cs
         |> mapFromSolverEqs eqs
 
-        

@@ -464,7 +464,7 @@ module Types =
             | OrderConstraintsSolved of Order * Constraint list
             | OrderScenario of string
             | OrderScenerioWithNameValue of Order * Name * BigRational
-
+            | OrderCouldNotBeSolved of string * Order
 
 
     module Logging =
