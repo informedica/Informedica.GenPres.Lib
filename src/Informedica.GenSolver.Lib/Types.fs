@@ -48,6 +48,7 @@ module Types =
         | Incr of Increment
         | MinIncr of min: Minimum * incr: Increment
         | IncrMax of incr: Increment * max: Maximum
+        | MinIncrMax of min: Minimum * incr: Increment * max: Maximum
         | ValSet of ValueSet // Set<BigRational>
 
     /// Represents a variable in an

@@ -9,10 +9,8 @@ open Informedica.GenSolver.Lib
 open System
 open System.IO
 
-open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
 open MathNet.Numerics
-open Types
 
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
@@ -35,17 +33,17 @@ module Solve =
 
     let printEqs = Solver.printEqs true procss
     let solve n p eqs =
-        let logger = 
+        let logger =
             fun s ->
                 File.AppendAllLines("order.log", [s])
             |> SolverLogging.logger
         let n = n |> Name.createExc
         try
-            Api.solve Solver.sortQue logger None n p eqs
+            Api.solve true Solver.sortQue logger None n p eqs
         with
-        | _ -> 
+        | _ ->
             procss $"cannot set {n |> Name.toString} with {p}"
-            eqs 
+            eqs
 
 
     let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
@@ -63,43 +61,43 @@ module Solve =
 
 
     let pick s incr take (eqs : Equation list) =
-        let var = 
+        let var =
             eqs
             |> List.collect Equation.toVars
             |> List.tryFind (fun v ->
-                v 
-                |> Variable.getName 
-                |> Name.toString 
+                v
+                |> Variable.getName
+                |> Name.toString
                 |> fun x -> x = s
             )
             |> Option.get
 
         match var.Values |> ValueRange.getValSet with
-        | None    -> 
+        | None    ->
             match incr with
             | None -> eqs
             | Some incr ->
-                let min, max = 
+                let min, max =
                     var.Values |> ValueRange.getMin,
                     var.Values |> ValueRange.getMax
                 match min, max with
                 | Some min, Some max ->
-                    let (incl_min, min), (incl_max, max) = 
+                    let (incl_min, min), (incl_max, max) =
                         min |> ValueRange.Minimum.toBoolBigRational,
                         max |> ValueRange.Maximum.toBoolBigRational
                     let min =
                         if min = 0N then incr
-                        else 
+                        else
                             let m = min |> BigRational.toMultipleOf incr
                             if incl_min || m > min then m
-                            else 
+                            else
                                 m + incr
                     let max =
                         let m = max |> BigRational.toMultipleOf incr
                         if incl_max || m < max then m
-                        else 
+                        else
                             m - incr
-                    let vs = 
+                    let vs =
                         take
                         |> function
                         | TakeFromMin x -> [min..incr..max] |> List.take x
@@ -108,24 +106,24 @@ module Solve =
                 | _ -> eqs
         | Some (ValueSet vs) ->
             match take with
-            | TakeFromMin x -> 
+            | TakeFromMin x ->
                     let x = if x > vs.Count then vs.Count else x
                     let vs = vs |> Set.toList |> List.take x
                     try
                         eqs
                         |> solveValues s vs
                     with
-                    | _ -> 
+                    | _ ->
                         printfn $"cannot set {vs}"
                         eqs
-            | TakeFromMax x -> 
+            | TakeFromMax x ->
                     let x = if x > vs.Count then vs.Count else x
                     let vs = vs |> Set.toList |> List.rev |> List.take x
                     try
                         eqs
                         |> solveValues s vs
                     with
-                    | _ -> 
+                    | _ ->
                         printfn $"cannot set {vs}"
                         eqs
 
@@ -141,7 +139,7 @@ module Solve =
         }
 
 
-    let createEqs (orb : Orb) = 
+    let createEqs (orb : Orb) =
         [
             "itm_cmp_qty = itm_cmp_cnc * cmp_qty"
             "itm_orb_qty = itm_orb_cnc * orb_qty"
@@ -226,7 +224,7 @@ module Solve =
                     |> not &&
                     e.Contains("cmp")
                 )
-            let orbEqs = 
+            let orbEqs =
                 eqs
                 |> List.filter (fun e ->
                     itmEqs
@@ -234,9 +232,9 @@ module Solve =
                     |> not &&
                     cmpEqs
                     |> List.exists((=) e)
-                    |> not                
+                    |> not
                 )
-            
+
             orb.Components
             |> List.fold (fun acc c ->
                 let itms =
@@ -246,13 +244,13 @@ module Solve =
                         |> List.map (fun s -> s.Replace(" cmp", $" {c.Name}").Replace(" itm", $" {i}"))
                     )
                 let cmps =
-                    cmpEqs 
+                    cmpEqs
                     |> List.map (fun s1 ->
                         s1.Replace(" cmp", $" {c.Name}")
                     )
-                itms @ cmps @ acc 
+                itms @ cmps @ acc
             ) []
-            |> fun es -> 
+            |> fun es ->
                 let sumEqs =
                     sumEqs
                     |> List.map (fun e ->
@@ -278,7 +276,7 @@ let gentaEqs =
     {
         Components =
             [
-                { 
+                {
                     Name = "genta_sol"
                     Items = ["gentamicin"]
                 }
@@ -288,7 +286,7 @@ let gentaEqs =
                 }
             ]
     }
-    |> createEqs 
+    |> createEqs
 
 
 
@@ -306,8 +304,8 @@ gentaEqs
 // preparation
 |> solveMaxIncl "gentamicin_orb_cnc" 2N // max conc
 |> solveMinIncl "orb_qty_ad" 5N
-|> solveMaxIncl "orb_qty_adj" 20N // 
-|> solveValues "orb_qty" [20N] // 
+|> solveMaxIncl "orb_qty_adj" 20N //
+|> solveValues "orb_qty" [20N] //
 |> solveValues "genta_sol_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N]) // max conc
 //|> solveValues "saline_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N])
 |> printEqs
@@ -322,7 +320,7 @@ gentaEqs
 |> solveMaxIncl "pres_time" 1N // time
 |> printEqs
 // pick the optimal scenario
-|> pick "orb_dos_qty" (Some (1N)) (TakeFromMin 10) // pick between min and max
+|> pick "orb_dos_qty" (Some 1N) (TakeFromMin 10) // pick between min and max
 //|> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
 |> pick "gentamicin_dos_tot_adj" None (TakeFromMax 2) // choose from list
 |> printEqs
@@ -344,8 +342,8 @@ gentaEqs
 // preparation
 |> solveMaxIncl "gentamicin_orb_cnc" 2N // max conc
 |> solveMinIncl "orb_qty_ad" 5N
-|> solveMaxIncl "orb_qty_adj" 20N // 
-|> solveValues "orb_qty" [20N] // 
+|> solveMaxIncl "orb_qty_adj" 20N //
+|> solveValues "orb_qty" [20N] //
 |> solveValues "genta_sol_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N]) // max conc
 |> solveValues "saline_orb_qty" ([1N/10N..1N/10N..10N] @ [11N..50N])
 |> printEqs
@@ -360,7 +358,7 @@ gentaEqs
 |> solveMaxIncl "pres_time" 1N // time
 |> printEqs
 // pick the optimal scenario
-|> pick "orb_dos_qty" (Some (1N)) (TakeFromMin 10) // pick between min and max
+|> pick "orb_dos_qty" (Some 1N) (TakeFromMin 10) // pick between min and max
 |> pick "orb_dos_rte" (Some (1N/10N)) (TakeFromMax 1) // pick between min and max
 |> pick "gentamicin_dos_tot_adj" None (TakeFromMax 2) // choose from list
 |> printEqs
@@ -373,7 +371,7 @@ let examplEqs =
     {
         Components =
             [
-                { 
+                {
                     Name = "CMPA"
                     Items = ["ITMA"]
                 }
@@ -383,7 +381,7 @@ let examplEqs =
                 }
             ]
     }
-    |> createEqs 
+    |> createEqs
 
 examplEqs
 |> printEqs
@@ -396,13 +394,13 @@ examplEqs
         |> List.filter (fun s ->
             s.Contains("CMPB") || s.Contains("ITMB")
         )
-        |> List.filter (fun s -> 
+        |> List.filter (fun s ->
             s.Contains("cmp_cnc") || s.Contains("CMPB_qty")
         )
     vars
     |> List.filter (fun s ->
         s.Contains("CMPB") |> not &&
-        s.Contains("ITMB") |> not        
+        s.Contains("ITMB") |> not
     )
     |> List.append cmps
     |> List.length

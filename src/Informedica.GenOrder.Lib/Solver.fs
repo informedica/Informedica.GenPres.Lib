@@ -158,7 +158,7 @@ module Solver =
                         let ns =
                             y::xs
                             |> List.filter noUnit
-                            |> List.map (VariableUnit.getName)
+                            |> List.map VariableUnit.getName
                         // find the vru with a unit
                         let x =
                             y::xs
@@ -263,12 +263,12 @@ module Solver =
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
         |> mapToSolverEqs
-        |> Api.solve sortQue log lim n (p |> toBase)
+        |> Api.solve true sortQue log lim n (p |> toBase)
         |> mapFromSolverEqs eqs
 
 
     let solve log lim =
-        let sortQue = Informedica.GenSolver.Lib.Solver.sortQue
+        let sortQue = Solver.sortQue
         applySolve sortQue log lim //(printfn "%s") //|> memSolve
 
 
@@ -287,7 +287,7 @@ module Solver =
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
         |> mapToSolverEqs
-        |> fun eqs -> Api.applyConstraints log eqs cs
+        |> fun eqs -> Api.applyConstraints true log eqs cs
         |> mapFromSolverEqs eqs
 
 
@@ -306,6 +306,6 @@ module Solver =
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
         |> mapToSolverEqs
-        |> Api.solveConstraints log cs
+        |> Api.solveConstraints true log cs
         |> mapFromSolverEqs eqs
 

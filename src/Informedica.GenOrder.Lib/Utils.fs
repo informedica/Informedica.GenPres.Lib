@@ -5,20 +5,14 @@ namespace Informedica.GenOrder.Lib
 module Utils =
 
     open System
-    open System.Data
     open System.IO
-    open System.Net
     open System.Net.Http
-    open MathNet.Numerics
 
     open Informedica.Utils.Lib.BCL
 
-    open Informedica.GenOrder.Lib
-    open Types
 
     module Csv =
 
-        open System
 
         type DataType =
             | StringData

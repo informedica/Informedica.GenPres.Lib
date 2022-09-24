@@ -5,11 +5,11 @@ namespace Informedica.GenSolver.Lib
 /// sum equations and a set of product and/or sum
 /// equations
 module Solver =
-    
+
     module EQD = Equation.Dto
 
     open Types
-    
+
     module Exception =
 
         /// Equation exception
@@ -25,9 +25,9 @@ module Solver =
 
 
     let sortByName eqs =
-        eqs 
+        eqs
         |> List.sortBy (fun e ->
-            e 
+            e
             |> Equation.toVars
             |> List.head
             |> Variable.getName)
@@ -36,17 +36,17 @@ module Solver =
     /// Format a set of equations to print.
     /// Using **f** to allow additional processing
     /// of the string.
-    let printEqs exact pf eqs = 
+    let printEqs exact pf eqs =
 
         "equations result:\n" |> pf
         eqs
         |> sortByName
         |> List.map (Equation.toString exact)
         |> List.iteri (fun i s -> sprintf "%i.\t%s" i s  |> pf)
-        "-----" |> pf 
+        "-----" |> pf
 
-        eqs    
-    
+        eqs
+
 
     /// Checks whether a list of `Equation` **eqs**
     /// contains an `Equation` **eq**
@@ -58,16 +58,16 @@ module Solver =
     /// a list of replaced `Equation` and a list
     /// of unchanged `Equation`
     let replace vars es =
-        let rpl, rst = 
-            es 
-            |> List.partition (fun e -> 
-                vars 
+        let rpl, rst =
+            es
+            |> List.partition (fun e ->
+                vars
                 |> List.exists (fun v -> e |> Equation.contains v)
             )
 
-        vars 
-        |> List.fold (fun acc v -> 
-            acc 
+        vars
+        |> List.fold (fun acc v ->
+            acc
             |> List.map (Equation.replace v)
         ) rpl
         , rst
@@ -76,28 +76,28 @@ module Solver =
     let memSolve f =
         let cache = ref Map.empty
         fun e ->
-            match (cache.Value).TryFind(e) with
+            match cache.Value.TryFind(e) with
             | Some r -> r
             | None ->
                 let r = f e
-                cache.Value <- (cache.Value).Add(e, r)
+                cache.Value <- cache.Value.Add(e, r)
                 r
 
     let sortQue que =
         if que |> List.length = 0 then que
         else
-            que 
+            que
             |> List.sortBy Equation.count //Equation.countProduct
 
-        
-    /// Create the equation solver using a 
-    /// product equation and a sum equation solver
-    /// and function to determine whether an 
-    /// equation is solved
-    let solveOpt log sortQue var eqs =
 
-        let solveE = Equation.solve log
-            
+    /// Create the equation solver using a
+    /// product equation and a sum equation solver
+    /// and function to determine whether an
+    /// equation is solved
+    let solve onlyMinIncrMax log sortQue var eqs =
+
+        let solveE = Equation.solve onlyMinIncrMax log
+
         let rec loop n que acc =
             if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
                 (que @ acc)
@@ -111,25 +111,25 @@ module Solver =
             |> Logging.logInfo log
 
             match que with
-            | [] -> 
+            | [] ->
                 match acc |> List.filter (Equation.check >> not) with
                 | []      -> acc
-                | invalid -> 
+                | invalid ->
                     invalid
                     |> Exceptions.SolverInvalidEquations
                     |> Exception.raiseExc (Some log)
-                
+
             | eq::tail ->
-                // If the equation is already solved, or not solvable 
+                // If the equation is already solved, or not solvable
                 // just put it to  the accumulated equations and go on with the rest
                 if eq |> Equation.isSolvable |> not then
-                    [ eq ] 
+                    [ eq ]
                     |> List.append acc
                     |> loop (n + 1) tail
                 // Else go solve the equation
                 else
                     match eq |> solveE with
-                    // Equation is changed, so every other equation can 
+                    // Equation is changed, so every other equation can
                     // be changed as well (if changed vars are in the other
                     // equations) so start new
                     | eq, Changed cs ->
@@ -141,35 +141,35 @@ module Solver =
                         acc
                         |> replace vars
                         |> function
-                        | (rpl, rst) ->
+                        | rpl, rst ->
                             // replace vars in tail
-                            let que = 
+                            let que =
                                 tail
                                 |> replace vars
-                                |> function 
-                                | (es1, es2) ->
+                                |> function
+                                | es1, es2 ->
                                     es1
                                     |> List.append es2
                                     |> List.append rpl
 
                             rst
                             |> List.append [ eq ]
-                            |> loop (n + 1) que 
+                            |> loop (n + 1) que
 
                     // Equation did not in fact change, so put it to
                     // the accumulated equations and go on with the rest
                     | eq, Unchanged ->
-                        [eq] 
+                        [eq]
                         |> List.append acc
                         |> loop (n + 1) tail
 
         match var with
         | None -> (eqs, [])
         | Some var ->
-            eqs 
+            eqs
             |> replace [var]
-        |> function 
-        | (rpl, rst) ->
+        |> function
+        | rpl, rst ->
             rpl
             |> Events.SolverStartSolving
             |> Logging.logInfo log
@@ -181,11 +181,11 @@ module Solver =
                 |> Logging.logInfo log
 
                 eqs
-            
-    
-    let solve log sortQue vr eqs =
-        solveOpt log sortQue (Some vr) eqs
 
 
-    let solveAll log eqs =
-        solveOpt log sortQue None eqs
+    let solveVariable onlyMinIncrMax log sortQue vr eqs =
+        solve onlyMinIncrMax log sortQue (Some vr) eqs
+
+
+    let solveAll onlyMinIncrMax log eqs =
+        solve onlyMinIncrMax log sortQue None eqs

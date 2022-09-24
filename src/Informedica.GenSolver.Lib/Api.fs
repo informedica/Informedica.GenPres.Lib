@@ -20,7 +20,7 @@ module Api =
 
     /// Initialize the solver returning a set of equations
     let init eqs =
-        let notempty = String.IsNullOrWhiteSpace >> not
+        let notEmpty = String.IsNullOrWhiteSpace >> not
         let prodEqs, sumEqs = eqs |> List.partition (String.contains "*")
         let createProdEqs = List.map (EQD.createProd >> EQD.fromDto)
         let createSumEqs  = List.map (EQD.createSum  >> EQD.fromDto)
@@ -30,13 +30,13 @@ module Api =
             |> List.map (String.splitAt '=')
             |> List.map (Array.collect (String.splitAt op))
             |> List.map (Array.map String.trim)
-            |> List.map (Array.filter notempty)
+            |> List.map (Array.filter notEmpty)
             |> List.map (Array.map VRD.createNew)
 
         (parse prodEqs '*' |> createProdEqs) @ (parse sumEqs '+' |> createSumEqs)
 
 
-    let setVariableValues lim n p eqs =
+    let setVariableValues onlyMinIncrMax lim n p eqs =
 
         eqs
         |> List.collect (Equation.findName n)
@@ -47,7 +47,7 @@ module Api =
 
             p
             |> Property.toValueRange
-            |> Variable.setValueRange var
+            |> Variable.setValueRange onlyMinIncrMax var
             |> fun var ->
                 match lim with
                 | Some l ->
@@ -62,7 +62,7 @@ module Api =
                             |> Seq.take l
                             |> Set.ofSeq
                             |> ValueRange.createValSet
-                            |> Variable.setValueRange var
+                            |> Variable.setValueRange onlyMinIncrMax var
                         | None -> var
 
                     else var
@@ -76,10 +76,10 @@ module Api =
     /// * p: the property of the variable to be updated
     /// * vs: the values to update the property of the variable
     /// * eqs: the list of equations to solve
-    let solve sortQue log lim n p eqs =
+    let solve onlyMinIncrMax sortQue log lim n p eqs =
 
         eqs
-        |> setVariableValues lim n p
+        |> setVariableValues onlyMinIncrMax lim n p
         |> function
         | None -> eqs
         | Some var ->
@@ -88,7 +88,7 @@ module Api =
             |> Logging.logInfo log
 
             eqs
-            |> Solver.solve log sortQue var
+            |> Solver.solveVariable onlyMinIncrMax log sortQue var
             |> fun eqs ->
                 eqs
                 |> Events.ApiEquationsSolved
@@ -105,11 +105,11 @@ module Api =
         |> List.map Equation.nonZeroOrNegative
 
 
-    let applyConstraints log eqs cs =
+    let applyConstraints onlyMinIncrMax log eqs cs =
         let tryApply =
             fun c eqs ->
                 try
-                    Constraint.apply log c eqs
+                    Constraint.apply onlyMinIncrMax log c eqs
                 with
                 | Variable.Exceptions.VariableException m ->
                     m
@@ -133,11 +133,11 @@ module Api =
         ) eqs
 
 
-    let solveConstraints log cs eqs =
+    let solveConstraints onlyMinIncrMax log cs eqs =
         cs
         |> Constraint.orderConstraints log
-        |> applyConstraints log eqs
-        |> Solver.solveAll log
+        |> applyConstraints false log eqs
+        |> Solver.solveAll onlyMinIncrMax log
         |> fun eqs ->
             (cs, eqs)
             |> Events.ApiAppliedConstraints

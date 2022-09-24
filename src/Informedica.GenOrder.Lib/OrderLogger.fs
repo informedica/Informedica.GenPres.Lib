@@ -1,6 +1,5 @@
 namespace Informedica.GenOrder.Lib
 
-open Microsoft.FSharp.Quotations
 
 module OrderLogger =
 
@@ -10,7 +9,6 @@ module OrderLogger =
     open Informedica.GenUnits.Lib
     open Informedica.GenOrder.Lib
 
-    open Types
 
     module Units = ValueUnit.Units
     module DrugConstraint = DrugOrder.DrugConstraint
@@ -20,7 +18,7 @@ module OrderLogger =
 
     type Logger = Informedica.GenSolver.Lib.Types.Logging.Logger
     type SolverMessage = Informedica.GenSolver.Lib.Types.Logging.SolverMessage
-    type OrderMessage = Informedica.GenOrder.Lib.Types.Logging.Message
+    type OrderMessage = Types.Logging.Message
 
 
     type Agent<'Msg> = MailboxProcessor<'Msg>
@@ -36,15 +34,15 @@ module OrderLogger =
             match m with
             | Events.SolverReplaceUnit (n, u) ->
                 $"replaced {n |> Name.toString} unit with {u |> ValueUnit.unitToString}"
-            | Events.OrderSolved o -> ""
-            | Events.OrderConstraintsSolved (o, cs) ->
+            | Events.OrderSolved _ -> ""
+            | Events.OrderConstraintsSolved (o, _) ->
                 o
                 |> Order.toString
                 |> String.concat "\n"
                 |> sprintf "=== Order constraints solved ===\n%s"
 
-            | Events.OrderScenario s -> ""
-            | Events.OrderScenerioWithNameValue (o, n, br) -> ""
+            | Events.OrderScenario _ -> ""
+            | Events.OrderScenerioWithNameValue _ -> ""
             | Events.OrderCouldNotBeSolved (_, o) ->
                 $"This order could not be solved:\n{o |> Order.toString}"
         | Logging.OrderException s -> s
@@ -57,8 +55,7 @@ module OrderLogger =
             m
             |> SolverLogging.printMsg
         | :? OrderMessage  as m -> m |> printOrderMsg
-        | _ ->
-            sprintf ""
+        | _ -> ""
 
     // A message to send to the order logger agent
     type Message =
@@ -101,7 +98,7 @@ module OrderLogger =
 
         let loggerAgent : Agent<Message> =
             Agent.Start <| fun inbox ->
-                let msgs = ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
+                let msgs = ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message>()
 
                 let rec loop (timer : Stopwatch) path level msgs =
                     async {
@@ -111,7 +108,7 @@ module OrderLogger =
                         | Start (path, level) ->
                             let timer = Stopwatch.StartNew()
                             return!
-                                ResizeArray<(float * Informedica.GenSolver.Lib.Types.Logging.Message)>()
+                                ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message>()
                                 |> loop timer path level
 
                         | Received m ->
@@ -143,7 +140,7 @@ module OrderLogger =
                                 |> printMsg
                                 |> function
                                 | s when s |> String.IsNullOrEmpty -> ()
-                                | s -> printfn "\n%i. %f: %A\n%s" i t m.Level s
+                                | s -> printfn $"\n%i{i}. %f{t}: %A{m.Level}\n%s{s}"
                             )
                             printfn "\n"
 
@@ -198,20 +195,20 @@ module OrderLogger =
                 |> Option.defaultValue ""
             | _ -> ""
 
-        printfn "\n\n=== SCENARIOS for Weight: %s ===" w
+        printfn $"\n\n=== SCENARIOS for Weight: %s{w} ==="
         sc
         |> List.iteri (fun i o ->
             o
             |> Order.printPrescription n
             |> fun (p, a, d) ->
-                printfn "%i\tprescription:\t%s" (i + 1) p
-                printfn "  \tdispensing:\t%s" a
-                printfn "  \tpreparation:\t%s" d
+                printfn $"%i{i + 1}\tprescription:\t%s{p}"
+                printfn $"  \tdispensing:\t%s{a}"
+                printfn $"  \tpreparation:\t%s{d}"
 
             if v then
                 o
                 |> Order.toString
-                |> List.iteri (fun i s -> printfn "%i\t%s" (i + 1) s)
+                |> List.iteri (fun i s -> printfn $"%i{i + 1}\t%s{s}")
 
                 printfn "\n"
         )

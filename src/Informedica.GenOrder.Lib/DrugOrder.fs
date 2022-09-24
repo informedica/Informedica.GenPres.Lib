@@ -119,7 +119,6 @@ module DrugOrder =
         module Increment = Informedica.GenSolver.Lib.Variable.ValueRange.Increment
 
         open Informedica.GenSolver.Lib.Types
-        open Types
 
 
         let create n m p l rs ps =
@@ -165,7 +164,7 @@ module DrugOrder =
                         Property =
                             get "Values"
                             |> Props.fromString (get "Property")
-                        Limit = Informedica.GenSolver.Lib.Types.NoLimit
+                        Limit = NoLimit
                         RouteShape = get "RouteShape" |> RouteShape.fromString
                         OrderType =
                                 get "OrderType" |> OrderType.fromString
@@ -175,7 +174,7 @@ module DrugOrder =
                 |> Array.toList
 
 
-        let filter (o : Order) cs =
+        let filter (o : Order) (cs : DrugConstraint list) =
             let rs = RouteShape.map o.Route o.Orderable.Shape
             let ot = o |> OrderType.map
 
@@ -633,7 +632,7 @@ module DrugOrder =
 
 
     let evaluate log (co : ConstrainedOrder) =
-        let (cs, o) = co
+        let cs, o = co
 
         DrugConstraint.apply log cs o
 

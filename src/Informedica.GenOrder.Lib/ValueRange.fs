@@ -3,7 +3,6 @@ namespace Informedica.GenOrder.Lib
 module ValueRange =
 
     open Informedica.GenUnits.Lib
-    open Informedica.GenSolver.Lib.Types
     open Informedica.GenSolver.Lib.Variable.ValueRange
 
 
@@ -11,12 +10,12 @@ module ValueRange =
     let toStringWithUnit exact un vr =
         let toUnit = ValueUnit.create un >> ValueUnit.toUnit
 
-        let fVs vs = 
-            vs 
+        let fVs vs =
+            vs
             |> ValueSet.map toUnit
             |> Some
             |> print exact None None None
-    
+
         let unr = print exact None None None None
 
         let print min incr max = print exact min incr max None
@@ -25,13 +24,13 @@ module ValueRange =
             print (min |> Minimum.map toUnit toUnit |> Some) None None
 
         let fMax max =
-            print None None (max |> Maximum.map toUnit toUnit |> Some) 
+            print None None (max |> Maximum.map toUnit toUnit |> Some)
 
         let fMinMax (min, max) =
             print
                 (min |> Minimum.map toUnit toUnit |> Some)
                 None
-                (max |> Maximum.map toUnit toUnit |> Some) 
+                (max |> Maximum.map toUnit toUnit |> Some)
 
         let fIncr incr =
             print None (incr |> Increment.map toUnit |> Some) None
@@ -47,7 +46,13 @@ module ValueRange =
                 None
                 (incr |> Increment.map toUnit |> Some)
                 (max |> Maximum.map toUnit toUnit |> Some)
-    
-        vr |> apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fVs 
+
+        let fMinIncrMax (min, incr, max) =
+            print
+                (min |> Minimum.map toUnit toUnit |> Some)
+                (incr |> Increment.map toUnit |> Some)
+                (max |> Maximum.map toUnit toUnit |> Some)
+
+        vr |> apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fMinIncrMax fVs
 
 

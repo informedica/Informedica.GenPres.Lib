@@ -88,11 +88,25 @@ module Utils =
         let minExclMultipleOf = calcMinOrMaxToMultiple false false
 
 
+    [<RequireQualifiedAccess>]
+    module Tuple =
+
+
+        let fstOf3 (one, _, _) = one
+
+
+        let sndOf3 (_, two, _) = two
+
+
+        let thdOf3 (_, _, three) = three
+
+
     /// Helper functions for `Option`
     [<RequireQualifiedAccess>]
     module Option =
 
         let none _ = None
+
 
 
     [<RequireQualifiedAccess>]

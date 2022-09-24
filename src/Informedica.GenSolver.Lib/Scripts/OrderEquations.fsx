@@ -9,16 +9,17 @@ open Informedica.GenSolver.Lib
 open System
 open System.IO
 
-open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
 open MathNet.Numerics
-open Types
 
-module Api = Informedica.GenSolver.Lib.Api
-module Solver = Informedica.GenSolver.Lib.Solver
+
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
 
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module Increment = ValueRange.Increment
+module ValueSet = ValueRange.ValueSet
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -29,25 +30,78 @@ module Solve =
         File.AppendAllLines("order.log", [s])
         $"{s} " |> printfn "%s"
 
+    let setProp n p eqs =
+        let n = n |> Name.createExc
+        match eqs |> Api.setVariableValues true None n p with
+        | Some var ->
+            eqs
+            |> List.map (fun e ->
+                e |> Equation.replace var
+            )
+        | None -> eqs
+
+    let setMinIncl n min = min |> Minimum.create true |> MinProp |> setProp n
+    let setMinExcl n min = min |> Minimum.create false |> MinProp |> setProp n
+    let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> setProp n
+    let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> setProp n
+    let setValues n vals = vals |> ValueSet.create |> ValsProp |> setProp n
+
 
     let printEqs = Solver.printEqs true procss
     let solve n p eqs =
-        let logger = 
+        let logger =
             fun s ->
                 File.AppendAllLines("order.log", [s])
             |> SolverLogging.logger
-        let n = n |> Name.createExc
-        Api.solve Solver.sortQue logger None n p eqs
+        try
+            eqs
+            |> Api.solve true Solver.sortQue logger None (n |> Name.createExc) p
+        with
+        | :? Variable.Exceptions.VariableException as e ->
+            printfn $"{e.Data0}"
+            raise e
+        | :? Solver.Exception.SolverException as e ->
+            printfn $"{e.Data0}"
+            raise e
 
-    let setMinIncl n min = solve n (MinInclProp min)
-    let setMinExcl n min = solve n (MinExclProp min)
-    let setMaxIncl n max = solve n (MaxInclProp max)
-    let setMaxExcl n max = solve n (MaxExclProp max)
-    let setValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
+    let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+    let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+    let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+    let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+    let solveIncr n incr = solve n (set [incr] |> Increment.create |> IncrProp)
+    let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
     let init     = Api.init
     let nonZeroNegative = Api.nonZeroNegative
 
+
+    let findValidValues n (eqs : Equation list) =
+        let var =
+            eqs
+            |> List.collect Equation.toVars
+            |> List.tryFind (fun v ->
+                v
+                |> Variable.getName
+                |> Name.toString
+                |> fun x -> x = n
+            )
+            |> Option.get
+
+        match var.Values |> ValueRange.getValSet with
+        | None    -> ()
+        | Some (ValueSet vs) ->
+            for v in vs do
+                try
+                    eqs
+                    |> solveValues n [v]
+                    |> ignore
+                    printfn $"can set {v}"
+                with
+                | _ ->
+                    printfn $"cannot set {v}"
+
+
+module Order =
 
     type Orb =
         {
@@ -60,7 +114,7 @@ module Solve =
         }
 
 
-    let createEqs (orb : Orb) = 
+    let createEqs (orb : Orb) =
         [
             "itm_cmp_qty = itm_cmp_cnc * cmp_qty"
             "itm_orb_qty = itm_orb_cnc * orb_qty"
@@ -143,7 +197,7 @@ module Solve =
                     |> not &&
                     e.Contains("cmp")
                 )
-            let orbEqs = 
+            let orbEqs =
                 eqs
                 |> List.filter (fun e ->
                     itmEqs
@@ -151,9 +205,9 @@ module Solve =
                     |> not &&
                     cmpEqs
                     |> List.exists((=) e)
-                    |> not                
+                    |> not
                 )
-            
+
             orb.Components
             |> List.fold (fun acc c ->
                 let itms =
@@ -163,13 +217,13 @@ module Solve =
                         |> List.map (fun s -> s.Replace(" cmp", $" {c.Name}").Replace(" itm", $" {i}"))
                     )
                 let cmps =
-                    cmpEqs 
+                    cmpEqs
                     |> List.map (fun s1 ->
                         s1.Replace(" cmp", $" {c.Name}")
                     )
-                itms @ cmps @ acc 
+                itms @ cmps @ acc
             ) []
-            |> fun es -> 
+            |> fun es ->
                 let sumEqs =
                     sumEqs
                     |> List.map (fun e ->
@@ -183,7 +237,7 @@ module Solve =
                     )
                 es @ orbEqs @ sumEqs
         |> Api.init
-        |> nonZeroNegative
+        |> Api.nonZeroNegative
 
 
 
@@ -191,7 +245,7 @@ open Solve
 
 
 let pcmEqs =
-    createEqs { Components = [ {Name = "pcm_supp"; Items = ["paracetamol"]} ] }
+    Order.createEqs { Components = [ {Name = "pcm_supp"; Items = ["paracetamol"]} ] }
 
 
 pcmEqs
@@ -207,7 +261,7 @@ pcmEqs
 |> setValues "orb_qty" [1N]
 // patient
 |> setValues "ord_adj" [10N]
-// product 
+// product
 |> setValues "paracetamol_cmp_qty" [60N; 120N; 240N; 500N; 1000N]
 |> setValues "pcm_supp_qty" [1N]
 |> printEqs
@@ -216,9 +270,9 @@ pcmEqs
 
 let gentaEqs =
     {
-        Components =
+        Order.Components =
             [
-                { 
+                {
                     Name = "genta_sol"
                     Items = ["gentamicin"]
                 }
@@ -228,7 +282,7 @@ let gentaEqs =
                 }
             ]
     }
-    |> createEqs 
+    |> Order.createEqs
 
 
 gentaEqs
@@ -252,7 +306,7 @@ gentaEqs
 |> setMaxIncl "orb_qty" 500N
 |> setMinExcl "gentamicin_orb_cnc" (1N/100N)
 |> setMaxExcl "gentamicin_orb_cnc" 2N
-// product 
+// product
 |> setValues "genta_sol_qty" [2N; 10N]
 |> setValues "gentamicin_cmp_cnc" [10N; 40N]
 |> setValues "gentamicin_cmp_qty" [20N;80N;400N]
@@ -298,219 +352,33 @@ gentaEqs
 |> ignore
 
 
-// gentamicin_dos_tot <1N..1000N> = gentamicin_dos_tot_adj <5N..7N> * ord_adj [1] 
-// gentamicin_dos_tot <5N..7N> = gentamicin_dos_qty <1N..1000N> * pres_freq [1] 
-// gentamicin_dos_qty <5N..7N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_qty <1/40N..100N> 
-// genta_sol_dos_tot <1/40N..100N> = genta_sol_dos_qty <1/8N..7/10N> * pres_freq [1] 
-// orb_dos_tot <1/2N..500N] = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..19999/40N> 
-// genta_sol_dos_tot <1/8N..7/10N> = genta_sol_orb_cnc <1/40N..7/25N> * orb_dos_tot <1/2N..500N] 
-// orb_dos_tot <1/2N..28N> = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..3999/8N> 
-// saline_dos_tot <9/25N..223/8N> = saline_dos_qty <9/25N..3999/8N> * pres_freq [1] 
-// saline_dos_qty <9/25N..223/8N> = saline_dos_rte <9/25N..39959/40N> * pres_time [1/2N..1N] 
-// orb_dos_rte [1N..999N] = genta_sol_dos_rte <1/40N..999/5N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..1998N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5111/20N> 
-// gentamicin_dos_rte <1N..5111/10N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..999/5N> 
-// orb_dos_rte [1N..5111/20N> = genta_sol_dos_rte <1/40N..5111/100N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..5111/10N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5343/50N> 
-// gentamicin_dos_rte <1N..5343/25N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5111/100N> 
-// orb_dos_rte [1N..5343/50N> = genta_sol_dos_rte <1/40N..5343/250N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..5343/25N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..38561/500N> 
-// gentamicin_dos_rte <1N..38561/250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5343/250N> 
-// orb_dos_rte [1N..38561/500N> = genta_sol_dos_rte <1/40N..38561/2500N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..38561/250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..44484/625N> 
-// gentamicin_dos_rte <1N..88968/625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..38561/2500N> 
-// orb_dos_rte [1N..44484/625N> = genta_sol_dos_rte <1/40N..44484/3125N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..88968/625N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..874811/12500N> 
-// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..44484/3125N> 
-// orb_dos_rte [1N..874811/12500N> = genta_sol_dos_rte <1/40N..874811/62500N> + saline_dos_rte <9/25N..223/4N> 
-// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..2179593/31250N> 
-// gentamicin_dos_rte <1N..2179593/15625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..874811/62500N> 
-// orb_dos_rte [1N..2179593/31250N> = genta_sol_dos_rte <1/40N..2179593/156250N> + saline_dos_rte <9/25N..223/4N> 
+// gentamicin_dos_tot <1N..1000N> = gentamicin_dos_tot_adj <5N..7N> * ord_adj [1]
+// gentamicin_dos_tot <5N..7N> = gentamicin_dos_qty <1N..1000N> * pres_freq [1]
+// gentamicin_dos_qty <5N..7N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_qty <1/40N..100N>
+// genta_sol_dos_tot <1/40N..100N> = genta_sol_dos_qty <1/8N..7/10N> * pres_freq [1]
+// orb_dos_tot <1/2N..500N] = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..19999/40N>
+// genta_sol_dos_tot <1/8N..7/10N> = genta_sol_orb_cnc <1/40N..7/25N> * orb_dos_tot <1/2N..500N]
+// orb_dos_tot <1/2N..28N> = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..3999/8N>
+// saline_dos_tot <9/25N..223/8N> = saline_dos_qty <9/25N..3999/8N> * pres_freq [1]
+// saline_dos_qty <9/25N..223/8N> = saline_dos_rte <9/25N..39959/40N> * pres_time [1/2N..1N]
+// orb_dos_rte [1N..999N] = genta_sol_dos_rte <1/40N..999/5N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..1998N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5111/20N>
+// gentamicin_dos_rte <1N..5111/10N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..999/5N>
+// orb_dos_rte [1N..5111/20N> = genta_sol_dos_rte <1/40N..5111/100N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..5111/10N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5343/50N>
+// gentamicin_dos_rte <1N..5343/25N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5111/100N>
+// orb_dos_rte [1N..5343/50N> = genta_sol_dos_rte <1/40N..5343/250N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..5343/25N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..38561/500N>
+// gentamicin_dos_rte <1N..38561/250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5343/250N>
+// orb_dos_rte [1N..38561/500N> = genta_sol_dos_rte <1/40N..38561/2500N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..38561/250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..44484/625N>
+// gentamicin_dos_rte <1N..88968/625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..38561/2500N>
+// orb_dos_rte [1N..44484/625N> = genta_sol_dos_rte <1/40N..44484/3125N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..88968/625N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..874811/12500N>
+// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..44484/3125N>
+// orb_dos_rte [1N..874811/12500N> = genta_sol_dos_rte <1/40N..874811/62500N> + saline_dos_rte <9/25N..223/4N>
+// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..2179593/31250N>
+// gentamicin_dos_rte <1N..2179593/15625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..874811/62500N>
+// orb_dos_rte [1N..2179593/31250N> = genta_sol_dos_rte <1/40N..2179593/156250N> + saline_dos_rte <9/25N..223/4N>
 
 
-
-
-// minimal failing case
-// f = eb/(b + c)
-// e = f(b + c)/b
-// x = b/(b + c)
-// y = (b + c)/b
-let failEqs =
-    [
-        "a = b + c"
-        "d = f * a"
-        "d = e * b"
-        "f = e * x"
-        "e = f * y"
-    ]
-    |> Api.init
-    |> nonZeroNegative
-
-
-failEqs
-|> setMinExcl "b" 1N
-|> printEqs
-|> setMinExcl "c" 1N
-|> printEqs
-|> setMaxExcl "c" 20N
-|> printEqs
-|> setMinIncl "e" 10N
-|> printEqs
-|> setMaxIncl "e" 20N
-|> printEqs
-|> setMinExcl "f" 1N
-|> printEqs
-|> setMaxExcl "f" 2N
-|> printEqs
-//|> setMaxExcl "a" 10N // this doesn't start a loop
-//|> setMaxExcl "a" 25N // this doesn't start a loop
-//|> setMaxExcl "a" 26N // this starts a loop
-//|> setMaxExcl "a" 30N // this starts a loop
-|> printEqs
-|> ignore
-
-
-
-
-let findValidValues n (eqs : Equation list) =
-    let f = 
-        eqs
-        |> List.collect Equation.toVars
-        |> List.tryFind (fun v ->
-            v 
-            |> Variable.getName 
-            |> Name.toString 
-            |> fun x -> x = n
-        )
-        |> Option.get
-
-    match f.Values |> ValueRange.getValueSet with
-    | None    -> ()
-    | Some vs ->
-        for v in vs do
-            try
-                eqs
-                |> setValues "f" [v]
-                |> ignore
-                printfn $"can set {v}"
-            with
-            | _ -> 
-                printfn $"cannot set {v}"
-
-
-// x = b/(b + c)
-// y = (b + c)/b
-let calcXY (eqs : Equation list) =
-    let getVar n = 
-        eqs 
-        |> List.collect Equation.toVars
-        |> List.find (Variable.getName >> Name.toString >>((=) n))
-    
-    let b = (getVar "b").Values |> ValueRange.getValueSet |> Option.defaultValue Set.empty
-    let c = (getVar "c").Values |> ValueRange.getValueSet |> Option.defaultValue Set.empty
-    
-    let eqs =
-        if b |> Set.isEmpty || c |> Set.isEmpty then eqs
-        else
-            let xs =
-                [
-                    for i in b do
-                        for j in c do
-                            i / (i + j)
-                ]
-            let ys = xs |> List.map (fun x -> 1N / x)
-            eqs 
-            |> setValues "x" xs
-            |> setValues "y" ys
-    //eqs
-    let b_min, b_max = 
-        getVar "b" 
-        |> Variable.getValueRange
-        |> fun vr -> 
-            vr |> ValueRange.getMin,
-            vr |> ValueRange.getMax
-
-    let c_min, c_max = 
-        getVar "c" 
-        |> Variable.getValueRange
-        |> fun vr -> 
-            vr |> ValueRange.getMin,
-            vr |> ValueRange.getMax
-
-    let b_max, x_max = 
-        match b_max, c_min with
-        | Some max, Some min -> 
-            let b1, max = max |> ValueRange.Maximum.maxToBoolBigRational
-            let b2, min = min |> ValueRange.Minimum.minToBoolBigRational
-            (b1 && b2), max / (max + min) |> Some
-        | _ -> false, None
-
-    let b_min, x_min = 
-        match b_min, c_max with
-        | Some min, Some max -> 
-            let b1, max = max |> ValueRange.Maximum.maxToBoolBigRational
-            let b2, min = min |> ValueRange.Minimum.minToBoolBigRational
-            (b1 && b2), min / (min + max) |> Some
-        | _ -> false, None
-
-    match x_max with
-    | Some max ->
-        eqs
-        |> (if b_max then setMaxIncl "x" max else setMaxExcl "x" max)
-        |> (if b_max then setMinIncl "y" (1N/max) else setMinExcl "y" (1N/max))
-    | None -> eqs
-    |> fun eqs ->
-        match x_min with
-        | Some min ->
-            eqs
-            |> (if b_min then setMinIncl "x" min else setMinExcl "x" min)
-            |> (if b_min then setMaxIncl "y" (1N/min) else setMaxExcl "y" (1N/min))
-        | None -> eqs
-
-
-failEqs
-|> setValues "b" [1N..5N]
-|> calcXY
-|> printEqs
-|> setValues "c" [1N..5N]
-|> calcXY
-|> printEqs
-|> setValues "e" [10N]
-|> calcXY
-|> printEqs
-|> findValidValues "f"
-//|> setValues "a" [2N]
-//|> printEqs
-//|> setValues "f" [3N] // this fails
-//|> setValues "f" [5N] // but this doesn't fail
-
-
-failEqs
-|> setMinExcl "b" 1N
-|> calcXY
-|> printEqs
-|> setMinExcl "c" 1N
-|> calcXY
-|> printEqs
-|> setMaxExcl "c" 20N
-|> calcXY
-|> printEqs
-|> setMinIncl "e" 10N
-|> calcXY
-|> printEqs
-|> setMaxIncl "e" 20N
-|> calcXY
-|> printEqs
-|> setMinExcl "f" 1N
-|> calcXY
-|> printEqs
-|> setMaxExcl "f" 2N
-|> calcXY
-|> printEqs
-//|> setMaxExcl "a" 10N // this doesn't start a loop
-//|> setMaxExcl "a" 25N // this doesn't start a loop
-//|> setMaxExcl "a" 26N // this starts a loop
-//|> calcXY
-//|> setMaxExcl "a" 30N // this starts a loop
-|> printEqs
-|> ignore

@@ -11,15 +11,15 @@ module Constraint =
     module ValueSet = ValueRange.ValueSet
     module Name = Variable.Name
 
-    let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name  
+    let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name
 
 
-    let toString { Name = n; Property = p; Limit = l} = $"{n |> Name.toString}: {p} {l}" 
+    let toString { Name = n; Property = p; Limit = l} = $"{n |> Name.toString}: {p} {l}"
 
 
     let scoreConstraint c =
             match c.Property with
-            | ValsProp vs -> 
+            | ValsProp vs ->
                 let n = vs |> ValueSet.count
                 if n = 1 then    -3, c
                 else              n, c
@@ -36,7 +36,7 @@ module Constraint =
             | ValsProp vs ->
                 if vs |> ValueSet.count <= 1 then [c] |> List.append acc
                 else
-                    let min = vs |> ValueSet.getMin |> Option.map MinProp 
+                    let min = vs |> ValueSet.getMin |> Option.map MinProp
                     let max = vs |> ValueSet.getMax |> Option.map MaxProp
                     [
                         c
@@ -46,24 +46,6 @@ module Constraint =
                     |> List.append acc
             | _ -> [c] |> List.append acc
         ) []
-        // clean up list of constraints
-        // |> List.fold (fun acc c ->
-        //     if acc |> List.exists ((=) c) then acc
-        //     else c::acc
-        //         // match acc |> List.tryFind (fun x -> c.Name = x.Name) with
-        //         // | None    -> c::acc
-        //         // | Some c' ->
-        //         //     match c'.Property with
-        //         //     | ValsProp n when n |> Set.count = 1 ->
-        //         //         acc
-        //         //         |> List.fold (fun acc x ->
-        //         //             if x.Name = c'.Name then 
-        //         //                 if acc |> List.exists ((=) c') then acc
-        //         //                 else c'::acc
-        //         //             else x::acc
-        //         //         ) []
-        //         //     | _ -> c::acc
-        // ) []
         |> List.fold (fun acc c ->
             if acc |> List.exists ((=) c) then acc
             else
@@ -77,10 +59,10 @@ module Constraint =
             |> Logging.logInfo log
 
             cs
-            |> List.map snd 
+            |> List.map snd
 
 
-    let apply log (c : Constraint) eqs =
+    let apply onlyMinIncrMax log (c : Constraint) eqs =
 
         let lim l b vr =
             if vr |> Variable.count <= l then vr
@@ -92,19 +74,19 @@ module Constraint =
                 | Some (ValueSet vs) ->
                     vs
                     |> Set.toList
-                    |> fun xs -> 
-                        if b then xs |> List.sort 
+                    |> fun xs ->
+                        if b then xs |> List.sort
                         else xs |> List.sortDescending
                     |> List.take l
                     |> Set.ofList
                     |> ValueRange.createValSet
-                    |> Variable.setValueRange vr
+                    |> Variable.setValueRange onlyMinIncrMax vr
                 | None -> vr
 
-        eqs 
+        eqs
         |> List.collect (Equation.findName c.Name)
         |> function
-        | [] -> 
+        | [] ->
             (c, eqs)
             |> Events.ConstraintVariableNotFound
             |> Logging.logWarning log
@@ -115,17 +97,17 @@ module Constraint =
 
             c.Property
             |> Property.toValueRange
-            |> Variable.setValueRange vr
+            |> Variable.setValueRange onlyMinIncrMax vr
             |> fun vr ->
                 match c.Limit with
                 | NoLimit -> vr
-                | MaxLim l -> 
+                | MaxLim l ->
                     (c.Limit, vr)
                     |> Events.ConstraintLimitSetToVariable
                     |> Logging.logInfo log
 
-                    vr |> lim l false  
-                | MinLim l -> 
+                    vr |> lim l false
+                | MinLim l ->
                     (c.Limit, vr)
                     |> Events.ConstraintLimitSetToVariable
                     |> Logging.logInfo log
@@ -142,15 +124,15 @@ module Constraint =
             |> Events.ConstraintVariableApplied
             |> Logging.logInfo log
 
-            eqs, Some var 
+            eqs, Some var
 
 
-    let solve log sortQue (c : Constraint) eqs =
-        match apply log c eqs with
+    let solve onlyMinIncrMax log sortQue (c : Constraint) eqs =
+        match apply onlyMinIncrMax log c eqs with
         | eqs, None -> eqs
         | eqs, Some var ->
-            eqs 
-            |> Solver.solve log sortQue var
+            eqs
+            |> Solver.solveVariable onlyMinIncrMax log sortQue var
             |> fun eqs ->
                 (c, eqs)
                 |> Events.ConstrainedEquationsSolved

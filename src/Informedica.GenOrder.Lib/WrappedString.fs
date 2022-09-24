@@ -6,9 +6,9 @@ module WrappedString =
 
     open Types
 
-    /// Type and functions that 
+    /// Type and functions that
     /// deal with an identifier
-    module Id = 
+    module Id =
 
         let create s = s |> Id
 
@@ -18,13 +18,12 @@ module WrappedString =
 
     /// Helper functions for `Informedica.GenSolver.Variable.Name` type
     module Name =
-        
+
         open Informedica.GenSolver.Lib
-        open Informedica.GenSolver.Lib.Types
-        
+
         module Name = Variable.Name
 
-        /// Create a `Name` from a list of strings that 
+        /// Create a `Name` from a list of strings that
         let create ns = ns |> String.concat "." |> Name.createExc
 
         let lift f = fun n -> n |> Name.toString |> f |> Name.createExc

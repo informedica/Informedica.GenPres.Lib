@@ -1,6 +1,5 @@
 namespace Informedica.GenOrder.Lib
 
-open System.Xml.Xsl
 
 
 module Api =
@@ -190,15 +189,10 @@ module Api =
         )
 
 
-    let evaluate age weight (doseRule : DoseRule) =
+    let evaluate _ weight (doseRule : DoseRule) =
         let solRule =
             Data.getSolutions ()
             |> List.tryFind (fun s -> s.Medication = doseRule.Medication)
-
-        let eqs d1 d2 =
-            match d1, d2 with
-            | Some x1, Some x2 -> x1 = x2
-            | _ -> false
 
         let fixedDose = calcFixedDose doseRule
 

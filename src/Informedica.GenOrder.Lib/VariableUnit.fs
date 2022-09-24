@@ -3,7 +3,6 @@ namespace Informedica.GenOrder.Lib
 /// Functions that deal with the `VariableUnit` type
 module VariableUnit =
 
-    open System
     open MathNet.Numerics
 
     open Informedica.Utils.Lib
@@ -20,7 +19,7 @@ module VariableUnit =
     module Maximum = ValueRange.Maximum
     module Equation    = Informedica.GenSolver.Lib.Equation
 
-    module VariableDto = Informedica.GenSolver.Lib.Variable.Dto
+    module VariableDto = Variable.Dto
     module Units = ValueUnit.Units
 
     type Unit = ValueUnit.Unit
@@ -37,7 +36,7 @@ module VariableUnit =
     /// Create a `VariableUnit` with preset values
     let create n vs min max un =
         // ToDo: add incr
-        ValueRange.create min None max vs
+        ValueRange.create true min None max vs
         |> function
         | vlr ->
             let var = Variable.create id n vlr
@@ -140,15 +139,15 @@ module VariableUnit =
             { vru with
                 Variable =
                     vr
-                    |> Variable.setValueRange vru.Variable }
+                    |> Variable.setValueRange true vru.Variable }
 
 
     let setMinIncl =
-        setValue (Minimum.create true) ValueRange.setMin
+        setValue (Minimum.create true) (ValueRange.setMin true)
 
 
     let setMaxIncl =
-        setValue (Maximum.create true) ValueRange.setMax
+        setValue (Maximum.create true) (ValueRange.setMax true)
 
 
     let setVals vs vru =
@@ -166,7 +165,7 @@ module VariableUnit =
             { vru with
                 Variable =
                     vr
-                    |> Variable.setValueRange vru.Variable }
+                    |> Variable.setValueRange true vru.Variable }
 
 
     /// Get the string representation of a `VariableUnit` **vru**
@@ -251,7 +250,7 @@ module VariableUnit =
                     u
                     |> ValueUnit.unitToString
                     |> String.removeTextBetweenBrackets
-                    |> fun us -> v, sprintf "%s %s" vs us
+                    |> fun us -> v, $"%s{vs} %s{us}"
             )
         | None -> Seq.empty
 
@@ -264,7 +263,7 @@ module VariableUnit =
     /// Helper functions for `Informedica.GenSolver.Variable.Name` type
     module Name =
 
-        module Name = Informedica.GenSolver.Lib.Variable.Name
+        module Name = Variable.Name
 
 
         /// Create a `Name` from a list of strings that
@@ -340,8 +339,6 @@ module VariableUnit =
                 >> ValueUnit.toBase
 
             let map  = Option.map
-            let none = Option.none
-            let bind = Option.bind
 
             let n    = [ dto.Name ] |> Name.create
             let vals =

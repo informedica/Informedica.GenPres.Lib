@@ -12,12 +12,19 @@ open Informedica.GenSolver.Lib
 open System
 open System.IO
 
-open Types
-
-module Api = Informedica.GenSolver.Lib.Api
-module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
+
+
+Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
+
+
+module Name = Variable.Name
+module ValueRange = Variable.ValueRange
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module Increment = ValueRange.Increment
+module ValueSet = ValueRange.ValueSet
 
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -29,9 +36,9 @@ module Solve =
         File.AppendAllLines("order.log", [s])
         $"{s} " |> printfn "%s"
 
-    let set n p eqs = 
+    let setProp n p eqs =
         let n = n |> Name.createExc
-        match eqs |> Api.setVariableValues None n p with
+        match eqs |> Api.setVariableValues true None n p with
         | Some var ->
             eqs
             |> List.map (fun e ->
@@ -39,35 +46,65 @@ module Solve =
             )
         | None -> eqs
 
-    let setMinIncl n min = set n (MinInclProp min)
-    let setMinExcl n min = set n (MinExclProp min)
-    let setMaxIncl n max = set n (MaxInclProp max)
-    let setMaxExcl n max = set n (MaxExclProp max)
-    let setValues n vals = set n (ValsProp (vals |> Set.ofSeq))
+    let setMinIncl n min = min |> Minimum.create true |> MinProp |> setProp n
+    let setMinExcl n min = min |> Minimum.create false |> MinProp |> setProp n
+    let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> setProp n
+    let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> setProp n
+    let setValues n vals = vals |> ValueSet.create |> ValsProp |> setProp n
 
 
     let printEqs = Solver.printEqs true procss
     let solve n p eqs =
-        let logger = 
-            fun s -> ()
-                //File.AppendAllLines("order.log", [s])
+        let logger =
+            fun s ->
+                File.AppendAllLines("order.log", [s])
             |> SolverLogging.logger
         try
             eqs
-            |> Api.solve Solver.sortQue logger None (n |> Name.createExc) p
+            |> Api.solve true Solver.sortQue logger None (n |> Name.createExc) p
         with
+        | :? Variable.Exceptions.VariableException as e ->
+            printfn $"{e.Data0}"
+            raise e
         | :? Solver.Exception.SolverException as e ->
             printfn $"{e.Data0}"
             raise e
 
-    let solveMinIncl n min = solve n (MinInclProp min)
-    let solveMinExcl n min = solve n (MinExclProp min)
-    let solveMaxIncl n max = solve n (MaxInclProp max)
-    let solveMaxExcl n max = solve n (MaxExclProp max)
-    let solveValues n vals = solve n (ValsProp (vals |> Set.ofSeq))
+    let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+    let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+    let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+    let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+    let solveIncr n incr = solve n (set [incr] |> Increment.create |> IncrProp)
+    let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
     let init     = Api.init
     let nonZeroNegative = Api.nonZeroNegative
+
+
+    let findValidValues n (eqs : Equation list) =
+        let var =
+            eqs
+            |> List.collect Equation.toVars
+            |> List.tryFind (fun v ->
+                v
+                |> Variable.getName
+                |> Name.toString
+                |> fun x -> x = n
+            )
+            |> Option.get
+
+        match var.Values |> ValueRange.getValSet with
+        | None    -> ()
+        | Some (ValueSet vs) ->
+            for v in vs do
+                try
+                    eqs
+                    |> solveValues n [v]
+                    |> ignore
+                    printfn $"can set {v}"
+                with
+                | _ ->
+                    printfn $"cannot set {v}"
 
 
 
@@ -85,7 +122,7 @@ module Equations =
         }
 
 
-    let create (orb : Orb) = 
+    let create (orb : Orb) =
         [
             "itm_cmp_qty = itm_cmp_cnc * cmp_qty"
             "itm_orb_qty = itm_orb_cnc * orb_qty"
@@ -170,7 +207,7 @@ module Equations =
                     |> not &&
                     e.Contains("cmp")
                 )
-            let orbEqs = 
+            let orbEqs =
                 eqs
                 |> List.filter (fun e ->
                     itmEqs
@@ -178,9 +215,9 @@ module Equations =
                     |> not &&
                     cmpEqs
                     |> List.exists((=) e)
-                    |> not                
+                    |> not
                 )
-            
+
             orb.Components
             |> List.fold (fun acc c ->
                 let itms =
@@ -190,13 +227,13 @@ module Equations =
                         |> List.map (fun s -> s.Replace(" cmp", $" {c.Name}").Replace(" itm", $" {i}"))
                     )
                 let cmps =
-                    cmpEqs 
+                    cmpEqs
                     |> List.map (fun s1 ->
                         s1.Replace(" cmp", $" {c.Name}")
                     )
-                itms @ cmps @ acc 
+                itms @ cmps @ acc
             ) []
-            |> fun es -> 
+            |> fun es ->
                 let sumEqs =
                     sumEqs
                     |> List.map (fun e ->
@@ -235,9 +272,7 @@ let run = runTestsWithCLIArgs [ CLIArguments.Verbosity LogLevel.Verbose ] [||]
 
 module Generators =
 
-    open System
     open FsCheck
-    open MathNet.Numerics
 
     let createBigR (n, d) =
         let d = if d = 0I then 1I else d
@@ -254,7 +289,7 @@ module Generators =
 
 
     type BigR = BigR of BigRational
-    let bigRArb () = 
+    let bigRArb () =
         bigRGen
         |> Arb.fromGen
         |> Arb.convert BigR (fun (BigR br) -> br)
@@ -265,17 +300,17 @@ module Generators =
         bigRGen
         |> Gen.map abs
         |> Gen.two
-        |> Gen.map (fun (br1, br2) -> 
+        |> Gen.map (fun (br1, br2) ->
             let br1 = br1.Numerator |> BigRational.FromBigInt
             let br2 = br2.Numerator |> BigRational.FromBigInt
             if br1 >= br2 then br2, br1 else br1, br2
-            |> fun (br1, b2) -> 
+            |> fun (br1, br2) ->
                 if br1 = br2 then br1, br2 + 1N else br1, br2
         )
         |> Arb.fromGen
         |> Arb.convert MinMax (fun (MinMax (min, max)) -> min, max)
 
-    
+
     type ListOf37<'a> = ListOf37 of 'a List
     let listOf37Arb() =
         Gen.listOfLength 37 Arb.generate
@@ -284,10 +319,10 @@ module Generators =
 
 
     let addToConfig config =
-        { 
-            config with 
+        {
+            config with
                 maxTest = 1000
-                arbitrary = typeof<BigR>.DeclaringType::config.arbitrary 
+                arbitrary = typeof<BigR>.DeclaringType::config.arbitrary
         }
 
 
@@ -299,9 +334,9 @@ testList "test setting min and max to abcdef eqs" [
     let config = Generators.addToConfig FsCheckConfig.defaultConfig
     let abdef = ["a"; "b"; "d"; "e"; "f"]
 
-    testPropertyWithConfig config "can set any" 
+    testPropertyWithConfig config "can set any"
     <| fun (i1: int) i2 i3 i4 i5
-           (Generators.MinMax (min1, max1)) 
+           (Generators.MinMax (min1, max1))
            (Generators.MinMax (min2, max2))
            (Generators.MinMax (min3, max3))
            (Generators.MinMax (min4, max4)) ->
@@ -311,8 +346,8 @@ testList "test setting min and max to abcdef eqs" [
             |> List.sortBy snd
             |> List.map fst
             |> function
-            | i1::i2::i3::i4::_ -> 
-                (abdef.[i1],abdef.[i2], abdef.[i3], abdef.[i4])
+            | i1::i2::i3::i4::_ ->
+                (abdef[i1],abdef[i2], abdef[i3], abdef[i4])
             | _ -> failwith "cannot process"
 
         try
@@ -333,15 +368,15 @@ testList "test setting min and max to abcdef eqs" [
             |> ignore
             Expect.isTrue "true is true" true
         with
-        | :? Solver.Exception.SolverException as e -> 
+        | :? Solver.Exception.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverLooped xs ->
+            | Exceptions.SolverTooManyLoops xs ->
                 printfn "ran into a loop with:"
                 xs
                 |> printEqs
                 |> ignore
                 Expect.isTrue "not true" false
-            | _ -> 
+            | _ ->
                 Expect.isTrue "true is true" true
         | _ -> Expect.isTrue "true is true" true
 ]
@@ -356,7 +391,7 @@ let twoCompEqs =
     {
         Components =
             [
-                { 
+                {
                     Name = "CMPA"
                     Items = ["ITMA"]
                 }
@@ -368,12 +403,12 @@ let twoCompEqs =
     }
     |> create
 
- 
+
 
 testList "can set any var of compA or qty or cnc of compB" [
     let config = Generators.addToConfig FsCheckConfig.defaultConfig
 
-    let vars = 
+    let vars =
         twoCompEqs
         |> List.collect Equation.toVars
         |> List.map (fun v -> v.Name |> Name.toString)
@@ -384,19 +419,19 @@ testList "can set any var of compA or qty or cnc of compB" [
                 |> List.filter (fun s ->
                     s.Contains("CMPB") || s.Contains("ITMB")
                 )
-                |> List.filter (fun s -> 
+                |> List.filter (fun s ->
                     s.Contains("cmp_cnc") || s.Contains("CMPB_qty")
                 )
             vars
             |> List.filter (fun s ->
                 s.Contains("CMPB") |> not &&
                 s.Contains("ITMB") |> not &&
-                s.Contains("ord") |> not      
+                s.Contains("ord") |> not
             )
 //            |> List.append cmps
 
 
-    testPropertyWithConfig config "can set any" 
+    testPropertyWithConfig config "can set any"
     <| fun (Generators.ListOf37 (indxs : int list))
            (Generators.ListOf37 (xs : Generators.MinMax list))
            ->
@@ -404,10 +439,10 @@ testList "can set any var of compA or qty or cnc of compB" [
             indxs
             |> List.take vars.Length
             |> List.mapi (fun i x -> i, x)
-            |> List.sortBy snd      
-            |> List.map fst      
+            |> List.sortBy snd
+            |> List.map fst
             |> List.take 12
-            |> List.map (fun i -> vars.[i])
+            |> List.map (fun i -> vars[i])
 
         try
             vars
@@ -415,7 +450,7 @@ testList "can set any var of compA or qty or cnc of compB" [
                 let i, eqs = acc
                 let eqs =
                     let (Generators.MinMax(min, max)) =
-                        xs.[i]
+                        xs[i]
                     eqs
                     |> solveMinIncl v min
                     |> solveMaxIncl v max
@@ -426,15 +461,15 @@ testList "can set any var of compA or qty or cnc of compB" [
             |> ignore
             Expect.isTrue "true is true" true
         with
-        | :? Solver.Exception.SolverException as e -> 
+        | :? Solver.Exception.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverLooped xs ->
+            | Exceptions.SolverTooManyLoops xs ->
                 vars
-                |> String.concat ", "                
+                |> String.concat ", "
                 |> printfn "ran into a loop with:%s\n"
                 xs |> printEqs |> ignore
                 Expect.isTrue "not true" false
-            | _ -> 
+            | _ ->
                 Expect.isTrue "true is true" true
         | _ -> Expect.isTrue "true is true" true
 ]

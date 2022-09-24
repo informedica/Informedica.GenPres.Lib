@@ -30,14 +30,13 @@ open Informedica.GenSolver.Lib
 /// Create the necessary test generators
 module Generators =
 
-    open Types
     open Expecto
     open FsCheck
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
 
 
-    let bigRGen (n, d) = 
+    let bigRGen (n, d) =
         let d = if d = 0 then 1 else d
         let n = abs(n) |> BigRational.FromInt
         let d = abs(d) |> BigRational.FromInt
@@ -122,8 +121,8 @@ module Generators =
             }
 
 
-    let config = { 
-        FsCheckConfig.defaultConfig with 
+    let config = {
+        FsCheckConfig.defaultConfig with
             arbitrary = [
                 typeof<BigRGenerator>
                 typeof<VarDtoGenerator>
@@ -143,7 +142,6 @@ module Tests =
 
     open MathNet.Numerics
     open Expecto
-    open Informedica.GenSolver.Lib
 
 
     module UtilsTests =
@@ -285,64 +283,64 @@ module Tests =
 
 
         module ValueRangeTests =
-            
+
             module MinimumTests =
-            
+
                 open Variable.ValueRange.Minimum
-            
+
                 let tests =
                     testList "minimum" [
-            
+
                         fun b m1 m2 ->
                             let min1 = create b m1
                             let min2 = create b m2
                             m1 > m2 = (min1 |> minGTmin min2)
                         |> Generators.testProp "min1 > min2"
-            
+
                         fun b m1 m2 ->
                             let min1 = create b m1
                             let min2 = create b m2
                             m1 < m2 = (min1 |> minSTmin min2)
                         |> Generators.testProp "min1 < min2"
-            
+
                         fun m1 m2 ->
                             let min1 = create true m1
                             let min2 = create false m2
                             (m1 = m2 || m1 < m2) = (min1 |> minSTmin min2)
                         |> Generators.testProp
                             "min1 incl < min2 excl, also when min1 = min2"
-            
+
                         fun m1 m2 ->
                             let min1 = create false m1
                             let min2 = create true m2
                             m1 < m2 = (min1 |> minSTmin min2)
                         |> Generators.testProp "min1 excl < min2 incl"
-            
+
                         fun b m1 m2 ->
                             let min1 = create b m1
                             let min2 = create b m2
                             m1 >= m2 = (min1 |> minGTEmin min2)
                         |> Generators.testProp "min1 >= min2"
-            
+
                         fun b m1 m2 ->
                             let min1 = create b m1
                             let min2 = create b m2
                             m1 <= m2 = (min1 |> minSTEmin min2)
                         |> Generators.testProp "min1 <= min2"
-            
+
                         fun m1 m2 ->
                             let min1 = create true m1
                             let min2 = create false m2
                             m1 > m2 = (min1 |> minGTmin min2)
                         |> Generators.testProp "min1 incl > min2 excl"
-            
+
                         fun m1 m2 ->
                             let min1 = create false m1
                             let min2 = create true m2
                             (m1 = m2 || m1 > m2) = (min1 |> minGTmin min2)
                         |> Generators.testProp
                             "min1 excl > min2 incl, also when min1 = min2"
-            
+
                         fun b m ->
                             let min = create b m
                             min
@@ -350,7 +348,7 @@ module Tests =
                             |> fun (b, m) -> create b m = min
                         |> Generators.testProp
                             "construct and deconstruct min there and back again"
-            
+
                         fun b m ->
                             let incr = set [1N/3N; 1N/4N; 1N/5N] |> Set.removeBigRationalMultiples
                             let min0 = create b m
@@ -375,9 +373,9 @@ module Tests =
                             oldMin |> restrict newMin |> minGTEmin oldMin
                         |> Generators.testProp "restrict different min"
                     ]
-            
+
                 let run () = tests |> Generators.run
-            
+
 
             module MaximumTests =
 
@@ -475,7 +473,6 @@ module Tests =
 
             module IncrementTests =
 
-                open Types
                 open Variable.ValueRange.Increment
 
 
@@ -533,7 +530,7 @@ module Tests =
                     testList "restrict increment" [
                         fun xs ->
                             try
-                                let newIncr = xs |> create 
+                                let newIncr = xs |> create
                                 let oldIncr = xs |> create
                                 (oldIncr |> restrict newIncr) = newIncr
                             with
@@ -542,7 +539,7 @@ module Tests =
 
                         fun xs1 xs2 ->
                             try
-                                let newIncr = xs1 |> create 
+                                let newIncr = xs1 |> create
                                 let oldIncr = xs2 |> create
                                 (oldIncr |> restrict newIncr |> count) <= (newIncr |> count)
                             with
@@ -636,7 +633,7 @@ module Tests =
 
         [<Tests>]
         let tests = testList "product equation" [
-            
+
             ]
 
 
@@ -658,11 +655,9 @@ VariableTests.run ()
 
 
 open MathNet.Numerics
-open Informedica.Utils.Lib.BCL
 
 open Expecto
 open FsCheck
-open Types
 open Variable.Operators
 
 module Property = Variable.ValueRange.Property
@@ -671,7 +666,7 @@ module Property = Variable.ValueRange.Property
 let generateVars n =
     (Generators.varGenerator |> Arb.fromGen).Generator.Sample(10, n)
     |> List.filter (fun dto ->
-        dto.Vals |> List.length < 5 
+        dto.Vals |> List.length < 5
     )
     |> List.map Variable.Dto.fromDto
     |> List.filter (fun var ->
@@ -697,10 +692,10 @@ Seq.allPairs vars1 vars2
 |> Seq.collect (fun (var1, var2) ->
     try
         [
-            var1, var2, var1 ^* var2, "x"
-            var1, var2, var1 ^/ var2, "/"
-            var1, var2, var1 ^+ var2, "+"
-            var1, var2, var1 ^- var2, "-"
+            var1, var2, var1 @* var2, "x"
+            var1, var2, var1 @/ var2, "/"
+            var1, var2, var1 @+ var2, "+"
+            var1, var2, var1 @- var2, "-"
         ]
     with
     | _ ->
@@ -713,8 +708,7 @@ Seq.allPairs vars1 vars2
     let x = var1.Values |> toStr
     let z = var2.Values |> toStr
     let y = res.Values |> toStr
-    $"{i}. {y} = {x} {op} {z}"
-    |> printfn "%s"    
+    printfn $@"{i}. {y} = {x} {op} {z}"
 )
 
 
@@ -725,10 +719,10 @@ Seq.allPairs vars1 vars2
 |> Seq.collect (fun (y, (x1, x2)) ->
     try
         [
-            y, y <== (x1 ^* x2), x1, x2, "x"
-            y, y <== (x1 ^/ x2), x1, x2, "/"
-            y, y <== (x1 ^+ x2), x1, x2, "+"
-            y, y <== (x1 ^- x2), x1, x2, "-"
+            y, y @<- (x1 ^* x2), x1, x2, "x"
+            y, y @<- (x1 ^/ x2), x1, x2, "/"
+            y, y @<- (x1 ^+ x2), x1, x2, "+"
+            y, y @<- (x1 ^- x2), x1, x2, "-"
         ]
     with
     | _ -> []
@@ -742,8 +736,7 @@ Seq.allPairs vars1 vars2
     let z = x2.Values |> toStr
     let y0 = y0.Values |> toStr
     let y1 = y1.Values |> toStr
-    $"{i}. {y0} -> {y1} = {x} {o} {z}"
-    |> printfn "%s"
+    printfn $@"{i}. {y0} -> {y1} = {x} {o} {z}"
 )
 
 
@@ -753,7 +746,7 @@ vars1
 )
 |> Seq.distinct
 |> Seq.iteri (fun i (vr, props) ->
-    printfn $"{i}. {vr |> Variable.ValueRange.toString true} -> {props}"
+    printfn @$"{i}. {vr |> Variable.ValueRange.toString true} -> {props}"
 )
 
 
@@ -764,24 +757,24 @@ vars1
     let max = Variable.ValueRange.Maximum.create true 2N
     let v =
         var.Values
-        |> Variable.ValueRange.setMax max
-        |> Variable.setValueRange var
+        |> Variable.ValueRange.setMax true max
+        |> Variable.setValueRange true var
     [ var.Values, v.Values, v.Values |> Variable.ValueRange.diffWith var.Values ]
     with
     | _ -> []
 )
 |> Seq.distinct
 |> Seq.iteri (fun i (vr1, vr2, props) ->
-    printfn $"{i}. {vr1 |> Variable.ValueRange.toString true} -> {vr2 |> Variable.ValueRange.toString true} diff = {props}"
+    printfn $@"{i}. {vr1 |> Variable.ValueRange.toString true} -> {vr2 |> Variable.ValueRange.toString true} diff = {props}"
 )
 
 
 let resultToString = function
-    | (eq, cs) ->
-        $"{eq |> Equation.toString true} {cs |> Equation.SolveResult.toString}"
+    | eq, cs ->
+        $@"{eq |> Equation.toString true} {cs |> Equation.SolveResult.toString}"
 
 
-let logger : Logging.Logger =
+let logger : Types.Logging.Logger =
     {
         Log =
             fun { TimeStamp = _; Level = _; Message = msg } ->
@@ -806,7 +799,7 @@ vars1
         |> function
         | Some eq ->
             printfn $"== start solving equation"
-            (eq, eq |> Equation.solve logger) |> Some
+            (eq, eq |> Equation.solve true logger) |> Some
         | None -> None
     with
     | _ ->
@@ -851,12 +844,12 @@ Equation.createProductEqExc (var0, [var1; var2])
 |> fun eq ->
     printfn $"{eq |> Equation.toString true}"
     eq
-|> Equation.solve ({ Log = printfn "%A" })
+|> Equation.solve true { Log = printfn "%A" }
 |> resultToString
 |> printfn "%s"
 
 
-Variable.ValueRange.MinMaxCalcultor.calcMinMax
+Variable.ValueRange.MinMaxCalculator.calcMinMax
     (*)
     (Some 3N, false)
     (None, false)
@@ -864,4 +857,4 @@ Variable.ValueRange.MinMaxCalcultor.calcMinMax
     (Some 0N, true)
 
 
-var0 <== var2 ^* var1
+var0 @<- var2 ^* var1

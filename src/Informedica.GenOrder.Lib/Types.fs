@@ -332,7 +332,7 @@ module Types =
 
     /// The constraints that can be applied
     /// and the order
-    type ConstrainedOrder = (DrugConstraint list * Order)
+    type ConstrainedOrder = DrugConstraint list * Order
 
     /// The dose limits that can be applied
     type DoseLimits =

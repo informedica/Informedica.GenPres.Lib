@@ -242,7 +242,7 @@ module Order =
         [ Literals.adjust; ord.Adjust |> Quantity.toString ]
         |> List.append (Orderable.Literals.orderable::(ord.Orderable |> Orderable.toString))
         |> List.append ("Prescription"::(ord.Prescription |> Prescription.toString))
-        |> List.append ("Route"::[(ord.Route)])
+        |> List.append ("Route"::[ord.Route])
         |> List.filter (String.isNullOrWhiteSpace >> not)
 
 
@@ -413,7 +413,7 @@ module Order =
                 o
                 |> toEqs
                 |> function
-                | (prod, sum) ->
+                | prod, sum ->
                     prod
                     |> List.map Solver.productEq
                     |> List.append (sum |> List.map Solver.sumEq)
@@ -437,7 +437,7 @@ module Order =
             o
             |> toEqs
             |> function
-            | (vrus1, vrus2) ->
+            | vrus1, vrus2 ->
                 vrus1
                 |> List.append vrus2
                 |> List.collect id
@@ -716,7 +716,7 @@ module Order =
             dto.Orderable <- ord.Orderable |> Orderable.Dto.toDto
             dto.Prescription <- ord.Prescription |> Prescription.Dto.toDto
             dto.Route <- ord.Route
-            let (start, stop) =
+            let start, stop =
                 match ord.StartStop with
                 | StartStop.Start dt -> (dt, None)
                 | StartStop.StartStop(start, stop) -> (start, stop |> Some)

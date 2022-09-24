@@ -146,7 +146,7 @@ module SolverLogging =
             )
             }
             """
-        | ConstraintLimitSetToVariable (l, var) -> ""
+        | ConstraintLimitSetToVariable _ -> ""
 
         | ConstraintVariableApplied (c, var) ->
             $"""=== Constraint apply Variable ===
@@ -173,11 +173,11 @@ module SolverLogging =
 
             }
             """
-        | ApiSetVariable (var, eqs) -> ""
+        | ApiSetVariable _ -> ""
 
-        | ApiEquationsSolved eqs -> ""
+        | ApiEquationsSolved _ -> ""
 
-        | ApiAppliedConstraints (cs, eqs) -> ""
+        | ApiAppliedConstraints _ -> ""
 
 
     let logger f =
