@@ -255,21 +255,25 @@ module Solver =
 
     // Solve a set of equations setting a property `p` with
     // name `n`, to a valueset `vs`.
-    let applySolve sortQue log n p eqs =
-
+    let solve log n p eqs =
+        let sortQue = Solver.sortQue
         let toBase = propToBase n eqs
 
         eqs
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
         |> mapToSolverEqs
-        |> Api.solve true sortQue log n (p |> toBase)
+        |> Api.solve false sortQue log n (p |> toBase)
         |> mapFromSolverEqs eqs
 
 
-    let solve log =
-        let sortQue = Solver.sortQue
-        applySolve sortQue log //(printfn "%s") //|> memSolve
+    let solveAll log eqs =
+        eqs
+        // use only eqs with all vrus have units
+        |> filterEqsWithUnits
+        |> mapToSolverEqs
+        |> Api.solveAll false log
+        |> mapFromSolverEqs eqs
 
 
     let applyConstraints log (cs : Constraint list) eqs =

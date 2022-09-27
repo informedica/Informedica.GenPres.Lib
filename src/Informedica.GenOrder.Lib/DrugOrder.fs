@@ -670,7 +670,6 @@ module DrugOrder =
 
         o
         |> Order.solveUnits log
-        |> fun x -> printfn "solved units"; x
         |> Order.solveConstraints log cs
         |> fun x -> printfn "solved constraints"; x
         |> Order.calcScenarios log

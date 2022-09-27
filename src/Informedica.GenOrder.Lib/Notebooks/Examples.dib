@@ -189,6 +189,7 @@ logInformative ()
                     DrugOrder.productComponent with 
                         Name = "cotrimoxazol"
                         Quantities = [ 1N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances =
                             [
@@ -333,7 +334,7 @@ But a ``Component`` cannot only have multiple ``Items``, multiple ``Components``
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // Dopamin infusion calculate scenario's 
 // with a number of standard solutions
@@ -342,7 +343,6 @@ logger.Start Level.Informative
         Id = "1"
         Name = "dopamin infusion"
         Quantities = [ 50N ]
-        Divisible = 10N
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"
@@ -353,6 +353,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "dopamin"
                         Quantities = [ 5N ]
+                        Divisible = 10N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -372,6 +373,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "saline"
                         Quantities = [ 5000N ]
+                        Divisible = 10N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -397,18 +399,22 @@ logger.Start Level.Informative
             ]
         OrderType = ContinuousOrder
 }
-|> DrugOrder.create
-|> DrugOrder.setAdjust "dopamin infusion" 3N
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "dopamin infusion"
-            SubstanceName = "dopamin"
-            MinDoseRateAdjust = Some 2N
-            MaxDoseRateAdjust = Some 20N
+|> DrugOrder.toConstrainedOrder false
+// setting dose limits for infection
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "dopamin infusion"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "dopamin"
+                    MinDoseRateAdjust = Some 2N
+                    MaxDoseRateAdjust = Some 20N
+                }
+            ]
     }
-|> DrugOrder.evaluate logger.Logger
-//|> Order.calcScenarios2
-|> printScenarios false ["dopamin"]
+|> DrugOrder.setAdjust "dopamin" 10N
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["dopamin"])
 
 #!markdown
 
@@ -416,7 +422,7 @@ A different way to calculate the same dopamine pump infusion order.
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // Dopamin infusion calculate scenario's 
 // with a a fixed infusion - dose rate
@@ -425,7 +431,6 @@ logger.Start Level.Informative
         Id = "1"
         Name = "dopamin infusion"
         Quantities = [ 50N ]
-        Divisible = 1N
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"
@@ -436,6 +441,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "dopamin"
                         Quantities = [ 5N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -454,6 +460,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "saline"
                         Quantities = [ 5000N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -479,18 +486,22 @@ logger.Start Level.Informative
             ]
         OrderType = ContinuousOrder
 }
-|> DrugOrder.create
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "dopamin infusion"
-            Rates = [ 1N ]
-            SubstanceName = "dopamin"
-            MinDoseRateAdjust = Some 2N
-            MaxDoseRateAdjust = Some 20N
+|> DrugOrder.toConstrainedOrder false
+// setting dose limits for infection
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "dopamin infusion"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "dopamin"
+                    MinDoseRateAdjust = Some 2N
+                    MaxDoseRateAdjust = Some 20N
+                }
+            ]
     }
-|> DrugOrder.setAdjust "dopamin infusion" 10N
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["dopamin"]
+|> DrugOrder.setAdjust "dopamin" 10N
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["dopamin"])
 
 #!markdown
 

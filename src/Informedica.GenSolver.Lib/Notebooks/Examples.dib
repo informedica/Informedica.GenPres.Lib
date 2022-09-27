@@ -39,7 +39,7 @@ let printEqs = Solver.printEqs true procss
 
 let setProp n p eqs =
     let n = n |> Name.createExc
-    match eqs |> Api.setVariableValues true None n p with
+    match eqs |> Api.setVariableValues true n p with
     | Some var ->
         eqs
         |> List.map (fun e ->
@@ -59,7 +59,7 @@ let solve n p eqs =
             File.AppendAllLines("examples.log", [s])
         |> SolverLogging.logger 
     let n = n |> Name.createExc
-    Api.solve true id logger None n p eqs
+    Api.solve true id logger n p eqs
 
 let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
 let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
@@ -108,7 +108,7 @@ Meaning you can only "shrink" a variable, not expand a variable.
 #!fsharp
 
 let simpleEq = [ "a = b" ] |> init
-simpleEq |> printEqs //|> ignore
+simpleEq |> printEqs |> ignore
 
 #!markdown
 
@@ -609,8 +609,8 @@ Also we cannot break a suppository we always need to give whole supps.
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
 |> printEqs
 |> ignore
 

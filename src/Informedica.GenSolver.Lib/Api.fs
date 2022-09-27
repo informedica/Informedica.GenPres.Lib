@@ -48,6 +48,9 @@ module Api =
             |> Some
 
 
+    let solveAll = Solver.solveAll
+
+
     /// Solve an `Equations` list with
     ///
     /// * f: function used to process string message

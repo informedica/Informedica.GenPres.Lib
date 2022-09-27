@@ -409,8 +409,28 @@ module Order =
         | e ->
             Exceptions.raiseExc (Some log) (e.ToString()) o
 
+    let solveAll log o =
+        // return eqs
+        let toEql prod sum =
 
-    let calcScenarios log (o : Order) =
+            prod
+            |> List.map Solver.productEq
+            |> List.append (sum |> List.map Solver.sumEq)
+
+        let prod, sum = o |> toEqs
+
+        let eqs = toEql prod sum
+
+        try
+            eqs
+            |> Solver.solveAll log
+            |> fromEqs o
+        with
+        | e ->
+            Exceptions.raiseExc (Some log) (e.ToString()) o
+
+
+    let calcScenarios log (order : Order) =
 
         let solve n v o =
             try
@@ -427,9 +447,11 @@ module Order =
                 |> Some
             with
             | e ->
-                Exceptions.raiseExc (Some log) (e.ToString()) o
-                None
+                (e.ToString(), o)
+                |> Exceptions.OrderCouldNotBeSolved
+                |> Logging.logError log
 
+                None
 
         let smallest o =
             o
@@ -454,18 +476,13 @@ module Order =
                 |> List.sortBy (fun (_, vs) -> vs |> Seq.length)
                 |> List.tryHead
 
-        // To do add logger
         let rec calc os sc =
-
             match sc with
             | None         ->
                 os
             | Some (n, vs) ->
-                let msg =
-                    (vs |> Seq.map BigRational.toString |> String.concat ",")
-                    |> sprintf "scenario: %A, with %A" n
-
-                msg
+                (vs |> Seq.map BigRational.toString |> String.concat ",")
+                |> sprintf "scenario: %A, with %A" n
                 |> Events.OrderScenario
                 |> Logging.logInfo log
 
@@ -493,6 +510,8 @@ module Order =
                 )
                 |> List.collect id
                 |> List.distinct
+
+        let o = order |> solveAll log
 
         o
         |> smallest

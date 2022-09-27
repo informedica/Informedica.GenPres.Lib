@@ -142,15 +142,15 @@ module SolverLogging =
             $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
 
         | ConstraintSortOrder cs ->
-            $"""=== Constraint sort order ===
-            { cs |> List.map (fun (i, c) ->
-                c
-                |> Constraint.toString
-                |> sprintf "%i: %s" i
-            )
-            |> String.concat "\n"
-            }
-            """
+            let s =
+                cs
+                |> List.map (fun (i, c) ->
+                    c
+                    |> Constraint.toString
+                    |> sprintf "%i: %s" i
+                )
+                |> String.concat "\n"
+            $"=== Constraint sort order ===\n{s}"
 
         | ConstraintApplied c -> $"Constraint {c |> Constraint.toString} applied"
 

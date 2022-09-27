@@ -164,10 +164,8 @@ module Solver =
                         |> loop n tail
 
         match var with
-        | None -> (eqs, [])
-        | Some var ->
-            eqs
-            |> replace [var]
+        | None     -> eqs, []
+        | Some var -> eqs |> replace [var]
         |> function
         | rpl, rst ->
             rpl
