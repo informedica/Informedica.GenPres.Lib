@@ -339,7 +339,7 @@ module Order =
     /// * m: the mapping for the field of the order
     /// * p: the property of the variable to be set
     /// * vs: the values to be set
-    let solve log lim n m p o =
+    let solve log n m p o =
         let n =
             mapName n m o
 
@@ -356,11 +356,11 @@ module Order =
         let eqs = toEql prod sum
 
         eqs
-        |> Solver.solve log lim n p
+        |> Solver.solve log n p
         |> fromEqs o
         |> fun o ->
             o
-            |> Events.OrderSolved
+            |> Events.OrderSolveFinished
             |> Logging.logInfo log
 
             o
@@ -395,15 +395,19 @@ module Order =
 
         let eqs = toEql prod sum
 
-        eqs
-        |> Solver.solveConstraints log cs
-        |> fromEqs o
-        |> fun o ->
-            (o, cs)
-            |> Events.OrderConstraintsSolved
-            |> Logging.logInfo log
+        try
+            eqs
+            |> Solver.solveConstraints log cs
+            |> fromEqs o
+            |> fun o ->
+                (o, cs)
+                |> Events.OrderConstraintsSolved
+                |> Logging.logInfo log
 
-            o
+                o
+        with
+        | e ->
+            Exceptions.raiseExc (Some log) (e.ToString()) o
 
 
     let calcScenarios log (o : Order) =
@@ -418,18 +422,12 @@ module Order =
                     |> List.map Solver.productEq
                     |> List.append (sum |> List.map Solver.sumEq)
 
-                |> Solver.solve log None n (v |> Set.singleton |> Property.createValsProp)
+                |> Solver.solve log n (v |> Set.singleton |> Property.createValsProp)
                 |> fromEqs o
                 |> Some
             with
             | e ->
-                (e.ToString(), o)
-                |> Events.OrderCouldNotBeSolved
-                |> Logging.logInfo log
-
-                e.ToString()
-                |> Logging.logError log
-
+                Exceptions.raiseExc (Some log) (e.ToString()) o
                 None
 
 

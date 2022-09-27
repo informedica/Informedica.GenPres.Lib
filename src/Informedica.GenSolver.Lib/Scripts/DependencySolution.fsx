@@ -34,7 +34,7 @@ module Solve =
 
     let setProp n p eqs =
         let n = n |> Name.createExc
-        match eqs |> Api.setVariableValues true None n p with
+        match eqs |> Api.setVariableValues true n p with
         | Some var ->
             eqs
             |> List.map (fun e ->
@@ -57,12 +57,9 @@ module Solve =
             |> SolverLogging.logger
         try
             eqs
-            |> Api.solve true Solver.sortQue logger None (n |> Name.createExc) p
+            |> Api.solve true Solver.sortQue logger (n |> Name.createExc) p
         with
-        | :? Variable.Exceptions.VariableException as e ->
-            printfn $"{e.Data0}"
-            raise e
-        | :? Solver.Exception.SolverException as e ->
+        | :? Exceptions.SolverException as e ->
             printfn $"{e.Data0}"
             raise e
 

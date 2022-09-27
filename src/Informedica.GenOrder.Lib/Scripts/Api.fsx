@@ -11,6 +11,13 @@ open Informedica.GenOrder.Lib
 let path = Some $"{__SOURCE_DIRECTORY__}/log.txt"
 
 
+Api.filter None None None (Some "paracetamol") None None
+|> List.item 0
+|> Api.evaluate None (6N)
+|> List.map Api.translate
+|> List.iter (printfn "%A")
+
+
 Api.filter None None None (Some "noradrenaline") (Some "infusievloeistof") None
 |> List.item 0
 |> Api.evaluate None (6N)
@@ -68,6 +75,7 @@ Api.filter None None None (Some "gentamicine") None None
 
         let toEqString op vs =
             vs
+            |> List.sortBy (fun vs -> vs |> List.head)
             |> List.map (fun vs ->
                 match vs with
                 | h::tail ->
@@ -80,12 +88,15 @@ Api.filter None None None (Some "gentamicine") None None
             )
             |> String.concat "\n"
 
+        let (Id s) = o.Id
+        let s = s + "."
+
         o
         |> Order.solveUnits l
-        |> Order.applyConstraints l cs
+        |> Order.solveConstraints l cs
         |> Order.toEqs
         |> fun (vs1, vs2) ->
             $"""
-{vs1 |> toEqString " * "}
-{vs2 |> toEqString " + "}
+{(vs1 |> toEqString " * ").Replace(s, "")}
+{(vs2 |> toEqString " + ").Replace(s, "")}
 """

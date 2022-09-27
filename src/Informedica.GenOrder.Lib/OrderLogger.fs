@@ -1,5 +1,8 @@
 namespace Informedica.GenOrder.Lib
 
+open Informedica.GenSolver.Lib
+open Informedica.GenSolver.Lib.Variable.ValueRange.MinMaxCalculator
+
 
 module OrderLogger =
 
@@ -14,27 +17,72 @@ module OrderLogger =
     module DrugConstraint = DrugOrder.DrugConstraint
     module Quantity = VariableUnit.Quantity
 
-    module SolverLogging = Informedica.GenSolver.Lib.SolverLogging
+    module SolverLogging = SolverLogging
 
     type Logger = Informedica.GenSolver.Lib.Types.Logging.Logger
     type SolverMessage = Informedica.GenSolver.Lib.Types.Logging.SolverMessage
-    type OrderMessage = Types.Logging.Message
+    type OrderMessage = Types.Logging.OrderMessage
 
 
     type Agent<'Msg> = MailboxProcessor<'Msg>
     type IMessage = Informedica.GenSolver.Lib.Types.Logging.IMessage
     type Level = Informedica.GenSolver.Lib.Types.Logging.Level
 
-    module Name = Informedica.GenSolver.Lib.Variable.Name
+    module Name = Variable.Name
+
+
+    let printOrderEqs (o : Order) eqs =
+        let toEqString op vs =
+            vs
+            |> List.sortBy (fun vs -> vs |> List.head)
+            |> List.map (fun vs ->
+                match vs with
+                | h::tail ->
+                    let s =
+                        tail
+                        |> List.map (VariableUnit.toString false)
+                        |> String.concat op
+                    $"{h |> VariableUnit.toString false} = {s}"
+                | _ -> ""
+            )
+            |> String.concat "\n"
+
+        let (Id s) = o.Id
+        let s = s + "."
+
+                // return eqs
+        let toEql prod sum =
+
+            prod
+            |> List.map Solver.productEq
+            |> List.append (sum |> List.map Solver.sumEq)
+
+        let prod, sum = o |> Order.toEqs
+
+        let oEqs = toEql prod sum
+        try
+            eqs
+            |> Solver.mapFromSolverEqs oEqs
+            |> Order.fromEqs o
+            |> Order.toEqs
+            |> fun (vs1, vs2) -> $"""
+        {(vs1 |> toEqString " * ").Replace(s, "")}
+        {(vs2 |> toEqString " + ").Replace(s, "")}
+        """
+        with
+        | e ->
+            printfn $"error printing: {e.ToString()}"
+            ""
 
     // To print all messages related to an order
-    let printOrderMsg msg =
+    let printOrderMsg (msgs : ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message> option) msg =
         match msg with
-        | Logging.OrderMessage m ->
+        | Logging.OrderEvent m ->
             match m with
             | Events.SolverReplaceUnit (n, u) ->
                 $"replaced {n |> Name.toString} unit with {u |> ValueUnit.unitToString}"
-            | Events.OrderSolved _ -> ""
+            | Events.OrderSolvedStarted o -> $"=== Order ({o.Orderable.Name}) Solver Started ==="
+            | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name}) Solver Finished ==="
             | Events.OrderConstraintsSolved (o, _) ->
                 o
                 |> Order.toString
@@ -43,23 +91,53 @@ module OrderLogger =
 
             | Events.OrderScenario _ -> ""
             | Events.OrderScenerioWithNameValue _ -> ""
-            | Events.OrderCouldNotBeSolved (_, o) ->
-                $"This order could not be solved:\n{o |> Order.toString}"
-        | Logging.OrderException s -> s
+
+        | Logging.OrderException (Exceptions.OrderCouldNotBeSolved(s, o)) ->
+            printfn $"printing error for order {o.Orderable.Name}"
+            printfn $"messages: {msgs.Value.Count}"
+            let eqs =
+                match msgs with
+                | Some msgs ->
+                    msgs
+                    |> Array.ofSeq
+                    |> Array.choose (fun (_, m) ->
+                        match m.Message with
+                        | :? SolverMessage as solverMsg ->
+                            match solverMsg with
+                            | Informedica.GenSolver.Lib.Types.Logging.ExceptionMessage m ->
+                                match m with
+                                | Informedica.GenSolver.Lib.Types.Exceptions.SolverErrored (_, _, eqs) ->
+                                    Some eqs
+                                | _ -> None
+                            | _ -> None
+                        | _ -> None
+                    )
+                    |> fun xs ->
+                        printfn $"found {xs |> Array.length}"; xs
+                    |> Array.tryHead
+                | None -> None
+            match eqs with
+            | Some eqs ->
+                let s = $"Terminated with {s}:\n{printOrderEqs o eqs}"
+                printfn $"%s{s}"
+                s
+            | None ->
+                let s = $"Terminated with {s}"
+                printfn $"%s{s}"
+                s
+
 
     // Catches a message and will dispatch this to the appropiate
     // print function
-    let printMsg (msg : Informedica.GenSolver.Lib.Types.Logging.Message) =
+    let printMsg (msgs : ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message> option) (msg : Informedica.GenSolver.Lib.Types.Logging.Message) =
         match msg.Message with
-        | :? SolverMessage as m ->
-            m
-            |> SolverLogging.printMsg
-        | :? OrderMessage  as m -> m |> printOrderMsg
+        | :? SolverMessage as m -> m |> SolverLogging.printMsg
+        | :? OrderMessage  as m -> m |> printOrderMsg msgs
         | _ -> ""
 
     // A message to send to the order logger agent
     type Message =
-        | Start of string option * Level
+        | Start of path: string option * Level
         | Received of Informedica.GenSolver.Lib.Types.Logging.Message
         | Report
         | Write of string
@@ -78,18 +156,18 @@ module OrderLogger =
     let noLogger : Logger = { Log = ignore }
 
 
-    let printLogger : Logger = { Log = (printMsg >> (printfn "%s")) }
+    let printLogger : Logger = { Log = (printMsg None >> (printfn "%s")) }
 
 
     // Create the logger agent
     let logger =
 
-        let write path i t m =
+        let write path i t ms m =
             match path with
             | None -> ()
             | Some p ->
                 m
-                |> printMsg
+                |> printMsg ms
                 |> function
                 | s when s |> String.IsNullOrEmpty -> ()
                 | s ->
@@ -106,6 +184,8 @@ module OrderLogger =
 
                         match msg with
                         | Start (path, level) ->
+                            if path.IsSome then System.IO.File.WriteAllText(path.Value, "")
+
                             let timer = Stopwatch.StartNew()
                             return!
                                 ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message>()
@@ -116,13 +196,13 @@ module OrderLogger =
                             | Level.Informative ->
                                 let t = timer.Elapsed.TotalSeconds
                                 let i = msgs.Count
-                                write path i t m
+                                write path i t (Some msgs) m
 
                                 msgs.Add(timer.Elapsed.TotalSeconds, m)
-                            | _ when m.Level = level ->
+                            | _ when m.Level = level || m.Level = Level.Error ->
                                 let t = timer.Elapsed.TotalSeconds
                                 let i = msgs.Count
-                                write path i t m
+                                write path i t (Some msgs) m
 
                                 msgs.Add(timer.Elapsed.TotalSeconds, m)
                             | _ -> ()
@@ -137,7 +217,7 @@ module OrderLogger =
                             msgs
                             |> Seq.iteri (fun i (t, m) ->
                                 m
-                                |> printMsg
+                                |> printMsg (Some msgs)
                                 |> function
                                 | s when s |> String.IsNullOrEmpty -> ()
                                 | s -> printfn $"\n%i{i}. %f{t}: %A{m.Level}\n%s{s}"
@@ -148,7 +228,7 @@ module OrderLogger =
 
                         | Write path ->
                             msgs
-                            |> Seq.iteri (fun i (t, m) -> write (Some path) i t m)
+                            |> Seq.iteri (fun i (t, m) -> write (Some path) i t (Some msgs) m)
 
                             return! loop timer (Some path) level msgs
                     }

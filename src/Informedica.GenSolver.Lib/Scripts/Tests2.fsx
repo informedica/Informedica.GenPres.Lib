@@ -7,12 +7,13 @@
 #r "nuget: Expecto.FsCheck"
 #r "nuget: Unquote"
 
-#r "../../Informedica.Utils.Lib/bin/Debug/net5.0/Informedica.Utils.Lib.dll"
-#r "../../Informedica.GenUnits.Lib/bin/Debug/net5.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
+#r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 
 #load "../Utils.fs"
 #load "../Types.fs"
 #load "../Logging.fs"
+#load "../Exceptions.fs"
 #load "../Variable.fs"
 #load "../Equation.fs"
 #load "../Solver.fs"
@@ -783,7 +784,7 @@ let logger : Types.Logging.Logger =
                     match m with
                     | Logging.SolverMessage m ->
                         match m with
-                        | Events.EquationCalculation (op1, op2, x, y, xs) -> printfn $"{Equation.calculationToString op1 op2 x y xs}"
+                        | Events.EquationStartCalculation (op1, op2, x, y, xs) -> printfn $"{Equation.calculationToString op1 op2 x y xs}"
                         | _ -> ()
                     | _ -> ()
                 | _ -> ()
@@ -857,4 +858,16 @@ Variable.ValueRange.MinMaxCalculator.calcMinMax
     (Some 0N, true)
 
 
-var0 @<- var2 ^* var1
+// calculating: a <0..> = b <0..> / c [1/86400]
+
+let varA = Variable.Dto.createNew "a" |> Variable.Dto.setMin (Some 0N) false |> Variable.Dto.fromDto
+let varB = Variable.Dto.createNew "b" |> Variable.Dto.setMin (Some 0N) false |> Variable.Dto.fromDto
+let varC = Variable.Dto.createNew "c" |> Variable.Dto.setVals [1N/86400N] |> Variable.Dto.fromDto
+Equation.createProductEqExc (varB, [varC; varA])
+|> fun eq ->
+    printfn $"{eq |> Equation.toString true}"
+    eq
+|> Equation.solve true { Log = printfn "%A" }
+|> resultToString
+|> printfn "%s"
+

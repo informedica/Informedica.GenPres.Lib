@@ -7,22 +7,9 @@ namespace Informedica.GenSolver.Lib
 module Solver =
 
     module EQD = Equation.Dto
+    module Name = Variable.Name
 
     open Types
-
-    module Exception =
-
-        /// Equation exception
-        exception SolverException of Exceptions.Message
-
-        /// Raise an `EquationException` with `Message` `m`.
-        let raiseExc log m =
-            match log with
-            | Some log -> m |> Logging.logError log
-            | None -> ()
-
-            m |> SolverException |> raise
-
 
     let sortByName eqs =
         eqs
@@ -42,7 +29,7 @@ module Solver =
         eqs
         |> sortByName
         |> List.map (Equation.toString exact)
-        |> List.iteri (fun i s -> sprintf "%i.\t%s" i s  |> pf)
+        |> List.iteri (fun i s -> $"%i{i}.\t%s{s}"  |> pf)
         "-----" |> pf
 
         eqs
@@ -96,13 +83,26 @@ module Solver =
     /// equation is solved
     let solve onlyMinIncrMax log sortQue var eqs =
 
-        let solveE = Equation.solve onlyMinIncrMax log
+        let solveE n eqs eq =
+            try
+                Equation.solve onlyMinIncrMax log eq
+            with
+            | Exceptions.SolverException m  ->
+                (n, m, eqs)
+                |> Exceptions.SolverErrored
+                |> Exceptions.raiseExc None
+            | e ->
+                let msg = $"didn't catch {e}"
+                printfn $"{msg}"
+                msg |> failwith
 
         let rec loop n que acc =
+            let n = n + 1
+
             if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
-                (que @ acc)
+                (n, que @ acc)
                 |> Exceptions.SolverTooManyLoops
-                |> Exception.raiseExc (Some log)
+                |> Exceptions.raiseExc None
 
             let que = que |> sortQue
 
@@ -117,7 +117,7 @@ module Solver =
                 | invalid ->
                     invalid
                     |> Exceptions.SolverInvalidEquations
-                    |> Exception.raiseExc (Some log)
+                    |> Exceptions.raiseExc None
 
             | eq::tail ->
                 // If the equation is already solved, or not solvable
@@ -125,10 +125,10 @@ module Solver =
                 if eq |> Equation.isSolvable |> not then
                     [ eq ]
                     |> List.append acc
-                    |> loop (n + 1) tail
+                    |> loop n tail
                 // Else go solve the equation
                 else
-                    match eq |> solveE with
+                    match eq |> solveE n (acc @ que) with
                     // Equation is changed, so every other equation can
                     // be changed as well (if changed vars are in the other
                     // equations) so start new
@@ -154,14 +154,14 @@ module Solver =
 
                             rst
                             |> List.append [ eq ]
-                            |> loop (n + 1) que
+                            |> loop n que
 
                     // Equation did not in fact change, so put it to
                     // the accumulated equations and go on with the rest
                     | eq, Unchanged ->
                         [eq]
                         |> List.append acc
-                        |> loop (n + 1) tail
+                        |> loop n tail
 
         match var with
         | None -> (eqs, [])
@@ -174,7 +174,16 @@ module Solver =
             |> Events.SolverStartSolving
             |> Logging.logInfo log
 
-            loop 0 rpl rst
+            try
+                loop 0 rpl rst
+            with
+            | Exceptions.SolverException m  ->
+                m |> Exceptions.raiseExc (Some log)
+            | e ->
+                let msg = $"didn't catch {e}"
+                printfn $"{msg}"
+                msg |> failwith
+
             |> fun eqs ->
                 eqs
                 |> Events.SolverFinishedSolving

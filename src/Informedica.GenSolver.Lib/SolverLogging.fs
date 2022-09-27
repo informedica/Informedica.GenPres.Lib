@@ -31,7 +31,7 @@ module SolverLogging =
         $"""{vars |> List.map (Variable.toString true) |> String.concat ", "}"""
 
 
-    let printException = function
+    let rec printException = function
     | Exceptions.ValueRangeEmptyValueSet ->
         "ValueRange cannot have an empty value set"
 
@@ -67,15 +67,35 @@ module SolverLogging =
     | Exceptions.VariableCannotSetValueRange (var, vlr) ->
         $"This variable:\n{var |> Variable.toString true}\ncannot be set with this range:{vlr |> ValueRange.toString true}\n"
 
-    | Exceptions.SolverTooManyLoops eqs ->
-        $"""The following equations are looped more than {Constants.MAX_LOOP_COUNT} times the equation list count
+    | Exceptions.SolverTooManyLoops (n, eqs) ->
+        $"""Looped (total {n}) more than {Constants.MAX_LOOP_COUNT} times the equation list count ({eqs |> List.length})
 {eqs |> eqsToStr}
 """
+
+    | Exceptions.SolverErrored (n, msg, eqs) ->
+        $"=== Solver Errored Solving ({n} loops) ===\n{eqs |> eqsToStr}"
+        |> fun s ->
+            match msg with
+            | Exceptions.SolverErrored _ -> s
+            | _ -> $"{s}\nError: {msg |> printException}"
+
     | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
 
     | Exceptions.ValueRangeTooManyValues c ->
         $"Trying to calculate with {c} values, which is higher than the max calc count {Constants.MAX_CALC_COUNT}"
 
+    | Exceptions.ConstraintVariableNotFound (c, eqs) ->
+        $"""=== Constraint Variable not found ===
+        {c
+        |> sprintf "Constraint %A cannot be set"
+        |> (fun s ->
+            eqs
+            |> List.map (Equation.toString true)
+            |> String.concat "\n"
+            |> sprintf "%s\In equations:\%s" s
+        )
+        }
+        """
 
     let printMsg = function
     | ExceptionMessage m ->
@@ -94,19 +114,14 @@ module SolverLogging =
 
 
         match m with
-        | EquationCouldNotBeSolved eq ->
-            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}"
-
-        | EquationCalculation (op1, op2, y, x, xs) ->
-            $"calculating: {Equation.calculationToString op1 op2 y x xs}"
-
         | EquationStartedSolving eq ->
             $"=== Start solving Equation ===\n{eq |> toString}"
 
+        | EquationStartCalculation (op1, op2, y, x, xs) ->
+            $"start calculating: {Equation.calculationToString op1 op2 y x xs}"
+
         | EquationFinishedCalculation (xs, changed) ->
-            $"""=== Equation finished calculation ===
-{if (not changed) then "No changes" else xs |> varsToStr}
-"""
+            $"""finished calculation: {if (not changed) then "No changes" else xs |> varsToStr}"""
 
         | EquationFinishedSolving (eq, b) ->
             $"""=== Equation Finished Solving ===
@@ -114,14 +129,17 @@ module SolverLogging =
 {b |> Equation.SolveResult.toString}
 """
 
+        | EquationCouldNotBeSolved eq ->
+            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}"
+
         | SolverStartSolving eqs ->
             $"=== Solver Start Solving ===\n{eqs |> eqsToStr}"
 
+        | SolverLoopedQue (n, eqs) ->
+            $"solver looped que {n} times with {eqs |> List.length} equations"
+
         | SolverFinishedSolving eqs ->
             $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
-
-        | SolverLoopedQue (n, eqs) ->
-            $"=== Solver looped que {n} times\nwith {eqs |> List.length} equations"
 
         | ConstraintSortOrder cs ->
             $"""=== Constraint sort order ===
@@ -134,50 +152,9 @@ module SolverLogging =
             }
             """
 
-        | ConstraintVariableNotFound (c, eqs) ->
-            $"""=== Constraint Variable not found ===
-            {c
-            |> sprintf "Constraint %A cannot be set"
-            |> (fun s ->
-                eqs
-                |> List.map (Equation.toString true)
-                |> String.concat "\n"
-                |> sprintf "%s\In equations:\%s" s
-            )
-            }
-            """
-        | ConstraintLimitSetToVariable _ -> ""
+        | ConstraintApplied c -> $"Constraint {c |> Constraint.toString} applied"
 
-        | ConstraintVariableApplied (c, var) ->
-            $"""=== Constraint apply Variable ===
-            {c
-            |> Constraint.toString
-            |> fun s ->
-                var
-                |> Variable.getName
-                |> Name.toString
-                |> sprintf "%s apply to %s" s
-            }
-            """
-
-        | ConstrainedEquationsSolved (c, eqs) ->
-            $"""=== Equations solved ===
-            {c
-            |> Constraint.toString
-            |> fun s ->
-                eqs
-                |> List.sort
-                |> List.map (Equation.toString true)
-                |> String.concat "\n"
-                |> sprintf "Constraint: %s applied to\n%s" s
-
-            }
-            """
-        | ApiSetVariable _ -> ""
-
-        | ApiEquationsSolved _ -> ""
-
-        | ApiAppliedConstraints _ -> ""
+        | ConstrainedSolved c -> $"Constraint {c |> Constraint.toString} solved"
 
 
     let logger f =

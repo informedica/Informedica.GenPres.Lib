@@ -59,8 +59,9 @@ module Name =
             fun s ->
                 let succ s (Name n) = n = (s |> String.trim) && n  |> String.length <= 1000
                 let fail = function
-                    | Exceptions.NullOrWhiteSpaceException -> true
-                    | Exceptions.LongerThan1000 x -> x |> String.length > 1000
+                    | Exceptions.NameNullOrWhiteSpaceException -> true
+                    | Exceptions.NameLongerThan1000 x -> x |> String.length > 1000
+                    | _ -> false
 
                 s
                 |> create (succ s) fail
@@ -461,7 +462,7 @@ module ValueRange =
                 let createVrMin incl v = ValueRange.create true (v |> Minimum.create incl |> Some) None None None
                 let createVrMax incl v = ValueRange.create true None None (v |> Maximum.create incl |> Some) None
                 // test doesn't properly test inclusive and exclusive
-                let prop op predMin predMax v1 incl1 v2 incl2 =
+                let prop op predMin predMax v1 _ v2 _ =
                     let vr1 = v1 |> createVrMax true
                     let vr2 = v2 |> createVrMin true
                     (vr1 |> op <| vr2) |> ValueRange.getMin |> predMin v1 v2 true true &&

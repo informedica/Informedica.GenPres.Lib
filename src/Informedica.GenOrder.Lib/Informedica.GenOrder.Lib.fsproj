@@ -11,6 +11,7 @@
     <Compile Include="List.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Logging.fs" />
+    <Compile Include="Exceptions.fs" />
     <Compile Include="WrappedString.fs" />
     <Compile Include="ValueUnit.fs" />
     <Compile Include="ValueRange.fs" />
@@ -25,6 +26,7 @@
     <Compile Include="Api.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Api.fsx" />
+    <None Include="Scripts\GentamicinProblem.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />

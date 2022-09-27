@@ -13,6 +13,7 @@
 #load "../List.fs"
 #load "../Utils.fs"
 #load "../Logging.fs"
+#load "../Exceptions.fs"
 #load "../WrappedString.fs"
 #load "../ValueUnit.fs"
 #load "../ValueRange.fs"

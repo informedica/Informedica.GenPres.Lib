@@ -14,13 +14,6 @@ open System.IO
 
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
-
-
-Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-
-
-module Name = Variable.Name
-module ValueRange = Variable.ValueRange
 module Minimum = ValueRange.Minimum
 module Maximum = ValueRange.Maximum
 module Increment = ValueRange.Increment
@@ -38,7 +31,7 @@ module Solve =
 
     let setProp n p eqs =
         let n = n |> Name.createExc
-        match eqs |> Api.setVariableValues true None n p with
+        match eqs |> Api.setVariableValues true n p with
         | Some var ->
             eqs
             |> List.map (fun e ->
@@ -61,12 +54,9 @@ module Solve =
             |> SolverLogging.logger
         try
             eqs
-            |> Api.solve true Solver.sortQue logger None (n |> Name.createExc) p
+            |> Api.solve true Solver.sortQue logger (n |> Name.createExc) p
         with
-        | :? Variable.Exceptions.VariableException as e ->
-            printfn $"{e.Data0}"
-            raise e
-        | :? Solver.Exception.SolverException as e ->
+        | :? Exceptions.SolverException as e ->
             printfn $"{e.Data0}"
             raise e
 
@@ -258,6 +248,7 @@ let eqs =
     ]
     |> Api.init
 
+//[ "a = b" ] |> Api.init |> Solver.printEqs true (printfn "%s")
 
 open Solve
 open Expecto
@@ -368,9 +359,9 @@ testList "test setting min and max to abcdef eqs" [
             |> ignore
             Expect.isTrue "true is true" true
         with
-        | :? Solver.Exception.SolverException as e ->
+        | :? Exceptions.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverTooManyLoops xs ->
+            | Exceptions.SolverTooManyLoops (n, xs) ->
                 printfn "ran into a loop with:"
                 xs
                 |> printEqs
@@ -461,9 +452,9 @@ testList "can set any var of compA or qty or cnc of compB" [
             |> ignore
             Expect.isTrue "true is true" true
         with
-        | :? Solver.Exception.SolverException as e ->
+        | :? Exceptions.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverTooManyLoops xs ->
+            | Exceptions.SolverTooManyLoops (n, xs) ->
                 vars
                 |> String.concat ", "
                 |> printfn "ran into a loop with:%s\n"

@@ -82,15 +82,6 @@ module Types =
         | Changed of List<Variable * Property Set>
 
 
-    /// A limitation of the maximum number
-    /// of values to use as a constraint
-    type Limit =
-        | MinLim of int
-        | MaxLim of int
-        | MinMaxLim of (int * int)
-        | NoLimit
-
-
     /// Represents a constraint on a `Variable`.
     /// I.e. either a set of values, or an increment
     /// or a minimum of maximum.
@@ -98,15 +89,35 @@ module Types =
         {
             Name: Name
             Property: Property
-            Limit: Limit
         }
+
+
+    module Exceptions =
+
+        type Message =
+            | NameNullOrWhiteSpaceException
+            | NameLongerThan1000 of name: string
+            | ValueRangeMinLargerThanMax of Minimum * Maximum
+            | ValueRangeNotAValidOperator
+            | ValueRangeEmptyValueSet
+            | ValueRangeTooManyValues of valueCount: int
+            | ValueRangeEmptyIncrement
+            | ValueRangeMinOverFlow of Minimum
+            | ValueRangeMaxOverFlow of Maximum
+            | VariableCannotSetValueRange of Variable * ValueRange
+            | EquationDuplicateVariables of duplicateVars: Variable list
+            | EquationEmptyVariableList
+            | ConstraintVariableNotFound of Constraint * Equation list
+            | SolverInvalidEquations of Equation list
+            | SolverTooManyLoops of loopCount : int * Equation list
+            | SolverErrored of loopCount: int * Message * Equation list
 
 
     module Events =
 
         type Event =
             | EquationStartedSolving of Equation
-            | EquationCalculation of
+            | EquationStartCalculation of
                 op1: (Variable -> Variable -> Variable) *
                 op2: (Variable -> Variable -> Variable) *
                 x: Variable *
@@ -116,35 +127,11 @@ module Types =
             | EquationCouldNotBeSolved of Equation
             | EquationFinishedSolving of Equation * SolveResult
             | SolverStartSolving of Equation list
-            | SolverLoopedQue of int * Equation list
+            | SolverLoopedQue of loopCount: int * Equation list
             | SolverFinishedSolving of Equation list
             | ConstraintSortOrder of (int * Constraint) list
-            | ConstraintVariableNotFound of Constraint * Equation list
-            | ConstraintLimitSetToVariable of Limit * Variable
-            | ConstraintVariableApplied of Constraint * Variable
-            | ConstrainedEquationsSolved of Constraint * Equation list
-            | ApiSetVariable of Variable * Equation list
-            | ApiEquationsSolved of Equation list
-            | ApiAppliedConstraints of Constraint list * Equation list
-
-
-    module Exceptions =
-
-        type Message =
-            | NameNullOrWhiteSpaceException
-            | NameLongerThan1000 of string
-            | ValueRangeMinLargerThanMax of Minimum * Maximum
-            | ValueRangeNotAValidOperator
-            | ValueRangeEmptyValueSet
-            | ValueRangeTooManyValues of int
-            | ValueRangeEmptyIncrement
-            | ValueRangeMinOverFlow of Minimum
-            | ValueRangeMaxOverFlow of Maximum
-            | VariableCannotSetValueRange of (Variable * ValueRange)
-            | EquationDuplicateVariables of Variable list
-            | EquationEmptyVariableList
-            | SolverInvalidEquations of Equation list
-            | SolverTooManyLoops of Equation list
+            | ConstraintApplied of Constraint
+            | ConstrainedSolved of Constraint
 
 
     module Logging =

@@ -39,7 +39,7 @@ module Solve =
             |> SolverLogging.logger
         let n = n |> Name.createExc
         try
-            Api.solve true Solver.sortQue logger None n p eqs
+            Api.solve true Solver.sortQue logger n p eqs
         with
         | _ ->
             procss $"cannot set {n |> Name.toString} with {p}"

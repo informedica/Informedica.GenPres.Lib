@@ -10,12 +10,8 @@
 
 open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
-open Informedica.GenSolver.Utils
 open MathNet.Numerics
-open Types
 
-module Api = Informedica.GenSolver.Lib.Api
-module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
 
@@ -35,26 +31,26 @@ let calcMinOrMaxToMultiple isMax isIncl incrs m =
         let nc = if isMax then (>) else (<)
         let ad = if isMax then (-) else (+)
 
-        let m' = 
+        let m' =
             if isMax then m |> BigRational.toMaxMultipleOf i
             else m |> BigRational.toMinMultipleOf i
-            
-        let m' = 
-            if (isIncl |> not) && (m' |> ec <| m) then 
+
+        let m' =
+            if (isIncl |> not) && (m' |> ec <| m) then
                 printfn $"recalc because is excl: {(m' |> ad <| i) }"
-                (m' |> ad <| i) 
+                (m' |> ad <| i)
             else m'
-        
-        match acc with 
+
+        match acc with
         | Some a -> if (m' |> nc <| a) then (true, Some m') else (b, Some a)
         | None   -> (true, Some m')
     ) (isIncl, None)
     |> fun (b, r) -> b, r |> Option.defaultValue m
 
 
-let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
+let maxInclMultipleOf = calcMinOrMaxToMultiple true true
 
-let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
+let maxExclMultipleOf = calcMinOrMaxToMultiple true false
 
 let minInclMultipleOf = calcMinOrMaxToMultiple false true
 

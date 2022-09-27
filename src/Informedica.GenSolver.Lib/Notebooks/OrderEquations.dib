@@ -18,24 +18,45 @@ module Api = Informedica.GenSolver.Lib.Api
 module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module Increment = ValueRange.Increment
+module ValueSet = ValueRange.ValueSet
 
-let procss s = $"{s} " |> printfn "%s"
+let procss s = printfn $"%s{s} "
 
 let printEqs = Solver.printEqs true procss
+
+let setProp n p eqs =
+    let n = n |> Name.createExc
+    match eqs |> Api.setVariableValues true None n p with
+    | Some var ->
+        eqs
+        |> List.map (fun e ->
+            e |> Equation.replace var
+        )
+    | None -> eqs
+
+let setMinIncl n min = min |> Minimum.create true |> MinProp |> setProp n
+let setMinExcl n min = min |> Minimum.create false |> MinProp |> setProp n
+let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> setProp n
+let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> setProp n
+let setValues n vals = vals |> ValueSet.create |> ValsProp |> setProp n
+
 let solve n p eqs =
     let logger = 
-        fun s ->
-            File.AppendAllLines("order.log", [s])
-        |> SolverLogging.logger
+        fun (s : string) ->
+            File.AppendAllLines("examples.log", [s])
+        |> SolverLogging.logger 
     let n = n |> Name.createExc
-    Api.solve id logger None n p eqs
-//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
+    Api.solve true id logger None n p eqs
 
-let setMinIncl n min = solve n (MinInclProp min)
-let setMinExcl n min = solve n (MinExclProp min)
-let setMaxIncl n max = solve n (MaxInclProp max)
-let setMaxExcl n max = solve n (MaxExclProp max)
-let setValues n vals = solve n (MinInclProp vals)
+let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+let solveIncr n incr = solve n (set [incr] |> Increment.create |> IncrProp)
+let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
 let init     = Api.init
 let nonZeroNegative = Api.nonZeroNegative
@@ -143,7 +164,7 @@ let createEqs (orb : Orb) =
                 )
 
             cmpEqs 
-            |> List.collect (fun s1 ->
+            |> List.map (fun s1 ->
                 s1.Replace(" cmp", $" {c.Name}")
             )
             |> List.append itms

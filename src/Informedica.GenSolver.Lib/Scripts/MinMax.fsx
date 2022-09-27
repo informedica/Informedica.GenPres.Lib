@@ -7,12 +7,13 @@
 #r "nuget: Unquote"
 
 
-#r "../../Informedica.Utils.Lib/bin/Debug/net5.0/Informedica.Utils.Lib.dll"
-#r "../../Informedica.GenUnits.Lib/bin/Debug/net5.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
+#r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 
 #load "../Utils.fs"
 #load "../Types.fs"
 #load "../Logging.fs"
+#load "../Exceptions.fs"
 #load "../Variable.fs"
 
 
@@ -122,8 +123,8 @@ module Generators =
             }
 
 
-    let config = { 
-        FsCheckConfig.defaultConfig with 
+    let config = {
+        FsCheckConfig.defaultConfig with
             arbitrary = [
                 typeof<BigRGenerator>
                 typeof<VarDtoGenerator>
@@ -142,7 +143,7 @@ module Generators =
 
 /// Functions to calculate the `Minimum`
 /// and `Maximum` in a `ValueRange`.
-/// I.e. what happens when you mult, div, add or subtr 
+/// I.e. what happens when you mult, div, add or subtr
 /// a `Range`, for example:
 /// <1N..3N> * <4N..5N> = <4N..15N>
 module MinMaxCalcultor =
@@ -164,14 +165,14 @@ module MinMaxCalcultor =
     let calc c op (x1, incl1) (x2, incl2) =
         let opIsMultOrDiv = (op |> BigRational.opIsMult || op |> BigRational.opIsDiv)
 
-        let incl = 
+        let incl =
             match incl1, incl2 with
             | true, true -> true
             | _ -> false
 
         match x1, x2 with
         | Some v, _  when opIsMultOrDiv && v = 0N ->
-            0N |> c incl1 |> Some 
+            0N |> c incl1 |> Some
         | Some v, _
         | _, Some v when op |> BigRational.opIsMult && v = 0N ->
             0N |> c incl |> Some
@@ -179,7 +180,7 @@ module MinMaxCalcultor =
             0N |> c incl |> Some
         | Some (v1), Some (v2) ->
             if op |> BigRational.opIsDiv && v2 = 0N then None
-            else 
+            else
                 v1 |> op <| v2 |> c incl |> Some
         | _ -> None
 
@@ -195,7 +196,7 @@ module MinMaxCalcultor =
     let minimize min1 min2 =
         match min1, min2 with
         | None,    None     -> None
-        | Some _,  None 
+        | Some _,  None
         | None,    Some _   -> None
         | Some m1, Some m2 ->
             if m1 |> Minimum.minSTmin m2 then m1
@@ -206,7 +207,7 @@ module MinMaxCalcultor =
     let maximize max1 max2 =
         match max1, max2 with
         | None,    None     -> None
-        | Some _,  None 
+        | Some _,  None
         | None,    Some _   -> None
         | Some m1, Some m2 ->
             if m1 |> Maximum.maxGTmax m2 then m1
@@ -361,12 +362,12 @@ module MinMaxCalcultor =
         // division by range containing zero
         | NN, NP
         | PP, NP
-        | NP, NP 
+        | NP, NP
         | NZ, NP
         | ZP, NP
 
 //        | NN, ZP
-        | NP, ZP 
+        | NP, ZP
         | NZ, ZP
 
         | PP, NZ

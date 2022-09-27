@@ -28,18 +28,45 @@ module Api = Informedica.GenSolver.Lib.Api
 module Solver = Informedica.GenSolver.Lib.Solver
 module Name = Variable.Name
 module ValueRange = Variable.ValueRange
+module Minimum = ValueRange.Minimum
+module Maximum = ValueRange.Maximum
+module Increment = ValueRange.Increment
+module ValueSet = ValueRange.ValueSet
 
-let procss s = $"{s} " |> printfn "%s"
+let procss s = printfn $"%s{s} "
 
 let printEqs = Solver.printEqs true procss
+
+let setProp n p eqs =
+    let n = n |> Name.createExc
+    match eqs |> Api.setVariableValues true None n p with
+    | Some var ->
+        eqs
+        |> List.map (fun e ->
+            e |> Equation.replace var
+        )
+    | None -> eqs
+
+let setMinIncl n min = min |> Minimum.create true |> MinProp |> setProp n
+let setMinExcl n min = min |> Minimum.create false |> MinProp |> setProp n
+let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> setProp n
+let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> setProp n
+let setValues n vals = vals |> ValueSet.create |> ValsProp |> setProp n
+
 let solve n p eqs =
     let logger = 
         fun (s : string) ->
             File.AppendAllLines("examples.log", [s])
         |> SolverLogging.logger 
     let n = n |> Name.createExc
-    Api.solve id logger None n p eqs
-//    |> fun eqs -> eqs |> printEqs |> printfn "%A"; eqs
+    Api.solve true id logger None n p eqs
+
+let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
+let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
+let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
+let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
+let solveIncr n incr = solve n (set [incr] |> Increment.create |> IncrProp)
+let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
 let init     = Api.init
 let nonZeroNegative = Api.nonZeroNegative
@@ -81,8 +108,7 @@ Meaning you can only "shrink" a variable, not expand a variable.
 #!fsharp
 
 let simpleEq = [ "a = b" ] |> init
-simpleEq
-|> printEqs |> ignore
+simpleEq |> printEqs //|> ignore
 
 #!markdown
 
@@ -90,10 +116,12 @@ We can limit the variables to a lower and upper limit.
 
 #!fsharp
 
+simpleEq |> printEqs
+
 simpleEq
-|> solve "b" (MinInclProp 0N)
+|> solveMinIncl "b" 0N
 |> printEqs
-|> solve "b" (MaxExclProp 5N)
+|> solveMaxExcl "b" 5N
 |> printEqs |> ignore
 
 #!markdown
@@ -105,35 +133,35 @@ We can now try to change variable ``a``.
 printfn "=== Try setting 10 to variable a will throw an exception ==="
 try
     simpleEq
-    |> solve "b" (MinInclProp 0N)
-    |> solve "b" (MaxExclProp 5N)
-    |> solve "a" (ValsProp ([10N] |> Set.ofList))
+    |> solveMinIncl "b" 0N
+    |> solveMaxExcl "b" 5N
+    |> solveValues "a" [10N]
     |> printEqs |> ignore
 with
 | e -> printfn "%A" e
 
 printfn "=== But setting 4 to variable a will succeed ==="
 simpleEq
-|> solve "b" (MinInclProp 0N)
-|> solve "b" (MaxExclProp 5N)
-|> solve "a" (ValsProp ([4N] |> Set.ofList))
+|> solveMinIncl "b" 0N
+|> solveMaxExcl "b" 5N
+|> solveValues "a" [4N]
 |> printEqs |> ignore
 
 printfn "=== Try setting a max 10 to variable a will be ignored ==="
 try
     simpleEq
-    |> solve "b" (MinInclProp 0N)
-    |> solve "b" (MaxExclProp 5N)
-    |> solve "a" (MaxInclProp 10N)
+    |> solveMinIncl "b" 0N
+    |> solveMaxExcl "b" 5N
+    |> solveMaxExcl "b" 10N
     |> printEqs |> ignore
 with
 | e -> printfn "%A" e
 
 printfn "=== But setting a max 3 to variable a will succeed ==="
 simpleEq
-|> solve "b" (MinInclProp 0N)
-|> solve "b" (MaxExclProp 5N)
-|> solve "a" (MaxInclProp 3N)
+|> solveMinIncl "b" 0N
+|> solveMaxExcl "b" 5N
+|> solveMaxExcl "b" 3N
 |> printEqs |> ignore
 
 #!markdown
@@ -204,7 +232,7 @@ For example, we set the variable ``b`` in the product equation to 3.
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([3N] |> Set.ofList))
+|> solveValues "b" [3N]
 |> printEqs 
 |> ignore
 
@@ -215,8 +243,8 @@ And value 2 to variable ``c``.
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([3N] |> Set.ofList))
-|> solve "c" (ValsProp ([2N] |> Set.ofList))
+|> solveValues "b" [3N]
+|> solveValues "c" [2N]
 |> printEqs 
 |> ignore
 
@@ -227,8 +255,8 @@ Or we first set variable ``a`` to 6 and then, for example variable ``c`` to 2.
 #!fsharp
 
 prodEq1
-|> solve "a" (ValsProp ([6N] |> Set.ofList))
-|> solve "c" (ValsProp ([2N] |> Set.ofList))
+|> solveValues "a" [6N] 
+|> solveValues "c" [2N]
 |> printEqs 
 |> ignore
 
@@ -243,7 +271,7 @@ Set the variable ``b`` to 1, 2, 3, 6.
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
+|> solveValues "b" [1N; 2N; 3N; 6N]
 |> printEqs 
 |> ignore
 
@@ -254,8 +282,8 @@ Set the variable ``c`` to 60, 120, 240, 500, 1000
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solveValues "b" [1N; 2N; 3N; 6N]
+|> solveValues "c" [60N; 120N; 240N; 500N; 1000N]
 |> printEqs 
 |> ignore
 
@@ -266,8 +294,8 @@ Or set variable ``a`` to 60, 120, 180, 240, 360, 480, 500, 720, 1000, 1440, 1500
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
-|> solve "a" (ValsProp ([60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N] |> Set.ofList))
+|> solveValues "b" [1N; 2N; 3N; 6N]
+|> solveValues "a" [60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N]
 |> printEqs 
 |> ignore
 
@@ -278,9 +306,9 @@ Then set variable ``c`` to 60, 120, 240, 500, 100.
 #!fsharp
 
 prodEq1
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
-|> solve "a" (ValsProp ([60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N] |> Set.ofList))
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solveValues "b" [1N; 2N; 3N; 6N]
+|> solveValues "a" [60N; 120N; 180N; 240N; 360N; 480N; 500N; 720N; 1000N; 1440N; 1500N; 2000N; 3000N; 6000N]
+|> solveValues "c" [60N; 120N; 240N; 500N; 1000N]
 |> printEqs 
 |> ignore
 
@@ -292,10 +320,8 @@ prodEq1
 
 Setting lower and/or upper limits to variables is a complex proces, as this can result, depending on the calculation operator in the calculation of a resulting lower and/or upper limit. Limits can also be inclusive or exclusive. Thus the following props can be used:
 
-- ``MinInclProp``
-- ``MaxInclProp``
-- ``MaxExclProp``
-- ``MaxExclProp``
+- ``MinProp`` with ``Incl`` ``true`` or ``false``
+- ``MaxProp`` with ``Incl`` ``true`` or ``false``
 
 And the following calculations have the performed:
 
@@ -381,7 +407,7 @@ Limit ``b`` with a minimum inclusive of 0.
 #!fsharp
 
 prodEq1
-|> solve "b" (MinInclProp 0N)
+|> solveMinIncl "b" 0N
 |> printEqs 
 |> ignore
 
@@ -392,8 +418,8 @@ Limit ``c`` as well to a minimum of inclusive 0
 #!fsharp
 
 prodEq1
-|> solve "b" (MinInclProp 0N)
-|> solve "c" (MinInclProp 0N)
+|> solveMinIncl "b" 0N
+|> solveMinIncl "c" 0N
 |> printEqs 
 |> ignore
 
@@ -404,9 +430,9 @@ Add a lower exclusive limit of 1 to ``a``.
 #!fsharp
 
 prodEq1
-|> solve "b" (MinInclProp 0N)
-|> solve "c" (MinInclProp 0N)
-|> solve "a" (MinExclProp 1N)
+|> solveMinIncl "b" 0N
+|> solveMinIncl "c" 0N
+|> solveMinExcl "a" 1N
 |> printEqs 
 |> ignore
 
@@ -417,10 +443,10 @@ Add an upper limit of exclusive 10 to ``a``.
 #!fsharp
 
 prodEq1
-|> solve "b" (MinInclProp 0N)
-|> solve "c" (MinInclProp 0N)
-|> solve "a" (MinExclProp 1N)
-|> solve "a" (MaxExclProp 10N)
+|> solveMinIncl "b" 0N
+|> solveMinIncl "c" 0N
+|> solveMinExcl "a" 1N
+|> solveMaxExcl "a" 10N
 |> printEqs 
 |> ignore
 
@@ -431,11 +457,11 @@ Add an exlusive upper limit of 2 to ``c``.
 #!fsharp
 
 prodEq1
-|> solve "b" (MinInclProp 0N)
-|> solve "c" (MinInclProp 0N)
-|> solve "a" (MinExclProp 1N)
-|> solve "a" (MaxInclProp 10N)
-|> solve "c" (MaxExclProp 2N)
+|> solveMinIncl "b" 0N
+|> solveMinIncl "c" 0N
+|> solveMinExcl "a" 1N
+|> solveMaxExcl "a" 10N
+|> solveMaxExcl "c" 2N
 |> printEqs 
 |> ignore
 
@@ -447,17 +473,17 @@ An example of limiting variable ``a`` with an lower and upper limit and setting 
 
 printfn "=== Example without limits on a ==="
 prodEq1
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solveValues "b" [1N; 2N; 3N; 6N]
+|> solveValues "c" [60N; 120N; 240N; 500N; 1000N]
 |> printEqs 
 |> ignore
 
 printfn "=== Example with limits on a ==="
 prodEq1
-|> solve "a" (MinInclProp 120N)
-|> solve "a" (MaxInclProp 1000N)
-|> solve "b" (ValsProp ([1N; 2N; 3N; 6N] |> Set.ofList))
-|> solve "c" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solveMinIncl "a" 120N
+|> solveMaxIncl "a" 1000N
+|> solveValues "b" [1N; 2N; 3N; 6N]
+|> solveValues "c" [60N; 120N; 240N; 500N; 1000N]
 |> printEqs 
 |> ignore
 
@@ -484,24 +510,23 @@ For each equation an additional variable will be calculated when all but one of 
 
 prodEq1 @ sumEq1
 |> nonZeroNegative
-|> solve "c" (ValsProp ([4N] |> Set.ofList))
-|> printEqs
+|> solveValues "c" [4N] 
 |> ignore
 
 prodEq1 @ sumEq1
 |> nonZeroNegative
-|> solve "c" (ValsProp ([4N] |> Set.ofList))
-|> solve "a" (ValsProp ([8N] |> Set.ofList))
+|> solveValues "c" [4N] 
+|> solveValues "a" [8N]
 |> printEqs
 |> ignore
 
 
 prodEq1 @ sumEq1
 |> nonZeroNegative
-|> solve "c" (ValsProp ([4N] |> Set.ofList))
-|> solve "a" (ValsProp ([8N] |> Set.ofList))
-|> solve "e" (ValsProp ([1N] |> Set.ofList))
-|> solve "f" (ValsProp ([2N] |> Set.ofList))
+|> solveValues "c" [4N] 
+|> solveValues "a" [8N]
+|> solveValues "e" [1N]
+|> solveValues "f" [2N]
 |> printEqs
 |> ignore
 
@@ -518,20 +543,20 @@ The order in which variables are set or limited doesn't matter to the end result
 printfn "First run"
 prodEq1 @ sumEq1
 |> nonZeroNegative
-|> solve "c" (ValsProp ([4N] |> Set.ofList))
-|> solve "a" (ValsProp ([8N] |> Set.ofList))
-|> solve "e" (ValsProp ([1N] |> Set.ofList))
-|> solve "f" (ValsProp ([2N] |> Set.ofList))
+|> solveValues "c" [4N] 
+|> solveValues "a" [8N]
+|> solveValues "e" [1N]
+|> solveValues "f" [2N]
 |> printEqs
 |> ignore
 
 printfn "Second run in reversed order"
 prodEq1 @ sumEq1
 |> nonZeroNegative
-|> solve "f" (ValsProp ([2N] |> Set.ofList))
-|> solve "e" (ValsProp ([1N] |> Set.ofList))
-|> solve "a" (ValsProp ([8N] |> Set.ofList))
-|> solve "c" (ValsProp ([4N] |> Set.ofList))
+|> solveValues "f" [2N]
+|> solveValues "e" [1N]
+|> solveValues "a" [8N]
+|> solveValues "c" [4N] 
 |> printEqs
 |> ignore
 
@@ -573,7 +598,7 @@ In the pharmacy the following suppository concentrations are available: 60, 120,
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
 |> printEqs
 |> ignore
 
@@ -596,10 +621,10 @@ In the drug formulary we can read that the daily adjusted dose of paracetamol sh
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
+|> solveMinIncl "ParacetamolDoseTotalAdjust" 40N
+|> solveMaxIncl "ParacetamolDoseTotalAdjust" 90N
 |> printEqs
 |> ignore
 
@@ -610,12 +635,12 @@ But we should never give more than 1000 mg each time and 4000 mg total per day.
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
+|> solveMinIncl "ParacetamolDoseTotalAdjust" 40N
+|> solveMaxIncl "ParacetamolDoseTotalAdjust" 90N
+|> solveMaxIncl "ParacetamolDoseQuantity" 1000N
+|> solveMaxIncl "ParacetamolDoseTotal" 4000N
 |> printEqs
 |> ignore
 
@@ -626,13 +651,13 @@ The drug formulary also states that you should give a supp 2, 3, 4 or 6 times a 
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
-|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
+|> solveMinIncl "ParacetamolDoseTotalAdjust" 40N
+|> solveMaxIncl "ParacetamolDoseTotalAdjust" 90N
+|> solveMaxIncl "ParacetamolDoseQuantity" 1000N
+|> solveMaxIncl "ParacetamolDoseTotal" 4000N
+|> solveValues "Frequency" [2N; 3N; 4N; 6N]
 |> printEqs
 |> ignore
 
@@ -645,14 +670,14 @@ We can now set the weight of the patient to for example 10 kg.
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
-|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
+|> solveMinIncl "ParacetamolDoseTotalAdjust" 40N
+|> solveMaxIncl "ParacetamolDoseTotalAdjust" 90N
+|> solveMaxIncl "ParacetamolDoseQuantity" 1000N
+|> solveMaxIncl "ParacetamolDoseTotal" 4000N
+|> solveValues "Frequency" [2N; 3N; 4N; 6N]
+|> solveValues "Adjust" [10N]
 |> printEqs
 |> ignore
 
@@ -663,14 +688,14 @@ And if we then pick a frequency of 3, there is a solved equation set.
 #!fsharp
 
 pcmEqs
-|> solve "ParacetamolSuppositoryConcentration" (ValsProp ([60N; 120N; 240N; 500N; 1000N] |> Set.ofList))
-|> solve "SuppositoryDoseQuantity" (ValsProp ([1N] |> Set.ofList))
-|> solve "ParacetamolDoseTotalAdjust" (MinInclProp 40N)
-|> solve "ParacetamolDoseTotalAdjust" (MaxInclProp 90N)
-|> solve "ParacetamolDoseQuantity" (MaxInclProp 1000N)
-|> solve "ParacetamolDoseTotal" (MaxInclProp 4000N)
-|> solve "Frequency" (ValsProp ([2N; 3N; 4N; 6N] |> Set.ofList))
-|> solve "Adjust" (ValsProp ([10N] |> Set.ofList))
-|> solve "Frequency" (ValsProp ([3N] |> Set.ofList))
+|> solveValues "ParacetamolSuppositoryConcentration" [60N; 120N; 240N; 500N; 1000N]
+|> solveValues "SuppositoryDoseQuantity" [1N]
+|> solveMinIncl "ParacetamolDoseTotalAdjust" 40N
+|> solveMaxIncl "ParacetamolDoseTotalAdjust" 90N
+|> solveMaxIncl "ParacetamolDoseQuantity" 1000N
+|> solveMaxIncl "ParacetamolDoseTotal" 4000N
+|> solveValues "Frequency" [2N; 3N; 4N; 6N]
+|> solveValues "Adjust" [10N]
+|> solveValues "Frequency" [3N]
 |> printEqs
 |> ignore

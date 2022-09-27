@@ -36,38 +36,17 @@ module Api =
         (parse prodEqs '*' |> createProdEqs) @ (parse sumEqs '+' |> createSumEqs)
 
 
-    let setVariableValues onlyMinIncrMax lim n p eqs =
-
+    let setVariableValues onlyMinIncrMax n p eqs =
         eqs
         |> List.collect (Equation.findName n)
         |> function
         | [] -> None
-
         | var::_ ->
-
             p
             |> Property.toValueRange
             |> Variable.setValueRange onlyMinIncrMax var
-            |> fun var ->
-                match lim with
-                | Some l ->
-                    if var |> Variable.count > l then
-                        var
-                        |> Variable.getValueRange
-                        |> ValueRange.getValSet
-                        |> function
-                        | Some (ValueSet vs) ->
-                            vs
-                            |> Seq.sort
-                            |> Seq.take l
-                            |> Set.ofSeq
-                            |> ValueRange.createValSet
-                            |> Variable.setValueRange onlyMinIncrMax var
-                        | None -> var
+            |> Some
 
-                    else var
-                | None -> var
-                |> Some
 
     /// Solve an `Equations` list with
     ///
@@ -76,25 +55,14 @@ module Api =
     /// * p: the property of the variable to be updated
     /// * vs: the values to update the property of the variable
     /// * eqs: the list of equations to solve
-    let solve onlyMinIncrMax sortQue log lim n p eqs =
-
+    let solve onlyMinIncrMax sortQue log n p eqs =
         eqs
-        |> setVariableValues onlyMinIncrMax lim n p
+        |> setVariableValues onlyMinIncrMax n p
         |> function
         | None -> eqs
         | Some var ->
-            (var, eqs)
-            |> Events.ApiSetVariable
-            |> Logging.logInfo log
-
             eqs
             |> Solver.solveVariable onlyMinIncrMax log sortQue var
-            |> fun eqs ->
-                eqs
-                |> Events.ApiEquationsSolved
-                |> Logging.logInfo log
-
-                eqs
 
 
     /// Make a list of `EQD`
@@ -106,30 +74,15 @@ module Api =
 
 
     let applyConstraints onlyMinIncrMax log eqs cs =
-        let tryApply =
-            fun c eqs ->
-                try
-                    Constraint.apply onlyMinIncrMax log c eqs
-                with
-                | Variable.Exceptions.VariableException m ->
-                    m
-                    |> Logging.logError log
-
-                    m
-                    |> Variable.Exceptions.raiseExc
-                | e ->
-                    e |> raise
+        let apply = Constraint.apply onlyMinIncrMax log
 
         cs
         |> List.fold (fun acc c ->
             acc
-            |> tryApply c
-            |> fun (_, var) ->
-                match var with
-                | None -> acc
-                | Some var ->
-                    acc
-                    |> List.map (Equation.replace var)
+            |> apply c
+            |> fun var ->
+                acc
+                |> List.map (Equation.replace var)
         ) eqs
 
 
@@ -138,9 +91,3 @@ module Api =
         |> Constraint.orderConstraints log
         |> applyConstraints false log eqs
         |> Solver.solveAll onlyMinIncrMax log
-        |> fun eqs ->
-            (cs, eqs)
-            |> Events.ApiAppliedConstraints
-            |> Logging.logInfo log
-
-            eqs

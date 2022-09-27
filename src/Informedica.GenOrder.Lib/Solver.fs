@@ -206,7 +206,7 @@ module Solver =
                 |> ValueUnit.toBase
 
         | None ->
-            sprintf "could not find %A in toBase n eqs vs" n
+            $"could not find %A{n} in toBase n eqs vs"
             |> failwith
 
 
@@ -228,7 +228,7 @@ module Solver =
                         |> function
                         | Some v -> v
                         | None ->
-                            sprintf "could not find %A" vru.Variable.Name
+                            $"could not find %A{vru.Variable.Name}"
                             |> failwith
                 }
             )
@@ -236,9 +236,9 @@ module Solver =
 
 
 
-    let setVals lim n p eqs =
+    let setVals n p eqs =
         eqs
-        |> Api.setVariableValues lim n p
+        |> Api.setVariableValues n p
 
 
     let filterEqsWithUnits =
@@ -255,7 +255,7 @@ module Solver =
 
     // Solve a set of equations setting a property `p` with
     // name `n`, to a valueset `vs`.
-    let applySolve sortQue log lim n p eqs =
+    let applySolve sortQue log n p eqs =
 
         let toBase = propToBase n eqs
 
@@ -263,13 +263,13 @@ module Solver =
         // use only eqs with all vrus have units
         |> filterEqsWithUnits
         |> mapToSolverEqs
-        |> Api.solve true sortQue log lim n (p |> toBase)
+        |> Api.solve true sortQue log n (p |> toBase)
         |> mapFromSolverEqs eqs
 
 
-    let solve log lim =
+    let solve log =
         let sortQue = Solver.sortQue
-        applySolve sortQue log lim //(printfn "%s") //|> memSolve
+        applySolve sortQue log //(printfn "%s") //|> memSolve
 
 
     let applyConstraints log (cs : Constraint list) eqs =
@@ -308,4 +308,3 @@ module Solver =
         |> mapToSolverEqs
         |> Api.solveConstraints true log cs
         |> mapFromSolverEqs eqs
-

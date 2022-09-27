@@ -8,6 +8,7 @@
 #load "../Types.fs"
 #load "../Utils.fs"
 #load "../Logging.fs"
+#load "../Exceptions.fs"
 #load "../Variable.fs"
 #load "../Equation.fs"
 #load "../Solver.fs"

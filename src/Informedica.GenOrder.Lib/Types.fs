@@ -260,7 +260,6 @@ module Types =
             Name : string
             Mapping : OrderMapping
             Property : Property
-            Limit : Limit
             RouteShape : RouteShape
             OrderType : OrderType
         }
@@ -335,7 +334,7 @@ module Types =
     type ConstrainedOrder = DrugConstraint list * Order
 
     /// The dose limits that can be applied
-    type DoseLimits =
+    type DoseLimit =
         {
             /// The substance name to which the dose limits
             /// are applied
@@ -378,7 +377,7 @@ module Types =
             Weight : BigRational option * BigRational option
             GestAge : BigRational option * BigRational option
             PostAge : BigRational option * BigRational option
-            /// maps to OrderType
+            /// maps to OrderTyp
             OrderType : OrderType
             /// maps to PresFreq
             Frequencies : BigRational list
@@ -392,11 +391,11 @@ module Types =
             AdjUnit : string
             TimeUnit : string
             RateUnit : string
-            Limits : DoseLimits list
+            Limits : DoseLimit list
         }
 
 
-    type SolutionLimits =
+    type SolutionLimit =
         {
             SubstanceName : string
             /// maps to ItemOrderableQty
@@ -419,7 +418,7 @@ module Types =
             RateUnit : string
             /// maps to OrderableDoseCount
             DoseCount : BigRational list
-            Limits : SolutionLimits list
+            Limits : SolutionLimit list
         }
 
 
@@ -456,22 +455,28 @@ module Types =
         }
 
 
+    module Exceptions =
+
+        type Message =
+            | OrderCouldNotBeSolved of string * Order
+
+
     module Events =
 
         type Event =
             | SolverReplaceUnit of (Name * Unit)
-            | OrderSolved of Order
+            | OrderSolvedStarted of Order
+            | OrderSolveFinished of Order
             | OrderConstraintsSolved of Order * Constraint list
             | OrderScenario of string
             | OrderScenerioWithNameValue of Order * Name * BigRational
-            | OrderCouldNotBeSolved of string * Order
 
 
     module Logging =
 
         open Informedica.GenSolver.Lib.Types.Logging
 
-        type Message =
-            | OrderException of string
-            | OrderMessage of Events.Event
+        type OrderMessage =
+            | OrderException of Exceptions.Message
+            | OrderEvent of Events.Event
             interface IMessage

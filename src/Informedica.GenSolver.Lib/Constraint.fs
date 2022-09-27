@@ -11,10 +11,11 @@ module Constraint =
     module ValueSet = ValueRange.ValueSet
     module Name = Variable.Name
 
+
     let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name
 
 
-    let toString { Name = n; Property = p; Limit = l} = $"{n |> Name.toString}: {p} {l}"
+    let toString { Name = n; Property = p } = $"{n |> Name.toString}: {p}"
 
 
     let scoreConstraint c =
@@ -40,8 +41,8 @@ module Constraint =
                     let max = vs |> ValueSet.getMax |> Option.map MaxProp
                     [
                         c
-                        if min.IsSome then { c with Property = min.Value ; Limit = NoLimit }
-                        if max.IsSome then { c with Property = max.Value ; Limit = NoLimit }
+                        if min.IsSome then { c with Property = min.Value }
+                        if max.IsSome then { c with Property = max.Value }
                     ]
                     |> List.append acc
             | _ -> [c] |> List.append acc
@@ -64,78 +65,34 @@ module Constraint =
 
     let apply onlyMinIncrMax log (c : Constraint) eqs =
 
-        let lim l b vr =
-            if vr |> Variable.count <= l then vr
-            else
-                vr
-                |> Variable.getValueRange
-                |> ValueRange.getValSet
-                |> function
-                | Some (ValueSet vs) ->
-                    vs
-                    |> Set.toList
-                    |> fun xs ->
-                        if b then xs |> List.sort
-                        else xs |> List.sortDescending
-                    |> List.take l
-                    |> Set.ofList
-                    |> ValueRange.createValSet
-                    |> Variable.setValueRange onlyMinIncrMax vr
-                | None -> vr
-
         eqs
         |> List.collect (Equation.findName c.Name)
         |> function
         | [] ->
             (c, eqs)
-            |> Events.ConstraintVariableNotFound
-            |> Logging.logWarning log
-
-            None
+            |> Exceptions.ConstraintVariableNotFound
+            |> Exceptions.raiseExc (Some log)
 
         | vr::_ ->
-
             c.Property
             |> Property.toValueRange
             |> Variable.setValueRange onlyMinIncrMax vr
-            |> fun vr ->
-                match c.Limit with
-                | NoLimit -> vr
-                | MaxLim l ->
-                    (c.Limit, vr)
-                    |> Events.ConstraintLimitSetToVariable
-                    |> Logging.logInfo log
-
-                    vr |> lim l false
-                | MinLim l ->
-                    (c.Limit, vr)
-                    |> Events.ConstraintLimitSetToVariable
-                    |> Logging.logInfo log
-
-                    vr |> lim l true
-
-                // ToDo implement min max limit
-                | _ -> vr
-            |> Some
-        |> function
-        | None -> eqs, None
-        | Some var ->
-            (c, var)
-            |> Events.ConstraintVariableApplied
+        |> fun var ->
+            c
+            |> Events.ConstraintApplied
             |> Logging.logInfo log
 
-            eqs, Some var
+            var
 
 
     let solve onlyMinIncrMax log sortQue (c : Constraint) eqs =
-        match apply onlyMinIncrMax log c eqs with
-        | eqs, None -> eqs
-        | eqs, Some var ->
-            eqs
-            |> Solver.solveVariable onlyMinIncrMax log sortQue var
-            |> fun eqs ->
-                (c, eqs)
-                |> Events.ConstrainedEquationsSolved
-                |> Logging.logInfo log
+        let var = apply onlyMinIncrMax log c eqs
 
-                eqs
+        eqs
+        |> Solver.solveVariable onlyMinIncrMax log sortQue var
+        |> fun eqs ->
+            c
+            |> Events.ConstrainedSolved
+            |> Logging.logInfo log
+
+            eqs
