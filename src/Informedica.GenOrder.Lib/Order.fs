@@ -383,7 +383,14 @@ module Order =
         |> fromEqs o
 
 
-    let solveConstraints log cs o =
+    let solveConstraints log cs order =
+        let _log msg o =
+            (o, cs)
+            |> msg
+            |> Logging.logInfo log
+
+            o
+
         // return eqs
         let toEql prod sum =
 
@@ -391,23 +398,20 @@ module Order =
             |> List.map Solver.productEq
             |> List.append (sum |> List.map Solver.sumEq)
 
-        let prod, sum = o |> toEqs
+        let prod, sum = order |> toEqs
 
         let eqs = toEql prod sum
+
+        order |> _log Events.OrderSolveConstraintsStarted |> ignore
 
         try
             eqs
             |> Solver.solveConstraints log cs
-            |> fromEqs o
-            |> fun o ->
-                (o, cs)
-                |> Events.OrderConstraintsSolved
-                |> Logging.logInfo log
-
-                o
+            |> fromEqs order
+            |> _log Events.OrderSolveConstraintsFinished
         with
         | e ->
-            Exceptions.raiseExc (Some log) (e.ToString()) o
+            Exceptions.raiseExc (Some log) (e.ToString()) order
 
     let solveAll log o =
         // return eqs

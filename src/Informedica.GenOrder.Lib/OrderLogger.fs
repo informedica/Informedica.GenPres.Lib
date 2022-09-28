@@ -81,13 +81,23 @@ module OrderLogger =
             match m with
             | Events.SolverReplaceUnit (n, u) ->
                 $"replaced {n |> Name.toString} unit with {u |> ValueUnit.unitToString}"
-            | Events.OrderSolvedStarted o -> $"=== Order ({o.Orderable.Name}) Solver Started ==="
+
+            | Events.OrderSolveStarted o -> $"=== Order ({o.Orderable.Name}) Solver Started ==="
+
             | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name}) Solver Finished ==="
-            | Events.OrderConstraintsSolved (o, _) ->
+
+            | Events.OrderSolveConstraintsStarted (o, cs) ->
+                o
+                |> Order.applyConstraints { Log = ignore } cs
+                |> Order.toString
+                |> String.concat "\n"
+                |> sprintf "=== Order Constraints Solving Started ===\n%s"
+
+            | Events.OrderSolveConstraintsFinished (o, _) ->
                 o
                 |> Order.toString
                 |> String.concat "\n"
-                |> sprintf "=== Order constraints solved ===\n%s"
+                |> sprintf "=== Order Constraints Solving Finished ===\n%s"
 
             | Events.OrderScenario _ -> ""
             | Events.OrderScenerioWithNameValue _ -> ""
@@ -133,7 +143,9 @@ module OrderLogger =
         match msg.Message with
         | :? SolverMessage as m -> m |> SolverLogging.printMsg
         | :? OrderMessage  as m -> m |> printOrderMsg msgs
-        | _ -> ""
+        | _ ->
+            printfn $"printMsg cannot handle {msg}"
+            ""
 
     // A message to send to the order logger agent
     type Message =

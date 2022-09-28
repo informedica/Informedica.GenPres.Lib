@@ -465,9 +465,10 @@ module Types =
 
         type Event =
             | SolverReplaceUnit of (Name * Unit)
-            | OrderSolvedStarted of Order
+            | OrderSolveStarted of Order
             | OrderSolveFinished of Order
-            | OrderConstraintsSolved of Order * Constraint list
+            | OrderSolveConstraintsStarted of Order * Constraint list
+            | OrderSolveConstraintsFinished of Order * Constraint list
             | OrderScenario of string
             | OrderScenerioWithNameValue of Order * Name * BigRational
 

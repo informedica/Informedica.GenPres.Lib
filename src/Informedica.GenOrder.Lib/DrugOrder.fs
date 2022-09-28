@@ -663,7 +663,7 @@ module DrugOrder =
         let cs, o = co
 
         o
-        |> Events.OrderSolvedStarted
+        |> Events.OrderSolveStarted
         |> Logging.logInfo log
 
         let cs = cs |> List.map (DrugConstraint.mapToConstraint o)
@@ -671,6 +671,5 @@ module DrugOrder =
         o
         |> Order.solveUnits log
         |> Order.solveConstraints log cs
-        |> fun x -> printfn "solved constraints"; x
         |> Order.calcScenarios log
 

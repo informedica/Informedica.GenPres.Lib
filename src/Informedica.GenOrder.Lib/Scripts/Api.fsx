@@ -10,9 +10,8 @@ open Informedica.GenOrder.Lib
 
 let path = Some $"{__SOURCE_DIRECTORY__}/log.txt"
 let startLogger () =
-// Start the logger at an informative level
+    // Start the logger at an informative level
     OrderLogger.logger.Start path Logging.Level.Informative
-
 
 
 startLogger()
@@ -33,7 +32,6 @@ Api.filter None None None (Some "noradrenaline") (Some "infusievloeistof") None
 
 // report output to the fsi
 OrderLogger.logger.Report ()
-
 
 
 Api.filter None None None (Some "gentamicine") None None

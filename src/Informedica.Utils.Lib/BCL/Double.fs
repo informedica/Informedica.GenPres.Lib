@@ -143,3 +143,10 @@ module Double =
             fract v 1N
             |> (fun (n, d) -> (n, d.Numerator))
             |> Some
+
+
+    let toStringNumberNL p (n: float) = n.ToString("R" + p, CultureInfo.GetCultureInfo("nl"))
+
+
+    let toStringNumberNLWithoutTrailingZeros =
+        toStringNumberNL "" >> String.removeTrailingZerosFromDutchNumber
