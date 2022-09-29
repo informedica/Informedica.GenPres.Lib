@@ -157,7 +157,7 @@ module Types =
     type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
 
 
-    type OrderType = | Continuous | DisContinuous | Timed | Once | AnyOrder
+    type DoseType = | Start | Maintenance | StepDown | Once | AnyDoseType
 
 
     type Frequency = { Count : BigRational; TimeUnit : string }
@@ -183,9 +183,11 @@ module Types =
 
     type Patient =
         {
+            Diagnosis : string
             Gender : Gender
             Age : MinMax
             Weight : MinMax
+            BSA : MinMax
             GestAge : MinMax
             PMAge : MinMax
         }
@@ -198,7 +200,7 @@ module Types =
             Shape : string
             Route : string
             Patient : Patient
-            OrderType : OrderType
+            DoseType : DoseType
             Frequencies : BigRational array
             Rates : BigRational array
             DoseUnit : string
@@ -206,11 +208,13 @@ module Types =
             TimeUnit : string
             RateUnit : string
             Time : MinMax
+            Duration : MinMax
             DoseLimits : DoseLimit array
+            Products : Product array
         }
 
 
-module OrderType =
+module DoseType =
 
     open Informedica.Utils.Lib.BCL
 
@@ -218,21 +222,21 @@ module OrderType =
         let s = s |> String.toLower |> String.trim
 
         match s with
-        | "cont" -> Continuous
-        | "discont" -> DisContinuous
-        | "timed" -> Timed
-        | "once" -> Once
+        | "start" -> Start
+        | "onderhoud" -> Maintenance
+        | "afbouw" -> StepDown
+        | "eenmalig" -> Once
         | _ ->
             printfn $"couldn't match {s}"
-            AnyOrder
+            AnyDoseType
 
 
     let toString = function
-        | Continuous -> "cont"
-        | DisContinuous -> "discont"
-        | Timed -> "timed"
-        | Once -> "once"
-        | AnyOrder -> ""
+        | Start -> "start"
+        | Maintenance -> "onderhoud"
+        | StepDown -> "afbouw"
+        | Once -> "eenmalig"
+        | AnyDoseType -> ""
 
 
 module Gender =
@@ -287,9 +291,9 @@ module Patient =
             | None -> 0
 
         (pat.Age.Minimum |> toInt |> fun i -> if i > 0 then i + 300 else i) +
-        (pat.Weight.Minimum |> toInt) +
         (pat.GestAge.Minimum |> toInt) +
-        (pat.PMAge.Minimum |> toInt)
+        (pat.PMAge.Minimum |> toInt) +
+        (pat.Weight.Minimum |> Option.map (fun w -> w / 1000N) |> toInt)
 
 
     let printAge a =
@@ -403,6 +407,15 @@ module Product =
     let tupleBrOpt brs1 brs2 =
         brs1 |> Array.tryHead,
         brs2 |> Array.tryHead
+
+
+    let filter generic shape (prods : Product array) =
+        let eqs s1 s2 =
+            let s1 = s1 |> String.trim |> String.toLower
+            let s2 = s2 |> String.trim |> String.toLower
+            s1 = s2
+        prods
+        |> Array.filter (fun p -> p.Generic |> eqs generic && p.Shape |> eqs shape)
 
 
     let products () =
@@ -525,7 +538,9 @@ module DoseRule =
                 |> Array.map BigRational.ToInt32
                 |> Array.map string
                 |> String.concat ", "
-            $"{frs} x / {r.TimeUnit}"
+            if r.TimeUnit |> String.isNullOrWhiteSpace then $"{frs} x"
+            else
+                $"{frs} x / {r.TimeUnit}"
 
 
     let printMinMaxDose u (minMax : MinMax) =
@@ -542,24 +557,18 @@ module DoseRule =
         | Some br -> $"{br |> BigRational.toStringNl} {u}"
 
 
-    let printDose (dr : DoseRule) =
+    let printDose wrap (dr : DoseRule) =
         dr.DoseLimits
         |> Array.map (fun dl ->
             let doseQtyAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}"
             let doseTotAdjUnit = $"{doseQtyAdjUnit}/{dr.TimeUnit}"
             let doseTotUnit = $"{dr.DoseUnit}/{dr.TimeUnit}"
-            let freqs = $"{dr |> printFreqs}"
             [
-                $"- {dl.Substance}"
-
                 $"{dl.NormDoseTotalAdjust |> printNormDose doseTotAdjUnit} " +
                 $"{dl.DoseTotalAdjust |> printMinMaxDose doseTotAdjUnit}"
 
                 $"{dl.NormDoseTotal |> printNormDose doseTotUnit} " +
                 $"{dl.DoseTotal |> printMinMaxDose doseTotUnit}"
-
-                if freqs |> String.isNullOrWhiteSpace |> not then
-                    $"in {freqs}"
 
                 $"{dl.NormDoseQuantityAdjust |> printNormDose doseQtyAdjUnit} " +
                 $"{dl.DoseQuantityAdjust |> printMinMaxDose doseQtyAdjUnit}"
@@ -569,10 +578,44 @@ module DoseRule =
             ]
             |> List.map String.trim
             |> List.filter (String.IsNullOrEmpty >> not)
-            |> String.concat "\n"
+            |> String.concat " "
+            |> fun s -> $"{dl.Substance} {wrap}{s}{wrap}"
         )
 
+
+    let filter indication generic shape route (patient : Patient option) (dsrs : DoseRule array) =
+        dsrs
+        |> Array.filter(fun dr ->
+            match indication with
+            | None -> true
+            | Some i -> dr.Indication = i
+        )
+        |> Array.filter(fun dr ->
+            match generic with
+            | None -> true
+            | Some g -> dr.Generic = g
+        )
+        |> Array.filter(fun dr ->
+            match shape with
+            | None -> true
+            | Some s -> dr.Shape = s
+        )
+        |> Array.filter(fun dr ->
+            match route with
+            | None -> true
+            | Some r -> dr.Route = r
+        )
+
+
+    let generics (dsrs : DoseRule array) =
+        dsrs
+        |> Array.map (fun dr -> dr.Generic)
+        |> Array.distinct
+
+
     let doseRules () =
+        let prods = Product.products ()
+
         Web.getDataFromSheet "DoseRules2"
         |> fun data ->
             let getColumn =
@@ -591,17 +634,20 @@ module DoseRule =
                     Generic = get "Generic"
                     Shape = get "Shape"
                     Route = get "Route"
+                    Diagn = get "Diagn"
                     Gender = get "Gender" |> Gender.fromString
                     MinAge = get "MinAge" |> toBrOpt
                     MaxAge = get "MaxAge" |> toBrOpt
                     MinWeight = get "MinWeight" |> toBrOpt
                     MaxWeight = get "MaxWeight" |> toBrOpt
+                    MinBSA = get "MinBSA" |> toBrOpt
+                    MaxBSA = get "MaxBSA" |> toBrOpt
                     MinGestAge = get "MinGestAge" |> toBrOpt
                     MaxGestAge = get "MaxGestAge" |> toBrOpt
                     MinPMAge = get "MinPMAge" |> toBrOpt
                     MaxPMAge = get "MaxPMAge" |> toBrOpt
-                    OrderType = get "OrderType" |> OrderType.fromString
-                    Frequencies = get "Frequencies" |> toBrs
+                    DoseType = get "DoseType" |> DoseType.fromString
+                    Frequencies = get "Freqs" |> toBrs
                     Rates = get "Rates" |> toBrs
                     DoseUnit = get "DoseUnit"
                     AdjustUnit = get "AdjustUnit"
@@ -609,6 +655,8 @@ module DoseRule =
                     RateUnit = get "RateUnit"
                     MinTime = get "MinTime" |> toBrOpt
                     MaxTime = get "MaxTime" |> toBrOpt
+                    MinDur = get "MinDur" |> toBrOpt
+                    MaxDur = get "MaxDur" |> toBrOpt
                     NormDose = get "NormDose" |> toBrOpt
                     MinDose = get "MinDose" |> toBrOpt
                     MaxDose = get "MaxDose" |> toBrOpt
@@ -643,13 +691,15 @@ module DoseRule =
                     Route = r.Route
                     Patient =
                         {
+                            Diagnosis = r.Diagn
                             Gender = r.Gender
                             Age = (r.MinAge, r.MaxAge) |> MinMax.fromTuple
                             Weight = (r.MinWeight, r.MaxWeight) |> MinMax.fromTuple
+                            BSA = (r.MinBSA, r.MaxBSA) |> MinMax.fromTuple
                             GestAge = (r.MinGestAge, r.MaxGestAge) |> MinMax.fromTuple
                             PMAge = (r.MinPMAge, r.MaxPMAge) |> MinMax.fromTuple
                         }
-                    OrderType = r.OrderType
+                    DoseType = r.DoseType
                     Frequencies = r.Frequencies
                     Rates = r.Rates
                     DoseUnit = r.DoseUnit
@@ -657,7 +707,9 @@ module DoseRule =
                     TimeUnit = r.TimeUnit
                     RateUnit = r.RateUnit
                     Time = (r.MinTime, r.MaxTime) |> MinMax.fromTuple
+                    Duration = (r.MinDur, r.MaxDur) |> MinMax.fromTuple
                     DoseLimits = [||]
+                    Products = prods |> Product.filter r.Generic r.Shape
                 }
             )
             |> Array.map (fun (dr, rs) ->
@@ -711,12 +763,146 @@ module DoseRule =
         |> Array.distinct
 
 
+    /// See for use of anonymous record in
+    /// fold: https://github.com/dotnet/fsharp/issues/6699
+    let toMarkdown (ds : DoseRule array) =
+        let generic_md generic = $"""
+# {generic}
+---
+"""
+
+        let route_md route products = $"""
+### Route: {route}
+#### Producten
+{products}
+"""
+
+        let product_md product =  $"""
+* {product}
+"""
+
+        let indication_md indication = $"""
+## Indicatie: {indication}
+---
+"""
+
+        let dose_md = """
+#### Doseringen
+"""
+
+        let patient_md patient doses = $"""
+* Patient: **{patient}**
+%s{doses}
+"""
+
+        ({| md = ""; doses = [||] |}, ds
+        |> Array.groupBy (fun d -> d.Generic))
+        ||> Array.fold (fun acc (generic, ds) ->
+            {| acc with
+                md = generic_md generic
+                doses = ds
+            |}
+            |> fun r ->
+                if r.doses = Array.empty then r
+                else
+                    (r, r.doses |> Array.groupBy (fun d -> d.Indication))
+                    ||> Array.fold (fun acc (indication, ds) ->
+                        {| acc with
+                            md = acc.md + (indication_md indication)
+                            doses = ds
+                        |}
+                        |> fun r ->
+                            if r.doses = Array.empty then r
+                            else
+                                (r, r.doses |> Array.groupBy (fun r -> r.Route))
+                                ||> Array.fold (fun acc (route, ds) ->
+
+                                    let prods =
+                                        ds
+                                        |> Array.collect (fun d -> d.Products)
+                                        |> Array.sortBy (fun p -> p.ShapeQuantity)
+                                        |> Array.map (fun p -> product_md p.Label)
+                                        |> Array.distinct
+                                        |> String.concat "\n"
+                                    {| acc with
+                                        md = acc.md + (route_md route prods)
+                                                    + dose_md
+                                        doses = ds
+                                    |}
+                                    |> fun r ->
+                                        if r.doses = Array.empty then r
+                                        else
+                                            (r, r.doses
+                                                |> Array.sortBy (fun d -> d.Patient |> Patient.sortBy)
+                                                |> Array.groupBy (fun d -> d.Patient |> Patient.toString))
+                                            ||> Array.fold (fun acc (pat, ds) ->
+                                                let doses =
+                                                    ("", ds |> Array.groupBy (fun d -> d.DoseType))
+                                                    ||> Array.fold (fun acc (dt, ds) ->
+                                                        let dose =
+                                                            ds
+                                                            |> Array.map (printDose "**")
+                                                            |> Array.distinct
+                                                            |> function
+                                                            | [| d |] -> d |> String.concat "\n"
+                                                            | _ -> ""
+
+                                                        let freqs =
+                                                            if dose = "" then ""
+                                                            else
+                                                                ds
+                                                                |> Array.map (fun d -> d |> printFreqs )
+                                                                |> Array.distinct
+                                                                |> String.concat "\n"
+
+                                                        $"{acc}\n*{dt |> DoseType.toString}*\n {dose} in **{freqs}**"
+                                                    )
+
+                                                {| acc with
+                                                    md =
+                                                        if doses = "" then acc.md
+                                                        else
+                                                            acc.md + (patient_md pat doses)
+                                                |}
+                                            )
+                                )
+                    )
+        )
+        |> fun r -> r.md
+
+
+
 open Informedica.Utils.Lib.BCL
 open DoseRule
 
-let drs = doseRules ()
+
+open System.IO
+
+File.WriteAllText("formularium.md", "")
 
 
-drs
-|> Array.collect printDose
-|> Array.iter (printfn "%s")
+doseRules ()
+|> fun drs ->
+    drs
+    |> generics
+    |> Array.sort
+    |> Array.map(fun g ->
+        drs
+        |> filter None (Some g) None None None
+        |> toMarkdown
+    )
+    |> fun s -> File.AppendAllLines("formularium.md", s)
+
+
+
+(doseRules()[0]).Patient
+|> Patient.toString
+
+[| doseRules()[0]|]
+|> toMarkdown
+
+doseRules()
+|> toMarkdown
+
+doseRules () |> ignore
+
