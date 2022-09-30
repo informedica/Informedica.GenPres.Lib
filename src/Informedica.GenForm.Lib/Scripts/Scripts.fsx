@@ -157,7 +157,15 @@ module Types =
     type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
 
 
-    type DoseType = | Start | Maintenance | StepDown | Once | AnyDoseType
+    type DoseType =
+        | Start
+        | Once
+        | PRN
+        | Maintenance
+        | Continuous
+        | StepDown of int
+        | StepUp of int
+        | AnyDoseType
 
 
     type Frequency = { Count : BigRational; TimeUnit : string }
@@ -202,16 +210,20 @@ module Types =
             Patient : Patient
             DoseType : DoseType
             Frequencies : BigRational array
-            Rates : BigRational array
             DoseUnit : string
             AdjustUnit : string
-            TimeUnit : string
+            FreqUnit : string
             RateUnit : string
             Time : MinMax
+            TimeUnit : string
+            Interval : MinMax
+            IntervalUnit : string
             Duration : MinMax
+            DurationUnit : string
             DoseLimits : DoseLimit array
             Products : Product array
         }
+
 
 
 module DoseType =
@@ -223,9 +235,32 @@ module DoseType =
 
         match s with
         | "start" -> Start
-        | "onderhoud" -> Maintenance
-        | "afbouw" -> StepDown
         | "eenmalig" -> Once
+        | "prn" -> PRN
+        | "onderhoud" -> Maintenance
+        | "continu" -> Continuous
+        | _ when s |> String.startsWith "afbouw" ->
+            match s |> String.split(" ") with
+            | [_;i] ->
+                match i |> Int32.tryParse with
+                | Some i -> StepDown i
+                | None ->
+                    printfn $"couldn't match {s}"
+                    AnyDoseType
+            | _ ->
+                printfn $"couldn't match {s}"
+                AnyDoseType
+        | _ when s |> String.startsWith "opbouw" ->
+            match s |> String.split(" ") with
+            | [_;i] ->
+                match i |> Int32.tryParse with
+                | Some i -> StepUp i
+                | None ->
+                    printfn $"couldn't match {s}"
+                    AnyDoseType
+            | _ ->
+                printfn $"couldn't match {s}"
+                AnyDoseType
         | _ ->
             printfn $"couldn't match {s}"
             AnyDoseType
@@ -233,10 +268,14 @@ module DoseType =
 
     let toString = function
         | Start -> "start"
-        | Maintenance -> "onderhoud"
-        | StepDown -> "afbouw"
         | Once -> "eenmalig"
+        | PRN -> "prn"
+        | Maintenance -> "onderhoud"
+        | Continuous -> "continu"
+        | StepDown i -> $"afbouw {i}"
+        | StepUp i -> $"opbouw {i}"
         | AnyDoseType -> ""
+
 
 
 module Gender =
@@ -340,27 +379,31 @@ module Patient =
             | _ -> ""
 
         let neonate =
+            let s =
+                if pat.GestAge.Maximum.IsSome && pat.GestAge.Maximum.Value <= 259N then "prematuren"
+                else "neonaten"
+
             match pat.GestAge.Minimum, pat.GestAge.Maximum, pat.PMAge.Minimum, pat.PMAge.Maximum with
             | Some min, Some max, _, _ ->
                 let min = min |> printDaysToWeeks
                 let max = max |> printDaysToWeeks
-                $"neonaten zwangerschapsduur %s{min} tot %s{max}"
+                $"{s} zwangerschapsduur %s{min} tot %s{max}"
             | Some min, None, _, _ ->
                 let min = min |> printDaysToWeeks
-                $"neonaten zwangerschapsduur vanaf %s{min}"
+                $"{s} zwangerschapsduur vanaf %s{min}"
             | None, Some max, _, _ ->
                 let max = max |> printDaysToWeeks
-                $"neonaten zwangerschapsduur tot %s{max}"
+                $"{s} zwangerschapsduur tot %s{max}"
             | _, _, Some min, Some max ->
                 let min = min |> printDaysToWeeks
                 let max = max |> printDaysToWeeks
-                $"neonaten postconceptie leeftijd %s{min} tot %s{max}"
+                $"prematuren postconceptie leeftijd %s{min} tot %s{max}"
             | _, _, Some min, None ->
                 let min = min |> printDaysToWeeks
-                $"neonaten postconceptie leeftijd vanaf %s{min}"
+                $"prematuren postconceptie leeftijd vanaf %s{min}"
             | _, _, None, Some max ->
                 let max = max |> printDaysToWeeks
-                $"neonaten postconceptie leeftijd tot %s{max}"
+                $"prematuren postconceptie leeftijd tot %s{max}"
             | _ -> ""
 
         let weight =
@@ -538,9 +581,48 @@ module DoseRule =
                 |> Array.map BigRational.ToInt32
                 |> Array.map string
                 |> String.concat ", "
-            if r.TimeUnit |> String.isNullOrWhiteSpace then $"{frs} x"
+            if frs |> String.isNullOrWhiteSpace then ""
             else
-                $"{frs} x / {r.TimeUnit}"
+                if r.FreqUnit |> String.isNullOrWhiteSpace then $"{frs} x"
+                else
+                    $"{frs} x / {r.FreqUnit}"
+
+
+    let printInterval (dr: DoseRule) =
+        if dr.IntervalUnit |> String.isNullOrWhiteSpace then ""
+        else
+            let s = dr.Interval |> MinMax.toString
+            if s |> String.isNullOrWhiteSpace then ""
+            else
+                let s =
+                    s
+                    |> String.replace "≥" "min. interval "
+                    |> String.replace "<" "max. interval"
+                    |> fun s ->
+                        if s |> String.contains "-" then $"elke {s}"
+                        else s
+                $"{s} {dr.IntervalUnit}"
+
+
+
+    let printTime (dr: DoseRule) =
+        if dr.TimeUnit |> String.isNullOrWhiteSpace then ""
+        else
+            let s = dr.Time |> MinMax.toString
+            if s |> String.isNullOrWhiteSpace then ""
+            else
+                $"{s} {dr.TimeUnit}"
+                |> String.replace "<" "max"
+
+
+    let printDuration (dr: DoseRule) =
+        if dr.DurationUnit |> String.isNullOrWhiteSpace then ""
+        else
+            let s = dr.Duration |> MinMax.toString
+            if s |> String.isNullOrWhiteSpace then ""
+            else
+                $"{s} {dr.DurationUnit}"
+                |> String.replace "<" "max"
 
 
     let printMinMaxDose u (minMax : MinMax) =
@@ -560,10 +642,19 @@ module DoseRule =
     let printDose wrap (dr : DoseRule) =
         dr.DoseLimits
         |> Array.map (fun dl ->
-            let doseQtyAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}"
-            let doseTotAdjUnit = $"{doseQtyAdjUnit}/{dr.TimeUnit}"
-            let doseTotUnit = $"{dr.DoseUnit}/{dr.TimeUnit}"
+            let doseQtyAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}/keer"
+            let doseTotAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}/{dr.FreqUnit}"
+            let doseTotUnit = $"{dr.DoseUnit}/{dr.FreqUnit}"
+            let doseQtyUnit = $"{dr.DoseUnit}/keer"
+            let doseRateUnit = $"{dr.DoseUnit}/{dr.RateUnit}"
+            let doseRateAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}/{dr.RateUnit}"
             [
+                $"{dl.NormDoseRate |> printNormDose doseRateUnit} " +
+                $"{dl.DoseRate |> printMinMaxDose doseRateUnit}"
+
+                $"{dl.NormDoseRateAdjust |> printNormDose doseRateAdjUnit} " +
+                $"{dl.DoseRateAdjust |> printMinMaxDose doseRateAdjUnit}"
+
                 $"{dl.NormDoseTotalAdjust |> printNormDose doseTotAdjUnit} " +
                 $"{dl.DoseTotalAdjust |> printMinMaxDose doseTotAdjUnit}"
 
@@ -573,8 +664,8 @@ module DoseRule =
                 $"{dl.NormDoseQuantityAdjust |> printNormDose doseQtyAdjUnit} " +
                 $"{dl.DoseQuantityAdjust |> printMinMaxDose doseQtyAdjUnit}"
 
-                $"{dl.NormDoseQuantity |> printNormDose dr.DoseUnit} " +
-                $"{dl.DoseQuantity |> printMinMaxDose dr.DoseUnit}"
+                $"{dl.NormDoseQuantity |> printNormDose doseQtyUnit} " +
+                $"{dl.DoseQuantity |> printMinMaxDose doseQtyUnit}"
             ]
             |> List.map String.trim
             |> List.filter (String.IsNullOrEmpty >> not)
@@ -648,15 +739,19 @@ module DoseRule =
                     MaxPMAge = get "MaxPMAge" |> toBrOpt
                     DoseType = get "DoseType" |> DoseType.fromString
                     Frequencies = get "Freqs" |> toBrs
-                    Rates = get "Rates" |> toBrs
                     DoseUnit = get "DoseUnit"
                     AdjustUnit = get "AdjustUnit"
-                    TimeUnit = get "TimeUnit"
+                    FreqUnit = get "FreqUnit"
                     RateUnit = get "RateUnit"
                     MinTime = get "MinTime" |> toBrOpt
                     MaxTime = get "MaxTime" |> toBrOpt
+                    TimeUnit = get "TimeUnit"
+                    MinInterval = get "MinInt" |> toBrOpt
+                    MaxInterval = get "MaxInt" |> toBrOpt
+                    IntervalUnit = get "IntUnit"
                     MinDur = get "MinDur" |> toBrOpt
                     MaxDur = get "MaxDur" |> toBrOpt
+                    DurUnit = get "DurUnit"
                     NormDose = get "NormDose" |> toBrOpt
                     MinDose = get "MinDose" |> toBrOpt
                     MaxDose = get "MaxDose" |> toBrOpt
@@ -701,13 +796,16 @@ module DoseRule =
                         }
                     DoseType = r.DoseType
                     Frequencies = r.Frequencies
-                    Rates = r.Rates
                     DoseUnit = r.DoseUnit
                     AdjustUnit = r.AdjustUnit
-                    TimeUnit = r.TimeUnit
+                    FreqUnit = r.FreqUnit
                     RateUnit = r.RateUnit
                     Time = (r.MinTime, r.MaxTime) |> MinMax.fromTuple
+                    TimeUnit = r.TimeUnit
+                    Interval = (r.MinInterval, r.MaxInterval) |> MinMax.fromTuple
+                    IntervalUnit = r.IntervalUnit
                     Duration = (r.MinDur, r.MaxDur) |> MinMax.fromTuple
+                    DurationUnit = r.DurUnit
                     DoseLimits = [||]
                     Products = prods |> Product.filter r.Generic r.Shape
                 }
@@ -782,13 +880,38 @@ module DoseRule =
 """
 
         let indication_md indication = $"""
+
 ## Indicatie: {indication}
 ---
 """
 
-        let dose_md = """
+        let doseCapt_md = """
 #### Doseringen
 """
+
+        let dose_md dt dose freqs intv time dur =
+            let dt = dt |> DoseType.toString
+            let freqs =
+                if freqs |> String.isNullOrWhiteSpace then ""
+                else
+                    $" in {freqs}"
+
+            let s =
+                [
+                    if intv |> String.isNullOrWhiteSpace |> not then
+                        $" {intv}"
+                    if time |> String.isNullOrWhiteSpace |> not then
+                        $" inloop tijd {time}"
+                    if dur |> String.isNullOrWhiteSpace |> not then
+                        $" {dur}"
+                ]
+                |> String.concat ", "
+                |> fun s ->
+                    if s |> String.isNullOrWhiteSpace then ""
+                    else
+                        $" ({s |> String.trim})"
+
+            $"*{dt}*\n{dose}{freqs}{s}"
 
         let patient_md patient doses = $"""
 * Patient: **{patient}**
@@ -826,7 +949,7 @@ module DoseRule =
                                         |> String.concat "\n"
                                     {| acc with
                                         md = acc.md + (route_md route prods)
-                                                    + dose_md
+                                                    + doseCapt_md
                                         doses = ds
                                     |}
                                     |> fun r ->
@@ -851,11 +974,43 @@ module DoseRule =
                                                             if dose = "" then ""
                                                             else
                                                                 ds
-                                                                |> Array.map (fun d -> d |> printFreqs )
+                                                                |> Array.map printFreqs
                                                                 |> Array.distinct
-                                                                |> String.concat "\n"
+                                                                |> function
+                                                                | [| s |] -> s
+                                                                | _ -> ""
 
-                                                        $"{acc}\n*{dt |> DoseType.toString}*\n {dose} in **{freqs}**"
+                                                        let intv =
+                                                            if dose = "" then ""
+                                                            else
+                                                                ds
+                                                                |> Array.map printInterval
+                                                                |> Array.distinct
+                                                                |> function
+                                                                | [| s |] -> s
+                                                                | _ -> ""
+
+                                                        let time =
+                                                            if dose = "" then ""
+                                                            else
+                                                                ds
+                                                                |> Array.map printTime
+                                                                |> Array.distinct
+                                                                |> function
+                                                                | [| s |] -> s
+                                                                | _ -> ""
+
+                                                        let dur =
+                                                            if dose = "" then ""
+                                                            else
+                                                                ds
+                                                                |> Array.map printDuration
+                                                                |> Array.distinct
+                                                                |> function
+                                                                | [| s |] -> s
+                                                                | _ -> ""
+
+                                                        $"{acc}\n{dose_md dt dose freqs intv time dur}"
                                                     )
 
                                                 {| acc with
@@ -872,11 +1027,12 @@ module DoseRule =
 
 
 
-open Informedica.Utils.Lib.BCL
 open DoseRule
 
 
 open System.IO
+
+
 
 File.WriteAllText("formularium.md", "")
 
