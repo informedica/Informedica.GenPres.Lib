@@ -195,7 +195,7 @@ module Patient =
 
         let neonate =
             let s =
-                if pat.GestAge.Maximum.IsSome && pat.GestAge.Maximum.Value <= 259N then "prematuren"
+                if pat.GestAge.Maximum.IsSome && pat.GestAge.Maximum.Value < 259N then "prematuren"
                 else "neonaten"
 
             match pat.GestAge.Minimum, pat.GestAge.Maximum, pat.PMAge.Minimum, pat.PMAge.Maximum with
@@ -205,7 +205,9 @@ module Patient =
                 $"{s} zwangerschapsduur %s{min} tot %s{max}"
             | Some min, None, _, _ ->
                 let min = min |> printDaysToWeeks
-                $"{s} zwangerschapsduur vanaf %s{min}"
+                if s = "neonaten" then s
+                else
+                    $"{s} zwangerschapsduur vanaf %s{min}"
             | None, Some max, _, _ ->
                 let max = max |> printDaysToWeeks
                 $"{s} zwangerschapsduur tot %s{max}"

@@ -356,7 +356,7 @@ fentanyl **100 - 3.200 mcg/dag max 800 mcg/keer** in 1, 2, 3, 4 x / dag
 
 #### Doseringen
 
-* Patient: **prematuren zwangerschapsduur tot 37 weken**
+* Patient: **neonaten zwangerschapsduur tot 37 weken**
 
 
 > 
@@ -364,7 +364,7 @@ fentanyl **100 - 3.200 mcg/dag max 800 mcg/keer** in 1, 2, 3, 4 x / dag
 fentanyl **0,5 - 3 mcg/kg/keer** in 1 x
 *continu*
 fentanyl **0,5 - 3 mcg/kg/uur**
-* Patient: **neonaten zwangerschapsduur vanaf 37 weken, leeftijd tot 4 weken**
+* Patient: **neonaten, leeftijd tot 4 weken**
 
 
 > 
@@ -496,23 +496,15 @@ paracetamol **40 - 60 mg/kg/dag max 1.000 mg/keer** in 3, 4 x / dag
 
 #### Doseringen
 
-* Patient: **prematuren postconceptie leeftijd tot 32 weken**
+* Patient: **neonaten zwangerschapsduur tot 37 weken**
 
 
 > 
 *start*
-paracetamol **12 mg/kg/keer** in 1 x (min. interval  4 uur,  inloop tijd ≥ 15 min,  max 1 keer)
-*onderhoud*
-paracetamol **24 mg/kg/dag** in 4 x / dag (min. interval  4 uur,  inloop tijd ≥ 15 min,  max 4 dagen)
-* Patient: **prematuren postconceptie leeftijd 32 weken tot 44 weken**
 
-
-> 
-*start*
-paracetamol **20 mg/kg/keer** in 1 x (min. interval  4 uur,  inloop tijd ≥ 15 min,  max 1 keer)
 *onderhoud*
-paracetamol **40 mg/kg/dag** in 4 x / dag (min. interval  4 uur,  inloop tijd ≥ 15 min,  max 4 dagen)
-* Patient: **neonaten zwangerschapsduur vanaf 37 weken, leeftijd tot 4 weken**
+
+* Patient: **neonaten, leeftijd tot 4 weken**
 
 
 > 

@@ -6,6 +6,8 @@
 open System
 open System.IO
 
+
+open MathNet.Numerics
 open Informedica.GenForm.Lib
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -24,6 +26,8 @@ DoseRule.doseRules ()
         |> DoseRule.filter
                { DoseRule.allFilter with
                     Generic = Some g
+                    //Age = Some 7N
+                    //GestAge = Some (7N * 39N)
                 }
         |> DoseRule.toMarkdown
     )
