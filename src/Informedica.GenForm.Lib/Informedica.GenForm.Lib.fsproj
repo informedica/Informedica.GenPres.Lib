@@ -1,14 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="Formulary.fs" />
     <None Include="Scripts\Scripts.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
