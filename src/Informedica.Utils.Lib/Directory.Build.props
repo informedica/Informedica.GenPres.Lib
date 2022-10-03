@@ -7,9 +7,9 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <PackageId>Informedica.Utils.Lib</PackageId>
-        <Version>1.0.3</Version>
+        <Version>1.0.4</Version>
         <Authors>halcwb</Authors>
-        <Company>Informedica</Company>      
+        <Company>Informedica</Company>
         <RepositoryUrl>https://github.com/informedica/Informedica.Utils.Lib</RepositoryUrl>
         <!-- owners is not supported in MSBuild -->
     </PropertyGroup>

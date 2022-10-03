@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenForm.Lib
+namespace Informedica.GenForm.Lib
 
 
 [<AutoOpen>]
@@ -49,6 +49,7 @@ module Types =
         | Continuous
         | StepDown of int
         | StepUp of int
+        | Contraindicated
         | AnyDoseType
 
 

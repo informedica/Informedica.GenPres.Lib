@@ -7,6 +7,19 @@ module DoseType =
 
     open Informedica.Utils.Lib.BCL
 
+
+    let sortBy = function
+        | Start -> 0
+        | Once -> 1
+        | PRN -> 2
+        | Maintenance -> 3
+        | Continuous -> 4
+        | StepUp n -> 50 + n
+        | StepDown n -> 100 + n
+        | AnyDoseType -> 200
+        | Contraindicated -> -1
+
+
     let fromString s =
         let s = s |> String.toLower |> String.trim
 
@@ -16,6 +29,8 @@ module DoseType =
         | "prn" -> PRN
         | "onderhoud" -> Maintenance
         | "continu" -> Continuous
+        | "contra" -> Contraindicated
+
         | _ when s |> String.startsWith "afbouw" ->
             match s |> String.split(" ") with
             | [_;i] ->
@@ -38,6 +53,7 @@ module DoseType =
             | _ ->
                 printfn $"couldn't match {s}"
                 AnyDoseType
+
         | _ ->
             printfn $"couldn't match {s}"
             AnyDoseType
@@ -51,6 +67,7 @@ module DoseType =
         | Continuous -> "continu"
         | StepDown i -> $"afbouw {i}"
         | StepUp i -> $"opbouw {i}"
+        | Contraindicated -> "contra"
         | AnyDoseType -> ""
 
 
@@ -77,6 +94,7 @@ module Gender =
         | AnyGender, _
         | _, AnyGender -> true
         | _ -> g1 = g2
+
 
 
 module MinMax =
@@ -106,7 +124,10 @@ module MinMax =
         match min, max with
         | None, None -> ""
         | Some min, None -> $"≥ {min}"
-        | Some min, Some max -> $"{min} - {max}"
+        | Some min, Some max ->
+            if min = max then $"{min}"
+            else
+                $"{min} - {max}"
         | None, Some max -> $"< {max}"
 
 
@@ -199,6 +220,17 @@ module Patient =
                 else "neonaten"
 
             match pat.GestAge.Minimum, pat.GestAge.Maximum, pat.PMAge.Minimum, pat.PMAge.Maximum with
+            | _, _, Some min, Some max ->
+                let min = min |> printDaysToWeeks
+                let max = max |> printDaysToWeeks
+                $"{s} postconceptie leeftijd %s{min} tot %s{max}"
+            | _, _, Some min, None ->
+                let min = min |> printDaysToWeeks
+                $"{s} postconceptie leeftijd vanaf %s{min}"
+            | _, _, None, Some max ->
+                let max = max |> printDaysToWeeks
+                $"{s} postconceptie leeftijd tot %s{max}"
+
             | Some min, Some max, _, _ ->
                 let min = min |> printDaysToWeeks
                 let max = max |> printDaysToWeeks
@@ -211,16 +243,6 @@ module Patient =
             | None, Some max, _, _ ->
                 let max = max |> printDaysToWeeks
                 $"{s} zwangerschapsduur tot %s{max}"
-            | _, _, Some min, Some max ->
-                let min = min |> printDaysToWeeks
-                let max = max |> printDaysToWeeks
-                $"prematuren postconceptie leeftijd %s{min} tot %s{max}"
-            | _, _, Some min, None ->
-                let min = min |> printDaysToWeeks
-                $"prematuren postconceptie leeftijd vanaf %s{min}"
-            | _, _, None, Some max ->
-                let max = max |> printDaysToWeeks
-                $"prematuren postconceptie leeftijd tot %s{max}"
             | _ -> ""
 
         let weight =
@@ -530,43 +552,6 @@ module DoseRule =
         ) doseRules
 
 
-
-        (*
-        doseRules
-        |> Array.filter(fun dr ->
-            match filter.Indication with
-            | None -> true
-            | Some i -> dr.Indication = i
-        )
-        |> Array.filter(fun dr ->
-            match filter.Generic with
-            | None -> true
-            | Some g -> dr.Generic = g
-        )
-        |> Array.filter(fun dr ->
-            match filter.Shape with
-            | None -> true
-            | Some s -> dr.Shape = s
-        )
-        |> Array.filter(fun dr ->
-            match filter.Route with
-            | None -> true
-            | Some r -> dr.Route = r
-        )
-        |> Array.filter(fun dr ->
-            match filter.Department with
-            | None -> true
-            | Some d -> dr.Department = d
-        )
-        *)
-
-
-    let generics (dsrs : DoseRule array) =
-        dsrs
-        |> Array.map (fun dr -> dr.Generic)
-        |> Array.distinct
-
-
     let doseRules () =
         let prods = Product.products ()
 
@@ -700,16 +685,32 @@ module DoseRule =
             )
 
 
-    let indications (doseRules : DoseRule array) =
+    let get getter (doseRules : DoseRule[]) =
         doseRules
-        |> Array.map (fun r -> r.Indication)
+        |> Array.map getter
         |> Array.distinct
+        |> Array.sort
 
 
-    let routes (doseRules : DoseRule array) =
-        doseRules
-        |> Array.map (fun r -> r.Route)
-        |> Array.distinct
+    let indications = get (fun dr -> dr.Indication)
+
+
+    let generics = get (fun dr -> dr.Generic)
+
+
+    let shapes = get (fun dr -> dr.Shape)
+
+
+    let routes = get (fun dr -> dr.Route)
+
+
+    let departments = get (fun dr -> dr.Department)
+
+
+    let diagnoses = get (fun dr -> dr.Patient.Diagnosis)
+
+
+    let genders = get (fun dr -> dr.Patient.Gender |> Gender.toString)
 
 
     let patients (doseRules : DoseRule array) =
@@ -735,7 +736,9 @@ module DoseRule =
 """
 
         let route_md route products = $"""
+
 ### Route: {route}
+
 #### Producten
 {products}
 """
@@ -751,6 +754,7 @@ module DoseRule =
 """
 
         let doseCapt_md = """
+
 #### Doseringen
 """
         let dose_md dt dose freqs intv time dur =
@@ -775,11 +779,13 @@ module DoseRule =
                     else
                         $" ({s |> String.trim})"
 
-            $"*{dt}*\n{dose}{freqs}{s}"
+            $"* *{dt}*: {dose}{freqs}{s}"
 
         let patient_md patient diagn =
             $"""
-* Patient: **{patient}**
+
+##### Patient: **{patient}**
+
 %s{diagn}
 """
 
@@ -834,7 +840,9 @@ module DoseRule =
                         | [| s |] -> s
                         | _ -> ""
 
-                $"{acc}\n{dose_md dt dose freqs intv time dur}"
+                if dt = Contraindicated then $"{acc}\n*gecontra-indiceerd*"
+                else
+                    $"{acc}\n{dose_md dt dose freqs intv time dur}"
             )
 
         ({| md = ""; rules = [||] |}, rules
@@ -879,17 +887,21 @@ module DoseRule =
                                         else
                                             (r, r.rules
                                                 |> Array.sortBy (fun d -> d.Patient |> Patient.sortBy)
-                                                |> Array.groupBy (fun d -> d.Patient |> Patient.toString, d.Patient.Diagnosis))
-                                            ||> Array.fold (fun acc ((pat, diagn), rs) ->
-                                                let doses = rs |> printDoses
+                                                |> Array.groupBy (fun d -> d.Patient))
+                                            ||> Array.fold (fun acc (pat, rs) ->
+                                                let doses =
+                                                    rs
+                                                    |> Array.sortBy (fun r -> r.DoseType |> DoseType.sortBy)
+                                                    |> printDoses
                                                 let diagn =
-                                                    if diagn |> String.isNullOrWhiteSpace then ""
+                                                    if pat.Diagnosis |> String.isNullOrWhiteSpace then ""
                                                     else
-                                                        $"* Diagnose: **{diagn}**"
+                                                        $"* Diagnose: **{pat.Diagnosis}**"
+                                                let pat = pat |> Patient.toString
 
                                                 {| acc with
                                                     rules = rs
-                                                    md = acc.md + (patient_md pat diagn) + $"\n> {doses}"
+                                                    md = acc.md + (patient_md pat diagn) + $"\n{doses}"
                                                 |}
                                             )
                                 )
@@ -898,3 +910,15 @@ module DoseRule =
         |> fun r -> r.md
 
 
+    let printGenerics (doseRules : DoseRule[]) =
+        doseRules
+        |> generics
+        |> Array.sort
+        |> Array.map(fun g ->
+            doseRules
+            |> filter
+                   { allFilter with
+                        Generic = Some g
+                    }
+            |> toMarkdown
+        )

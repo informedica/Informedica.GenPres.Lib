@@ -3,6 +3,12 @@
 
 #load "load.fsx"
 
+
+#load "../Types.fs"
+#load "../Utils.fs"
+#load "../Formulary.fs"
+
+
 open System
 open System.IO
 
