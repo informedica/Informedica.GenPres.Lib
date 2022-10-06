@@ -30,6 +30,7 @@ module Types =
             Shape : string
             ShapeQuantity : BigRational option
             ShapeUnit : string
+            ShapeVolume : BigRational option
             Divisible : BigRational option
             Substances : Substance array
         }

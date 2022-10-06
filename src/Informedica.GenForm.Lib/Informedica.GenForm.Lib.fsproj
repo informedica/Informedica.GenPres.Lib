@@ -7,7 +7,10 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
-    <Compile Include="Formulary.fs" />
+    <Compile Include="MinMax.fs" />
+    <Compile Include="Patient.fs" />
+    <Compile Include="Product.fs" />
+    <Compile Include="DoseRule.fs" />
     <None Include="Scripts\Scripts.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>

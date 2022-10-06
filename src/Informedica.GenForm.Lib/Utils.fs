@@ -110,4 +110,16 @@ module Utils =
                 br |> BigRational.toFloat |> Double.toStringNumberNLWithoutTrailingZeros
 
 
+        let toBrs s =
+            s
+            |> String.splitAt ';'
+            |> Array.choose Double.tryParse
+            |> Array.choose BigRational.fromFloat
 
+
+        let toBrOpt brs = brs |> Array.tryHead
+
+
+        let tupleBrOpt brs1 brs2 =
+            brs1 |> Array.tryHead,
+            brs2 |> Array.tryHead
