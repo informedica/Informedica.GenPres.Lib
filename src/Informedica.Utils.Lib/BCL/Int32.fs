@@ -6,7 +6,14 @@ module Int32 =
     open System.Globalization
 
 
-    let parse s = Int32.Parse(s, Globalization.CultureInfo.InvariantCulture)
+    let parse s =
+        try 
+        Int32.Parse(s, Globalization.CultureInfo.InvariantCulture)
+        with
+        | e ->
+            printfn $"cannot parse {s} to Int32"
+            raise e
+
 
     let tryParse (s : string) =
         let (b, n) = Int32.TryParse(s)

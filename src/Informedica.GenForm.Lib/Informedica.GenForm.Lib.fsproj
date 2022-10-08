@@ -11,6 +11,7 @@
     <Compile Include="Patient.fs" />
     <Compile Include="Product.fs" />
     <Compile Include="DoseRule.fs" />
+    <Compile Include="SolutionRule.fs" />
     <None Include="Scripts\Scripts.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>

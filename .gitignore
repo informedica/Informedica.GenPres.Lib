@@ -111,6 +111,10 @@
 !/src/Informedica.GenSolver.Lib/
 !/src/Informedica.GenSolver.Lib/Scripts/
 !/src/Informedica.GenSolver.Lib/Notebooks/
+#Informedica.Zindex.Lib
+!/src/Informedica.Zindex.Lib/
+!/src/Informedica.Zindex.Lib/Scripts/
+!/src/Informedica.Zindex.Lib/Notebooks/
 #Informedica.GenForm.Lib
 !/src/Informedica.GenForm.Lib/
 !/src/Informedica.GenForm.Lib/Scripts/

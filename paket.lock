@@ -2,6 +2,8 @@ STORAGE: NONE
 RESTRICTION: == net6.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    Aether (8.3.1)
+      FSharp.Core (>= 4.3.4)
     Expecto (9.0.4)
       FSharp.Core (>= 4.6)
       Mono.Cecil (>= 0.11.3)
@@ -13,6 +15,7 @@ NUGET
     FsCheck (2.16.5)
       FSharp.Core (>= 4.2.3)
     FSharp.Core (6.0.5)
+    Markdig (0.30.4)
     MathNet.Numerics (5.0)
     MathNet.Numerics.FSharp (5.0)
       FSharp.Core (>= 6.0.2)

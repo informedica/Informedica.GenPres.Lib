@@ -12,6 +12,14 @@ module MinMax =
         }
 
 
+    let map fMin fMax (minMax : MinMax) =
+        { minMax with
+            Minimum = minMax.Minimum |> Option.map fMin
+            Maximum = minMax.Maximum |> Option.map fMax
+        }
+        
+
+
     let isNone (minMax : MinMax) =
         minMax.Minimum |> Option.isNone &&
         minMax.Maximum |> Option.isNone

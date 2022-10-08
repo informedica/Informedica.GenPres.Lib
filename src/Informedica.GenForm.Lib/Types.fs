@@ -127,3 +127,49 @@ module Types =
             PMAge : BigRational option
             DoseType : DoseType
         }
+
+
+
+    type Location =
+        | PVL
+        | CVL
+        | AnyLocation
+
+
+    type SolutionLimit =
+        {
+            Substance : string
+            Unit : string
+            Quantity : MinMax
+            Quantities : BigRational []
+            Concentration : MinMax
+        }
+
+
+    type Selector =
+        {
+            Generic : string
+            Shape : string
+            Department : string
+            Location : Location
+            Age : MinMax
+            Weight : MinMax
+            Dose : MinMax
+            DoseType : DoseType
+        }
+
+
+    type SolutionRule =
+        {
+            Selector : Selector
+            Solutions : string []
+            Volumes : BigRational []
+            Volume : MinMax
+            DosePerc : MinMax
+            Time : MinMax
+            MaxRate : BigRational option
+            RateUnit : string
+            Products : Product []
+            SolutionLimits : SolutionLimit []
+        }
+
