@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module Names =
 
@@ -12,19 +13,19 @@ module Names =
     type Length = TwentyFive | Fifty
 
 
-    type Item = 
-        | Shape 
-        | Route 
-        | GenericUnit 
+    type Item =
+        | Shape
+        | Route
+        | GenericUnit
         | ShapeUnit
         | PrescriptionContainer
-        | ConsumerContainer 
+        | ConsumerContainer
 
 
     let mapItem = function
         | Shape -> 6
-        | Route -> 7 
-        | GenericUnit -> 1
+        | Route -> 7
+        | GenericUnit -> 2
         | ShapeUnit -> 2
         | PrescriptionContainer -> 73
         | ConsumerContainer -> 4
@@ -32,13 +33,13 @@ module Names =
 
     /// Look in BST020T Namen bestand
     let getName id nm =
-        match 
+        match
             Zindex.BST020T.records ()
             |> Array.tryFind (fun r ->
                 r.MUTKOD <> 1 &&
                 r.NMNR = id
             ) with
-        | Some r -> 
+        | Some r ->
             match nm with
             | Full  -> r.NMNAAM
             | Short  -> r.NMNM40
@@ -46,12 +47,12 @@ module Names =
             | Label -> r.NMETIK
         | None -> ""
 
-            
+
     /// Look in BST902T Therauri totaal
-    let getThes id it ln = 
+    let getThes id it ln =
         match
             Zindex.BST902T.records ()
-            |> Array.tryFind (fun r -> 
+            |> Array.tryFind (fun r ->
                 r.MUTKOD <> 1 &&
                 r.TSITNR = id &&
                 it |> mapItem = r.TSNR
@@ -91,7 +92,7 @@ module Names =
 
     let getGenericUnits =
         fun () ->
-            getItems GenericUnit TwentyFive
+            getItems GenericUnit Fifty
         |> Memoization.memoize
 
 

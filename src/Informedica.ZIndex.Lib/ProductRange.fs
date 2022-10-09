@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module ProductRange =
 
@@ -42,10 +43,10 @@ module ProductRange =
             Indications = inds
         }
 
-    let data_ () = 
+    let data_ () =
         File.readAllLines FilePath.formulary
         |> Array.skip 1
-        |> Array.map  ((String.splitAt ';') >> (fun sa -> 
+        |> Array.map  ((String.splitAt ';') >> (fun sa ->
             create (sa.[0] |> Int32.tryParse)
                    sa.[1]
                    sa.[2]
@@ -53,7 +54,7 @@ module ProductRange =
                    sa.[4]
                    sa.[5]
                    sa.[6]
-                   sa.[7] 
+                   sa.[7]
                    sa.[8]
                    (sa.[9] |> Double.tryParse)
                    sa.[10]

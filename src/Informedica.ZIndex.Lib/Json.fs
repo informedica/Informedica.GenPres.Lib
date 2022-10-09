@@ -1,4 +1,5 @@
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
+
 
 module Json =
 

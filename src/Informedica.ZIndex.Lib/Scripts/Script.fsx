@@ -7,10 +7,15 @@ open System.Collections.Generic
 
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
-open Informedica.GenProduct.Lib
+open Informedica.ZIndex.Lib
 
 // File
 File.exists <| FilePath.GStandPath + "BST000T"
+
+Names.getGenericUnits ()
+
+Names.getShapeUnits ()
+
 
 // Load all
 printfn "Loading GenPresProduct ..."
@@ -24,7 +29,7 @@ DoseRule.load ()
 let logGenericProducts () =
     printfn "Start ..."
     let _log = new List<string>()
-    let logf s = 
+    let logf s =
         _log.Add(s)
     GenericProduct.getWithLog logf [] |> ignore
     _log.ToArray()
@@ -32,7 +37,6 @@ let logGenericProducts () =
     |> Array.iter (printfn "%s")
 
 logGenericProducts ()
-
 
 
 // ProductRange
@@ -43,7 +47,7 @@ ProductRange.data ()
 // Substance
 Substance.get()
 |> Array.sortBy (fun s -> s.Name)
-|> Array.iter (fun s -> printfn "%s" s.Name)
+|> Array.iter (fun s -> printfn $"{s.Name} {s.Mole}")
 
 
 Substance.get ()
@@ -54,21 +58,30 @@ Substance.get ()
 ConsumerProduct.get(100)
 |> printf "%A"
 
+GenPresProduct.get true
+|> Seq.length
+
+
 // GenPres product
 GenPresProduct.get true
 |> Seq.sortBy (fun gpp -> gpp.Name, gpp.Shape, gpp.Route)
-|> Seq.map (fun gpp -> gpp.Name + ", " + gpp.Shape + ", " + (gpp.Route |> String.concat "/"))
-//|> Seq.take 10
+|> Seq.map (fun gpp -> $"""{gpp.Name}, {gpp.Shape}, {gpp.Route |> String.concat "/"}""")
+|> Seq.take 200
 |> Seq.iter (fun n -> printfn "%s" n)
 
 
-GenPresProduct.filter true "paracetamol" "" ""
+GenPresProduct.filter true "paracetamol" "" "oraal"
 |> Array.map GenPresProduct.toString
 |> Array.iter (printfn "%s")
 
 // Dose rules
 DoseRule.get ()
 |> Array.length
+
+DoseRule.get ()
+|> Array.take 100
+|> Array.map DoseRule.toString2
+|> Array.iter (printfn "%s")
 
 // Get all possible dose units
 DoseRule.get()
@@ -85,10 +98,10 @@ DoseRule.get()
 
 
 // Get all dose rules for the filter
-RuleFinder.createFilter None None None None "paracetamol" "" "oraal"
+RuleFinder.createFilter None None None None "PARACETAMOL" "tablet" "ORAAL"
 |> RuleFinder.find true
 |> RuleFinder.convertToResult
-|> ignore
+
 
 DoseRule.get()
 |> Array.map (fun dr -> dr.Indication)
@@ -97,7 +110,7 @@ DoseRule.get()
 |> Array.iter (printfn "%s")
 //|> Array.length
 
-// Get all distinct indciations
+// Get all distinct indications
 DoseRule.indications ()
 |> Array.iter (printfn "%s")
 
@@ -109,7 +122,7 @@ type FrequencyTime = { Value : float; Unit : string }
 
 // Get all possible freq Time
 DoseRule.frequencies ()
-|> Array.map (fun f -> 
+|> Array.map (fun f ->
     f.Time
     |> String.replace "per " ""
 )
@@ -129,7 +142,7 @@ DoseRule.frequencies ()
             printfn "%s" v
             { Value = v |> Double.parse; Unit = u }
         | _ -> { Value = 0.; Unit = ""}
-    
+
     (t.Unit)
 )
 |> Array.iter (fun f -> printfn "%s %s" (f.Frequency |> string) (f.Time))
@@ -153,7 +166,7 @@ DoseRule.get()
 
 
 GenPresProduct.filter true "amoxiciline" "" "iv"
-|> Array.collect (fun gpp -> 
+|> Array.collect (fun gpp ->
     gpp.GenericProducts
 )
 |> Array.map (fun gp ->
@@ -183,20 +196,20 @@ RuleFinder.createFilter (Some 12.) (Some 10.) None None "paracetamol" "" ""
 DoseRule.get ()
 |> Array.filter (fun dr ->
     dr.Freq.Time = "eenmalig" && dr.Freq.Frequency > 1.0
-) 
-|> Array.iter (fun dr -> 
-    dr 
-    |> DoseRule.toString ", " 
+)
+|> Array.iter (fun dr ->
+    dr
+    |> DoseRule.toString ", "
     |> printfn "%s"
 )
 
 GenPresProduct.get true
 |> Array.iter (fun gpp ->
-    let dbls = 
+    let dbls =
         GenPresProduct.get true
         |> Array.filter (fun gpp_ -> gpp.Name = gpp_.Name && gpp.Shape = gpp_.Shape)
-    if dbls |> Array.length > 1 then 
-        dbls 
+    if dbls |> Array.length > 1 then
+        dbls
         |> Array.iter (fun gpp__ ->
             printfn "%s %s %s" gpp__.Name gpp__.Shape (gpp__.Route |> String.concat "/")
         )
@@ -204,9 +217,9 @@ GenPresProduct.get true
 
 GenPresProduct.get true
 |> Array.collect (fun gpp ->
-    gpp.GenericProducts 
+    gpp.GenericProducts
     |> Array.collect (fun gp ->
-        gp.Substances 
+        gp.Substances
         |> Array.map (fun s -> s.GenericUnit)
     )
 ) |> Array.distinct |> Array.sort
@@ -215,7 +228,7 @@ DoseRule.get ()
 |> Array.filter (fun dr ->
     dr.PrescriptionProduct |> Array.length > 0 &&
     dr.TradeProduct |> Array.length = 0
-) 
+)
 |> Array.map (DoseRule.toString ", ")
 |> Array.iter (printfn "%s")
 
@@ -226,7 +239,7 @@ let rts =
     ) |> Array.sort |> Array.distinct
 
 GenPresProduct.getRoutes()
-|> Array.filter (fun r -> 
+|> Array.filter (fun r ->
     rts
     |> Array.exists ((=) r)
     |> not
@@ -234,7 +247,7 @@ GenPresProduct.getRoutes()
 
 RuleFinder.createFilter None None None None "diclofenac" "" ""
 |> RuleFinder.find true
-|> Array.map (fun dr -> 
+|> Array.map (fun dr ->
     (dr.Routes |> Array.map RuleFinder.createRoute, dr)
 )
 |> Array.groupBy (fun (r, _) ->
@@ -244,13 +257,13 @@ RuleFinder.createFilter None None None None "diclofenac" "" ""
     let drs =
         drs
         |> Array.map snd
-        |> Array.groupBy (fun dr -> 
+        |> Array.groupBy (fun dr ->
             (dr.Gender, dr.Age, dr.Weight, dr.BSA)
         )
     (r, drs)
 )
 |> Array.map (fun (r, drs) ->
-    let drs = 
+    let drs =
         drs |> Array.map (fun (pat, drs) ->
             (pat, drs |> Array.map (DoseRule.toString ", ") |> Array.distinct)
         )
@@ -270,7 +283,7 @@ DoseRule.get ()
 DoseRule.get ()
 |> Array.filter (fun dr ->
     dr.Freq.Time |> String.contains "eenmalig" &&
-    dr.Freq.Frequency > 1. 
+    dr.Freq.Frequency > 1.
 )
 |> Array.map (DoseRule.toString ", ")
 |> Array.iter (printfn "%s")
@@ -293,7 +306,7 @@ Zindex.BST921T.records ()
 
 printfn "start"
 GenericProduct.get []
-|> Array.iter (fun gp -> 
+|> Array.iter (fun gp ->
     if gp.Substances |> Array.isEmpty then
         printfn "%s" gp.Name
 )
@@ -307,7 +320,7 @@ GenPresProduct.get true
 |> Array.distinct
 |> Array.iter (printfn "%s")
 
-// check if each substance exists 
+// check if each substance exists
 GenPresProduct.get true
 |> Array.forall (fun gpp ->
     let ss =
@@ -316,7 +329,7 @@ GenPresProduct.get true
             gp.Substances
             |> Array.map (fun s -> s.SubstanceName)
         )
-    
+
     gpp.Name |> String.split "/"
     |> List.forall (fun sn ->
         ss
@@ -356,7 +369,7 @@ let freqDoseToString (fd : FreqDose) =
         | None, Some max ->
             sprintf "tot %A %s" max u
         | None, None -> ""
-        
+
     let norm = fd.NormDose |> minmaxToString fd.Unit
     let abs = fd.AbsDose |> minmaxToString fd.Unit
     let perKg = fd.NormKg |> minmaxToString (fd.Unit + "/kg")
@@ -368,8 +381,8 @@ let freqDoseToString (fd : FreqDose) =
         if s |> String.isNullOrWhiteSpace then ""
         else lbl + ": " + s
 
-    printfn "%A %s %s %s %s %s %s %s" 
-        fd.Freq.Frequency 
+    printfn "%A %s %s %s %s %s %s %s"
+        fd.Freq.Frequency
         fd.Freq.Time
         (norm |> doseLabel "norm dose")
         (abs |> doseLabel "abs dose")
@@ -395,10 +408,10 @@ GenPresProduct.get true
 )
 |> Array.iter (fun dro ->
     match dro with
-    | Some dr -> 
+    | Some dr ->
         printfn "%s %s" dr.Product.Name (dr.Product.Route |> String.concat "/")
         dr.DoseRules |> Array.iter (printfn "%s")
-        dr.Doses 
+        dr.Doses
         |> Array.iter (fun d ->
             d |> freqDoseToString
         )
@@ -422,7 +435,7 @@ GenPresProduct.get true
 )
 |> Array.collect (fun dro ->
     match dro with
-    | Some dr -> 
+    | Some dr ->
         dr.Product.Route
     | None -> Array.empty
 )
@@ -441,9 +454,9 @@ DoseRule.get ()
 |> Array.length
 
 
-// Find a product 
+// Find a product
 let search n =
-    let contains s2 s1 = 
+    let contains s2 s1 =
         s1
         |> String.toLower
         |> String.contains (s2 |> String.toLower)

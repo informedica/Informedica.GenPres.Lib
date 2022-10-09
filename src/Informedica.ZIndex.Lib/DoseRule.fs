@@ -1,4 +1,5 @@
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
+
 
 module DoseRule =
 
@@ -12,7 +13,7 @@ module DoseRule =
 
 
     module Constants =
-            
+
         [<Literal>]
         let intensive = "intensieve"
 
@@ -58,7 +59,7 @@ module DoseRule =
             /// The list of generic products for which the dose rule applies
             GenericProduct : GenericProduct[]
             /// The list of prescription products for which the dose rule applies
-            PrescriptionProduct : Product[] 
+            PrescriptionProduct : Product[]
             /// The list of trade products for which the dose rule applies
             TradeProduct : Product[]
             /// The route for which the dose rule applies
@@ -76,33 +77,33 @@ module DoseRule =
             /// gender.
             Gender : string
             /// The optional minimum or maximum age limits for the dose rule
-            Age : MinMax 
+            Age : MinMax
             /// The optional minimum or maximum weight limits for which the dose
             /// rule applies
-            Weight : MinMax 
+            Weight : MinMax
             /// The optional BSA min/max for which the dose rule applies
-            BSA : MinMax 
+            BSA : MinMax
             /// The frequency of the dose rule. The total dose can be calculated
             /// by multiplying the dose by the frequency.
-            Freq : Frequency 
+            Freq : Frequency
             /// The normal optional min/max of the unadjusted dose
-            Norm : MinMax 
+            Norm : MinMax
             /// The absolute optional min/max of the unadjusted dose
-            Abs : MinMax 
+            Abs : MinMax
             /// The normal optional min/max of the dose adjusted by weight
-            NormKg : MinMax 
+            NormKg : MinMax
             /// The absolute optional min/max of the dose adjusted by weight
-            AbsKg : MinMax 
-            /// The absolute optional min/max of the dose adjusted by BSA 
-            NormM2 : MinMax 
+            AbsKg : MinMax
             /// The absolute optional min/max of the dose adjusted by BSA
-            AbsM2 : MinMax 
+            NormM2 : MinMax
+            /// The absolute optional min/max of the dose adjusted by BSA
+            AbsM2 : MinMax
             /// The unit in which the dose is measured
             Unit : string
         }
     and Product = { Id: int; Name: string }
-    and GenericProduct = 
-        {  
+    and GenericProduct =
+        {
             Id: int
             Name: string
             Route: string []
@@ -114,13 +115,13 @@ module DoseRule =
     and MinMax = { Min: float Option; Max: float Option }
 
 
-    let foldMinMax xs = 
+    let foldMinMax xs =
         xs |> Array.fold (fun { Min = min; Max = max} (acc: MinMax) ->
             { Min = Option.min acc.Min min; Max = Option.max acc.Max max }
         ) { Min = None; Max = None }
 
 
-    let freqToString (freq : Frequency) = 
+    let freqToString (freq : Frequency) =
         (string freq.Frequency) + " " + freq.Time
 
 
@@ -128,53 +129,53 @@ module DoseRule =
         let minMaxToString n u p (mm: MinMax) s =
             let mms =
                 match mm.Min, mm.Max with
-                | Some min, Some max -> 
+                | Some min, Some max ->
                     let min = Double.fixPrecision p min |> string
                     let max = Double.fixPrecision p max |> string
                     sprintf "%s - %s" min max
-                | Some min, None -> 
+                | Some min, None ->
                     let min = Double.fixPrecision p min |> string
                     sprintf "vanaf %s" min
-                | None, Some max -> 
+                | None, Some max ->
                     if max = 0. then ""
-                    else 
+                    else
                         let max = Double.fixPrecision p max |> string
                         sprintf "tot %s" max
-                | None, None -> ""  
+                | None, None -> ""
             if mms = "" then s
             else
                 s + n + ": " + mms + " " + u + del
 
-        let adds s1 s2 s3 = 
+        let adds s1 s2 s3 =
             if s2 |> String.IsNullOrWhiteSpace then s3
-            else 
+            else
                 let s3 = if s1 = "" then s3 else s3 + s1 + ": "
                 s3 + s2 + del
 
-        let gp = 
-            r.GenericProduct |> Seq.fold(fun a gp -> 
+        let gp =
+            r.GenericProduct |> Seq.fold(fun a gp ->
                 let s' = if a |> String.IsNullOrWhiteSpace then "" else ", "
                 s' + gp.Name) ""
 
-        let pp = 
-            r.PrescriptionProduct |> Seq.fold(fun a gp -> 
+        let pp =
+            r.PrescriptionProduct |> Seq.fold(fun a gp ->
                 let s' = if a |> String.IsNullOrWhiteSpace then "" else ", "
                 s' + gp.Name) ""
 
-        let tp = 
-            r.TradeProduct |> Seq.fold(fun a gp -> 
+        let tp =
+            r.TradeProduct |> Seq.fold(fun a gp ->
                 let s' = if a |> String.IsNullOrWhiteSpace then "" else ", "
                 s' + gp.Name) ""
 
         let s = "" + (string r.Id) + del
-        let s = s |> adds "" gp 
-        let s = s |> adds "" pp 
+        let s = s |> adds "" gp
+        let s = s |> adds "" pp
         let s = s |> adds "" tp
         let s = s |> adds "Gebruik" r.Usage
         let s = s |> adds "Groep" r.CareGroup
         let s = s |> adds "Type" r.DoseType
         let s = s |> adds "Route" (r.Routes |> String.concat "/")
-        let s = s |> adds "Indicatie" r.Indication 
+        let s = s |> adds "Indicatie" r.Indication
 
         let s = if r.HighRisk then s + "Hig Risk " else s
 
@@ -184,7 +185,7 @@ module DoseRule =
         let s = s |> minMaxToString "Gewicht" "kg" 3 r.Weight
         let s = s |> minMaxToString "BSA" "m2" 3 r.BSA
 
-        let s = 
+        let s =
             if r.Freq.Frequency <= 0. then s
             else
                 s + "Freq: " + (r.Freq |> freqToString) + " " + del
@@ -196,7 +197,7 @@ module DoseRule =
 
         let s = s |> minMaxToString "Norm/m2" r.Unit 3 r.NormM2
         let s = s |> minMaxToString "Abs/m2" r.Unit 3 r.AbsM2
-        
+
         let s = s |> String.subString 0 ((s |> String.length) - (del |> String.length))
         s
 
@@ -209,7 +210,7 @@ module DoseRule =
     let createFrequency fr tm = { Frequency = fr; Time = tm }
 
     let createMinMax mn mx =
-    
+
         let chkmx =
             mx
             |> string
@@ -219,7 +220,7 @@ module DoseRule =
         else
             let mn = if mn = 0. then None else Some mn
             let mx = if mx = 0. || chkmx then None else Some mx
-        
+
             { Min = mn; Max = mx }
 
     let create id gr us dt gp pr tr rt ci ic hr sx ag wt bs fr no ab nk ak nm am un =
@@ -249,8 +250,8 @@ module DoseRule =
             Unit = un
         }
 
-      
-    let empty = 
+
+    let empty =
         {
             Id = 0
             CareGroup = ""
@@ -280,7 +281,7 @@ module DoseRule =
 
     let _getGenericProducts () =
         GenPresProduct.get true
-        |> Array.collect (fun gpp -> 
+        |> Array.collect (fun gpp ->
             gpp.GenericProducts
             |> Array.map (fun gp -> gp.Id)
         )
@@ -288,7 +289,7 @@ module DoseRule =
         |> Array.toList
         |> GenericProduct.get
         |> Array.map (fun gp ->
-            let unt = 
+            let unt =
                 gp.Substances
                 |> Array.fold (fun acc s ->
                     if acc = "" then s.ShapeUnit else acc
@@ -300,7 +301,7 @@ module DoseRule =
                 Unit = unt
                 Substances =
                     gp.Substances
-                    |> Array.map (fun s -> 
+                    |> Array.map (fun s ->
                         {
                             Name = s.SubstanceName
                             Quantity = s.SubstanceQuantity
@@ -310,7 +311,7 @@ module DoseRule =
             }
         )
 
-    let getGenericProducts : unit -> GenericProduct[] = 
+    let getGenericProducts : unit -> GenericProduct[] =
         Memoization.memoize _getGenericProducts
 
 
@@ -320,7 +321,7 @@ module DoseRule =
             join nm in Zindex.BST020T.records ()
                 on (p.PRNMNR = nm.NMNR)
             where (p.MUTKOD <> 1)
-            select 
+            select
                 (
                     createProduct p.PRKODE
                                   (nm.NMNAAM.Trim())
@@ -338,7 +339,7 @@ module DoseRule =
             join nm in Zindex.BST020T.records ()
                 on (p.HPNAMN = nm.NMNR)
             where (p.MUTKOD <> 1)
-            select 
+            select
                 (
                     createProduct p.HPKODE
                                   (nm.NMNAAM.Trim())
@@ -350,13 +351,13 @@ module DoseRule =
         Memoization.memoize _getTradeProducts
 
 
-    let getICPCRoute (icp : Zindex.BST642T.BST642T) = 
+    let getICPCRoute (icp : Zindex.BST642T.BST642T) =
         let r = Names.getThes icp.GPKTWG Names.Route Names.Fifty
         if r = "TOEDIENINGSWEG NIET INGEVULD" ||
            r = "PARENTERAAL" then Array.empty
         else [|r|]
         |> Array.collect (fun r ->
-            r 
+            r
             |> String.splitAt ','
             |> Array.map String.trim
         )
@@ -368,7 +369,7 @@ module DoseRule =
             tx.TSNR = bas.GPDCTH &&
             tx.TSITNR = bas.GPDCOD
         )
-        |> (fun r -> 
+        |> (fun r ->
             if r |> Option.isNone then ""
             else r.Value.THNM50.Trim())
 
@@ -377,20 +378,20 @@ module DoseRule =
         Zindex.BST380T.records ()
         |> Array.tryFind (fun i ->
             i.ICPCNR1 = icp.ICPCNR1
-        ) 
+        )
         |> (fun r ->
             if r.IsNone then ""
             else r.Value.ICPCTXT.Trim()
         )
 
 
-    let getFrequency (cat: Zindex.BST643T.BST643T) = 
+    let getFrequency (cat: Zindex.BST643T.BST643T) =
         Zindex.BST360T.records ()
-        |> Array.tryFind (fun tx -> 
+        |> Array.tryFind (fun tx ->
             tx.MUTKOD <> 1 &&
-            tx.TTEHNR = cat.GPDFEE 
+            tx.TTEHNR = cat.GPDFEE
         )
-        |> (fun r -> 
+        |> (fun r ->
             if r |> Option.isNone then ""
             else r.Value.TTEHOM.Trim())
 
@@ -408,10 +409,10 @@ module DoseRule =
             join cat in Zindex.BST643T.records ()
                 on (dos.GPDDNR = cat.GPDDNR)
             // get many to 1 all dose indications
-            join icp in Zindex.BST642T.records () 
+            join icp in Zindex.BST642T.records ()
                 on (cat.GPDCAT = icp.GPDCAT)
             // get many to 1 all prescription and trade products
-            join bas in Zindex.BST641T.records () 
+            join bas in Zindex.BST641T.records ()
                 on (icp.GPDBAS = bas.GPDBAS)
             // get many to 1 all generic products
             join vas in Zindex.BST640T.records ()
@@ -425,9 +426,9 @@ module DoseRule =
                    gpks |> Array.exists ((=) bas.GPKODE))
 
             select
-                ((bas.GPKODE, bas.PRKODE, bas.HPKODE), 
-                { 
-                    empty with 
+                ((bas.GPKODE, bas.PRKODE, bas.HPKODE),
+                {
+                    empty with
                         Id           = dos.GPDDNR
                         Routes       = getICPCRoute icp
                         DoseType     = getDoseType bas
@@ -455,35 +456,35 @@ module DoseRule =
                         BSA    = createMinMax cat.GPDM2M cat.GPDM2X
                         Freq   = getFrequency cat
                         Norm   = createMinMax dos.GPNRMMIN dos.GPNRMMAX
-                        Abs    = createMinMax dos.GPABSMIN dos.GPABSMAX 
+                        Abs    = createMinMax dos.GPABSMIN dos.GPABSMAX
                         NormKg = createMinMax dos.GPNRMMINK dos.GPNRMMAXK
                         AbsKg  = createMinMax dos.GPABSMINK dos.GPABSMAXK
                         NormM2 = createMinMax dos.GPNRMMINM dos.GPNRMMAXM
                         AbsM2  = createMinMax dos.GPABSMINM dos.GPABSMAXM
-                })      
+                })
         }
         |> Seq.toArray
         // Get Generic products
         |> Array.map ((fun (bas, r) ->
             let (gpk, _, _) = bas
-            let gpks = 
+            let gpks =
                 getGenericProducts ()
-                |> Array.filter (fun gp -> 
+                |> Array.filter (fun gp ->
                         gp.Id = gpk
                     )
-            let rt = 
-                if (r.Routes |> Array.isEmpty) 
-                then 
-                    gpks 
+            let rt =
+                if (r.Routes |> Array.isEmpty)
+                then
+                    gpks
                     |> Array.collect (fun gp ->
                         gp.Route
                     )
                 else r.Routes
-            let un = 
+            let un =
                 match gpks |> Array.tryHead with
                 | Some gp -> gp.Unit
                 | None -> ""
-            let r = 
+            let r =
                 {
                     r with
                         GenericProduct = gpks
@@ -494,7 +495,7 @@ module DoseRule =
         // Get prescription products
          ) >> (fun (bas, r) ->
             let (_, prk, _) = bas
-            let prks = 
+            let prks =
                 getPresciptionProducts ()
                 |> Array.filter (fun pp ->
                     pp.Id = prk
@@ -503,7 +504,7 @@ module DoseRule =
         // Get trade products
         ) >> (fun (bas, r) ->
             let (_, _, hpk) = bas
-            let hpks = 
+            let hpks =
                 getTradeProducts ()
                 |> Array.filter (fun tp ->
                     tp.Id = hpk
@@ -516,10 +517,10 @@ module DoseRule =
         if FilePath.ruleCache |> File.exists then
             FilePath.ruleCache
             |> Json.getCache<DoseRule[]>
-        else 
+        else
             printfn "No cache creating DoseRule"
             let rules = GenPresProduct.getGPKS true |> parse
-            rules |> Json.cache FilePath.ruleCache 
+            rules |> Json.cache FilePath.ruleCache
             rules
 
     let get : unit -> DoseRule [] = Memoization.memoize _get
@@ -527,7 +528,7 @@ module DoseRule =
     let load () = get () |> ignore
 
     let toString2 (dr : DoseRule) =
-        let addString lbl s = 
+        let addString lbl s =
             if s = "" then ""
             else
                 lbl + ": " + s + ", "
@@ -535,12 +536,12 @@ module DoseRule =
         let freqToString (fr: Frequency) =
             (fr.Frequency |> string) + " " + (fr.Time |> string)
 
-        let optToString pre post o = 
+        let optToString pre post o =
             let s =
-                if o |> Option.isSome then o |> Option.get |> string else "" 
+                if o |> Option.isSome then o |> Option.get |> string else ""
             if s = "" then "" else pre + " " +  s + " " + post
 
-        let minMaxToString u (mm: MinMax) = 
+        let minMaxToString u (mm: MinMax) =
             let s =
                 match mm.Min, mm.Max with
                 | None, None -> ""
@@ -594,42 +595,42 @@ module DoseRule =
 
 
     type DoseRule with
-        
+
         static member Weight_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.Weight) ,
             (fun mm dr -> { dr with Weight = mm })
-        
+
         static member BSA_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.BSA) ,
             (fun mm dr -> { dr with BSA = mm })
-        
+
         static member Norm_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.Norm) ,
             (fun mm dr -> { dr with Norm = mm })
-        
+
         static member Abs_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.Abs) ,
             (fun mm dr -> { dr with Abs = mm })
-        
+
         static member NormKg_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.NormKg) ,
             (fun mm dr -> { dr with NormKg = mm })
-        
+
         static member AbsKg_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.AbsKg) ,
             (fun mm dr -> { dr with AbsKg = mm })
-        
+
         static member NormM2_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.NormM2) ,
             (fun mm dr -> { dr with NormM2 = mm })
-        
+
         static member AbsM2_ :
             (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
             (fun dr -> dr.AbsM2) ,

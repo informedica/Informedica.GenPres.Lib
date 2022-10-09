@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
 
 // Tabel: BST001T: Bestand 001 Rubrieken
 // ---------------
@@ -24,15 +24,16 @@ module BST001T =
 
 
     let name = "BST001T"
-        
+
     let posl = [ 0004; 0001; 0020; 0003; 0010; 0050; 0008; 0002; 0001; 0004; 0002; 0006; 0017 ]
 
     type BST001T =
-        { 
+        {
             MUTKOD: string
             MDBST: string
-            MDRNAM: string 
-            MDROMS: string 
+            MDVNR: int
+            MDRNAM: string
+            MDROMS: string
             MDRSLE: string
             MDRTYP: string
             MDRLEN: int
@@ -40,24 +41,25 @@ module BST001T =
             MDROPM: string
         }
 
-    let create mk tb nm bs ke tp ln dc fm =
-        { 
+    let create mk tb vn nm bs ke tp ln dc fm =
+        {
             MUTKOD = mk
             MDBST  = tb
+            MDVNR = vn
             MDRNAM = nm
-            MDROMS = bs 
+            MDROMS = bs
             MDRSLE = ke
             MDRTYP = tp
             MDRLEN = ln
-            MDRDEC = dc 
+            MDRDEC = dc
             MDROPM = fm
         }
 
-    let pickList = [1..2] @ [4..5] @ [7..11]
+    let pickList = [1..5] @ [7..11]
 
-    let data _ =  
+    let data _ =
         FilePath.GStandPath + "/" + name
-        |> File.readAllLines 
+        |> File.readAllLines
         |> Array.filter (String.length >> ((<) 10))
         |> Array.map (Parser.splitRecord posl)
         |> Array.map (Array.map String.trim)
@@ -68,10 +70,13 @@ module BST001T =
     let records _ =
         _data
         |> Array.map (fun d ->
-            let ln = Int32.Parse d.[6]
-            let dc = Int32.Parse d.[7]
-            create d.[0] d.[1] d.[2] d.[3] d.[4] d.[5] ln dc d.[8])
+            let vn = Int32.Parse d.[2]
+            let ln = Int32.Parse d.[7]
+            let dc = Int32.Parse d.[8]
+            create d.[0] d.[1] vn d.[3] d.[4] d.[5] d.[6] ln dc d.[9])
         |> Array.filter (fun r -> r.MUTKOD <> "1")
+        |> Array.sortBy (fun r -> r.MDBST, r.MDVNR)
+
 
     let _records = records ()
 
@@ -87,7 +92,7 @@ module BST001T =
         |> Seq.sumBy (fun r -> r.MDRLEN)
 
     let columns n =
-        _records 
+        _records
         |> Seq.filter (fun r -> r.MDBST = n)
         |> Seq.filter (fun r -> r.MDRNAM <> "******")
 
@@ -97,45 +102,44 @@ module BST001T =
         let tab = "    "
         let s = sprintf "type %s =\n" n
         let s = s + sprintf "%s%s%s{\n" tab tab tab
-        let s = 
+        let s =
             s + (
                 columns n
                 |> Seq.pickSeq pl
-                |> Seq.fold (fun s c -> 
-                    let t = 
-                        if c.MDRTYP = "N" then 
+                |> Seq.fold (fun s c ->
+                    let t =
+                        if c.MDRTYP = "N" then
                             if c.MDROPM |> Parser.isDoubleFormat then "float" else "int"
                         else "string"
                     s + sprintf "%s%s%s%s%s : %s\n" tab tab tab tab c.MDRNAM t) "")
         s + (sprintf "%s%s%s}\n" tab tab tab)
-        
+
     let createString n pl =
         let tab = "    "
-        let cs = 
+        let cs =
             columns n
             |> Seq.pickSeq pl
-        let args = 
-            cs 
-            |> Seq.fold (fun s c -> 
+        let args =
+            cs
+            |> Seq.fold (fun s c ->
                 s + c.MDRNAM.ToLower() + " " ) ""
-             
+
         let s = sprintf "let create %s =\n" args
         let s = s + sprintf "%s%s%s{\n" tab tab tab
-        let s = 
+        let s =
             s + (
                 cs
-                |> Seq.fold (fun s c -> 
-                let m = 
-                    if c.MDRTYP = "N" then 
+                |> Seq.fold (fun s c ->
+                let m =
+                    if c.MDRTYP = "N" then
                         let typ, opm = "\"" + c.MDRTYP + "\"", "\"" + c.MDROPM + "\""
-                        if c.MDROPM |> Parser.isDoubleFormat then 
+                        if c.MDROPM |> Parser.isDoubleFormat then
                             sprintf "|> ((Parser.parseValue %s %s) >> Double.parse)"
                                     typ opm
-                        else 
+                        else
                             sprintf "|> ((Parser.parseValue %s %s) >> Int32.parse)"
                                     typ opm
                     elif c.MDRNAM = "ATCODE" then ""
                     else "|> String.trim"
                 s + sprintf "%s%s%s%s%s = %s %s\n" tab tab tab tab c.MDRNAM (c.MDRNAM.ToLower()) m) "")
         s + (sprintf "%s%s%s}\n" tab tab tab)
-        

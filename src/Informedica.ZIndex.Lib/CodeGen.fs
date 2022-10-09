@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module CodeGen =
 
@@ -16,18 +17,18 @@ module CodeGen =
         {record}
 
         {create}
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = {pickList}
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map {map}
 
         let records : unit -> {n} [] = Memoization.memoize _records
 
-    """ 
+    """
 
     [<Literal>]
     let zindexCode = """
@@ -42,16 +43,16 @@ module Zindex =
     {code}
 
     """
-    
-    let generate n pl = 
+
+    let generate n pl =
         let cm = BST000T.commentString n pl
         let rc = BST001T.recordString n pl
         let cr = BST001T.createString n pl
-        let mp = 
+        let mp =
             let pl = if pl = [] then [0..(BST001T.columnCount n - 1)] else [0..((pl |> List.length) - 1)]
-            let args = 
-                pl 
-                |> List.fold (fun s p -> s + " (xs |> Array.item " + (string) p + ")") "" 
+            let args =
+                pl
+                |> List.fold (fun s p -> s + " (xs |> Array.item " + (string) p + ")") ""
             "(fun xs -> create {args})"
             |> String.replace "{args}" args
 
@@ -62,7 +63,7 @@ module Zindex =
         |> String.replace "{record}" rc
         |> String.replace "{create}" cr
         |> String.replace "{map}" mp
-    
+
     let tabelList =
         [
             ("BST004T", [1;2;3;4;11;12])
@@ -92,20 +93,20 @@ module Zindex =
     let generateZIndex tl =
         let code =
             tl
-            |> List.fold (fun s (tb, pl) -> 
+            |> List.fold (fun s (tb, pl) ->
                     s + "\n" + generate tb pl
                 ) ""
 
         let comment =
             let s = "/// <summary>\n"
-            
+
             (tl
             |> List.fold (fun s (n, _) ->
                 let t = BST000T.table n
                 s + "/// <para>" + t.MDBST + ": " + t.MDOBST + "</para>\n"
             ) s) + "/// </summary>"
 
-        zindexCode 
+        zindexCode
         |> String.replace "{code}" code
         |> String.replace "{comment}" comment
 

@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module PrescriptionProduct =
 
@@ -26,18 +27,18 @@ module PrescriptionProduct =
             TradeProducts = ps
         }
 
-    let _get id = 
+    let _get id =
         Zindex.BST051T.records ()
-        |> Array.filter (fun r -> 
-            r.MUTKOD <> 1 && 
-            r.GPKODE = id && 
+        |> Array.filter (fun r ->
+            r.MUTKOD <> 1 &&
+            r.GPKODE = id &&
             Zindex.BST050T.records ()
-            |> Array.exists (fun r' -> 
+            |> Array.exists (fun r' ->
                 r'.PRKODE = r.PRKODE
             )
         )
-        |> Array.map (fun r -> 
-            let p = 
+        |> Array.map (fun r ->
+            let p =
                 Zindex.BST050T.records ()
                 |> Array.find (fun r' -> r'.PRKODE = r.PRKODE)
             let nm = Names.getName p.PRNMNR Names.Full
@@ -45,6 +46,7 @@ module PrescriptionProduct =
             let un = Names.getThes r.XPEHHV Names.GenericUnit Names.Fifty
             let ct = Names.getThes r.HPEMBT Names.PrescriptionContainer Names.Fifty
             let ps = TradeProduct.get r.PRKODE
+
             create r.PRKODE nm lb r.HPGALG un ct ps
         )
 

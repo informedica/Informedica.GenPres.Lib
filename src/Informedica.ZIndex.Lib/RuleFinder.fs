@@ -1,4 +1,4 @@
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
 
 module RuleFinder =
 
@@ -74,7 +74,7 @@ module RuleFinder =
     // UTERIEN
     // VAGINAAL
 
-    type Route = 
+    type Route =
         | AUR // AURICULAIR OOR
         | CUT // CUTAAN TRANSDERMAAL TRANSDERML LOKAAL
         | ENDOTR // ENDOTR.PULM ENDOTRACHEOPULMONAIR
@@ -91,7 +91,7 @@ module RuleFinder =
         | NoRoute
 
     let routeMapping =
-        [ 
+        [
             (AUR, ["AURICULAIR"; "OOR"])
             (CUT, [ "CUTAAN"; "TRANSDERMAAL"; "TRANSDERML"; "LOKAAL"])
             (ENDOTR, ["ENDOTR.PULM"; "ENDOTRACHEOPULMONAIR"])
@@ -107,28 +107,28 @@ module RuleFinder =
             (SUBCUT, ["SUBCUTAAN"; "SC"])
         ]
 
-    let createRoute s = 
-        let m = 
-            routeMapping 
-            |> List.tryFind (fun (_, rs) -> 
-                rs 
+    let createRoute s =
+        let m =
+            routeMapping
+            |> List.tryFind (fun (_, rs) ->
+                rs
                 |> List.exists (String.equalsCapInsens s)
             )
         match m with
         | Some (r, _) -> r
         | _ -> NoRoute
 
-    let eqsRoute r rs = 
+    let eqsRoute r rs =
         if r = NoRoute then true
         else
-            rs 
+            rs
             |> Array.map createRoute
             |> Array.exists ((=) r)
 
     type AgeInMo = float Option
 
     type WeightInKg = float Option
-    
+
     type BSAInM2 = float Option
 
     let inRange n { DoseRule.Min = min; DoseRule.Max = max } =
@@ -151,13 +151,13 @@ module RuleFinder =
     type ProductFilter =
         | GPKRoute of (int * string)
         | GenericShapeRoute of GenericShapeRoute
-    and GenericShapeRoute = 
+    and GenericShapeRoute =
         {
             Generic: string
             Shape: string
             Route: string
         }
-    
+
 
     type Filter =
         {
@@ -167,7 +167,7 @@ module RuleFinder =
 
     let createFilter age wght bsa gpk gen shp rte =
         let pat = { Age = age; Weight = wght; BSA = bsa }
-        let prod = 
+        let prod =
             if gpk |> Option.isSome then
                 (gpk |> Option.get, rte)
                 |> GPKRoute
@@ -185,23 +185,23 @@ module RuleFinder =
     let createGPKRouteFilter gpk rte = createFilter None None None gpk "" "" rte
 
     let find all { Patient = pat; Product = prod } =
-        let r = 
+        let r =
             match prod with
             | GPKRoute (_, route)   -> route
-            | GenericShapeRoute gsr -> gsr.Route 
-            |> createRoute 
+            | GenericShapeRoute gsr -> gsr.Route
+            |> createRoute
 
         match prod with
         | GPKRoute (gpk, _) -> [| gpk |]
         | GenericShapeRoute gsr ->
             GenPresProduct.filter all gsr.Generic gsr.Shape gsr.Route
-            |> Array.collect (fun gpp -> 
-                gpp.GenericProducts 
+            |> Array.collect (fun gpp ->
+                gpp.GenericProducts
                 |> Array.map (fun gp -> gp.Id)
             )
         |> Array.collect (fun gpk ->
             DoseRule.get ()
-            |> Array.filter (fun dr -> 
+            |> Array.filter (fun dr ->
                 (dr.CareGroup = DoseRule.Constants.intensive || dr.CareGroup = DoseRule.Constants.all)
                 && dr.GenericProduct |> Array.exists (fun gp -> gp.Id = gpk)
                 && dr.Routes |> eqsRoute r
@@ -265,7 +265,7 @@ module RuleFinder =
             AbsM2 = absM2
             Unit = un
         }
-     
+
 
     let convertToResult (drs : DoseRule.DoseRule  []) =
 
@@ -289,7 +289,7 @@ module RuleFinder =
                 if tail |> List.forall (fun mm -> mm.BSA = h.Weight) then h.BSA
                 else DoseRule.minmax
 
-        // Alle dose rules should apply to the same 
+        // Alle dose rules should apply to the same
         // GenPresProduct
         let gpp =
             drs
@@ -298,24 +298,24 @@ module RuleFinder =
                 |> Array.map (fun gp -> gp.Id)
             )
             |> Array.distinct
-            |> Array.collect GenPresProduct.findByGPK 
+            |> Array.collect GenPresProduct.findByGPK
             |> (fun gpps ->
                 if gpps |> Array.isEmpty then None
                 else
                     gpps
-                    |> Array.fold (fun acc gpp -> 
+                    |> Array.fold (fun acc gpp ->
                         match acc with
                         | Some gpp' -> if gpp' = gpp then acc else None
                         | None -> None
                     ) (Some gpps.[0])
-            ) 
+            )
 
         match gpp with
         | Some gpp' ->
             let multMinMax f n { DoseRule.Min = min; DoseRule.Max = max } =
                 let m = f * n
 
-                let mn, mx = 
+                let mn, mx =
                     match min, max with
                     | None, None           -> (0., 0.)
                     | Some min', None      -> (min' * m, 0.)
@@ -324,21 +324,21 @@ module RuleFinder =
 
                 DoseRule.createMinMax mn mx
 
-            let gpks (dr : DoseRule.DoseRule) = 
-                dr.GenericProduct 
-                |> Array.map (fun gp -> gp.Id) 
+            let gpks (dr : DoseRule.DoseRule) =
+                dr.GenericProduct
+                |> Array.map (fun gp -> gp.Id)
                 |> Array.toList
                 |> GenericProduct.get
 
 
             // Calculate the normal min max dose
-            let calcDose get drs = 
+            let calcDose get drs =
                 drs
-                |> Array.collect (fun dr -> 
+                |> Array.collect (fun dr ->
                     dr
                     |> gpks
                     |> Array.map (fun gp ->
-                        let n = 
+                        let n =
                             (gp.Substances
                             |> Array.head).SubstanceQuantity
                         dr |> get |> multMinMax dr.Freq.Frequency n)
@@ -353,19 +353,19 @@ module RuleFinder =
             let abs = calcDose DoseRule.Optics.getAbs
 
             // Calculate the normal min max dose per kg
-            let normKg = calcDose DoseRule.Optics.getNormKg 
+            let normKg = calcDose DoseRule.Optics.getNormKg
 
             // Calculate the absolute min max dose per kg
-            let absKg = calcDose DoseRule.Optics.getAbsKg 
+            let absKg = calcDose DoseRule.Optics.getAbsKg
 
             // Calculate the normal min max dose per m2
-            let normM2 = calcDose DoseRule.Optics.getNormM2 
+            let normM2 = calcDose DoseRule.Optics.getNormM2
 
             // Calculate the absolute min max dose per m2
-            let absM2 = calcDose DoseRule.Optics.getAbsM2 
+            let absM2 = calcDose DoseRule.Optics.getAbsM2
 
-            let calcNoneAndAdjusted 
-                (calcAdj   : DoseRule.DoseRule [] -> DoseRule.MinMax) 
+            let calcNoneAndAdjusted
+                (calcAdj   : DoseRule.DoseRule [] -> DoseRule.MinMax)
                 (calcNorm  : DoseRule.DoseRule [] -> DoseRule.MinMax)
                 (calcPerKg : DoseRule.DoseRule [] -> DoseRule.MinMax) drs =
 
@@ -376,14 +376,14 @@ module RuleFinder =
                 let calc op x1 x2 y =
                     match y with
                     | Some _ -> y
-                    | None -> 
+                    | None ->
                         match x1, x2 with
                         | Some x1_, Some x2_ -> (x1_ |> op <| x2_) |> Some
                         | _ -> y
 
                 // Norm.min = PerKg.min * Wght.min
                 // Norm.max = PerKg.max * Wght.max
-                { norm with 
+                { norm with
                     Min = norm.Min |> calc (*) perKg.Min wght.Min
                     Max = norm.Max |> calc (*) perKg.Max wght.Max } ,
                 // PerKg.min = Norm.min / Wght.max
@@ -422,19 +422,19 @@ module RuleFinder =
                     let drs' =
                         drs
                         |> Array.filter (fun dr -> dr.Freq = fr)
-                    createFreqDose 
-                        fr 
-                        ([| drs' |> calcNormPerKg |> fst; drs' |> calcNormPerM2 |> fst |] |> DoseRule.foldMinMax ) 
-                        ([| drs' |> calcAbsPerKg  |> fst; drs' |> calcAbsPerM2  |> fst |] |> DoseRule.foldMinMax ) 
-                        (drs' |> calcNormPerKg |> snd) 
-                        (drs' |> calcAbsPerKg  |> snd) 
-                        (drs' |> calcNormPerM2 |> snd) 
-                        (drs' |> calcAbsPerM2  |> snd) 
+                    createFreqDose
+                        fr
+                        ([| drs' |> calcNormPerKg |> fst; drs' |> calcNormPerM2 |> fst |] |> DoseRule.foldMinMax )
+                        ([| drs' |> calcAbsPerKg  |> fst; drs' |> calcAbsPerM2  |> fst |] |> DoseRule.foldMinMax )
+                        (drs' |> calcNormPerKg |> snd)
+                        (drs' |> calcAbsPerKg  |> snd)
+                        (drs' |> calcNormPerM2 |> snd)
+                        (drs' |> calcAbsPerM2  |> snd)
                         (drs' |> un)
                 )
 
-            createResult gpp' (drs |> Array.map (DoseRule.toString ", ")) freqs 
+            createResult gpp' (drs |> Array.map (DoseRule.toString ", ")) freqs
             |> Some
-        
+
         | None -> None
 

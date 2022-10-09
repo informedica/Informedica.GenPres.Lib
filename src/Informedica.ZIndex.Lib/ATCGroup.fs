@@ -1,4 +1,4 @@
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
 
 module ATCGroup =
 
@@ -49,25 +49,25 @@ module ATCGroup =
             Routes = rts
         }
 
-    let empty = create "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" 
+    let empty = create "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
 
     let parse gpks =
         query {
             for gpk in Zindex.BST711T.records () do
-            join main in Zindex.BST801T.records () 
+            join main in Zindex.BST801T.records ()
                 on (gpk.ATCODE.Substring(0, 1) = main.ATCODE.Trim())
-            join ther in Zindex.BST801T.records () 
+            join ther in Zindex.BST801T.records ()
                 on (gpk.ATCODE.Substring(0, 3) = ther.ATCODE.Trim())
-            join thes in Zindex.BST801T.records () 
+            join thes in Zindex.BST801T.records ()
                 on (gpk.ATCODE.Substring(0, 4) = thes.ATCODE.Trim())
-            join phar in Zindex.BST801T.records () 
+            join phar in Zindex.BST801T.records ()
                 on (gpk.ATCODE.Substring(0, 5) = phar.ATCODE.Trim())
-            join subs in Zindex.BST801T.records () 
+            join subs in Zindex.BST801T.records ()
                 on (gpk.ATCODE.Substring(0, 7) = subs.ATCODE.Trim())
 
             let shape = Names.getThes gpk.GPKTVR Names.Shape Names.Fifty
 
-            let generic = 
+            let generic =
                 query {
                     for spk in
                         Zindex.BST720T.records ()
@@ -77,9 +77,9 @@ module ATCGroup =
                     join gngnk in Zindex.BST750T.records ()
                         on (ssk.GNSTAM = gngnk.GNGNK)
                     select gngnk.GNGNAM
-                } 
+                }
                 |> Seq.toArray
-                |> Seq.fold (fun a s -> 
+                |> Seq.fold (fun a s ->
                     if a = "" then s
                     else a + "/" + s) ""
 
@@ -87,16 +87,16 @@ module ATCGroup =
 
                 let rt =
                     Zindex.BST051T.records ()
-                    |> Array.filter (fun r -> 
-                        r.MUTKOD <> 1 && 
+                    |> Array.filter (fun r ->
+                        r.MUTKOD <> 1 &&
                         r.GPKODE = gpk.GPKODE
                     )
                     |> Array.collect (fun r ->
                         Zindex.BST031T.records ()
                         |> Array.filter (fun r' ->
                             r'.MUTKOD <> 1 &&
-                            r'.PRKODE = r.PRKODE 
-                        )    
+                            r'.PRKODE = r.PRKODE
+                        )
                     )
                     |> Array.collect (fun r ->
                         Zindex.BST760T.records ()
@@ -120,7 +120,7 @@ module ATCGroup =
                     match
                         DoseRule.getGenericProducts ()
                         |> Array.tryFind (fun r -> r.Id = gpk.GPKODE) with
-                    | Some p -> 
+                    | Some p ->
                         if p.Route |> Array.isEmpty || p.Route |> Array.length > 1 then ""
                         else p.Route.[0]
                     | None -> ""
@@ -134,7 +134,7 @@ module ATCGroup =
                    subs.MUTKOD <> 1 &&
                    gpks |> Array.exists ((=) gpk.GPKODE))
 
-            select 
+            select
                 ({
                     empty with
                         ATC1 = main.ATCODE.Trim()
@@ -155,7 +155,7 @@ module ATCGroup =
                         Generic = generic
                         Shape = shape
                         Routes = route
-                })        
+                })
         }
         |> Seq.toArray
         |> Array.distinct
@@ -164,7 +164,7 @@ module ATCGroup =
         if FilePath.groupCache |> File.exists then
             FilePath.groupCache
             |> Json.getCache
-        else 
+        else
             printfn "No cache creating group.cache"
             let grps = GenPresProduct.getGPKS true |> parse
             grps |> Json.cache FilePath.groupCache

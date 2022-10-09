@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module TradeProduct =
 
@@ -31,16 +32,16 @@ module TradeProduct =
 
     let _get id =
         Zindex.BST031T.records ()
-        |> Array.filter (fun r  -> 
+        |> Array.filter (fun r  ->
             r.MUTKOD <> 1 &&
             r.PRKODE = id
         )
-        |> Array.map (fun r -> 
+        |> Array.map (fun r ->
             let nm = Names.getName r.HPNAMN Names.Full
             let lb = Names.getName r.HPNAMN Names.Label
             let ps = ConsumerProduct.get r.HPKODE
 
-            let rt = 
+            let rt =
                 Zindex.BST760T.records ()
                 |> Array.filter (fun x -> x.HPKODE = r.HPKODE)
                 |> Array.map (fun x -> x.ENKTDW)

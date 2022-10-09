@@ -1,4 +1,5 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
+
 
 module Substance =
 
@@ -12,7 +13,7 @@ module Substance =
             MoleReal : float
         }
 
-    let create id nm ms mr = 
+    let create id nm ms mr =
         {
             Id = id
             Name = nm
@@ -27,7 +28,7 @@ module Substance =
         |> Array.filter (fun r -> r.MUTKOD <> 1)
         |> Array.map (fun r ->
             create r.GNGNK r.GNGNAM r.GNMOLE r.GNMOLS)
-        
+
     let _get _ =
         if FilePath.substanceCache  |> File.exists then
             FilePath.substanceCache

@@ -31,9 +31,11 @@ open Informedica.Utils.Lib
 
 let zindexPath = __SOURCE_DIRECTORY__ |> Path.combineWith "../../../"
 
-// Check the path to the zindex 
+// Check the path to the zindex
 zindexPath
 |> Path.combineWith "data/zindex/BST000T"
 |> File.exists
 
 Environment.CurrentDirectory <- zindexPath
+
+#time

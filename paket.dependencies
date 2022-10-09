@@ -9,7 +9,5 @@ nuget MathNet.Numerics.FSharp
 nuget Microsoft.Net.Test.Sdk
 nuget Unquote
 nuget YoloDev.Expecto.TestSdk
-
 nuget Markdig
-nuget MathNet.Numerics.FSharp
 nuget Aether

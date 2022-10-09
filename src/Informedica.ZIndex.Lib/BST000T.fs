@@ -1,4 +1,4 @@
-﻿namespace Informedica.GenProduct.Lib
+﻿namespace Informedica.ZIndex.Lib
 
 // Tabel: BST000T: Bestand 000 Bestanden
 // ---------------
@@ -55,15 +55,15 @@ module BST000T =
             MDANM3 = nw
             MDANTL = tt
         }
-     
+
     let posl = BST001T.getPosl name
 
     let pickList = [1] @ [2; 3] @ [5] @ [9..14]
-         
+
     let records _ =
         Parser.getData name posl pickList
         |> Array.map (Array.map String.trim)
-        |> Array.map (fun d -> 
+        |> Array.map (fun d ->
             let rl = Int32.Parse d.[3]
             let ua = Int32.Parse d.[5]
             let dl = Int32.Parse d.[6]
@@ -79,7 +79,7 @@ module BST000T =
 
     let commentString n pl =
         let tab = "    "
-        let d = 
+        let d =
             let t = table n
 
             if t.MDRECL <> BST001T.recordLength n then
@@ -96,4 +96,3 @@ module BST000T =
                 i := !i + 1
                 s + sprintf "%s/// <para> %i.\t%s: \t%s </para>\n" tab !i c.MDRNAM c.MDROMS
             ) s) + "    /// </summary>"
-            

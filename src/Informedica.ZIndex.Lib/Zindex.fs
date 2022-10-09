@@ -1,5 +1,5 @@
 
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
 
 /// <summary>
 /// <para>BST004T: Bestand 004 Artikelen</para>
@@ -30,10 +30,10 @@ module Zindex =
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST004T: Bestand 004 Artikelen </para>
     /// <para> --------------- </para>
@@ -69,21 +69,21 @@ module Zindex =
                 VPDLHV = vpdlhv |> ((Parser.parseValue "N" "(6,2)") >> Double.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;11;12]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5))
 
         let records : unit -> BST004T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST020T: Bestand 020 Namen </para>
     /// <para> --------------- </para>
@@ -119,21 +119,21 @@ module Zindex =
                 NMNAAM = nmnaam |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5))
 
         let records : unit -> BST020T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST031T: Bestand 031 Handelsproducten </para>
     /// <para> --------------- </para>
@@ -187,21 +187,21 @@ module Zindex =
                 HPDEEL = hpdeel |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;5;6;7;18;19;20;21;22;38]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10) (xs |> Array.item 11))
 
         let records : unit -> BST031T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST050T: Bestand 050 Voorschrijfproducten (PRK) </para>
     /// <para> --------------- </para>
@@ -228,21 +228,21 @@ module Zindex =
                 PRNMNR = prnmnr |> ((Parser.parseValue "N" "(7,0)") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2))
 
         let records : unit -> BST050T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST051T: Bestand 051 Voorschrijfpr. geneesmiddel identific. </para>
     /// <para> --------------- </para>
@@ -278,21 +278,21 @@ module Zindex =
                 HPGALG = hpgalg |> ((Parser.parseValue "N" "(5,2)") >> Double.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;4;5;6;7]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5))
 
         let records : unit -> BST051T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST360T: Bestand 360 t-tabel (tijdseenheid) </para>
     /// <para> --------------- </para>
@@ -319,21 +319,21 @@ module Zindex =
                 TTEHOM = ttehom |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;4]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2))
 
         let records : unit -> BST360T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST380T: Bestand 380 ICPC - 1 </para>
     /// <para> --------------- </para>
@@ -360,21 +360,21 @@ module Zindex =
                 ICPCTXT = icpctxt |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;4]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2))
 
         let records : unit -> BST380T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST640T: Bestand 640 Doseringen Basis-Algemeen </para>
     /// <para> --------------- </para>
@@ -404,21 +404,21 @@ module Zindex =
                 GPRISC = gprisc |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;6;8]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3))
 
         let records : unit -> BST640T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST641T: Bestand 641 Doseringen Basis-Artikelkeuze </para>
     /// <para> --------------- </para>
@@ -457,21 +457,21 @@ module Zindex =
                 GPDBAS = gpdbas |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6))
 
         let records : unit -> BST641T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST642T: Bestand 642 Doseringen Uitzonderingen op Basis </para>
     /// <para> --------------- </para>
@@ -516,21 +516,21 @@ module Zindex =
                 GPDCAT = gpdcat |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;5;6;8;11;12;13]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8))
 
         let records : unit -> BST642T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST643T: Bestand 643 Categorieen </para>
     /// <para> --------------- </para>
@@ -587,21 +587,21 @@ module Zindex =
                 GPDDNR = gpddnr |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7;8;9;10;11;12;13]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10) (xs |> Array.item 11) (xs |> Array.item 12))
 
         let records : unit -> BST643T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST649T: Bestand 649 Dosisgegevens - Nieuw per 01/11/2016 </para>
     /// <para> --------------- </para>
@@ -661,21 +661,21 @@ module Zindex =
                 GPABSMAXM = gpabsmaxm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7;8;9;10;11;12;13;14]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10) (xs |> Array.item 11) (xs |> Array.item 12) (xs |> Array.item 13))
 
         let records : unit -> BST649T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST701T: Bestand 701 Ingegeven samenstellingen </para>
     /// <para> --------------- </para>
@@ -685,7 +685,7 @@ module Zindex =
     /// <para> 3.	GNMWHS: 	Aanduiding werkzaam/hulpstof (W/H) </para>
     /// <para> 4.	GNGNK: 	GeneriekeNaamKode (GNK) </para>
     /// <para> 5.	GNMINH: 	Hoeveelheid werkzame stof </para>
-    /// <para> 6.	THMINE: 	Eenh. hvh werkz.stof - thesaurus 1 </para>
+    /// <para> 6.	THMINE: 	Eenh. hvh werkz.stof - thesaurus 2 </para>
     /// <para> 7.	XNMINE: 	Eenh.hoeveelheid werkzame stof kode </para>
     /// <para> 8.	GNSTAM: 	Stamnaamcode (SNK) </para>
     /// <para> 9.	THSTWG: 	Stamtoedieningsweg - thesaurus 58 </para>
@@ -726,21 +726,21 @@ module Zindex =
                 SSKTWG = ssktwg |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7;8;9;10;11]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10))
 
         let records : unit -> BST701T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST711T: Bestand 711 Generieke producten </para>
     /// <para> --------------- </para>
@@ -787,25 +787,25 @@ module Zindex =
                 GPMLCI = gpmlci |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPMLCT = gpmlct |> ((Parser.parseValue "N" "") >> Int32.parse)
                 SPKODE = spkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;5;7;8;11;12;17;20;22]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10))
 
         let records : unit -> BST711T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST715T: Bestand 715 Generieke samenstellingen </para>
     /// <para> --------------- </para>
@@ -844,21 +844,21 @@ module Zindex =
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6))
 
         let records : unit -> BST715T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST720T: Bestand 720 Superprodukten </para>
     /// <para> --------------- </para>
@@ -885,21 +885,21 @@ module Zindex =
                 SSKODE = sskode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2))
 
         let records : unit -> BST720T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST725T: Bestand 725 Stamnaam + stamtoedieningsweg </para>
     /// <para> --------------- </para>
@@ -929,21 +929,21 @@ module Zindex =
                 SSKTWG = ssktwg |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3))
 
         let records : unit -> BST725T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST750T: Bestand 750 Generieke namen </para>
     /// <para> --------------- </para>
@@ -1006,21 +1006,21 @@ module Zindex =
                 GNVOOR = gnvoor |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8) (xs |> Array.item 9) (xs |> Array.item 10) (xs |> Array.item 11) (xs |> Array.item 12) (xs |> Array.item 13) (xs |> Array.item 14))
 
         let records : unit -> BST750T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST760T: Bestand 760 Enkelvoudige toedieningswegen HPK </para>
     /// <para> --------------- </para>
@@ -1047,21 +1047,21 @@ module Zindex =
                 ENKTDW = enktdw |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;5]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2))
 
         let records : unit -> BST760T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST801T: Bestand 801 ATC codes </para>
     /// <para> --------------- </para>
@@ -1088,27 +1088,27 @@ module Zindex =
         let create mutkod atcode atoms atomse atkind  =
             {
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 ATOMS = atoms |> String.trim
                 ATOMSE = atomse |> String.trim
                 ATKIND = atkind |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4))
 
         let records : unit -> BST801T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST902T: Bestand 902 Thesauri totaal </para>
     /// <para> --------------- </para>
@@ -1141,21 +1141,21 @@ module Zindex =
                 THNM50 = thnm50 |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;7;8]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4))
 
         let records : unit -> BST902T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST921T: Bestand 921 Tekstblokken ASCII (vervangt 920) </para>
     /// <para> --------------- </para>
@@ -1200,17 +1200,16 @@ module Zindex =
                 TXTEXT = txtext |> String.trim
             }
 
-    
+
         let posl = BST001T.getPosl name
 
         let pickList = [1;2;3;4;5;6;7;8;9]
-         
+
         let _records _ =
             Parser.getData name posl pickList
             |> Array.map (fun xs -> create  (xs |> Array.item 0) (xs |> Array.item 1) (xs |> Array.item 2) (xs |> Array.item 3) (xs |> Array.item 4) (xs |> Array.item 5) (xs |> Array.item 6) (xs |> Array.item 7) (xs |> Array.item 8))
 
         let records : unit -> BST921T [] = Memoization.memoize _records
 
-    
 
-    
+
