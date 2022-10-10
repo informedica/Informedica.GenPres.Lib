@@ -1,4 +1,4 @@
-﻿namespace Informedica.ZIndex.Lib
+namespace Informedica.ZIndex.Lib
 
 
 module CodeGen =
@@ -32,7 +32,7 @@ module CodeGen =
 
     [<Literal>]
     let zindexCode = """
-namespace Informedica.GenProduct.Lib
+namespace Informedica.ZIndex.Lib
 
 {comment}
 module Zindex =
@@ -71,6 +71,7 @@ module Zindex =
             ("BST031T", [1;2;3;5;6;7;18;19;20;21;22;38])
             ("BST050T", [1..3])
             ("BST051T", [1;2;4;5;6;7])
+            ("BST200T", [1;2;3;4;5])
             ("BST360T", [1;2;4])
             ("BST380T", [1;2;4])
             ("BST640T", [1;2;6;8])

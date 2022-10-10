@@ -1,4 +1,4 @@
-﻿namespace Informedica.ZIndex.Lib
+namespace Informedica.ZIndex.Lib
 
 
 module ConsumerProduct =
@@ -12,15 +12,17 @@ module ConsumerProduct =
             Label : string
             Quantity : float
             Container : string
+            BarCodes : string []
         }
 
-    let create id nm lb qt ct =
+    let create id nm lb qt ct br =
         {
             Id = id
             Name = nm
             Label = lb
             Quantity = qt
             Container = ct
+            BarCodes = br
         }
 
     let _get id =
@@ -34,7 +36,14 @@ module ConsumerProduct =
             let lb = Names.getName r.ATNMNR Names.Label
             let ct = Names.getThes r.VPDLOM Names.ConsumerContainer Names.Fifty
 
-            create r.ATKODE nm lb r.VPDLHV ct
+            let br =
+                Zindex.BST200T.records ()
+                |> Array.filter (fun b ->
+                    b.ATKODE = r.ATKODE 
+                )
+                |> Array.map (fun b -> b.BARCOD)
+
+            create r.ATKODE nm lb r.VPDLHV ct br
         )
 
     let get : int -> ConsumerProduct [] = Memoization.memoize _get

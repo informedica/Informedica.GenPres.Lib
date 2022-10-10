@@ -59,34 +59,34 @@ module GenericProduct =
 
     let getRoutes (gp : Zindex.BST711T.BST711T) =
         // try to get the 'enkelvoudige toedieningsweg'
-        let rt =
+        let rts =
             Zindex.BST051T.records ()
-            |> Array.filter (fun r ->
-                r.MUTKOD <> 1 &&
-                r.GPKODE = gp.GPKODE
+            |> Array.filter (fun prp ->
+                prp.MUTKOD <> 1 &&
+                prp.GPKODE = gp.GPKODE
             )
-            |> Array.collect (fun r ->
+            |> Array.collect (fun prp ->
                 Zindex.BST031T.records ()
-                |> Array.filter (fun r' ->
-                    r'.MUTKOD <> 1 &&
-                    r'.PRKODE = r.PRKODE
+                |> Array.filter (fun hp ->
+                    hp.MUTKOD <> 1 &&
+                    hp.PRKODE = prp.PRKODE
                 )
             )
-            |> Array.collect (fun r ->
+            |> Array.collect (fun hp ->
                 Zindex.BST760T.records ()
-                |> Array.filter (fun r' ->
-                    r'.MUTKOD <> 1 &&
-                    r'.HPKODE = r.HPKODE
+                |> Array.filter (fun rt ->
+                    rt.MUTKOD <> 1 &&
+                    rt.HPKODE = hp.HPKODE
                 )
-                |> Array.map(fun r' -> r'.ENKTDW)
+                |> Array.map(fun rt -> rt.ENKTDW)
             )
             |> Array.distinct
-            |> Array.map (fun tdw ->
-                Names.getThes tdw Names.Route Names.Fifty
+            |> Array.map (fun rt ->
+                Names.getThes rt Names.Route Names.Fifty
             )
             |> Array.filter String.notEmpty
 
-        if rt |> Array.isEmpty |> not then rt
+        if rts |> Array.isEmpty |> not then rts
         else
             [| Names.getThes gp.GPKTWG Names.Route Names.Fifty |]
 

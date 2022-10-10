@@ -1,51 +1,12 @@
 
-#I __SOURCE_DIRECTORY__
-
-#load "./../../../.paket/load/netstandard2.0/Library/library.group.fsx"
-
-#r "./../../Informedica.GenUtils.Lib/bin/Debug/netstandard2.0/Informedica.GenUtils.Lib.dll"
-#r "./../../Informedica.GenUnits.Lib/bin/Debug/netstandard2.0/Informedica.GenUnits.Lib.dll"
-#r "./../../Informedica.GenProduct.Lib/bin/Debug/netstandard2.0/Informedica.GenProduct.Lib.dll"
-
-#r "netstandard"
-
-
-#time
-
-
-open System
-
-let pwd = Environment.GetEnvironmentVariable("HOME")
-Environment.CurrentDirectory <- 
-    if pwd |> String.IsNullOrWhiteSpace then 
-        __SOURCE_DIRECTORY__ + "/../../../"
-
-    else 
-        pwd + "/Development/GenForm/" //__SOURCE_DIRECTORY__ + "/../../../"
-
-
-#load "./../Utils/String.fs" 
-#load "./../Utils/List.fs" 
-#load "./../Utils/MarkDown.fs" 
-#load "./../Mapping.fs" 
-#load "./../ValueUnit.fs" 
-#load "./../MinMax.fs" 
-#load "./../Route.fs" 
-#load "./../Product.fs" 
-#load "./../Patient.fs" 
-#load "./../DoseRule.fs" 
-#load "./../GStand.fs" 
-
-
-// #load "./../../../.paket/load/netstandard2.0/Markdig.fsx"
-
-
+#load "load.fsx"
 
 
 open Aether  
 open Aether.Optics
 
-open Informedica.GenForm.Lib
+
+open Informedica.ZForm.Lib
 
 
 module MinMaxTests =
@@ -282,13 +243,13 @@ module PatientTests =
 module GStandTests =
 
     open GStand
-    open Informedica.GenUtils.Lib.BCL
+    open Informedica.Utils.Lib.BCL
 
     module Dosage = DoseRule.Dosage
     
-    module RF = Informedica.GenProduct.Lib.RuleFinder 
-    module DR = Informedica.GenProduct.Lib.DoseRule
-    module GPP = Informedica.GenProduct.Lib.GenPresProduct
+    module RF = Informedica.ZIndex.Lib.RuleFinder 
+    module DR = Informedica.ZIndex.Lib.DoseRule
+    module GPP = Informedica.ZIndex.Lib.GenPresProduct
 
     let cfg = { UseAll = true ; IsRate = false ; SubstanceUnit = None ; TimeUnit = None }
 
@@ -545,9 +506,4 @@ Synoniemen: {synonym}
 
     
     
-    //open MathNet.Numerics
-
-    //module VU = Informedica.GenUnits.Lib.ValueUnit
-
-    //1N |> VU.create VU.Units.Time.month |> VU.convertTo VU.Units.Time.month   
     

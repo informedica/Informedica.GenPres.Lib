@@ -1,5 +1,5 @@
 
-namespace Informedica.ZIndex.Lib
+namespace Informedica.GenProduct.Lib
 
 /// <summary>
 /// <para>BST004T: Bestand 004 Artikelen</para>

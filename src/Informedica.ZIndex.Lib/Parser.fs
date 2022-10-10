@@ -1,4 +1,4 @@
-﻿namespace Informedica.ZIndex.Lib
+namespace Informedica.ZIndex.Lib
 
 
 module Parser =
@@ -48,7 +48,7 @@ module Parser =
                 | [|n;d|] ->
                     let n = n |> Int32.parse
                     let d = d |> Int32.parse
-                    s |> String.subString 0 n
+                    s |> String.subString d n
                 | _ -> s
 
         else s
