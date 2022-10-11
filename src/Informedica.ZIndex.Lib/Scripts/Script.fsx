@@ -25,6 +25,7 @@ ATCGroup.load ()
 printfn "Loading DoseRule ..."
 DoseRule.load ()
 
+
 // Print log genericproducts
 let logGenericProducts () =
     printfn "Start ..."
@@ -487,3 +488,153 @@ let search n =
 
 search "augmentin"
 |> Array.length
+
+
+GenericProduct.get []
+|> Array.filter (fun gp ->
+    gp.Name
+    |> String.toLower
+    |> String.contains "insuline"
+)
+|> Array.map (fun gp ->
+    gp.Id, gp.Label, gp.Substances[0].SubstanceUnit
+)
+
+GenericProduct.get []
+|> Array.filter (fun gp ->
+    gp.Id = 130055
+)
+
+
+// get barcodes
+GenericProduct.get []
+|> Array.take 100
+|> Array.collect (fun gp ->
+//    gp.Label,
+    gp.PrescriptionProducts
+    |> Array.collect (fun pp ->
+        pp.TradeProducts
+        |> Array.collect (fun tp ->
+            tp.ConsumerProducts
+            |> Array.collect (fun cp ->
+                cp.BarCodes
+                |> Array.map (fun b -> (gp.Id, b))
+            )
+        )
+    )
+)
+|> Array.groupBy fst
+|> Array.map (fun (gpk, bc) ->
+    gpk, bc |> Array.map snd
+)
+|> Array.iter (fun (gpk, bc) -> printfn $"gpk: {gpk}: %A{bc}")
+
+
+
+GenPresProduct.get true
+|> Array.collect (fun gpp ->
+    gpp.GenericProducts
+    |> Array.collect (fun gp ->
+        gp.Substances
+        |> Array.collect (fun s ->
+            gp.ATC
+            |> ATCGroup.findByATC5 ()
+            |> Array.map (fun atc ->
+                {|
+                    GPK = gp.Id
+                    ATC = atc.ATC5
+                    MainGroup = atc.AnatomicalGroup
+                    SubGroup = atc.TherapeuticMainGroup
+                    Generic = gpp.Name
+                    TallMan = ""
+                    Synonyms =
+                        gp.PrescriptionProducts
+                        |> Array.collect (fun pp ->
+                            pp.TradeProducts
+                            |> Array.map (fun tp -> tp.Brand)
+                        )
+                        |> String.concat ";"
+                    Product =
+                        gp.PrescriptionProducts
+                        |> Array.collect (fun pp ->
+                            pp.TradeProducts
+                            |> Array.map (fun tp -> tp.Label)
+                        )
+                        |> Array.tryHead
+                        |> Option.defaultValue ""
+                    Label = gp.Label
+                    Shape = gpp.Shape
+                    ShapeQuantity =
+                        gp.PrescriptionProducts
+                        |> Array.fold (fun acc pp ->
+                            if pp.Quantity <> acc then pp.Quantity else acc
+                        ) 1.0
+                        |> fun v -> if v <= 0. then 1. else v
+                    ShapeVol = ""
+                    ShapeUnit = gpp.Unit
+                    Substance = s.SubstanceName
+                    SubstanceQuantity = s.SubstanceQuantity
+                    SubstanceUnit = s.SubstanceUnit
+                    MultipleQuantity = 0.
+                    MultipleUnit = ""
+                    Divisible = 1
+                |}
+            )
+        )
+    )
+)
+//|> Array.take 10
+|> Array.map (fun r ->
+    let strToStr s = $"\"{s}\""
+    let numToStr n = $"{n}"
+    [
+        r.GPK |> numToStr
+        r.ATC |> strToStr
+        r.MainGroup |> strToStr
+        r.SubGroup |> strToStr
+        r.Generic |> String.toLower |> strToStr
+        r.TallMan |> strToStr
+        r.Synonyms |> strToStr
+        r.Product |> strToStr
+        r.Label |> strToStr
+        r.Shape |> String.toLower |> strToStr
+        r.ShapeQuantity |> strToStr
+        r.ShapeVol
+        r.ShapeUnit |> String.toLower |> strToStr
+        r.Substance |> String.toLower |> strToStr
+        r.SubstanceQuantity |> strToStr
+        r.SubstanceUnit |> String.toLower |> strToStr
+        r.SubstanceQuantity / (r.Divisible |> float) |> numToStr
+        r.SubstanceUnit
+        r.Divisible |> numToStr
+    ]
+    |> String.concat "\t"
+
+)
+|> Array.distinct
+|> Array.append [|
+    [
+        "GPK"
+        "ATC"
+        "MainGroup"
+        "SubGroup"
+        "Generic"
+        "TallMan"
+        "Synonyms"
+        "Product"
+        "Label"
+        "Shape"
+        "ShapeQuantity"
+        "ShapeVol"
+        "ShapeUnit"
+        "Substance"
+        "SubstanceQuantity"
+        "SubstanceUnit"
+        "MultipleQuantity"
+        "MultipleUnit"
+        "Divisible"
+    ]
+    |> String.concat "\t"
+|]
+|> String.concat "\n"
+|> fun s -> System.IO.File.WriteAllText("ZIndexProducts.csv", s)

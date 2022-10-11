@@ -1,4 +1,4 @@
-﻿namespace Informedica.ZIndex.Lib
+namespace Informedica.ZIndex.Lib
 
 
 module Names =
@@ -67,6 +67,7 @@ module Names =
                 itm |> mapItem = r.TSNR
             )
             |> Array.map (fun r ->
+                r.TSITNR,
                 match ln with | TwentyFive -> r.THNM25 | Fifty -> r.THNM50
             )
             |> Array.distinct
@@ -77,7 +78,10 @@ module Names =
         fun () ->
             getItems Route TwentyFive
             |> Array.collect (fun rt ->
-                rt |> String.splitAt '/'
+                rt
+                |> snd
+                |> String.splitAt ','
+                |> Array.map String.trim
             )
             |> Array.distinct
             |> Array.sort
@@ -87,30 +91,35 @@ module Names =
     let getShapes =
         fun () ->
             getItems Shape Fifty
+            |> Array.map snd
         |> Memoization.memoize
 
 
     let getGenericUnits =
         fun () ->
             getItems GenericUnit Fifty
+            |> Array.map snd
         |> Memoization.memoize
 
 
     let getShapeUnits =
         fun () ->
             getItems ShapeUnit TwentyFive
+            |> Array.map snd
         |> Memoization.memoize
 
 
     let getPrescriptionContainers =
         fun () ->
             getItems PrescriptionContainer TwentyFive
+            |> Array.map snd
         |> Memoization.memoize
 
 
     let getConsumerContainers =
         fun () ->
             getItems ConsumerContainer TwentyFive
+            |> Array.map snd
         |> Memoization.memoize
 
 
