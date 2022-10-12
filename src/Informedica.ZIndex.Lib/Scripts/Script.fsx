@@ -530,7 +530,7 @@ GenericProduct.get []
 |> Array.iter (fun (gpk, bc) -> printfn $"gpk: {gpk}: %A{bc}")
 
 
-
+// create product file
 GenPresProduct.get true
 |> Array.collect (fun gpp ->
     gpp.GenericProducts
@@ -553,6 +553,7 @@ GenPresProduct.get true
                             pp.TradeProducts
                             |> Array.map (fun tp -> tp.Brand)
                         )
+                        |> Array.filter (String.isNullOrWhiteSpace >> not)                        
                         |> String.concat ";"
                     Product =
                         gp.PrescriptionProducts
@@ -638,3 +639,21 @@ GenPresProduct.get true
 |]
 |> String.concat "\n"
 |> fun s -> System.IO.File.WriteAllText("ZIndexProducts.csv", s)
+
+
+// route shape 
+GenPresProduct.get true
+|> Array.collect (fun gpp ->
+    gpp.Route
+    |> Array.map (fun r ->
+        r |> String.toLower,
+        gpp.Shape |> String.toLower
+    )
+)
+|> Array.distinct
+|> Array.iter (fun (r, s) -> printfn $"{r}\t{s}")
+
+
+Names.getItems Names.Route Names.Fifty
+|> Array.iter (fun (id, s) -> printfn $"{id}: {s}")
+

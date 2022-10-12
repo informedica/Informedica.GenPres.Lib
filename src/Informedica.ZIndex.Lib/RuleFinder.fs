@@ -165,6 +165,16 @@ module RuleFinder =
             Product: ProductFilter
         }
 
+
+    let filter =
+        {
+            Patient = { Age = None; Weight = None; BSA = None }
+            Product =
+                { Generic = ""; Shape = ""; Route = "" }
+                |> GenericShapeRoute
+        }
+
+
     let createFilter age wght bsa gpk gen shp rte =
         let pat = { Age = age; Weight = wght; BSA = bsa }
         let prod =
