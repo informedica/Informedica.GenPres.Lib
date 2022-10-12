@@ -15,9 +15,9 @@ File.exists "data/cache/README.md"
 GenPresProduct.get true
 |> Seq.collect (fun gpp ->
     gpp.GenericProducts
-    |> Seq.collect (fun gp -> 
+    |> Seq.collect (fun gp ->
         gp.Route
-        |> Seq.map (fun r -> 
+        |> Seq.map (fun r ->
             gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap, r
         )
     )
@@ -33,9 +33,9 @@ GenPresProduct.get true
 GenPresProduct.get true
 |> Seq.collect (fun gpp ->
     gpp.GenericProducts
-    |> Seq.collect (fun gp -> 
+    |> Seq.collect (fun gp ->
         gp.Route
-        |> Seq.map (fun r -> 
+        |> Seq.map (fun r ->
             gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap
         )
     )
@@ -66,9 +66,9 @@ GenPresProduct.get true
 GenPresProduct.get true
 |> Seq.collect (fun gpp ->
     gpp.GenericProducts
-    |> Seq.collect (fun gp -> 
+    |> Seq.collect (fun gp ->
         gp.Route
-        |> Seq.map (fun r -> 
+        |> Seq.map (fun r ->
             gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap
         )
     )
@@ -114,42 +114,42 @@ let createFormularium () =
             gp.PrescriptionProducts
             |> Array.collect (fun pp ->
                 pp.TradeProducts
-                |> function 
+                |> function
                 | _ when pp.TradeProducts |> Array.isEmpty -> "" |> Array.singleton
-                | _ -> pp.TradeProducts 
+                | _ -> pp.TradeProducts
                        |> Array.map (fun tp -> tp.Label)
                 |> Array.collect (fun prd ->
                     gp.Route
-                    |> function 
+                    |> function
                     | _ when gp.Route |> Array.isEmpty -> "" |> Array.singleton
                     | _ -> gp.Route
                     |> Array.map (fun rte ->
                         let gpk = gp.Id |> string
                         let atc = gp.ATC.Trim()
-                        let grp = 
+                        let grp =
                             ATCGroup.get ()
-                            |> Array.tryFind (fun g -> 
+                            |> Array.tryFind (fun g ->
                                 g.ATC5.Trim() |> String.startsWith atc ||
                                 atc |> String.startsWith (g.ATC5.Trim())
                             )
-                        let mng = 
+                        let mng =
                             match grp with
                             | Some x -> x.TherapeuticMainGroup
                             | None -> ""
-                        let sbg = 
+                        let sbg =
                             match grp with
                             | Some x -> x.TherapeuticSubGroup
                             | None -> ""
                         let gen = gpp.Name
                         let lbl = gp.Label
                         let shp = gpp.Shape
-                        let qty, qun, mun = 
+                        let qty, qun, mun =
                             if gp.Substances |> Array.length = 1 |> not then "", "", ""
-                            else 
+                            else
                                 let subst =
                                     (gp.Substances |> Array.head)
-                                (sprintf "%A" subst.SubstanceQuantity), 
-                                (sprintf "%s/%s" subst.SubstanceUnit subst.ShapeUnit), 
+                                (sprintf "%A" subst.SubstanceQuantity),
+                                (sprintf "%s/%s" subst.SubstanceUnit subst.ShapeUnit),
                                 subst.SubstanceUnit
                         let qty = qty |> String.replace "." ","
                         let mqt = qty
@@ -175,7 +175,7 @@ let writeFormulariumToFile file =
     createFormularium ()
     |> String.concat "\n"
     |> File.writeTextToFile file
-    
+
 
 writeFormulariumToFile "formularium.csv"
 
@@ -186,14 +186,14 @@ ATCGroup.get ()
 |> Array.sortBy fst
 |> Array.iter (printfn "%A")
 
-// Check if there are GenPresProducts 
+// Check if there are GenPresProducts
 // without GenericProducts, shouldn't be
 GenPresProduct.get true
 |> Array.exists (fun gpp ->
     gpp.GenericProducts |> Array.isEmpty
 )
 
-// Check whether there are GenericProducts 
+// Check whether there are GenericProducts
 // without PrescriptionProducts
 GenPresProduct.get true
 |> Array.exists (fun gpp ->
@@ -204,13 +204,13 @@ GenPresProduct.get true
 )
 
 
-// Get the PrescriptionProducts 
+// Get the PrescriptionProducts
 // without TradeProducts
 GenPresProduct.get true
 |> Array.collect (fun gpp ->
     gpp.GenericProducts
     |> Array.collect (fun gp ->
-        gp.PrescriptionProducts 
+        gp.PrescriptionProducts
         |> Array.filter (fun pp ->
             pp.TradeProducts
             |> Array.isEmpty
@@ -229,6 +229,5 @@ GenericProduct.get []
     gp.Name |> String.toLower |> String.contains "cidofovir"
 )
 
-GenPresProduct.get true |> ignore
-ATCGroup.load () 
-(fun () -> printfn "Loading dose rules.. "; DoseRule.load (); printfn "ready loading doserules") ()
+
+

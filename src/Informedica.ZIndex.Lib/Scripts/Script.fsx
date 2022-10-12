@@ -12,11 +12,7 @@ open Informedica.ZIndex.Lib
 // File
 File.exists <| FilePath.GStandPath + "BST000T"
 
-Names.getGenericUnits ()
-
-Names.getShapeUnits ()
-
-
+//Json.clearCache ()
 // Load all
 printfn "Loading GenPresProduct ..."
 GenPresProduct.load true
