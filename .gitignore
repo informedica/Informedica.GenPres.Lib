@@ -95,6 +95,15 @@
 !/docs/
 !/docs/**
 
+# Add data folders
+!/data/
+!/data/cache/
+!/data/zindex/
+!/data/formulary/
+!/data/formulary/*.csv
+!/data/mapping/
+
+
 # Add source files
 !/scripts/
 !/src/

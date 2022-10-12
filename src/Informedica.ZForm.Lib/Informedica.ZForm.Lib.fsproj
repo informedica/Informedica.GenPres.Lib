@@ -16,6 +16,10 @@
     <Compile Include="DoseRule.fs" />
     <Compile Include="GStand.fs" />
     <Compile Include="Dto.fs" />
+    <None Include="Scripts\GStand.fsx" />
+    <None Include="Scripts\GenForm3.fsx" />
+    <None Include="Scripts\Dto.fsx" />
+    <None Include="Scripts\Scripts.fsx" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Dto.fsx" />
   </ItemGroup>

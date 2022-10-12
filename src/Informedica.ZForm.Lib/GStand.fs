@@ -63,6 +63,15 @@ module GStand =
         }
 
 
+    let config =
+        {
+            UseAll = true
+            IsRate = false
+            SubstanceUnit = None
+            TimeUnit = None
+
+        }
+
 
     /// Map GSTand min max float Option values to
     /// a `DoseRule` `MinMax`

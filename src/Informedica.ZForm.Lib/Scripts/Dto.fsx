@@ -229,5 +229,65 @@ GenericProduct.get []
     gp.Name |> String.toLower |> String.contains "cidofovir"
 )
 
+<<<<<<< HEAD
 
 
+=======
+GenPresProduct.get true |> ignore
+ATCGroup.load () 
+(fun () -> printfn "Loading dose rules.. "; DoseRule.load (); printfn "ready loading doserules") ()
+
+
+GenPresProduct.get true
+|> Array.filter (fun gpp ->
+    gpp.Name |> String.toLower |> String.contains "argipressine"
+)
+|> Array.collect (fun gpp ->
+    gpp.GenericProducts
+    |> Array.map (fun gp -> gp.Id, gp.Label, gp.Route)
+)
+
+
+GenPresProduct.get true
+|> Array.filter (fun gpp ->
+    gpp.Name |> String.toLower |> String.contains "insuline"
+)
+|> Array.collect (fun gpp ->
+    gpp.GenericProducts
+    |> Array.map (fun gp -> gp.Id, gp.Label, gp.Route, gp.Substances[0].SubstanceUnit)
+)
+
+
+GenPresProduct.get true
+|> Array.filter (fun gpp ->
+    gpp.GenericProducts
+    |> Array.exists (fun gp -> gp.Id = 175552)
+)
+|> Array.collect (fun gpp ->
+    gpp.GenericProducts
+    |> Array.map (fun gp -> gp.Id, gp.Label, gp.Route)
+)
+
+
+{ Dto.dto with
+    AgeInMo = 240.
+    WeightKg = 30.
+    GPK = 00161527
+}
+|> Dto.processDto
+|> fun dto -> dto.Text
+
+
+"rect"
+|> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
+
+
+RuleFinder.createFilter None None None (Some 00161527) "" "" "" 
+|> RuleFinder.find true
+|> Array.map DoseRule.toString2
+
+
+
+Mapping.MappingTests.tests ()
+
+>>>>>>> origin

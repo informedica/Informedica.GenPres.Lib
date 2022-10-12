@@ -1,0 +1,18 @@
+AppMap;GStandMap;PedFormMap;ValueUnitMap
+mg;MILLIGRAM;;mg[Mass]
+mcg;MICROGRAM;;microg[Mass]
+gr;GRAM;;g[Mass]
+FIP;FIP EENHEID                 (ZIE NED.PH.8.BLZ.836);;FIP[General]
+IE;INTERNATIONALE EENHEID;;IU[General]
+MIE;MILJOEN IE;;megaIU[General]
+E;"USP EENHEID**INCL ANSON**ARMOUR**USNF**WALLACE**WAMPOLE";;E[General]
+E;EENHEID;;E[General]
+E;ANTIFACTOR-XA-ACTIVITEIT EENHEID;;anti-Xa E[General]
+CCID50;CELL CULTURE INFECTIVE DOSE 50% (CCID50);;CCID50[General]
+;NIET VAN TOEPASSING;;
+ml;MILLILITER;;ml[Volume]
+stuk;STUK;;stuk[General]
+dose;DOSIS;;dosis[General]
+min;MINUUT;;min[Time]
+uur;UUR;;hr[Time]
+dag;DAG;;day[Time]

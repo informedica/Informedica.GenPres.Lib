@@ -166,7 +166,9 @@ module Dto =
                     | Some gp -> gp |> Some
                     | None ->
                         if gpp.GenericProducts |> Seq.length = 1 then gpp.GenericProducts |> Seq.head |> Some
-                        else None
+                        else
+                            printfn $"too many products ({gpp.GenericProducts |> Seq.length}) narrow the search"
+                            None
 
                 match gp with
                 | Some gp ->
