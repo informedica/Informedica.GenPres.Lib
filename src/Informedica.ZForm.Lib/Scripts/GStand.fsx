@@ -23,3 +23,6 @@ GStand.createDoseRules config None None None (Some 00161527) "" "" ""
     dr
     |> DoseRule.toString true
 )
+|> fun s -> System.IO.File.WriteAllText("gstand.md", s |> String.concat "\n")
+
+

@@ -229,12 +229,8 @@ GenericProduct.get []
     gp.Name |> String.toLower |> String.contains "cidofovir"
 )
 
-<<<<<<< HEAD
-
-
-=======
 GenPresProduct.get true |> ignore
-ATCGroup.load () 
+ATCGroup.load ()
 (fun () -> printfn "Loading dose rules.. "; DoseRule.load (); printfn "ready loading doserules") ()
 
 
@@ -282,12 +278,10 @@ GenPresProduct.get true
 |> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
 
 
-RuleFinder.createFilter None None None (Some 00161527) "" "" "" 
+RuleFinder.createFilter None None None (Some 00161527) "" "" ""
 |> RuleFinder.find true
 |> Array.map DoseRule.toString2
 
 
 
 Mapping.MappingTests.tests ()
-
->>>>>>> origin

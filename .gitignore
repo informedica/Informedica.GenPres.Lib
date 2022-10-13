@@ -102,6 +102,8 @@
 !/data/formulary/
 !/data/formulary/*.csv
 !/data/mapping/
+!/data/output/
+!/data/output/*.csv
 
 
 # Add source files

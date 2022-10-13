@@ -22,4 +22,4 @@ module FilePath =
     let groupCache = data + "cache/group.cache"
 
     [<Literal>]
-    let formulary = data + "formulary/Formulary.csv"
+    let mapping = data + "mapping/Formulary.csv"

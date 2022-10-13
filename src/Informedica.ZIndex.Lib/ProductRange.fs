@@ -44,7 +44,7 @@ module ProductRange =
         }
 
     let data_ () =
-        File.readAllLines FilePath.formulary
+        File.readAllLines FilePath.mapping
         |> Array.skip 1
         |> Array.map  ((String.splitAt ';') >> (fun sa ->
             create (sa.[0] |> Int32.tryParse)

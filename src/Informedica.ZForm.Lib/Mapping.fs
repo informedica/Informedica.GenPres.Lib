@@ -18,15 +18,15 @@ module Mapping =
 
 
     [<Literal>]
-    let unitPath = "./formulary/UnitMapping.csv"
+    let unitPath = "./mapping/UnitMapping.csv"
 
 
     [<Literal>]
-    let freqPath = "./formulary/FrequencyMapping.csv"
+    let freqPath = "./mapping/FrequencyMapping.csv"
 
 
     [<Literal>]
-    let routePath = "./formulary/RouteMapping.csv"
+    let routePath = "./mapping/RouteMapping.csv"
 
     /// The different types of mapping:
     /// * AppMap: mapping for the application
