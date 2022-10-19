@@ -1,18 +1,32 @@
 
-#load "load.fsx"
+#load "load2.fsx"
 
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
+open Informedica.ZForm.Lib.DoseRule.ShapeDosage
 open Informedica.ZForm.Lib.Utils
 open Informedica.ZIndex.Lib
 
-type GenPresProduct = GenPresProduct.GenPresProduct
 
-let mapping =
+type GenPresProduct = GenPresProduct.GenPresProduct
+type GenericProduct = GenericProduct.GenericProduct
+
+let mappingRouteShape =
     Web.getDataFromSheet "RouteShape2"
 
 
+let mappingFreqs =
+    Web.getDataFromSheet "Frequencies"
+
+
+let mappingUnits =
+    Web.getDataFromSheet "Units"
+
+
 type OrderingType = Both | NonInfuse
+
+
+type Status = Active | Inactive | Retired
 
 
 [<Literal>]
@@ -42,10 +56,65 @@ let hasNoUnit (gpp : GenPresProduct) =
     |> Array.isEmpty
 
 
+let isSolutionShape s =
+    mappingRouteShape
+    |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
+    |> Array.fold (fun acc xs ->
+        if not acc then xs[3] = "TRUE"
+        else acc
+    ) false
+
+
 let getATCCodes (gpp : GenPresProduct) =
     gpp.GenericProducts
     |> Array.map (fun gp -> gp.ATC |> String.trim)
     |> Array.distinct
+
+
+let mapUnit un =
+    let un = un |> String.trim |> String.toLower
+    mappingUnits
+    |> Array.tryFind (fun r ->
+        r[0] = un || r[1] = un
+    )
+    |> function
+    | Some r -> r[2]
+    | None   ->
+        printfn $"cannot find {un} in mapping"
+        ""
+
+
+let mapFreq freq =
+    mappingFreqs
+    |> Array.filter (fun r ->
+        r[0] = freq
+    )
+    |> function
+    | [||]   ->
+        printfn $"cannot find {freq} in mapping"
+        ""
+    | xs ->
+        xs
+        |> Array.collect (fun r -> r[1..2])
+        |> Array.filter (String.isNullOrWhiteSpace >> not)
+        |> Array.distinct
+        |> String.concat ";"
+
+
+let filter gpps =
+    gpps
+    |> Array.filter (hasNoUnit >> not)
+    |> Array.map (fun gpp ->
+        { gpp
+            with GenericProducts =
+                gpp.GenericProducts
+                |> Array.filter (fun gp ->
+                    gp.Substances
+                    |> Array.forall (fun s -> s.SubstanceUnit <> NA)
+                )
+        }
+    )
+
 
 
 let print file xs =
@@ -66,7 +135,7 @@ Names.getItems Names.Route Names.Fifty
         ExternalCode = id
         RouteName = r |> capitalize
         OrderType =
-            mapping
+            mappingRouteShape
             |> Array.filter (fun xs -> r |> String.toLower = xs[0] )
             |> Array.fold (fun acc xs ->
                 match acc with
@@ -94,7 +163,7 @@ Names.getItems Names.Shape Names.Fifty
             | Some gpp -> gpp.Route
             | None -> [||]
         OrderingType =
-            mapping
+            mappingRouteShape
             |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
             |> Array.fold (fun acc xs ->
                 match acc with
@@ -104,7 +173,7 @@ Names.getItems Names.Shape Names.Fifty
                 | Both -> Both
             ) NonInfuse
         IsDrugInSolution =
-            mapping
+            mappingRouteShape
             |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
             |> Array.fold (fun acc xs ->
                 if not acc then xs[3] = "TRUE"
@@ -128,87 +197,174 @@ Names.getItems Names.Shape Names.Fifty
 )
 
 
+// Ingredients
+GenPresProduct.get true
+|> filter
+|> Array.collect (fun gpp -> gpp.GenericProducts)
+|> Array.collect (fun gp -> gp.Substances)
+|> Array.map (fun s ->
+    s.SubstanceId,
+    s.SubstanceName |> String.trim |> String.toLower,
+    s.SubstanceUnit |> mapUnit
+)
+|> Array.distinct
+|> Array.filter (fun (_, s, u) ->
+    if u |> String.isNullOrWhiteSpace then
+        printfn $"{s} hasn no unit"
+    u |> String.isNullOrWhiteSpace |> not
+)
+|> Array.sortBy (fun (_, s, _) -> s)
+|> Array.map (fun (c, s, u) -> $"{c}\t{s}\t{u}")
+|> Array.append [|
+    [
+        "ExternalCode"
+        "IngredientName"
+        "Unit"
+    ] |> String.concat "\t"
+|]
+|> print "Ingredients.csv"
+
+
+let removeEmptyUnitSubstances (gp : GenericProduct) =
+    { gp with
+        Substances =
+            gp.Substances
+            |> Array.filter (fun s ->
+                s.SubstanceUnit <> NA
+            )
+    }
+
+
+let getFrequencies (id : int) =
+    RuleFinder.createFilter
+        None
+        None
+        None
+        (Some id)
+        ""
+        ""
+        ""
+    |> RuleFinder.find true
+    |> Array.map (fun dr -> $"{dr.Freq.Frequency} {dr.Freq.Time}")
+    |> Array.distinct
+    |> Array.map mapFreq
+    |> Array.distinct
+    |> String.concat ";"
+
+
 let getMedication () =
-    GenPresProduct.get true
-    |> Array.filter (hasNoUnit >> not)
-    |> Array.map (fun gpp ->
-        { gpp
-            with GenericProducts =
-                gpp.GenericProducts
-                |> Array.filter (fun gp ->
-                    gp.Substances
-                    |> Array.forall (fun s -> s.SubstanceUnit <> NA)
+    let meds =
+        GenPresProduct.get true
+        |> filter
+        |> Array.collect (fun gpp -> gpp.GenericProducts)
+        |> Array.map removeEmptyUnitSubstances
+        |> Array.filter (fun gp -> gp.Substances |> Array.isEmpty |> not)
+        |> Array.distinct
+        |> Array.map (fun gp ->
+            let n = gp.Label |> String.trim |> String.toLower
+            let g =
+                ATCGroup.get ()
+                |> Array.filter (fun g ->
+                    g.ATC5
+                    |> String.toLower
+                    |> String.contains (gp.ATC |> String.toLower |> String.trim)
                 )
-        }
-    )
-    |> Array.groupBy (fun gpp ->
+                |> Array.tryHead
+            let su =
+                if gp.Shape |> isSolutionShape then "milliliter"
+                else gp.Substances[0].ShapeUnit
+                |> mapUnit
 
-        {|
-            MedicationName =
-                let n = gpp.Name |> String.trim |> String.toLower
-                if not (gpp |> isMultiple) then n
-                else
-                    $"{n} {gpp.Shape |> String.trim |> String.toLower}"
-            IsMultiple = gpp |> isMultiple
-        |}
-    )
-    |> Array.map (fun (r, gpps) ->
-        let gps = gpps |> Array.collect (fun gpp -> gpp.GenericProducts)
-        let substs = gps |> Array.collect (fun gp -> gp.Substances)
-        let su () =
-            substs
-            |> Array.map (fun s -> s.ShapeUnit)
-            |> Array.fold (fun acc su ->
-                if acc |> String.isNullOrWhiteSpace then su
-                else
-                    if acc = su then acc
-                    else
-                        printfn $"{r.MedicationName} {r.IsMultiple} shape unit diff {acc} {su}"
-                        su
-            ) ""
-            |> String.trim |> String.toLower
+            {|
+                ExternalCode = $"GPK-{gp.Id}"
+                MedicationName = n
+                Unit = su
 
-        {| r with
-            ExternalCode = ""
-            Unit =
-                if r.IsMultiple then su ()
-                else
-                    substs
-                    |> Array.map (fun s -> s.GenericUnit)
-                    |> Array.fold (fun acc u ->
-                        if acc |> String.isNullOrWhiteSpace then u
-                        else
-                            if acc = u then acc
-                            else
-                                printfn $"{r.MedicationName} diff units {acc} - {u}"
-                                u
+                ATC =
+                    gp.PrescriptionProducts
+                    |> Array.collect (fun pp ->
+                        pp.TradeProducts
+                        |> Array.map (fun tp -> tp.Brand)
+                    ) |> Array.append [| gp.ATC |]
+                    |> Array.map String.trim
+                    |> Array.filter (String.isNullOrWhiteSpace >> not)
+                    |> Array.distinct
+                    |> String.concat ", "
+                Status = "Active"
+                Format = "1,234.56"
+                IncrementValue = 1
+                CodeSnippetName = n
+                Frequencies =
+                    let freqs = gp.Id |> getFrequencies
+                    if freqs |> String.isNullOrWhiteSpace then "[All]"
+                    else freqs
+                DoseForms = gp.Shape |> String.capitalize
+                Routes =
+                    GenPresProduct.get true
+                    |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
+                    |> Array.collect (fun gpp -> gpp.Route)
+                    |> Array.distinct
+                    |> Array.map capitalize
+                    |> String.concat ";"
+                AdditivesGroup = "[None]"
+                DiluentsGroup =
+                    if gp.Shape |> isSolutionShape then "Oplossingen"
+                    else ""
+                DrugInDiluentGroup =
+                    if gp.Shape |> isSolutionShape then "[None]"
+                    else ""
+                DrugFamily = g |> Option.map (fun g -> g.AnatomicalGroup) |> Option.defaultValue ""
+                DrugSubFamily = g |> Option.map (fun g -> g.TherapeuticMainGroup) |> Option.defaultValue ""
+                IsFormulary = true
+                ComplexMedications =
+                    gp.Substances
+                    |> Array.map (fun s ->
+                        {|
+                            ComplexMedictionName = n
+                            IngredientName =
+                                s.SubstanceName
+                                |> String.toLower
+                                |> String.trim
+                            Concentration = s.SubstanceQuantity
+                            ConcentrationUnit =
+                                s.SubstanceUnit
+                                |> mapUnit
+                            In = 1.
+                            InUnit = su
+                        |}
+                    )
+            |}
+        )
+        |> Array.sortBy (fun r -> r.MedicationName)
 
-                    ) ""
-                    |> String.trim |> String.toLower
-            ATC =
-                gpps
-                |> Array.collect getATCCodes
-                |> String.concat ", "
-            Status = "Active"
-            Format = "1,234.56"
-            IncrementValue = 1
-            CodeSnippetName = r.MedicationName
-            Frequencies = "[All]"
-            DoseForms =
-                gpps
-                |> Array.map (fun gpp -> gpp.Shape)
-                |> Array.distinct
-                |> Array.map capitalize
-                |> String.concat ";"
-            Routes =
-                gpps
-                |> Array.collect (fun gpp -> gpp.Route)
-                |> Array.distinct
-                |> Array.map capitalize
-                |> String.concat ";"
-        |}
+    meds
+    |> Array.collect (fun r -> r.ComplexMedications)
+    |> Array.map (fun r ->
+        [
+            r.ComplexMedictionName
+            r.IngredientName
+            $"%f{r.Concentration}"
+            r.ConcentrationUnit
+            $"%f{r.In}"
+            r.InUnit
+        ]
+        |> String.concat "\t"
     )
-    |> Array.sortBy (fun r -> r.MedicationName)
+    |> Array.append
+        ([|
+            "ComplexMedicationName"
+            "IngredientName"
+            "Concentration"
+            "ConcentrationUnit"
+            "In"
+            "InUnit"
+        |]
+        |> String.concat "\t"
+        |> Array.singleton)
+    |> print "ComplexMedications.csv"
+    |> ignore
+
+    meds
     |> Array.map (fun r ->
         [
             r.ExternalCode
@@ -221,10 +377,42 @@ let getMedication () =
             r.CodeSnippetName
             r.Frequencies
             r.DoseForms
+            r.Routes
+            r.AdditivesGroup
+            r.DiluentsGroup
+            r.DrugInDiluentGroup
+            r.DrugFamily
+            r.DrugSubFamily
+            $"""{if r.IsFormulary then "TRUE" else "FALSE"}"""
+
         ]
         |> String.concat "\t"
     )
-    |> print "Medication.csv"
+    |> Array.append
+        ([|
+            "ExternalCode"
+            "MedicationName"
+            "Unit"
+            "ATC"
+            "Status"
+            "Format"
+            "IncrementValue"
+            "CodeSnippetName"
+            "Frequencies"
+            "DoseForms"
+            "Routes"
+            "AdditivesGroup"
+            "DiluentsGroup"
+            "DrugInDiluentGroup"
+            "DrugFamily"
+            "DrugSubFamily"
+            "IsFormulary"
+        |]
+        |> String.concat "\t"
+        |> Array.singleton)
+    |> print "Medications.csv"
+
+
 
 
 
@@ -238,3 +426,11 @@ GenPresProduct.get true
 )
 |> Array.map (fun gp -> $"{gp.Id}, {gp.Name}")
 |> Array.iteri (printfn "%i. %s")
+
+
+GenPresProduct.get true
+|> Array.filter (fun gpp -> gpp.Name |> String.length > 100)
+
+
+Substance.get ()
+|> Array.take 100

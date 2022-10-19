@@ -70,6 +70,37 @@ let getATCCodes (gpp : GenPresProduct) =
     |> Array.distinct
 
 
+let filter gpps =
+    gpps
+    |> Array.filter (hasNoUnit >> not)
+    |> Array.map (fun gpp ->
+        { gpp
+            with GenericProducts =
+                gpp.GenericProducts
+                |> Array.filter (fun gp ->
+                    gp.Substances
+                    |> Array.forall (fun s -> s.SubstanceUnit <> NA)
+                )
+        }
+    )
+
+let isSolutionShape s =
+    mapping
+    |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
+    |> Array.fold (fun acc xs ->
+        if not acc then xs[3] = "TRUE"
+        else acc
+    ) false
+
+
+let isSolution (gpps : GenPresProduct []) =
+    gpps
+    |> Array.fold (fun acc gpp ->
+        if gpp.Shape |> isSolutionShape then true
+        else acc
+    ) false
+
+
 let print file xs =
     xs
     |> String.concat "\n"
@@ -174,7 +205,7 @@ Names.getItems Names.Shape Names.Fifty
     |}
 )
 |> Array.filter (fun r -> r.Routes |> Array.isEmpty |> not)
-|> Array.sortBy (fun r -> r.ExternalCode)
+|> Array.sortBy (fun r -> r.DoseFormName)
 
 |> Array.map (fun r ->
     let rs =
@@ -343,3 +374,122 @@ The following fields have to be defined:
 * MaskConcentrationMassUnit
 * MaskConcentrationVolumeUnit
 * IsFormulary
+
+#!fsharp
+
+GenPresProduct.get true
+|> filter
+|> Array.groupBy (fun gpp ->
+    let name =
+        if gpp.Name |> String.length > 100 &&
+            gpp.Name |> String.split "/" |> List.length > 5 then
+            gpp.GenericProducts
+            |> Array.map (fun gp -> gp.Label)
+            |> Array.filter (String.isNullOrWhiteSpace >> not)
+            |> Array.distinct
+            |> String.concat "/"
+        else
+            let n = gpp.Name |> String.trim |> String.toLower
+            if not (gpp |> isMultiple) then n
+            else
+                $"{n} {gpp.Shape |> String.trim |> String.toLower}"
+
+    {|
+        MedicationName = name
+        IsMultiple = gpp |> isMultiple
+    |}
+)
+|> Array.map (fun (r, gpps) ->
+    let gps = gpps |> Array.collect (fun gpp -> gpp.GenericProducts)
+    let substs = gps |> Array.collect (fun gp -> gp.Substances)
+    let su () =
+        if gpps |> isSolution then "milliliter"
+        else
+            substs
+            |> Array.map (fun s -> s.ShapeUnit)
+            |> Array.fold (fun acc su ->
+                if acc |> String.isNullOrWhiteSpace then su
+                else
+                    if acc = su then acc
+                    else
+                        printfn $"{r.MedicationName} {r.IsMultiple} shape unit diff {acc} {su}"
+                        su
+            ) ""
+            |> String.trim |> String.toLower
+
+    {| r with
+        ExternalCode = "GPST-??"
+        Unit =
+            if r.IsMultiple then su ()
+            else
+                substs
+                |> Array.map (fun s -> s.GenericUnit)
+                |> Array.fold (fun acc u ->
+                    if acc |> String.isNullOrWhiteSpace then u
+                    else
+                        if acc = u then acc
+                        else
+                            printfn $"{r.MedicationName} diff units {acc} - {u}"
+                            u
+
+                ) ""
+                |> String.trim |> String.toLower
+        ATC =
+            gpps
+            |> Array.collect getATCCodes
+            |> String.concat ", "
+        Status = "Active"
+        Format = "1,234.56"
+        IncrementValue = 1
+        CodeSnippetName = r.MedicationName
+        Frequencies = "[All]"
+        DoseForms =
+            gpps
+            |> Array.map (fun gpp -> gpp.Shape)
+            |> Array.distinct
+            |> Array.map capitalize
+            |> String.concat ";"
+        Routes =
+            gpps
+            |> Array.collect (fun gpp -> gpp.Route)
+            |> Array.distinct
+            |> Array.map capitalize
+            |> String.concat ";"
+        GenericProducts =
+            gpps
+            |> Array.collect (fun gpp -> gpp.GenericProducts)
+    |}
+)
+|> Array.sortBy (fun r -> r.MedicationName)
+|> Array.map (fun r ->
+    [
+        r.ExternalCode
+        r.MedicationName
+        r.Unit
+        r.ATC
+        r.Status
+        r.Format
+        $"%i{r.IncrementValue}"
+        r.CodeSnippetName
+        r.Frequencies
+        r.DoseForms
+    ]
+    |> String.concat "\t"
+)
+|> Array.append
+    ([|
+        "ExternalCode"
+        "MedicationName"
+        "AlternativeName"
+        "Unit"
+        "ATC"
+        "Status"
+        "Format"
+        "IncrementValue"
+        "CodeSnippetName"
+        "Frequencies"
+        "DoseForms"
+    |]
+    |> String.concat "\t"
+    |> Array.singleton)
+|> print "Medication.csv"

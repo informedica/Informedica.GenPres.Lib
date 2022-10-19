@@ -80,6 +80,7 @@ DoseRule.get ()
 |> Array.map DoseRule.toString2
 |> Array.iter (printfn "%s")
 
+
 // Get all possible dose units
 DoseRule.get()
 |> Array.map (fun dr -> dr.Unit)
@@ -144,6 +145,14 @@ DoseRule.frequencies ()
 )
 |> Array.iter (fun f -> printfn "%s %s" (f.Frequency |> string) (f.Time))
 
+
+DoseRule.frequencies ()
+|> Array.sortBy(fun f -> f.Time, f.Frequency)
+|> Array.map (fun f ->
+    $"{f.Frequency} {f.Time}"
+)
+|> Array.distinct
+|> Array.iter(printfn "%s")
 
 // Get all distinct frequencies times
 DoseRule.frequencies ()
@@ -549,7 +558,7 @@ GenPresProduct.get true
                             pp.TradeProducts
                             |> Array.map (fun tp -> tp.Brand)
                         )
-                        |> Array.filter (String.isNullOrWhiteSpace >> not)                        
+                        |> Array.filter (String.isNullOrWhiteSpace >> not)
                         |> String.concat ";"
                     Product =
                         gp.PrescriptionProducts
@@ -637,7 +646,7 @@ GenPresProduct.get true
 |> fun s -> System.IO.File.WriteAllText("ZIndexProducts.csv", s)
 
 
-// route shape 
+// route shape
 GenPresProduct.get true
 |> Array.collect (fun gpp ->
     gpp.Route
@@ -653,3 +662,12 @@ GenPresProduct.get true
 Names.getItems Names.Route Names.Fifty
 |> Array.iter (fun (id, s) -> printfn $"{id}: {s}")
 
+
+Names.getItems Names.ShapeUnit Names.TwentyFive
+|> Array.map snd
+|> Array.zip (Names.getItems Names.ShapeUnit Names.Fifty |> Array.map snd)
+|> Array.map (fun (l, s) ->
+    l |> String.trim |> String.toLower,
+    s |> String.trim |> String.toLower
+)
+|> Array.iter (fun (l, s) -> printfn $"{l}\t{s}")

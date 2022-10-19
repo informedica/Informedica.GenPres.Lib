@@ -130,6 +130,10 @@
 !/src/Informedica.ZForm.Lib/
 !/src/Informedica.ZForm.Lib/Scripts/
 !/src/Informedica.ZForm.Lib/Notebooks/
+#Informedica.MetaVision.Lib
+!/src/Informedica.MetaVision.Lib/
+!/src/Informedica.MetaVision.Lib/Scripts/
+!/src/Informedica.MetaVision.Lib/Notebooks/
 #Informedica.GenForm.Lib
 !/src/Informedica.GenForm.Lib/
 !/src/Informedica.GenForm.Lib/Scripts/
