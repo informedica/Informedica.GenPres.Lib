@@ -44,6 +44,15 @@ module Utils =
             | [|s1; s2|] -> $"{s1 |> String.capitalize}-{s2 |> String.capitalize}"
             | _ -> s |> String.capitalize
 
+    let capitalizeRoute route =
+        route
+        |> capitalize
+        |> fun s ->
+            if s |> String.startsWith "Intra-" ||
+               s |> String.startsWith "Intra" |> not then s
+            else s |> String.replace "Intra" "Intra-" |> capitalize
+            |> String.replace "-" ""
+
 
     let isMultiple (gpp : GenPresProduct) =
         gpp.GenericProducts
@@ -224,14 +233,7 @@ module MetaVision =
         |> Array.map (fun (id, r) ->
             {|
                 ExternalCode = id
-                RouteName =
-                    r
-                    |> capitalize
-                    |> fun s ->
-                        if s |> String.startsWith "Intra-" ||
-                           s |> String.startsWith "Intra" |> not then s
-                        else s |> String.replace "Intra" "Intra-" |> capitalize
-                        |> String.replace "-" ""
+                RouteName = r |> capitalizeRoute
                 OrderType =
                     mappingRouteShape
                     |> Array.filter (fun xs -> r |> String.toLower = xs[0] )
@@ -266,10 +268,12 @@ module MetaVision =
                 DoseFormName = s |> String.capitalize
                 Routes =
                     GenPresProduct.get true
-                    |> Array.tryFind (fun gpp -> gpp.Shape = s)
-                    |> function
-                    | Some gpp -> gpp.Route
-                    | None -> [||]
+                    |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
+                    |> Array.collect (fun gpp -> gpp.Route)
+                    |> Array.collect (String.splitAt ',')
+                    |> Array.map capitalizeRoute
+                    |> Array.filter ((<>) "Parenteraal")
+                    |> Array.distinct
                 OrderingType =
                     mappingRouteShape
                     |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
@@ -419,8 +423,10 @@ module MetaVision =
                         GenPresProduct.get true
                         |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
                         |> Array.collect (fun gpp -> gpp.Route)
+                        |> Array.collect (String.splitAt ',')
+                        |> Array.filter ((<>) "Parenteraal")
                         |> Array.distinct
-                        |> Array.map capitalize
+                        |> Array.map capitalizeRoute
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
                     DiluentsGroup =

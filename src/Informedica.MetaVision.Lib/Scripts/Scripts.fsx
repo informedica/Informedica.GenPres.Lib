@@ -3,6 +3,7 @@
 
 #load "../MetaVision.fs"
 
+open Informedica.Utils.Lib.BCL
 open Informedica.ZIndex.Lib
 open Informedica.MetaVision.Lib
 open Informedica.ZIndex.Lib.ATCGroup
@@ -18,8 +19,8 @@ MetaVision.createRoutes "Routes.csv"
 MetaVision.createDoseForms "DoseForms.csv"
 
 
-MetaVision.createMedications (Some 20) "Ingredients.csv" "Medications.csv" "ComplexMedications.csv"
-
+MetaVision.createMedications None "Ingredients.csv" "Medications.csv" "ComplexMedications.csv"
+|> Array.length
 
 
 open Informedica.Utils.Lib.BCL
@@ -77,3 +78,28 @@ GenPresProduct.get true
 |> Array.collect (fun gpp -> gpp.GenericProducts)
 |> Array.map (fun gp -> gp.Id, gp.Name, gp.Shape, gp.Substances[0].ShapeUnit)
 |> Array.filter (fun (_, _, s, u) -> s = "INFUUS" && u = "MILLIGRAM")
+
+
+Names.getItems Names.Route Names.TwentyFive
+|> Array.map snd
+|> Array.zip (Names.getItems Names.Route Names.Fifty |> Array.map snd)
+|> Array.map (fun (l, s) ->
+    l
+    |> String.replace "," "/"
+    |> String.replace "/ " "/",
+    s
+    |> String.replace "," "/"
+    |> String.replace "/ " "/"
+    |> String.toLower
+)
+|> Array.collect (fun (l, s) ->
+    s
+    |> String.splitAt '/'
+    |> Array.zip (l |> String.splitAt '/')
+)
+|> Array.distinct
+|> Array.sort
+|> Array.map (fun (l, s) -> $"{l}\t{s}")
+|> Array.iter (printfn "%s")
+
+
