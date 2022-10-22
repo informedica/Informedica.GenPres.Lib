@@ -1,177 +1,177 @@
-ExternalCode	DoseFormName	Routes	OrderType	IsDrugInSolution	Category	IsDispensibleAmountAllowed
-1	Emulsie voor cutaan gebruik	Cutaan	NonInfuse	False	G-Standaard	False
-2	Oplossing voor hemofiltratie	Intraveneus;Extracorporaal	Both	False	G-Standaard	False
-4	Smelttablet	Oraal	NonInfuse	False	G-Standaard	False
-6	Implantatiespons	Voor implantatie	NonInfuse	False	G-Standaard	False
-9	Dispergeerbare tablet	Oraal	NonInfuse	False	G-Standaard	False
-10	Zalf	Cutaan;Rectaal	NonInfuse	False	G-Standaard	False
-12	Zalf voor rectaal gebruik	Rectaal	NonInfuse	False	G-Standaard	False
-15	Zalf voor inhalatiedamp	Nasaal	NonInfuse	False	G-Standaard	False
-16	Omhulde tablet	Oraal	NonInfuse	False	G-Standaard	False
-17	Gel voor oromucosaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-18	Emulsie voor injectie	Intraveneus	Both	False	G-Standaard	False
-19	Capsule, zacht	Oraal	NonInfuse	False	G-Standaard	False
-21	Suspensie voor injectie	Intramusculair;Subcutaan;Intraarticulair;Intralaesionaal;Intrabursaal;Periarticulair;Intravitreaal;Intraveneus;Intrapleuraal	Both	False	G-Standaard	False
-22	Radiofarmaceutische uitgangsoplossing	Niet van toepassing	NonInfuse	False	G-Standaard	False
-23	Radionuclide generator	Inhalatie	NonInfuse	False	G-Standaard	False
-24	Oplossing voor cutaan gebruik	Cutaan	NonInfuse	False	G-Standaard	False
-26	Toedieningssysteem voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-27	Filmomhulde tablet	Oraal	NonInfuse	False	G-Standaard	False
-31	Maagsapresistente tablet + tablet	Oraal	NonInfuse	False	G-Standaard	False
-32	Emulsie voor infusie	Intraveneus	Both	False	G-Standaard	False
-33	Collodion	Cutaan	NonInfuse	False	G-Standaard	False
-34	Oogdruppels, suspensie	Oculair	Both	False	G-Standaard	False
-36	Implantatiegaas	Voor implantatie	NonInfuse	False	G-Standaard	False
-37	Concentraat voor drank	Oraal	Both	True	G-Standaard	False
-38	Concentraat voor mondspoeling	Oromucosaal	NonInfuse	True	G-Standaard	False
-40	Pasta voor cutaan gebruik	Cutaan	NonInfuse	False	G-Standaard	False
-41	Pasta voor oromucosaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-44	Poeder voor suspensie voor injectie	Intramusculair;Subcutaan;Intradermaal	Both	True	G-Standaard	False
-45	Vloeistof voor oromucosaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-46	Spray voor sublinguaal gebruik	Sublinguaal	NonInfuse	False	G-Standaard	False
-47	Kit voor radiofarmaceutisch preparaat	Intraveneus	Both	False	G-Standaard	False
-54	Druppels voor oraal gebruik, oplossing	Oromucosaal;Sublinguaal	NonInfuse	False	G-Standaard	False
-60	Creme	Cutaan;Transdermaal;Urethraal	NonInfuse	False	G-Standaard	False
-61	Creme voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-62	Creme voor rectaal gebruik	Rectaal	NonInfuse	False	G-Standaard	False
-71	Oplosbare tablet	Oraal	NonInfuse	False	G-Standaard	False
-72	Gel voor gastro-enteraal gebruik	Gastroenteraal	NonInfuse	False	G-Standaard	False
-73	Lyophilisaat voor oraal gebruik	Sublinguaal;Oraal	NonInfuse	False	G-Standaard	False
-79	Injectie/infusieoplossing	Epiduraal;Perineuraal;Intraveneus;Subcutaan;Intramusculair;Intrathecaal	Both	False	G-Standaard	False
-80	Tablet voor buccaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-81	Infuus	Intraveneus;Intravesicaal;Intramusculair;Intrathecaal;Epiduraal;Perineuraal;Lokaal;Subcutaan;Intracardiaal	Both	False	G-Standaard	False
-82	Injectie	Subcutaan;Intraveneus;Intramusculair;Intradermaal;Intrathecaal;Intravitreaal;Intralaesionaal	Both	False	G-Standaard	False
-83	Injectie/infuus	Intraveneus;Intramusculair;Subcutaan;Intrathecaal;Intraarterieel;Intravesicaal;Intraperitoneaal;Intrapleuraal;Intratumoraal;Intrapericardiaal;Epiduraal;Perineuraal;Intraarticulair;Intrabursaal;Rectaal;Sublinguaal;Lokaal;Peribulbair;Extracorporaal	Both	False	G-Standaard	False
-84	Oplossing voor parenteraal/oraal gebruik	Intraveneus;Oraal	Both	False	G-Standaard	False
-85	Tablet + kauwtablet	Oraal	NonInfuse	False	G-Standaard	False
-87	Poeder voor suspensie voor oraal/rectaal gebruik	Oraal;Rectaal	Both	True	G-Standaard	False
-88	Oorpoeder	Auriculair	NonInfuse	False	G-Standaard	False
-89	Suspensie voor dentaal gebruik	Dentaal	NonInfuse	False	G-Standaard	False
-90	Kauwcapsule	Oraal	NonInfuse	False	G-Standaard	False
-92	Levend weefsel equivalent	Voor implantatie	NonInfuse	False	G-Standaard	False
-93	Pasta voor oraal gebruik	Oraal	NonInfuse	False	G-Standaard	False
-94	Spray voor transdermaal gebruik, oplossing	Transdermaal	NonInfuse	False	G-Standaard	False
-95	Dispersie voor infusie	Intraveneus	Both	False	G-Standaard	False
-96	Oogdruppels, emulsie	Oculair	Both	False	G-Standaard	False
-97	Concentraat voor orale suspensie	Oraal	Both	True	G-Standaard	False
-98	Drank/mondspoeling	Oraal;Oromucosaal; oromucosaal	Both	False	G-Standaard	False
-99	Neuspoeder	Nasaal	NonInfuse	False	G-Standaard	False
-100	Zetpil	Rectaal	NonInfuse	False	G-Standaard	False
-101	Dispersie voor vernevelvloeistof	Inhalatie	NonInfuse	False	G-Standaard	False
-102	Dispersie voor injectie met vertraagde afgifte	Perineuraal;Lokaal	Both	False	G-Standaard	False
-103	Poeder voor oplossing voor intravesicaal gebruik	Intravesicaal	Both	True	G-Standaard	False
-104	Gel voor intra-uterien gebruik	Intrauterien;Intracervicaal	NonInfuse	False	G-Standaard	False
-110	Oogzalf	Oculair	Both	False	G-Standaard	False
-120	Ovule	Vaginaal	NonInfuse	False	G-Standaard	False
-140	Neuszalf	Nasaal	NonInfuse	False	G-Standaard	False
-151	Oorzalf	Auriculair	NonInfuse	False	G-Standaard	False
-161	Gel voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-162	Gel voor rectaal gebruik	Rectaal	NonInfuse	False	G-Standaard	False
-165	Gel voor oraal gebruik	Oraal;Oromucosaal	NonInfuse	False	G-Standaard	False
-167	Gel	Cutaan;Transdermaal;Niet gespecificeerd of meervoudig;Lokaal;Urethraal;Endotracheopulmonair	NonInfuse	False	G-Standaard	False
-169	Ooggel	Oculair	Both	False	G-Standaard	False
-171	Gel voor urethraal gebruik	Urethraal	NonInfuse	False	G-Standaard	False
-172	Gel voor endocervicaal gebruik	Endocervicaal	NonInfuse	False	G-Standaard	False
-180	Maagsapresistente capsule	Oraal	NonInfuse	False	G-Standaard	False
-190	Inhalatiepoeder	Inhalatie	NonInfuse	False	G-Standaard	False
-200	Poeder voor oraal gebruik	Oraal	Both	True	G-Standaard	False
-213	Strooipoeder	Cutaan	NonInfuse	False	G-Standaard	False
-214	Inhalatiepoeder voor nasaal gebruik	Nasaal	NonInfuse	False	G-Standaard	False
-224	Poeder voor oplossing	Oromucosaal	NonInfuse	True	G-Standaard	False
-225	Poeder voor drank	Oraal	Both	True	G-Standaard	False
-226	Poeder voor orale suspensie	Oraal	Both	True	G-Standaard	False
-227	Poeder voor klysma	Rectaal	Both	True	G-Standaard	False
-229	Poeder voor instillatievloeistof	Intravesicaal	Both	True	G-Standaard	False
-230	Tablet	Oraal	NonInfuse	False	G-Standaard	False
-231	Tablet + bruisgranulaat	Oraal	NonInfuse	False	G-Standaard	False
-235	Reep	Oraal	NonInfuse	False	G-Standaard	False
-241	Implantaat	Subcutaan;Intravitreaal	NonInfuse	False	G-Standaard	False
-242	Implantatiestift	Subcutaan	NonInfuse	False	G-Standaard	False
-250	Maagsapresistente tablet	Oraal	NonInfuse	False	G-Standaard	False
-260	Kauwtablet	Oraal	NonInfuse	False	G-Standaard	False
-261	Kauwgom	Oraal	NonInfuse	False	G-Standaard	False
-270	Bruistablet	Oraal	NonInfuse	False	G-Standaard	False
-280	Dragee	Oraal	NonInfuse	False	G-Standaard	False
-300	Capsule	Oraal;Vaginaal	NonInfuse	False	G-Standaard	False
-301	Capsule voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-310	Tablet met gereguleerde afgifte	Oraal	NonInfuse	False	G-Standaard	False
-330	Zuigtablet	Oraal;Oromucosaal	NonInfuse	False	G-Standaard	False
-331	Tablet voor sublinguaal gebruik	Sublinguaal	NonInfuse	False	G-Standaard	False
-350	Capsule met gereguleerde afgifte	Oraal	NonInfuse	False	G-Standaard	False
-371	Granulaat	Oraal	NonInfuse	False	G-Standaard	False
-375	Granulaat met gereguleerde afgifte	Oraal	NonInfuse	False	G-Standaard	False
-377	Bruisgranulaat	Oraal	NonInfuse	False	G-Standaard	False
-379	Granulaat voor orale suspensie	Oraal	NonInfuse	False	G-Standaard	False
-380	Tablet voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-382	Maagsapresistent granulaat	Oraal	NonInfuse	False	G-Standaard	False
-400	Drank	Oraal	Both	False	G-Standaard	False
-405	Drank/concentraat voor klysma	Oraal;Rectaal	Both	True	G-Standaard	False
-410	Gorgeldrank	Oromucosaal	NonInfuse	False	G-Standaard	False
-420	Mondspoeling	Oromucosaal	NonInfuse	False	G-Standaard	False
-430	Oplossing	Oraal;Rectaal;Cutaan;Lokaal;Auriculair;Oromucosaal;Nasaal	Both	False	G-Standaard	False
-432	Vloeistof voor inhalatiedamp	Nasaal;Inhalatie	NonInfuse	False	G-Standaard	False
-434	Vloeistof	Nasaal	Both	False	G-Standaard	False
-436	Spoeling voor urethraal gebruik	Urethraal	NonInfuse	False	G-Standaard	False
-437	Concentraat voor oplossing	Niet gespecificeerd of meervoudig	NonInfuse	False	G-Standaard	False
-440	Blaasspoeling	Intravesicaal	Both	False	G-Standaard	False
-460	Klysma	Rectaal	Both	False	G-Standaard	False
-464	Tablet voor klysma	Rectaal	Both	False	G-Standaard	False
-470	Stroop	Oraal	Both	False	G-Standaard	False
-480	Suspensie voor oraal gebruik	Oraal	Both	False	G-Standaard	False
-481	Emulsie voor oraal gebruik	Oraal	NonInfuse	False	G-Standaard	False
-482	Suspensie voor cutaan gebruik	Cutaan	NonInfuse	False	G-Standaard	False
-486	Endotracheopulmonaire instillatie, suspensie	Endotracheopulmonair	NonInfuse	False	G-Standaard	False
-491	Kruidenthee	Oraal	NonInfuse	False	G-Standaard	False
-500	Oogdruppels	Oculair	Both	False	G-Standaard	False
-510	Oordruppels	Auriculair	NonInfuse	False	G-Standaard	False
-520	Neusdruppels	Nasaal	Both	False	G-Standaard	False
-521	Neusspray	Nasaal	NonInfuse	False	G-Standaard	False
-530	Vernevelvloeistof	Inhalatie	NonInfuse	False	G-Standaard	False
-531	Aerosol	Inhalatie	NonInfuse	False	G-Standaard	False
-535	Inhalatiegas	Inhalatie	NonInfuse	False	G-Standaard	False
-540	Infusievloeistof	Intraveneus;Subcutaan;Intraperitoneaal;Intrathecaal;Intracoronair;Epiduraal;Perineuraal;Lokaal;Peribulbair;Intramusculair;Oraal;Extracorporaal;Intracerebraal	Both	False	G-Standaard	False
-541	Concentraat voor oplossing voor infusie	Intraveneus;Inhalatie;Intramusculair;Subcutaan;Epiduraal;Intrathecaal;Nasaal;Intralaesionaal;Perineuraal;Intracoronair;Extracorporaal;Niet van toepassing	Both	True	G-Standaard	False
-550	Injectievloeistof	Intramusculair;Intraveneus;Subcutaan;Intravitreaal;Intrathecaal;Epiduraal;Perineuraal;Lokaal;Intradermaal;Submucosaal;Intraarticulair;Intralaesionaal;Intrabursaal;Periarticulair;Intraarterieel;Endotracheopulmonair;Oraal;Extracorporaal;Intracoronair;Niet van toepassing;Rectaal;Intrauterien;Intraoculair;Cutaan;Intratympanaal;Intravesicaal;Intracardiaal;Intracaverneus;Peribulbair;Intralymfatisch;Intrapleuraal;Intraossaal	Both	False	G-Standaard	False
-551	Concentraat voor oplossing voor injectie	Intramusculair;Intraveneus;Intravitreaal;Subretinaal	Both	True	G-Standaard	False
-552	Poeder voor injectievloeistof	Intramusculair;Intraveneus;Subcutaan;Intraarticulair;Periarticulair;Rectaal;Intrathecaal;Intrapleuraal;Intraoculair;Intraperitoneaal;Oraal;Peribulbair;Retrobulbair;Parabulbair;Intradermaal;Intraarterieel;Intratumoraal;Intrapericardiaal;Intralaesionaal	Both	True	G-Standaard	False
-553	Poeder voor oplossing voor infusie	Intraveneus;Intraarterieel;Intraperitoneaal;Intramusculair	Both	True	G-Standaard	False
-559	Poeder voor injectie/infusieoplossing	Intraveneus;Subcutaan;Intramusculair;Intravesicaal	Both	True	G-Standaard	False
-571	Oplossing voor hemodialyse	Extracorporaal;Hemodialyse	Both	False	G-Standaard	False
-573	Concentraat voor oplossing voor hemodialyse	Hemodialyse	Both	True	G-Standaard	False
-574	Oplossing voor peritoneale dialyse	Intraperitoneaal	Both	False	G-Standaard	False
-575	Oplossing voor hemofiltratie/hemodialyse	Intraveneus;Extracorporaal	Both	False	G-Standaard	False
-590	Druppels voor oraal gebruik	Oraal;Cutaan;Lokaal	Both	False	G-Standaard	False
-591	Druppels voor oromucosaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-602	Spray	Niet gespecificeerd of meervoudig;Lokaal;Oraal;Oromucosaal;Sublinguaal;Cutaan	NonInfuse	False	G-Standaard	False
-611	Spoeling	Niet gespecificeerd of meervoudig;Cutaan;Intraperitoneaal;Lokaal;Vaginaal	Both	False	G-Standaard	False
-621	Instillatievloeistof	Intraperitoneaal	Both	False	G-Standaard	False
-630	Oogwassing	Oculair	Both	False	G-Standaard	False
-652	Huidspray	Cutaan	NonInfuse	False	G-Standaard	False
-654	Spray voor oromucosaal gebruik	Oromucosaal	NonInfuse	False	G-Standaard	False
-657	Vloeistof voor vaginaal gebruik	Vaginaal	NonInfuse	False	G-Standaard	False
-660	Oplosmiddel voor parenteraal gebruik	Niet van toepassing;Subcutaan	Both	False	G-Standaard	False
-710	Shampoo	Cutaan	NonInfuse	False	G-Standaard	False
-720	Huidstift	Cutaan	NonInfuse	False	G-Standaard	False
-724	Ooginsert	Oculair	Both	False	G-Standaard	False
-730	Schuim voor cutaan gebruik	Cutaan	NonInfuse	False	G-Standaard	False
-732	Schuim voor rectaal gebruik	Rectaal	NonInfuse	False	G-Standaard	False
-740	Tandpasta	Dentaal	NonInfuse	False	G-Standaard	False
-743	Gel voor dentaal gebruik	Dentaal	NonInfuse	False	G-Standaard	False
-751	Pleister	Cutaan;Transdermaal	NonInfuse	False	G-Standaard	False
-752	Pleister voor transdermaal gebruik	Transdermaal	NonInfuse	False	G-Standaard	False
-753	Geimpregneerd verbandgaas	Cutaan	NonInfuse	False	G-Standaard	False
-756	Poeder voor cement	Voor implantatie	NonInfuse	False	G-Standaard	False
-760	Iud (intra uterine device)	Intrauterien	NonInfuse	False	G-Standaard	False
-800	Poeder voor vernevelvloeistof	Inhalatie	NonInfuse	True	G-Standaard	False
-904	Weefsellijm	Epilesionaal	NonInfuse	False	G-Standaard	False
-905	Maagsapresistente tablet met gereguleerde afgifte	Oraal	NonInfuse	False	G-Standaard	False
-906	Suspensie voor implantatie	Intraarticulair	NonInfuse	False	G-Standaard	False
-920	Implantatiekraal	Voor implantatie	NonInfuse	False	G-Standaard	False
-991	Poeder voor lokaal gebruik	Oraal;Lokaal	Both	True	G-Standaard	False
-993	Weefsellijm matrix	Epilesionaal	NonInfuse	False	G-Standaard	False
-994	Kauw-/dispergeerbare tablet	Oraal	NonInfuse	False	G-Standaard	False
-995	Pastille	Oromucosaal	NonInfuse	False	G-Standaard	False
-996	Druppels voor sublinguaal gebruik	Sublinguaal;Oraal	NonInfuse	False	G-Standaard	False
-997	Concentraat voor oplossing voor injectie/infusie	Intraveneus	Both	True	G-Standaard	False
-998	Gas en oplosmiddel voor dispersie injectie/infusie	Intraveneus	Both	False	G-Standaard	False
-999	Concentraat voor oplossing voor cutaan gebruik	Cutaan	NonInfuse	True	G-Standaard	False
+ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Category	IsDispensableAmountAllowed
+1	emulsie voor cutaan gebruik	cutaan			FALSE	G-Standaard	FALSE
+2	oplossing voor hemofiltratie	iv;extra-corporaal			FALSE	G-Standaard	FALSE
+4	smelttablet	or			FALSE	G-Standaard	FALSE
+6	implantatiespons	implantatie			FALSE	G-Standaard	FALSE
+9	dispergeerbare tablet	or			FALSE	G-Standaard	FALSE
+10	zalf	cutaan;rect			FALSE	G-Standaard	FALSE
+12	zalf voor rectaal gebruik	rect			FALSE	G-Standaard	FALSE
+15	zalf voor inhalatiedamp	nasaal			FALSE	G-Standaard	FALSE
+16	omhulde tablet	or			FALSE	G-Standaard	FALSE
+17	gel voor oromucosaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+18	emulsie voor injectie	iv			FALSE	G-Standaard	FALSE
+19	capsule, zacht	or			FALSE	G-Standaard	FALSE
+21	suspensie voor injectie	im;sc;parenteraal;intra-articulair;lesionaal;intra-burs;peri-articulair;intra-vitreaal;iv;pleuraal			FALSE	G-Standaard	FALSE
+22	radiofarmaceutische uitgangsoplossing	niet van toepassing			FALSE	G-Standaard	FALSE
+23	radionuclide generator	inh			FALSE	G-Standaard	FALSE
+24	oplossing voor cutaan gebruik	cutaan			FALSE	G-Standaard	FALSE
+26	toedieningssysteem voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+27	filmomhulde tablet	or			FALSE	G-Standaard	FALSE
+31	maagsapresistente tablet + tablet	or			FALSE	G-Standaard	FALSE
+32	emulsie voor infusie	iv;parenteraal			FALSE	G-Standaard	FALSE
+33	collodion	cutaan			FALSE	G-Standaard	FALSE
+34	oogdruppels, suspensie	oog			FALSE	G-Standaard	FALSE
+36	implantatiegaas	implantatie			FALSE	G-Standaard	FALSE
+37	concentraat voor drank	or			FALSE	G-Standaard	FALSE
+38	concentraat voor mondspoeling	oromucosaal			FALSE	G-Standaard	FALSE
+40	pasta voor cutaan gebruik	cutaan			FALSE	G-Standaard	FALSE
+41	pasta voor oromucosaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+44	poeder voor suspensie voor injectie	im;sc;intra-derm			TRUE	G-Standaard	FALSE
+45	vloeistof voor oromucosaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+46	spray voor sublinguaal gebruik	sublinguaal			FALSE	G-Standaard	FALSE
+47	kit voor radiofarmaceutisch preparaat	parenteraal;iv			FALSE	G-Standaard	FALSE
+54	druppels voor oraal gebruik, oplossing	oromucosaal;sublinguaal			FALSE	G-Standaard	FALSE
+60	creme	cutaan;transdermaal;urethraal			FALSE	G-Standaard	FALSE
+61	creme voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+62	creme voor rectaal gebruik	rect			FALSE	G-Standaard	FALSE
+71	oplosbare tablet	or			FALSE	G-Standaard	FALSE
+72	gel voor gastro-enteraal gebruik	gastro-enteraal			FALSE	G-Standaard	FALSE
+73	lyophilisaat voor oraal gebruik	sublinguaal;or			FALSE	G-Standaard	FALSE
+79	injectie/infusieoplossing	epiduraal;peri-neuraal;iv;sc;im;parenteraal;intra-thecaal			FALSE	G-Standaard	FALSE
+80	tablet voor buccaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+81	infuus	iv;parenteraal;intra-vesicaal;im;intra-thecaal;epiduraal;peri-neuraal;lokaal;sc;cardiaal			FALSE	G-Standaard	FALSE
+82	injectie	sc;iv;im;intra-derm;intra-thecaal;intra-vitreaal;lesionaal			FALSE	G-Standaard	FALSE
+83	injectie/infuus	iv;im;sc;intra-thecaal;art;intra-vesicaal;parenteraal;peritoneaal;pleuraal;intra-tumor;pericardiaal;epiduraal;peri-neuraal;intra-articulair;intra-burs;rect;sublinguaal;lokaal;peri-bulbair;extra-corporaal			FALSE	G-Standaard	FALSE
+84	oplossing voor parenteraal/oraal gebruik	iv;or			FALSE	G-Standaard	FALSE
+85	tablet + kauwtablet	or			FALSE	G-Standaard	FALSE
+87	poeder voor suspensie voor oraal/rectaal gebruik	or;rect			TRUE	G-Standaard	FALSE
+88	oorpoeder	oor			FALSE	G-Standaard	FALSE
+89	suspensie voor dentaal gebruik	dentaal			FALSE	G-Standaard	FALSE
+90	kauwcapsule	or			FALSE	G-Standaard	FALSE
+92	levend weefsel equivalent	implantatie			FALSE	G-Standaard	FALSE
+93	pasta voor oraal gebruik	or			FALSE	G-Standaard	FALSE
+94	spray voor transdermaal gebruik, oplossing	transdermaal			FALSE	G-Standaard	FALSE
+95	dispersie voor infusie	iv			TRUE	G-Standaard	FALSE
+96	oogdruppels, emulsie	oog			FALSE	G-Standaard	FALSE
+97	concentraat voor orale suspensie	or			FALSE	G-Standaard	FALSE
+98	drank/mondspoeling	or;oromucosaal;oromucosaal			FALSE	G-Standaard	FALSE
+99	neuspoeder	nasaal			FALSE	G-Standaard	FALSE
+100	zetpil	rect			FALSE	G-Standaard	FALSE
+101	dispersie voor vernevelvloeistof	inh			FALSE	G-Standaard	FALSE
+102	dispersie voor injectie met vertraagde afgifte	peri-neuraal;lokaal			FALSE	G-Standaard	FALSE
+103	poeder voor oplossing voor intravesicaal gebruik	intra-vesicaal			TRUE	G-Standaard	FALSE
+104	gel voor intra-uterien gebruik	uterien;intra-cervic			FALSE	G-Standaard	FALSE
+110	oogzalf	oog			FALSE	G-Standaard	FALSE
+120	ovule	vaginaal			FALSE	G-Standaard	FALSE
+140	neuszalf	nasaal			FALSE	G-Standaard	FALSE
+151	oorzalf	oor			FALSE	G-Standaard	FALSE
+161	gel voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+162	gel voor rectaal gebruik	rect			FALSE	G-Standaard	FALSE
+165	gel voor oraal gebruik	or;oromucosaal			FALSE	G-Standaard	FALSE
+167	gel	cutaan;transdermaal;niet gespecificeerd of meervoudig;lokaal;urethraal;endo-tracheopulm			FALSE	G-Standaard	FALSE
+169	ooggel	oog			FALSE	G-Standaard	FALSE
+171	gel voor urethraal gebruik	urethraal			FALSE	G-Standaard	FALSE
+172	gel voor endocervicaal gebruik	endo-cervic			FALSE	G-Standaard	FALSE
+180	maagsapresistente capsule	or			FALSE	G-Standaard	FALSE
+190	inhalatiepoeder	inh			FALSE	G-Standaard	FALSE
+200	poeder voor oraal gebruik	or			FALSE	G-Standaard	FALSE
+213	strooipoeder	cutaan			FALSE	G-Standaard	FALSE
+214	inhalatiepoeder voor nasaal gebruik	nasaal			FALSE	G-Standaard	FALSE
+224	poeder voor oplossing	oromucosaal			TRUE	G-Standaard	FALSE
+225	poeder voor drank	or			FALSE	G-Standaard	FALSE
+226	poeder voor orale suspensie	or			TRUE	G-Standaard	FALSE
+227	poeder voor klysma	rect			TRUE	G-Standaard	FALSE
+229	poeder voor instillatievloeistof	intra-vesicaal			TRUE	G-Standaard	FALSE
+230	tablet	or			FALSE	G-Standaard	FALSE
+231	tablet + bruisgranulaat	or			FALSE	G-Standaard	FALSE
+235	reep	or			FALSE	G-Standaard	FALSE
+241	implantaat	sc;intra-vitreaal			FALSE	G-Standaard	FALSE
+242	implantatiestift	sc			FALSE	G-Standaard	FALSE
+250	maagsapresistente tablet	or			FALSE	G-Standaard	FALSE
+260	kauwtablet	or			FALSE	G-Standaard	FALSE
+261	kauwgom	or			FALSE	G-Standaard	FALSE
+270	bruistablet	or			FALSE	G-Standaard	FALSE
+280	dragee	or			FALSE	G-Standaard	FALSE
+300	capsule	or;vaginaal			FALSE	G-Standaard	FALSE
+301	capsule voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+310	tablet met gereguleerde afgifte	or			FALSE	G-Standaard	FALSE
+330	zuigtablet	or;oromucosaal			FALSE	G-Standaard	FALSE
+331	tablet voor sublinguaal gebruik	sublinguaal			FALSE	G-Standaard	FALSE
+350	capsule met gereguleerde afgifte	or			FALSE	G-Standaard	FALSE
+371	granulaat	or			FALSE	G-Standaard	FALSE
+375	granulaat met gereguleerde afgifte	or			FALSE	G-Standaard	FALSE
+377	bruisgranulaat	or			FALSE	G-Standaard	FALSE
+379	granulaat voor orale suspensie	or			FALSE	G-Standaard	FALSE
+380	tablet voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+382	maagsapresistent granulaat	or			FALSE	G-Standaard	FALSE
+400	drank	or			FALSE	G-Standaard	FALSE
+405	drank/concentraat voor klysma	or;rect			FALSE	G-Standaard	FALSE
+410	gorgeldrank	oromucosaal			FALSE	G-Standaard	FALSE
+420	mondspoeling	oromucosaal			FALSE	G-Standaard	FALSE
+430	oplossing	or;rect;cutaan;lokaal;oor;oromucosaal;nasaal			FALSE	G-Standaard	FALSE
+432	vloeistof voor inhalatiedamp	nasaal;inh			FALSE	G-Standaard	FALSE
+434	vloeistof	nasaal			FALSE	G-Standaard	FALSE
+436	spoeling voor urethraal gebruik	urethraal			FALSE	G-Standaard	FALSE
+437	concentraat voor oplossing	niet gespecificeerd of meervoudig			FALSE	G-Standaard	FALSE
+440	blaasspoeling	intra-vesicaal			FALSE	G-Standaard	FALSE
+460	klysma	rect			FALSE	G-Standaard	FALSE
+464	tablet voor klysma	rect			FALSE	G-Standaard	FALSE
+470	stroop	or			FALSE	G-Standaard	FALSE
+480	suspensie voor oraal gebruik	or			FALSE	G-Standaard	FALSE
+481	emulsie voor oraal gebruik	or			FALSE	G-Standaard	FALSE
+482	suspensie voor cutaan gebruik	cutaan			FALSE	G-Standaard	FALSE
+486	endotracheopulmonaire instillatie, suspensie	endo-tracheopulm			FALSE	G-Standaard	FALSE
+491	kruidenthee	or			FALSE	G-Standaard	FALSE
+500	oogdruppels	oog			FALSE	G-Standaard	FALSE
+510	oordruppels	oor			FALSE	G-Standaard	FALSE
+520	neusdruppels	nasaal			FALSE	G-Standaard	FALSE
+521	neusspray	nasaal			FALSE	G-Standaard	FALSE
+530	vernevelvloeistof	inh			FALSE	G-Standaard	FALSE
+531	aerosol	inh			FALSE	G-Standaard	FALSE
+535	inhalatiegas	inh			FALSE	G-Standaard	FALSE
+540	infusievloeistof	iv;sc;peritoneaal;intra-thecaal;intra-coronair;parenteraal;epiduraal;peri-neuraal;lokaal;peri-bulbair;im;or;extra-corporaal;intra-cerebraal			FALSE	G-Standaard	FALSE
+541	concentraat voor oplossing voor infusie	iv;parenteraal;inh;im;sc;epiduraal;intra-thecaal;nasaal;lesionaal;peri-neuraal;intra-coronair;extra-corporaal;niet van toepassing			FALSE	G-Standaard	FALSE
+550	injectievloeistof	im;iv;sc;intra-vitreaal;parenteraal;intra-thecaal;epiduraal;peri-neuraal;lokaal;intra-derm;submucosaal;intra-articulair;lesionaal;intra-burs;peri-articulair;art;endo-tracheopulm;or;extra-corporaal;intra-coronair;niet van toepassing;rect;uterien;intra-oculair;cutaan;intra-tympanaal;intra-vesicaal;cardiaal;intra-caverneus;peri-bulbair;lymfatisch;pleuraal;intra-ossaal			FALSE	G-Standaard	FALSE
+551	concentraat voor oplossing voor injectie	im;iv;intra-vitreaal;parenteraal;subretinaal			FALSE	G-Standaard	FALSE
+552	poeder voor injectievloeistof	im;iv;parenteraal;sc;intra-articulair;peri-articulair;rect;intra-thecaal;pleuraal;intra-oculair;peritoneaal;or;peri-bulbair;retro-bulbair;para-bulbair;intra-derm;art;intra-tumor;pericardiaal;lesionaal			TRUE	G-Standaard	FALSE
+553	poeder voor oplossing voor infusie	iv;art;peritoneaal;parenteraal;im			TRUE	G-Standaard	FALSE
+559	poeder voor injectie/infusieoplossing	iv;sc;im;intra-vesicaal			TRUE	G-Standaard	FALSE
+571	oplossing voor hemodialyse	extra-corporaal;hemodialyse			FALSE	G-Standaard	FALSE
+573	concentraat voor oplossing voor hemodialyse	hemodialyse			FALSE	G-Standaard	FALSE
+574	oplossing voor peritoneale dialyse	peritoneaal			FALSE	G-Standaard	FALSE
+575	oplossing voor hemofiltratie/hemodialyse	iv;extra-corporaal			FALSE	G-Standaard	FALSE
+590	druppels voor oraal gebruik	or;cutaan;lokaal			FALSE	G-Standaard	FALSE
+591	druppels voor oromucosaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+602	spray	niet gespecificeerd of meervoudig;lokaal;or;oromucosaal;sublinguaal;cutaan			FALSE	G-Standaard	FALSE
+611	spoeling	niet gespecificeerd of meervoudig;cutaan;peritoneaal;lokaal;vaginaal			FALSE	G-Standaard	FALSE
+621	instillatievloeistof	peritoneaal			FALSE	G-Standaard	FALSE
+630	oogwassing	oog			FALSE	G-Standaard	FALSE
+652	huidspray	cutaan			FALSE	G-Standaard	FALSE
+654	spray voor oromucosaal gebruik	oromucosaal			FALSE	G-Standaard	FALSE
+657	vloeistof voor vaginaal gebruik	vaginaal			FALSE	G-Standaard	FALSE
+660	oplosmiddel voor parenteraal gebruik	niet van toepassing;sc			FALSE	G-Standaard	FALSE
+710	shampoo	cutaan			FALSE	G-Standaard	FALSE
+720	huidstift	cutaan			FALSE	G-Standaard	FALSE
+724	ooginsert	oog			FALSE	G-Standaard	FALSE
+730	schuim voor cutaan gebruik	cutaan			FALSE	G-Standaard	FALSE
+732	schuim voor rectaal gebruik	rect			FALSE	G-Standaard	FALSE
+740	tandpasta	dentaal			FALSE	G-Standaard	FALSE
+743	gel voor dentaal gebruik	dentaal			FALSE	G-Standaard	FALSE
+751	pleister	cutaan;transdermaal			FALSE	G-Standaard	FALSE
+752	pleister voor transdermaal gebruik	transdermaal			FALSE	G-Standaard	FALSE
+753	geimpregneerd verbandgaas	cutaan			FALSE	G-Standaard	FALSE
+756	poeder voor cement	implantatie			FALSE	G-Standaard	FALSE
+760	iud (intra uterine device)	uterien			FALSE	G-Standaard	FALSE
+800	poeder voor vernevelvloeistof	inh			FALSE	G-Standaard	FALSE
+904	weefsellijm	epilesionaal			FALSE	G-Standaard	FALSE
+905	maagsapresistente tablet met gereguleerde afgifte	or			FALSE	G-Standaard	FALSE
+906	suspensie voor implantatie	intra-articulair			FALSE	G-Standaard	FALSE
+920	implantatiekraal	implantatie			FALSE	G-Standaard	FALSE
+991	poeder voor lokaal gebruik	or;lokaal			FALSE	G-Standaard	FALSE
+993	weefsellijm matrix	epilesionaal			FALSE	G-Standaard	FALSE
+994	kauw-/dispergeerbare tablet	or			FALSE	G-Standaard	FALSE
+995	pastille	oromucosaal			FALSE	G-Standaard	FALSE
+996	druppels voor sublinguaal gebruik	sublinguaal;or			FALSE	G-Standaard	FALSE
+997	concentraat voor oplossing voor injectie/infusie	iv			FALSE	G-Standaard	FALSE
+998	gas en oplosmiddel voor dispersie injectie/infusie	iv			FALSE	G-Standaard	FALSE
+999	concentraat voor oplossing voor cutaan gebruik	cutaan			TRUE	G-Standaard	FALSE
