@@ -965,7 +965,7 @@ module MetaVision =
                     |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
                     |> Array.collect (fun gpp -> gpp.Route)
                     |> Array.collect (String.splitAt ',')
-                    |> Array.filter ((<>) "Parenteraal")
+                    |> Array.filter ((String.equalsCapInsens "parenteraal") >> not)
                     |> Array.distinct
                 OrderingType =
                     mappingRouteShape
@@ -1001,7 +1001,7 @@ module MetaVision =
                 "ExternalCode", $"%i{r.ExternalCode}"
                 "DoseFormName", r.DoseFormName
                 "Routes", rs
-                "OrderType",$"{r.OrderingType}"
+                "OrderingType",$"{r.OrderingType}"
                 "IsDrugInSolution", $"{r.IsDrugInSolution |> mapBool}"
                 "Category", r.Category
                 "IsDispensableAmountAllowed", $"{r.IsDispensableAmountAllowed |> mapBool}"
@@ -1129,7 +1129,7 @@ module MetaVision =
                         |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
                         |> Array.collect (fun gpp -> gpp.Route)
                         |> Array.collect (String.splitAt ',')
-                        |> Array.filter ((<>) "Parenteraal")
+                        |> Array.filter ((String.equalsCapInsens "Parenteraal") >> not)
                         |> Array.distinct
                         |> Array.map mapRoute
                         |> String.concat ";"
@@ -1182,6 +1182,7 @@ module MetaVision =
                             |> Array.append cms
                 |}
             )
+            |> Array.filter (fun r -> r.Routes |> String.isNullOrWhiteSpace |> not)
             |> Array.sortBy (fun r -> r.MedicationName)
             |> Array.map (fun r ->
                 {| r with

@@ -753,7 +753,6 @@ articaine/adrenaline injv 40/0,01mg/ml	adrenaline	0,01	mg
 articaine/adrenaline injv 40/0,01mg/ml	articaine	40	mg		
 articaine/adrenaline injvlst 40/0,005mg/ml	adrenaline	0,005	mg		
 articaine/adrenaline injvlst 40/0,005mg/ml	articaine	40	mg		
-ascorbinezuur infopl conc 250mg/ml	ascorbinezuur	250	mg		
 ascorbinezuur injvlst 100mg/ml	ascorbinezuur	100	mg		
 ascorbinezuur oogdruppels 100mg/ml	ascorbinezuur	100	mg		
 ascorbinezuur poeder 400mg	ascorbinezuur	400	mg		
@@ -764,8 +763,6 @@ ascorbinezuur tablet 250mg	ascorbinezuur	250	mg
 ascorbinezuur tablet 250mg	stuk	1	stuk		
 ascorbinezuur tablet 500mg	ascorbinezuur	500	mg		
 ascorbinezuur tablet 500mg	stuk	1	stuk		
-ascorbinezuur/dexpanthenol infopl conc 100/2mg/ml	ascorbinezuur	100	mg		
-ascorbinezuur/dexpanthenol infopl conc 100/2mg/ml	dexpanthenol	2	mg		
 asfotase alfa injvlst  40mg/ml	asfotase alfa	40	mg		
 asfotase alfa injvlst 100mg/ml	asfotase alfa	100	mg		
 asparaginase infpoeder 10.000e (coli)	asparaginase	10000	E		
@@ -883,7 +880,6 @@ atropine tablet 0,25mg	atropine	0,25	mg
 atropine tablet 0,25mg	stuk	1	stuk		
 atropine/midazolam klysma 0,1/1mg/ml	atropine	0,1	mg		
 atropine/midazolam klysma 0,1/1mg/ml	midazolam	1	mg		
-aurothiobarnsteenzuur injvlst 100mg/ml	aurothiobarnsteenzuur	100	mg		
 autologe limba corne (st)cel weef equ 197500ce/cm2	autologe limbale corneale (stam)cellen	197500			
 autologe limba corne (st)cel weef equ 197500ce/cm2	cm^2	1	cm^2		
 avacopan capsule 10mg	avacopan	10	mg		
@@ -1367,10 +1363,6 @@ bof/mazelen/rubellavaccin  1 dosis (mmrvaxpro)	mazelenvaccin	1000	CCID50
 bof/mazelen/rubellavaccin  1 dosis (mmrvaxpro)	rubellavaccin	1000	CCID50		
 bof/mazelen/rubellavaccin  1 dosis (mmrvaxpro)	bofvaccin	12500	CCID50		
 bof/mazelen/rubellavaccin  1 dosis (mmrvaxpro)	stuk	1	stuk		
-bof/mazelen/rubellavaccin  1 dosis (priorix)	rubellavaccin	1000	CCID50		
-bof/mazelen/rubellavaccin  1 dosis (priorix)	bofvaccin	5000	CCID50		
-bof/mazelen/rubellavaccin  1 dosis (priorix)	mazelenvaccin	1000	CCID50		
-bof/mazelen/rubellavaccin  1 dosis (priorix)	stuk	1	stuk		
 boorzuur capsule vaginaal 600mg	boorzuur	600	mg		
 boorzuur capsule vaginaal 600mg	stuk	1	stuk		
 bortezomib injectie	bortezomib	1	mg		
@@ -1664,8 +1656,6 @@ butoconazol ovule 100mg	butoconazol	100	mg
 butoconazol ovule 100mg	stuk	1	stuk		
 butoconazol vaginaalcreme 20mg/g	butoconazol	20	mg		
 butoconazol vaginaalcreme 20mg/g	g	1	g		
-c1-esteraseremmer infusiepoeder 500e	c1-esteraseremmer	500	E		
-c1-esteraseremmer infusiepoeder 500e	stuk	1	stuk		
 c1-esteraseremmer injpdr 1500ie	c1-esteraseremmer	1500	IE		
 c1-esteraseremmer injpdr 1500ie	stuk	1	stuk		
 c1-esteraseremmer injpdr 2000ie	c1-esteraseremmer	2000	IE		
@@ -1969,7 +1959,6 @@ caspofungine infusiepoeder 70mg	caspofungine	70	mg
 caspofungine infusiepoeder 70mg	stuk	1	stuk		
 caspofungine infuus	caspofungine	1	mg		
 caspofungine infuus	mg	1	mg		
-caspofungine infvlst 0,5mg/ml	caspofungine	0,555	mg		
 cefaclor tablet omhuld 500mg	cefaclor	500	mg		
 cefaclor tablet omhuld 500mg	stuk	1	stuk		
 cefalexine tablet 500mg	cefalexine	500	mg		
@@ -2008,7 +1997,6 @@ cefixim tablet 400mg	cefixim	400	mg
 cefixim tablet 400mg	stuk	1	stuk		
 cefotaxim infuus	cefotaxim	1	mg		
 cefotaxim infuus	mg	1	mg		
-cefotaxim infvlst 30mg/ml	cefotaxim	31,444	mg		
 cefotaxim injectiepoeder  500mg	cefotaxim	524,063	mg		
 cefotaxim injectiepoeder  500mg	stuk	1	stuk		
 cefotaxim injectiepoeder 1000mg	cefotaxim	1000	mg		
@@ -2084,8 +2072,6 @@ ceftriaxon injvlst 100mg/ml	ceftriaxon	100	mg
 ceftriaxon injvlst 50mg/ml	ceftriaxon	50	mg		
 ceftriaxon pdr inj/infopl 100g (smartpak)	ceftriaxon	100	g		
 ceftriaxon pdr inj/infopl 100g (smartpak)	stuk	1	stuk		
-cefuroxim infusiepoeder 1500mg	cefuroxim	1577,757	mg		
-cefuroxim infusiepoeder 1500mg	stuk	1	stuk		
 cefuroxim infuus	cefuroxim	1	mg		
 cefuroxim infuus	mg	1	mg		
 cefuroxim infvlst 12mg/ml	cefuroxim	12	mg		
@@ -2833,8 +2819,6 @@ dapson tablet 100mg	stuk	1	stuk
 daptomycine pdr inj/infopl 500mg	daptomycine	500	mg		
 daptomycine pdr inj/infopl 500mg	stuk	1	stuk		
 daratumumab infopl conc 20mg/ml	daratumumab	20	mg		
-daratumumab infuus	daratumumab	1	mg		
-daratumumab infuus	mg	1	mg		
 daratumumab injectie/infuus	daratumumab	1	mg		
 daratumumab injectie/infuus	mg	1	mg		
 daratumumab injvlst 120mg/ml	daratumumab	120	mg		
@@ -3220,7 +3204,6 @@ dimethylsulfoxide creme 250mg/g	dimethylsulfoxide	250	mg
 dimethylsulfoxide creme 250mg/g	g	1	g		
 dimethylsulfoxide creme 500mg/g	dimethylsulfoxide	500	mg		
 dimethylsulfoxide creme 500mg/g	g	1	g		
-dimethylsulfoxide injopl conc 0,5ml/ml	dimethylsulfoxide	550	mg		
 dimethylsulfoxide opl cutaan 1000mg/g	dimethylsulfoxide	1000	mg		
 dimethylsulfoxide opl cutaan 1000mg/g	g	1	g		
 dimethylsulfoxide opl cutaan 1ml/ml	dimethylsulfoxide	1	mL		
@@ -3334,7 +3317,6 @@ dobutamine infuus	mg	1	mg
 dobutamine infvlst  3mg/ml	dobutamine	3,363	mg		
 dobutamine infvlst  5mg/ml	dobutamine	5	mg		
 dobutamine infvlst 7,5mg/ml	dobutamine	7,5	mg		
-dobutamine injvlst 5mg/ml	dobutamine	5,604	mg		
 docetaxel infopl conc 20mg/ml	docetaxel	20	mg		
 docetaxel infopl conc 40mg/ml	docetaxel	40	mg		
 docetaxel infuus	docetaxel	1	mg		
@@ -3388,8 +3370,6 @@ dosulepine capsule 25mg	dosulepine	25	mg
 dosulepine capsule 25mg	stuk	1	stuk		
 dosulepine dragee 75mg	dosulepine	75	mg		
 dosulepine dragee 75mg	stuk	1	stuk		
-doxapram infvlst 2mg/ml	doxapram	2	mg		
-doxapram injvlst 20mg/ml	doxapram	20	mg		
 doxazosine tablet mga 4mg	doxazosine	4	mg		
 doxazosine tablet mga 4mg	stuk	1	stuk		
 doxazosine tablet mga 8mg	doxazosine	8	mg		
@@ -3488,7 +3468,6 @@ echinacea/salvia extract spray oromucosaal	dosis	1	dosis
 eculizumab infopl conc 10mg/ml	eculizumab	10	mg		
 eculizumab infuus	eculizumab	1	mg		
 eculizumab infuus	mg	1	mg		
-edetinezuur infopl conc 150mg/ml	edetinezuur	150	mg		
 edetinezuur oogdruppels  4mg/ml	edetinezuur	4	mg		
 edetinezuur oogdruppels 20mg/ml	edetinezuur	20	mg		
 edetinezuur oogwassing  4mg/ml	edetinezuur	4	mg		
@@ -4411,8 +4390,6 @@ flucytosine infvlst 10mg/ml	flucytosine	10	mg
 fludarabine injectie/infuus	fludarabine	1	mg		
 fludarabine injectie/infuus	mg	1	mg		
 fludarabine injopl conc 25mg/ml	fludarabine	25	mg		
-fludarabine pdr v injvlst 50mg	fludarabine	50	mg		
-fludarabine pdr v injvlst 50mg	stuk	1	stuk		
 fludarabine tablet omhuld 10mg	fludarabine	10	mg		
 fludarabine tablet omhuld 10mg	stuk	1	stuk		
 fludrocortison tablet  62,5ug	fludrocortison	62,5	µg		
@@ -4628,9 +4605,6 @@ fosfaten inf con 1,5mmol/ml (na/k-fosfaten)(a15)	kaliumdiwaterstoffosfaat	170	mg
 fosfaten inf con 1,5mmol/ml (na/k-fosfaten)(asz)	dinatriumwaterstoffosfaat	90,5	mg		
 fosfaten inf con 1,5mmol/ml (na/k-fosfaten)(asz)	kaliumdiwaterstoffosfaat	170	mg		
 fosfaten inf con 1mmol/ml (natriumfosfaat)	natriumdiwaterstoffosfaat	155	mg		
-fosfaten inf con 2mmol/ml (na/k-fosfaten)	dinatriumwaterstoffosfaat	133,5	mg		
-fosfaten inf con 2mmol/ml (na/k-fosfaten)	kaliumdiwaterstoffosfaat	170,1	mg		
-fosfaten inf con 2mmol/ml (na/k-fosfaten)	kaliumhydroxide	14	mg		
 fosfaten inf con 2mmol/ml (natriumfosfaat)	natriumdiwaterstoffosfaat	312	mg		
 fosfaten inf con 3mmol/ml	natriumdiwaterstoffosfaat	91,67	mg		
 fosfaten inf con 3mmol/ml	dinatriumwaterstoffosfaat	119	mg		
@@ -4642,7 +4616,6 @@ fosfaten infvlst 0,6mmol/ml (na/k-fosfaten)	dinatriumwaterstoffosfaat	36,2	mg
 fosfaten infvlst 0,6mmol/ml (na/k-fosfaten)	kaliumdiwaterstoffosfaat	68	mg		
 fosfaten infvlst 1mmol/ml (na/k-fosfaten)	dinatriumwaterstoffosfaat	119,26	mg		
 fosfaten infvlst 1mmol/ml (na/k-fosfaten)	kaliumdiwaterstoffosfaat	90,76	mg		
-fosfatidylcholine infvlst 50mg/ml	fosfatidylcholine	50	mg		
 fosfolipiden endotr inst sus 80mg/ml	colfosceril	80	mg		
 fosfomycine granulaat 3g	fosfomycine	3	g		
 fosfomycine granulaat 3g	stuk	1	stuk		
@@ -5162,7 +5135,6 @@ hydrocortison granulaat 2mg	hydrocortison	2	mg
 hydrocortison granulaat 2mg	stuk	1	stuk		
 hydrocortison granulaat 5mg	hydrocortison	5	mg		
 hydrocortison granulaat 5mg	stuk	1	stuk		
-hydrocortison injvlst 5mg/ml	hydrocortison	6,709	mg		
 hydrocortison oogdruppels 3,35mg/ml	hydrocortison	3,35	mg		
 hydrocortison oogzalf 10mg/g	hydrocortison	10	mg		
 hydrocortison oogzalf 10mg/g	g	1	g		
@@ -5391,7 +5363,6 @@ ibutilide infvlst 87ug/ml	ibutilide	87	µg
 icatibant injvlst 10mg/ml	icatibant	10	mg		
 ichthammol zalf 100mg/g	ichthammol	100	mg		
 ichthammol zalf 100mg/g	g	1	g		
-idarubicine infopl conc 1mg/ml	idarubicine	1	mg		
 idarubicine infuus	idarubicine	1	mg		
 idarubicine infuus	mg	1	mg		
 idarubicine injvlst 1mg/ml	idarubicine	1	mg		
@@ -5672,8 +5643,6 @@ isoprenaline infopl conc 0,2mg/ml	isoprenaline	0,2	mg
 isoprenaline infopl conc 1mg/ml	isoprenaline	1	mg		
 isoprenaline infuus	isoprenaline	1	mg		
 isoprenaline infuus	mg	1	mg		
-isoprenaline infvlst 1mg/ml	isoprenaline	1	mg		
-isoprenaline injvlst 1mg/ml	isoprenaline	1,069	mg		
 isopropanol/propanol/mecetronium opl cutaan	isopropanol	381	mg		
 isopropanol/propanol/mecetronium opl cutaan	propanol	254	mg		
 isopropanol/propanol/mecetronium opl cutaan	mecetronium	1,7	mg		
@@ -5712,7 +5681,6 @@ isotretinoine capsule zacht 20mg	stuk	1	stuk
 itraconazol capsule 100mg	itraconazol	100	mg		
 itraconazol capsule 100mg	stuk	1	stuk		
 itraconazol drank 10mg/ml	itraconazol	10	mg		
-itraconazol infopl conc 10mg/ml	itraconazol	10	mg		
 ivabradine tablet 2,5mg	ivabradine	2,5	mg		
 ivabradine tablet 2,5mg	stuk	1	stuk		
 ivabradine tablet 5mg	ivabradine	5	mg		
@@ -5856,7 +5824,6 @@ kamfer/levomenthol/eucalyptus zalf v inhalatiedamp	kamfer	26	mg
 kamfer/levomenthol/eucalyptus zalf v inhalatiedamp	levomenthol	40	mg		
 kamfer/levomenthol/eucalyptus zalf v inhalatiedamp	eucalyptus	20	mg		
 kamfer/levomenthol/eucalyptus zalf v inhalatiedamp	g	1	g		
-kanamycine injvlst 250mg/ml	kanamycine	300,619	mg		
 kava kava extract 30% capsule 250 mg	piper methysticum	250	mg		
 kava kava extract 30% capsule 250 mg	stuk	1	stuk		
 ketamine creme 100mg/g	ketamine	100	mg		
@@ -7109,8 +7076,6 @@ methenamine tablet msr 500mg	stuk	1	stuk
 methionine poeder voor drank 5g	methionine	5	g		
 methionine poeder voor drank 5g	stuk	1	stuk		
 methionine susp oraal 200mg/ml	methionine	200	mg		
-methohexital injectiepoeder 500mg	methohexital	500	mg		
-methohexital injectiepoeder 500mg	stuk	1	stuk		
 methotrexaat infopl conc 100mg/ml	methotrexaat	100	mg		
 methotrexaat injectie/infuus	methotrexaat	1	mg		
 methotrexaat injectie/infuus	mg	1	mg		
@@ -7331,9 +7296,6 @@ mexiletine capsule 125mg (=150mg mexiletine hcl)	stuk	1	stuk
 mexiletine capsule 167mg (=200mg mexiletine hcl)	mexiletine	167	mg		
 mexiletine capsule 167mg (=200mg mexiletine hcl)	mexiletine	200	mg		
 mexiletine capsule 167mg (=200mg mexiletine hcl)	stuk	1	stuk		
-mgso4/kcl/pyridoxine infopl conc 250/74,5/5mg/ml	magnesiumsulfaat	250	mg		
-mgso4/kcl/pyridoxine infopl conc 250/74,5/5mg/ml	kaliumchloride	74,5	mg		
-mgso4/kcl/pyridoxine infopl conc 250/74,5/5mg/ml	pyridoxine	5	mg		
 mianserine tablet 10mg	mianserine	10	mg		
 mianserine tablet 10mg	stuk	1	stuk		
 mianserine tablet 30mg	mianserine	30	mg		
@@ -7611,8 +7573,6 @@ morfine/dexamethason infvlst 20/0,08mg/ml	morfine	20	mg
 morfine/dexamethason infvlst 20/0,08mg/ml	dexamethason	0,08	mg		
 morfine/dexamethason infvlst 5/0,07mg/ml	morfine	5	mg		
 morfine/dexamethason infvlst 5/0,07mg/ml	dexamethason	0,07	mg		
-morfine/droperidol infvlst 1/0,05mg/ml	morfine	1	mg		
-morfine/droperidol infvlst 1/0,05mg/ml	droperidol	0,05	mg		
 moroctocog alfa injectiepoeder  250ie	moroctocog alfa	250	IE		
 moroctocog alfa injectiepoeder  250ie	stuk	1	stuk		
 moroctocog alfa injectiepoeder  500ie	moroctocog alfa	500	IE		
@@ -7743,7 +7703,6 @@ natrium-/magnesium-/kaliumsulfaat drank	magnesiumsulfaat	18,614	mg
 natrium-/magnesium-/kaliumsulfaat drank	kaliumsulfaat	17,784	mg		
 natrium-/magnesium-/kaliumsulfaat drank	natriumsulfaat	99,489	mg		
 natriumcalciumedetaat infvlst 200mg/ml	natriumcalciumedetaat	200	mg		
-natriumcalciumedetaat injvlst 190mg/ml	natriumcalciumedetaat	190	mg		
 natriumcarbonaat oordruppels 100mg/ml	natriumcarbonaat	100	mg		
 natriumchloride blaasspoeling 9mg/ml	natriumchloride	9	mg		
 natriumchloride capsule  25mg	natriumchloride	25	mg		
@@ -8393,7 +8352,6 @@ oxycodon capsule 10mg	stuk	1	stuk
 oxycodon capsule 20mg	oxycodon	20	mg		
 oxycodon capsule 20mg	stuk	1	stuk		
 oxycodon drank 10mg/ml	oxycodon	10	mg		
-oxycodon infvlst  5mg/ml	oxycodon	5	mg		
 oxycodon injectie/infuus	oxycodon	1	mg		
 oxycodon injectie/infuus	mg	1	mg		
 oxycodon injvlst 10mg/ml	oxycodon	10	mg		
@@ -8680,8 +8638,6 @@ peginterferon alfa 2a injvlst 270ug/ml	peginterferon alfa 2a	270	µg
 peginterferon alfa 2a injvlst 360ug/ml	peginterferon alfa 2a	360	µg		
 peginterferon alfa 2b injectie	peginterferon alfa 2b	1	µg		
 peginterferon alfa 2b injectie	µg	1	µg		
-peginterferon alfa 2b injectiepoeder  50ug	peginterferon alfa 2b	50	µg		
-peginterferon alfa 2b injectiepoeder  50ug	stuk	1	stuk		
 peginterferon beta 1a biogen idec injvlst 126ug/ml	peginterferon beta 1a "biogen idec"	126	µg		
 peginterferon beta 1a biogen idec injvlst 188ug/ml	peginterferon beta 1a "biogen idec"	188	µg		
 peginterferon beta 1a biogen idec injvlst 250ug/ml	peginterferon beta 1a "biogen idec"	250	µg		
@@ -9240,8 +9196,6 @@ probenecide tablet 250mg	stuk	1	stuk
 procainamide injectie/infuus	procainamide	1	mg		
 procainamide injectie/infuus	mg	1	mg		
 procainamide injvlst 100mg/ml	procainamide	100	mg		
-procaine injvlst 10mg/ml	procaine	10	mg		
-procaine injvlst 20mg/ml	procaine	20	mg		
 procarbazine capsule 10mg	procarbazine	10	mg		
 procarbazine capsule 10mg	stuk	1	stuk		
 procarbazine capsule 20mg	procarbazine	23,299	mg		
@@ -9432,7 +9386,6 @@ ranibizumab injvlst 10mg/ml	ranibizumab	10	mg
 ranitidine drank 15mg/ml	ranitidine	15	mg		
 ranitidine injectie/infuus	ranitidine	1	mg		
 ranitidine injectie/infuus	mg	1	mg		
-ranitidine injvlst 25mg/ml	ranitidine	27,899	mg		
 rasagiline tablet 1mg	rasagiline	1	mg		
 rasagiline tablet 1mg	stuk	1	stuk		
 rasburicase infusiepoeder 1,5mg	rasburicase	1,5	mg		
@@ -9459,7 +9412,6 @@ rehydratiezout poeder voor drank norit	natriumchloride	520	mg
 rehydratiezout poeder voor drank norit	natriumcitraat	580	mg		
 rehydratiezout poeder voor drank norit	glucose	2,7	g		
 rehydratiezout poeder voor drank norit	stuk	1	stuk		
-remdesivir infopl conc 5mg/ml	remdesivir	5	mg		
 remdesivir infusiepoeder 100mg	remdesivir	100	mg		
 remdesivir infusiepoeder 100mg	stuk	1	stuk		
 remifentanil infvlst 0,02mg/ml	remifentanil	0,02	mg		
@@ -10339,7 +10291,6 @@ tapentadol tablet mga 250mg	tapentadol	250	mg
 tapentadol tablet mga 250mg	stuk	1	stuk		
 tasonermine infusiepoeder 1mg	tasonermine	1	mg		
 tasonermine infusiepoeder 1mg	stuk	1	stuk		
-taurine injvlst 50mg/ml	taurine	50	mg		
 tauro-ursodeoxycholzuur capsule 500mg	tauro-ursodeoxycholzuur	500	mg		
 tauro-ursodeoxycholzuur capsule 500mg	stuk	1	stuk		
 taurolidine instillatievlst 20mg/ml	taurolidine	20	mg		
@@ -10587,8 +10538,6 @@ tijm extract/althaea wortelext pastille 51,1/4,5mg	althaea	4,5	mg
 tijm extract/althaea wortelext pastille 51,1/4,5mg	tijm	51,1	mg		
 tijm extract/althaea wortelext pastille 51,1/4,5mg	stuk	1	stuk		
 tildrakizumab injvlst 100mg/ml	tildrakizumab	100	mg		
-tilmanocept kit radiof prep 50ug	tilmanocept	50	µg		
-tilmanocept kit radiof prep 50ug	stuk	1	stuk		
 timolol oogdruppels 2,5mg/ml	timolol	2,5	mg		
 timolol oogdruppels 5mg/ml	timolol	5	mg		
 timolol ooggel 1mg/g	timolol	1	mg		
@@ -10694,7 +10643,6 @@ tofacitinib tablet 10mg	tofacitinib	10	mg
 tofacitinib tablet 10mg	stuk	1	stuk		
 tofacitinib tablet mga 11mg	tofacitinib	11	mg		
 tofacitinib tablet mga 11mg	stuk	1	stuk		
-tolbutamide injvlst 25mg/ml	tolbutamide	25	mg		
 tolbutamide tablet  250mg	tolbutamide	250	mg		
 tolbutamide tablet  250mg	stuk	1	stuk		
 tolbutamide tablet  500mg	tolbutamide	500	mg		
@@ -10814,8 +10762,6 @@ trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)	trastuzumab	420	mg
 trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)	stuk	1	stuk		
 trastuzumab infusiepoeder 60mg (zercepac)	trastuzumab	60	mg		
 trastuzumab infusiepoeder 60mg (zercepac)	stuk	1	stuk		
-trastuzumab infuus (herc/herz/kanj/ogiv/traz)	trastuzumab	1	mg		
-trastuzumab infuus (herc/herz/kanj/ogiv/traz)	mg	1	mg		
 trastuzumab inj/inf (her/kan/ogi/ont/tra/zer)	trastuzumab	1	mg		
 trastuzumab inj/inf (her/kan/ogi/ont/tra/zer)	mg	1	mg		
 trastuzumab injvlst 120mg/ml (herceptin)	trastuzumab	120	mg		

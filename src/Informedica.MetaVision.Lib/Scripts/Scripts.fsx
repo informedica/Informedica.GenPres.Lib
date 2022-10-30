@@ -90,3 +90,66 @@ GenPresProduct.get true
 GenPresProduct.get true
 |> MetaVision.createSolutions "Solutions.csv"
 |> Array.length
+
+
+let rts1 =
+    MetaVision.createRoutes "Routes.csv"
+    |> Array.map (String.split "\t")
+    |> Array.map List.toArray
+    |> Array.map (Array.item 1)
+    |> Array.skip 1
+
+let rts2 =
+    MetaVision.createDoseForms "DoseForms.csv"
+    |> Array.map (String.split "\t")
+    |> Array.map List.toArray
+    |> Array.map (Array.item 2)
+    |> Array.collect (String.splitAt ';')
+    |> Array.skip 1
+    |> Array.distinct
+
+rts1 |> Array.length
+rts2 |> Array.length
+
+rts2 |> Array.forall (fun r -> rts1 |> Array.exists ((=) r))
+
+
+let forms1 =
+    MetaVision.createDoseForms "DoseForms.csv"
+    |> Array.map (String.split "\t")
+    |> Array.map List.toArray
+    |> Array.map (Array.item 1)
+    |> Array.skip 1
+    |> Array.distinct
+
+let meds =
+    GenPresProduct.get true
+    |> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Products.csv"
+
+let forms2 =
+    meds
+    |> Array.map (String.split "\t")
+    |> Array.map (List.toArray)
+    |> Array.map (Array.item 9)
+    |> Array.skip 1
+    |> Array.distinct
+
+// all forms in meds should exist in forms
+forms2 |> Array.forall (fun f -> forms1 |> Array.exists ((=) f))
+
+let rts3 =
+    meds
+    |> Array.map (String.split "\t")
+    |> Array.map List.toArray
+    |> Array.map (Array.item 10)
+    |> Array.collect (String.splitAt ';')
+    |> Array.skip 1
+    |> Array.distinct
+
+// all routes in meds should exists in routes
+rts3 |> Array.forall (fun r ->
+    let b = rts1 |> Array.exists ((=) r)
+    if not b then printfn $"||{r}||"
+    b
+)
+
