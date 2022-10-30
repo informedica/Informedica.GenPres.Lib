@@ -37,7 +37,7 @@ GenPresProduct.get true
 )
 *)
 //|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
-|> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Products.csv"
+|> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Brands.csv" "Products.csv"
 |> Array.length
 
 
@@ -124,7 +124,7 @@ let forms1 =
 
 let meds =
     GenPresProduct.get true
-    |> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Products.csv"
+    |> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Brands.csv" "Products.csv"
 
 let forms2 =
     meds

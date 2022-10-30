@@ -8,6 +8,7 @@
     <Compile Include="MetaVision.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Scripts.fsx" />
+    <None Include="Scripts\ClosedXML.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.ZForm.Lib\Informedica.ZForm.Lib.fsproj" />

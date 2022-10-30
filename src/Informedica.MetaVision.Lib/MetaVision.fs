@@ -799,13 +799,12 @@ module Utils =
         |> function
         | [||]   ->
             printfn $"cannot find {freq} in mapping"
-            ""
+            [||]
         | xs ->
             xs
             |> Array.collect (fun r -> r[1..2])
             |> Array.filter (String.isNullOrWhiteSpace >> not)
             |> Array.distinct
-            |> String.concat ";"
 
 
     let getFormulary gpk =
@@ -816,9 +815,9 @@ module Utils =
         | Some xs ->
             [
                 if xs[1] <> "" then UMCU
-                if xs[6] <> "" then ICC
-                if xs[8] <> "" then PICU
-                if xs[7] <> "" then NICU
+                if xs[6] = "TRUE" then ICC
+                if xs[8] = "TRUE" then PICU
+                if xs[7] = "TRUE" then NICU
             ]
         | None -> []
 
@@ -882,7 +881,7 @@ module Utils =
         |> RuleFinder.find true
         |> Array.map (fun dr -> $"{dr.Freq.Frequency} {dr.Freq.Time}")
         |> Array.distinct
-        |> Array.map mapFreq
+        |> Array.collect mapFreq
         |> Array.distinct
         |> String.concat ";"
 
@@ -996,6 +995,7 @@ module MetaVision =
             let rs =
                 r.Routes
                 |> Array.map mapRoute
+                |> Array.distinct
                 |> String.concat ";"
             [|
                 "ExternalCode", $"%i{r.ExternalCode}"
@@ -1064,9 +1064,11 @@ module MetaVision =
         |> ignore
 
 
-    let createMedications pathIngr pathMed pathCompl pathProd meds =
+
+    let createMedications pathIngr pathMed pathCompl pathBrand pathProd meds =
         let mapMeds = (Array.mapStringHeadings Constants.medicationHeadings) >> (String.concat "\t")
         let mapComp = (Array.mapStringHeadings Constants.complexMedicationHeadings) >> (String.concat "\t")
+        let mapBrand = (Array.mapStringHeadings Constants.brandHeadings) >> (String.concat "\t")
         let mapProd = (Array.mapStringHeadings Constants.productHeadings) >> (String.concat "\t")
 
         meds |> createIngredients pathIngr
@@ -1180,6 +1182,16 @@ module MetaVision =
                                     |}
                                 |]
                             |> Array.append cms
+
+                    Brands =
+                        gp.PrescriptionProducts
+                        |> Array.collect (fun pp ->
+                            pp.TradeProducts
+                            |> Array.map (fun tp -> tp.Brand)
+                        )
+                        |> Array.filter (String.isNullOrWhiteSpace >> not)
+                        |> Array.distinct
+
                 |}
             )
             |> Array.filter (fun r -> r.Routes |> String.isNullOrWhiteSpace |> not)
@@ -1215,6 +1227,22 @@ module MetaVision =
                             |]
                 |}
             )
+
+        meds
+        |> Array.filter (fun r -> r.Brands |> Array.isEmpty |> not)
+        |> Array.collect (fun r ->
+            r.Brands
+            |> Array.map (fun b ->
+                [|
+                    "BrandName", b
+                    "MedicationName", r.MedicationName
+                |]
+                |> mapBrand
+            )
+        )
+        |> Array.append [| Constants.brandHeadings |> String.concat "\t" |]
+        |> print pathBrand
+        |> ignore
 
         meds
         |> Array.collect (fun r -> r.ComplexMedications)
