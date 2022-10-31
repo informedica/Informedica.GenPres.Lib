@@ -13,16 +13,16 @@ open Informedica.ZIndex.Lib.ATCGroup
 open Informedica.ZIndex.Lib.GenericProduct
 
 
-MetaVision.getDrugFamilies "DrugFamilies.csv"
+MetaVision.getDrugFamilies "DrugFamilies"
 
 
-MetaVision.shapeUnits "ShapeUnits.csv"
+MetaVision.shapeUnits "ShapeUnits"
 
 
-MetaVision.createRoutes "Routes.csv"
+MetaVision.createRoutes "Routes"
 
 
-MetaVision.createDoseForms "DoseForms.csv"
+MetaVision.createDoseForms "DoseForms"
 
 
 GenPresProduct.get true
@@ -37,7 +37,7 @@ GenPresProduct.get true
 )
 *)
 //|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
-|> MetaVision.createMedications "Ingredients.csv" "Medications.csv" "ComplexMedications.csv" "Brands.csv" "Products.csv"
+|> MetaVision.createMedications "Ingredients" "Medications" "ComplexMedications" "Brands" "Products"
 |> Array.length
 
 

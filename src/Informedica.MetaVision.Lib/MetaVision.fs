@@ -1,5 +1,6 @@
 ﻿namespace Informedica.MetaVision.Lib
 
+open ClosedXML.Excel
 
 open System.Runtime
 open Informedica.Utils.Lib
@@ -611,6 +612,7 @@ module Constants =
 [<AutoOpen>]
 module Utils =
 
+
     [<RequireQualifiedAccess>]
     module Array =
 
@@ -886,10 +888,23 @@ module Utils =
         |> String.concat ";"
 
 
-    let print file xs =
+    let loadDataImport (sheet : string) xs =
+        let wb = new XLWorkbook("data/output/DrugDatabaseForImport.xlsx")
+        wb.Worksheet(sheet).Cell(2, 3).Value <- xs
+        wb.Save()
+
+
+    let print b file xs =
+        if b then
+            xs
+            |> Array.map (String.split "\t")
+            |> Array.map List.toArray
+            |> Array.skip 1
+            |> loadDataImport file
+
         xs
         |> String.concat "\n"
-        |> File.writeTextToFile $"data/output/{file}"
+        |> File.writeTextToFile $"data/output/{file}.csv"
 
         xs
 
@@ -906,20 +921,20 @@ module MetaVision =
         |> Array.distinct
         |> Array.sort
         |> Array.map (fun (m, s) -> $"{m}\t{s}")
-        |> print path
+        |> print false path
 
 
-    let shapeUnits path =
+    let shapeUnits name =
         GenPresProduct.get true
         //|> Array.filter (fun gpp -> gpp.Shape |> String.toLower |> String.contains "concentraat" )
         |> Array.collect (fun gpp -> gpp.GenericProducts)
         |> Array.map (fun gp -> gp.Shape, gp.Substances[0].ShapeUnit)
         |> Array.distinct
         |> Array.map (fun (s, u) -> $"{s |> String.trim |> String.toLower}\t{u |> String.trim |> String.toLower}")
-        |> print path
+        |> print false name
 
 
-    let createRoutes path =
+    let createRoutes name =
         let mapRts = (Array.mapStringHeadings Constants.routeHeadings) >> (String.concat "\t")
         // Get routes and external codes
         // Intra seperated by -
@@ -945,10 +960,10 @@ module MetaVision =
             |> mapRts
         )
         |> Array.append [| Constants.routeHeadings |> String.concat "\t" |]
-        |> print path
+        |> print true name
 
 
-    let createDoseForms path =
+    let createDoseForms name =
         let mapForms = (Array.mapStringHeadings Constants.doseFormHeadings) >> (String.concat "\t")
 
         // Get doseforms
@@ -1010,10 +1025,10 @@ module MetaVision =
             |> mapForms
         )
         |> Array.append [| Constants.doseFormHeadings |> String.concat "\t" |]
-        |> print path
+        |> print true name
 
 
-    let createIngredients path (gpps : GenPresProduct[]) =
+    let createIngredients name (gpps : GenPresProduct[]) =
         let mapIngrs = (Array.mapStringHeadings Constants.ingredientHeadings) >> (String.concat "\t")
 
         let substs =
@@ -1060,18 +1075,18 @@ module MetaVision =
             |> mapIngrs
         )
         |> Array.append [| Constants.ingredientHeadings |> String.concat "\t" |]
-        |> print path
+        |> print true name
         |> ignore
 
 
 
-    let createMedications pathIngr pathMed pathCompl pathBrand pathProd meds =
+    let createMedications ingrName medName complName brandName prodName meds =
         let mapMeds = (Array.mapStringHeadings Constants.medicationHeadings) >> (String.concat "\t")
         let mapComp = (Array.mapStringHeadings Constants.complexMedicationHeadings) >> (String.concat "\t")
         let mapBrand = (Array.mapStringHeadings Constants.brandHeadings) >> (String.concat "\t")
         let mapProd = (Array.mapStringHeadings Constants.productHeadings) >> (String.concat "\t")
 
-        meds |> createIngredients pathIngr
+        meds |> createIngredients ingrName
 
         let meds =
             meds
@@ -1241,7 +1256,7 @@ module MetaVision =
             )
         )
         |> Array.append [| Constants.brandHeadings |> String.concat "\t" |]
-        |> print pathBrand
+        |> print true brandName
         |> ignore
 
         meds
@@ -1258,7 +1273,7 @@ module MetaVision =
             |> mapComp
         )
         |> Array.append [| Constants.complexMedicationHeadings |> String.concat "\t" |]
-        |> print pathCompl
+        |> print true complName
         |> ignore
 
         meds
@@ -1288,7 +1303,7 @@ module MetaVision =
             |> mapProd
         )
         |> Array.append [| Constants.productHeadings |> String.concat "\t" |]
-        |> print pathProd
+        |> print true prodName
         |> ignore
 
 
@@ -1317,7 +1332,7 @@ module MetaVision =
             |> mapMeds
         )
         |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
-        |> print pathMed
+        |> print true medName
 
 
     let createSolutions solPath (meds : GenPresProduct[]) =
@@ -1377,4 +1392,4 @@ module MetaVision =
             )
         )
         |> Array.append [| Constants.solutionHeadings |> String.concat "\t" |]
-        |> print solPath
+        |> print false solPath

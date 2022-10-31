@@ -4,10 +4,8 @@
 
 #load "../MetaVision.fs"
 
-#r "nuget: ClosedXML"
 
 open System
-open ClosedXML
 
 open ClosedXML.Excel
 open Informedica.Utils.Lib
@@ -25,10 +23,15 @@ let rts =
     MetaVision.createRoutes "Routes.csv"
     |> Array.map (fun s -> s |> String.split "\t" |> List.toArray)
 
-let loadDataImport =
+let loadDataImport rts forms ingrds meds compl brands prods =
     let wb = new XLWorkbook("data/output/DrugDatabaseForImport.xlsx")
-    let ws = wb.Worksheet("Routes")
-    ws.Cell(2, 3).Value <- rts
-    wb.Save()
+    wb.Worksheet("Routes").Cell(2, 3).Value <- rts
+    wb.Worksheet("DoseForms").Cell(2, 3).Value <- forms
+    wb.Worksheet("Ingredients").Cell(2, 3).Value <- ingrds
+    wb.Worksheet("Medications").Cell(2, 3).Value <- meds
+    wb.Worksheet("ComplexMedications").Cell(2, 3).Value <- compl
+    wb.Worksheet("Brands").Cell(2, 3).Value <- brands
+    wb.Worksheet("Products").Cell(2, 3).Value <- prods
 
+    wb.Save()
     printfn "finished"

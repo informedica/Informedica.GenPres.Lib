@@ -54,7 +54,7 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 95	dispersie voor infusie	iv		Both	TRUE	G-Standaard	FALSE
 96	oogdruppels, emulsie	oog		Both	FALSE	G-Standaard	FALSE
 97	concentraat voor orale suspensie	or		Both	FALSE	G-Standaard	FALSE
-98	drank/mondspoeling	or;oromucosaal;oromucosaal		Both	FALSE	G-Standaard	FALSE
+98	drank/mondspoeling	or;oromucosaal		Both	FALSE	G-Standaard	FALSE
 99	neuspoeder	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 100	zetpil	rect		NonInfuse	FALSE	G-Standaard	FALSE
 101	dispersie voor vernevelvloeistof	inh		NonInfuse	FALSE	G-Standaard	FALSE
