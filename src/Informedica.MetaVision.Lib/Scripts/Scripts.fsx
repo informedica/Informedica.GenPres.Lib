@@ -6,6 +6,7 @@
 #load "../MetaVision.fs"
 
 
+open DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage
 open Informedica.Utils.Lib.BCL
 open Informedica.ZIndex.Lib
 open Informedica.MetaVision.Lib
@@ -25,20 +26,32 @@ MetaVision.createRoutes "Routes"
 MetaVision.createDoseForms "DoseForms"
 
 
-GenPresProduct.get true
-(*
-|> Array.filter (fun gpp ->
-    let n = gpp.Name |> String.toLower |> String.trim
-    n |> String.contains "cotri" ||
-    n |> String.contains "amoxi" ||
-    n |> String.contains "parac" ||
-    n |> String.contains "norad" ||
-    n |> String.contains "morfi"
+let meds =
+    GenPresProduct.get true
+    |> Array.filter (fun gpp ->
+        let n = gpp.Name |> String.toLower |> String.trim
+        n |> String.contains "cotri" ||
+        n |> String.contains "amoxi" ||
+        n |> String.contains "parac" ||
+        n |> String.contains "norad" ||
+        n |> String.contains "morfi"
+    )
+    //|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
+    |> MetaVision.createMedications "Ingredients" "Medications" "ComplexMedications" "Brands" "Products"
+
+meds
+|> Array.collect (fun m ->
+    m.Routes
+    |> Array.collect (fun r ->
+        if m.Products |> Array.isEmpty then
+            [| "", r, m |]
+        else
+            [|
+                m.MedicationName, r, m
+
+            |]
+    )
 )
-*)
-//|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
-|> MetaVision.createMedications "Ingredients" "Medications" "ComplexMedications" "Brands" "Products"
-|> Array.length
 
 
 open Informedica.Utils.Lib.BCL

@@ -653,7 +653,6 @@ module Utils =
         Web.getDataFromSheet "Formulary"
 
 
-
     type OrderingType = Both | NonInfuse
 
 
@@ -729,6 +728,7 @@ module Utils =
         | None ->
             failwith $"cannot find unit: {un}, shape: {shape}"
 
+
     let shapeInSolution un shape =
         mappingShapeUnit
         |> Array.tryFind (fun xs ->
@@ -772,8 +772,6 @@ module Utils =
         |> Array.sort
         |> Array.map (fun (l, s) -> $"{l}\t{s}")
         |> Array.iter (printfn "%s")
-
-
 
 
     let mapUnit un =
@@ -1225,19 +1223,21 @@ module MetaVision =
                                     MedicationName = r.MedicationName
                                     Manufacturer = "Apotheek"
                                     DoseForm = r.DoseForms
-                                    Routes = "[All]"
+                                    Routes = r.Routes
                                     Format = r.Format
                                     IncrementValue = r.IncrementValue
-                                    Unit = "mL"
+//                                    Unit = "mL"
                                     DefaultUnit = r.Unit
                                     IsUnknownStrength = "FALSE"
                                     StrengthLEFT = r.ComplexMedications[0].Concentration
                                     StrengthLEFTUnit = r.Unit
                                     StrengthRIGHT = "1"
                                     StrengthRIGHTUnit = "mL"
+                                    DiluentGroup = "Diluents"
                                     ProductRequiresReconstitution = "FALSE"
                                     IsVolumeKnown = "FALSE"
                                     Volume = "0"
+                                    DiluentName = "water"
                                 |}
                             |]
                 |}
@@ -1287,25 +1287,27 @@ module MetaVision =
                 "Manufacturer", r.Manufacturer
                 "DoseForm", r.DoseForm
                 "Routes", r.Routes
+                "Status", "Active"
                 "Format", r.Format
                 "IncrementValue", r.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros
-                "Unit", r.Unit
+//                "Unit", r.Unit
                 "DefaultUnit", r.DefaultUnit
                 "IsUnknownStrength", r.IsUnknownStrength
                 "StrengthLEFT", r.StrengthLEFT |> Double.toStringNumberNLWithoutTrailingZeros
                 "StrengthLEFTUnit", r.StrengthLEFTUnit
                 "StrengthRIGHT", r.StrengthRIGHT
                 "StrengthRIGHTUnit", r.StrengthRIGHTUnit
+                "DiluentGroup", r.DiluentGroup
                 "ProductRequiresReconstitution", r.ProductRequiresReconstitution
                 "IsVolumeKnown", r.IsVolumeKnown
                 "Volume", r.Volume
+                "DiluentName", "water"
             |]
             |> mapProd
         )
         |> Array.append [| Constants.productHeadings |> String.concat "\t" |]
         |> print true prodName
         |> ignore
-
 
         meds
         |> Array.map (fun r ->
@@ -1332,7 +1334,8 @@ module MetaVision =
             |> mapMeds
         )
         |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
-        |> print true medName
+        |> print true medName |> ignore
+        meds
 
 
     let createSolutions solPath (meds : GenPresProduct[]) =
