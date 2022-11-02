@@ -645,10 +645,6 @@ module Utils =
         Web.getDataFromSheet "Units"
 
 
-    let mappingShapeUnit =
-        Web.getDataFromSheet "ShapeUnit"
-
-
     let mappingFormulary =
         Web.getDataFromSheet "Formulary"
 
@@ -714,34 +710,26 @@ module Utils =
         |> Array.isEmpty
 
 
-    let shapeInDiluent un shape =
-        mappingShapeUnit
-        |> Array.tryFind (fun xs ->
-            shape |> String.trim |> String.equalsCapInsens xs[0] &&
-            un |> String.trim |> String.equalsCapInsens xs[1]
+    let filterRouteShapeUnit rte shape unt =
+        mappingRouteShape
+        |> Array.filter (fun xs ->
+            let eqsRte = rte |> String.isNullOrWhiteSpace || rte |> String.trim |> String.equalsCapInsens xs[0]
+            let eqsShp = shape |> String.isNullOrWhiteSpace || shape |> String.trim |> String.equalsCapInsens xs[1]
+            let eqsUnt = unt |> String.isNullOrWhiteSpace || unt |> String.trim |> String.equalsCapInsens xs[1]
+            eqsRte && eqsShp && eqsUnt
         )
-        |> function
-        | Some xs ->
-            xs
-            |> Array.item 2
-            |> ((=) "TRUE")
-        | None ->
-            failwith $"cannot find unit: {un}, shape: {shape}"
 
 
-    let shapeInSolution un shape =
-        mappingShapeUnit
-        |> Array.tryFind (fun xs ->
-            shape |> String.trim |> String.equalsCapInsens xs[0] &&
-            un |> String.trim |> String.equalsCapInsens xs[1]
-        )
-        |> function
-        | Some xs ->
-            xs
-            |> Array.item 3
-            |> ((=) "TRUE")
-        | None ->
-            failwith $"cannot find unit: {un}, shape: {shape}"
+    let shapeInDiluent rte unt shape =
+        filterRouteShapeUnit rte shape unt
+        |> Array.map (fun xs -> xs[5] = "TRUE")
+        |> Array.fold (fun acc b -> acc || b) false
+
+
+    let shapeInSolution rte unt shape =
+        filterRouteShapeUnit rte shape unt
+        |> Array.map (fun xs -> xs[6] = "TRUE")
+        |> Array.fold (fun acc b -> acc || b) false
 
 
     let getATCCodes (gpp : GenPresProduct) =
@@ -886,23 +874,25 @@ module Utils =
         |> String.concat ";"
 
 
-    let loadDataImport (sheet : string) xs =
-        let wb = new XLWorkbook("data/output/DrugDatabaseForImport.xlsx")
+    let loadDataImport (file : string) (sheet : string) xs =
+        let wb = new XLWorkbook(file)
         wb.Worksheet(sheet).Cell(2, 3).Value <- xs
         wb.Save()
 
 
-    let print b file xs =
-        if b then
+    let print file sheet xs =
+        match file with
+        | Some file ->
             xs
             |> Array.map (String.split "\t")
             |> Array.map List.toArray
             |> Array.skip 1
-            |> loadDataImport file
+            |> loadDataImport file sheet
+        | None -> ()
 
         xs
         |> String.concat "\n"
-        |> File.writeTextToFile $"data/output/{file}.csv"
+        |> File.writeTextToFile $"data/output/{sheet}.csv"
 
         xs
 
@@ -919,7 +909,7 @@ module MetaVision =
         |> Array.distinct
         |> Array.sort
         |> Array.map (fun (m, s) -> $"{m}\t{s}")
-        |> print false path
+        |> print None path
 
 
     let shapeUnits name =
@@ -929,10 +919,10 @@ module MetaVision =
         |> Array.map (fun gp -> gp.Shape, gp.Substances[0].ShapeUnit)
         |> Array.distinct
         |> Array.map (fun (s, u) -> $"{s |> String.trim |> String.toLower}\t{u |> String.trim |> String.toLower}")
-        |> print false name
+        |> print None name
 
 
-    let createRoutes name =
+    let createRoutes file name =
         let mapRts = (Array.mapStringHeadings Constants.routeHeadings) >> (String.concat "\t")
         // Get routes and external codes
         // Intra seperated by -
@@ -958,10 +948,10 @@ module MetaVision =
             |> mapRts
         )
         |> Array.append [| Constants.routeHeadings |> String.concat "\t" |]
-        |> print true name
+        |> print file name
 
 
-    let createDoseForms name =
+    let createDoseForms file name =
         let mapForms = (Array.mapStringHeadings Constants.doseFormHeadings) >> (String.concat "\t")
 
         // Get doseforms
@@ -969,34 +959,38 @@ module MetaVision =
         |> Array.distinct
         |> Array.map (fun (id, s) ->
             let s = s |> String.toLower
+            let rts =
+                GenPresProduct.get true
+                |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
+                |> Array.collect (fun gpp -> gpp.Route)
+                |> Array.collect (String.splitAt ',')
+                |> Array.filter ((String.equalsCapInsens "parenteraal") >> not)
+                |> Array.distinct
+
             {|
                 ExternalCode = id
                 DoseFormName = s |> String.toLower
-                Routes =
-                    GenPresProduct.get true
-                    |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
-                    |> Array.collect (fun gpp -> gpp.Route)
-                    |> Array.collect (String.splitAt ',')
-                    |> Array.filter ((String.equalsCapInsens "parenteraal") >> not)
-                    |> Array.distinct
+                Routes = rts
                 OrderingType =
                     mappingRouteShape
-                    |> Array.filter (fun xs -> s |> String.toLower = xs[1] )
+                    |> Array.filter (fun xs ->
+                        rts
+                        |> Array.exists (fun rt ->
+                            rt |> String.equalsCapInsens xs[0]
+                        ) &&
+                        s |> String.toLower = xs[1]
+
+                    )
                     |> Array.fold (fun acc xs ->
                         match acc with
                         | NonInfuse ->
-                            if xs[2] |> String.contains "NoTime" then acc
-                            else Both
+                            if xs[4] = "TRUE" then Both
+                            else acc
                         | Both -> Both
                     ) NonInfuse
                 IsDrugInSolution =
-                    mappingShapeUnit
-                    |> Array.tryFind (fun xs -> s = xs[0] )
-                    |> function
-                    | Some xs -> xs[2] = "TRUE"
-                    | None ->
-                        printfn $"cannot find shape {s} in ShapeUnit"
-                        false
+                    s |> shapeInSolution "" "" ||
+                    s |> shapeInDiluent "" ""
                 Category = "G-Standaard"
                 IsDispensableAmountAllowed = false
 
@@ -1023,10 +1017,10 @@ module MetaVision =
             |> mapForms
         )
         |> Array.append [| Constants.doseFormHeadings |> String.concat "\t" |]
-        |> print true name
+        |> print file name
 
 
-    let createIngredients name (gpps : GenPresProduct[]) =
+    let createIngredients file name (gpps : GenPresProduct[]) =
         let mapIngrs = (Array.mapStringHeadings Constants.ingredientHeadings) >> (String.concat "\t")
 
         let substs =
@@ -1073,18 +1067,18 @@ module MetaVision =
             |> mapIngrs
         )
         |> Array.append [| Constants.ingredientHeadings |> String.concat "\t" |]
-        |> print true name
+        |> print file name
         |> ignore
 
 
 
-    let createMedications ingrName medName complName brandName prodName meds =
+    let createMedications file ingrName medName complName brandName prodName meds =
         let mapMeds = (Array.mapStringHeadings Constants.medicationHeadings) >> (String.concat "\t")
         let mapComp = (Array.mapStringHeadings Constants.complexMedicationHeadings) >> (String.concat "\t")
         let mapBrand = (Array.mapStringHeadings Constants.brandHeadings) >> (String.concat "\t")
         let mapProd = (Array.mapStringHeadings Constants.productHeadings) >> (String.concat "\t")
 
-        meds |> createIngredients ingrName
+        meds |> createIngredients file ingrName
 
         let meds =
             meds
@@ -1150,10 +1144,10 @@ module MetaVision =
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
                     DiluentsGroup =
-                        if gp.Shape |> shapeInSolution gp.Substances[0].ShapeUnit then "Oplossingen"
+                        if gp.Shape |> shapeInSolution "" gp.Substances[0].ShapeUnit then "Verdunningen"
                         else ""
                     DrugInDiluentGroup =
-                        if gp.Shape |> shapeInDiluent gp.Substances[0].ShapeUnit then "Diluents"
+                        if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit then "Oplossingen"
                         else
                             "[None]"
                     DrugFamily = g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
@@ -1256,7 +1250,7 @@ module MetaVision =
             )
         )
         |> Array.append [| Constants.brandHeadings |> String.concat "\t" |]
-        |> print true brandName
+        |> print file brandName
         |> ignore
 
         meds
@@ -1273,7 +1267,7 @@ module MetaVision =
             |> mapComp
         )
         |> Array.append [| Constants.complexMedicationHeadings |> String.concat "\t" |]
-        |> print true complName
+        |> print file complName
         |> ignore
 
         meds
@@ -1306,7 +1300,7 @@ module MetaVision =
             |> mapProd
         )
         |> Array.append [| Constants.productHeadings |> String.concat "\t" |]
-        |> print true prodName
+        |> print file prodName
         |> ignore
 
         meds
@@ -1334,11 +1328,11 @@ module MetaVision =
             |> mapMeds
         )
         |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
-        |> print true medName |> ignore
+        |> print file medName |> ignore
         meds
 
 
-    let createSolutions solPath (meds : GenPresProduct[]) =
+    let createSolutions file solName (meds : GenPresProduct[]) =
         // get solutions
         meds
         |> Array.collect (fun gpp -> gpp.GenericProducts)
@@ -1349,8 +1343,8 @@ module MetaVision =
         )
         |> Array.filter (fun gp ->
             let su = gp.Substances[0].ShapeUnit
-            gp.Shape |> shapeInDiluent su ||
-            gp.Shape |> shapeInSolution su
+            gp.Shape |> shapeInDiluent "" su ||
+            gp.Shape |> shapeInSolution "" su
         )
         |> Array.sortBy (fun gp -> gp.Name, gp.Shape, gp.Route)
         |> Array.collect (fun gp ->
@@ -1371,7 +1365,7 @@ module MetaVision =
                         Route = r
                         Department = dep
                         DiluentVol =
-                            if gp.Shape |> shapeInDiluent su then "1" else "0"
+                            if gp.Shape |> shapeInDiluent r su then "1" else "0"
                         Solutions = "NaCl;gluc5;gluc10"
                         Substance =
                             gp.Substances[0].SubstanceName
@@ -1395,4 +1389,40 @@ module MetaVision =
             )
         )
         |> Array.append [| Constants.solutionHeadings |> String.concat "\t" |]
-        |> print false solPath
+        |> print file solName
+
+
+    type ImportConfig =
+        {
+            Ingredients : string
+            Medications : string
+            ComplexMedications : string
+            Brands : string
+            Products : string
+            OrderTemplates : string
+            ImportFile : string option
+        }
+
+
+    let config =
+        {
+            Ingredients = "Ingredients"
+            Medications = "Medications"
+            ComplexMedications = "ComplexMedications"
+            Brands = "Brands"
+            Products = "Products"
+            OrderTemplates = "OrderTemplates"
+            ImportFile = Some "data/output/DrugDatabaseForImport.xlsx"
+        }
+
+    let createImport (config : ImportConfig) =
+        createMedications
+            config.ImportFile
+            config.Ingredients
+            config.Medications
+            config.ComplexMedications
+            config.Brands
+            config.Products
+//            config.OrderTemplates
+
+

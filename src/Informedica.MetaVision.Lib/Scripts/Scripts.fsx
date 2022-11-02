@@ -17,13 +17,10 @@ open Informedica.ZIndex.Lib.GenericProduct
 MetaVision.getDrugFamilies "DrugFamilies"
 
 
-MetaVision.shapeUnits "ShapeUnits"
+MetaVision.createRoutes (Some "data/output/DrugDatabaseForImport.xlsx") "Routes"
 
 
-MetaVision.createRoutes "Routes"
-
-
-MetaVision.createDoseForms "DoseForms"
+MetaVision.createDoseForms (Some "data/output/DrugDatabaseForImport.xlsx") "DoseForms"
 
 
 let meds =
@@ -37,21 +34,42 @@ let meds =
         n |> String.contains "morfi"
     )
     //|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
-    |> MetaVision.createMedications "Ingredients" "Medications" "ComplexMedications" "Brands" "Products"
+    |> MetaVision.createImport MetaVision.config
+
 
 meds
 |> Array.collect (fun m ->
     m.Routes
+    |> String.splitAt ';'
     |> Array.collect (fun r ->
         if m.Products |> Array.isEmpty then
-            [| "", r, m |]
+            [| m, "", r  |]
         else
-            [|
-                m.MedicationName, r, m
-
-            |]
+            m.Products
+            |> Array.map (fun p ->
+                m, p.ProductName, r
+            )
     )
 )
+|> Array.map (fun (m, p, r) ->
+    {|
+        OrderTemplateName = m.MedicationName
+        MedicationName = m.MedicationName
+        ProductName = p
+        DoseForm = m.DoseForms
+        Route = r
+        IsPRN = "FALSE"
+        PatternMode = "Standard"
+        ComponentType = "MainComponent"
+        ComponentMedicationName =
+            if p |> String.isNullOrWhiteSpace then m.MedicationName
+            else ""
+        ComponentProductName =
+            if p |> String.isNullOrWhiteSpace then ""
+            else p
+    |}
+)
+
 
 
 open Informedica.Utils.Lib.BCL
