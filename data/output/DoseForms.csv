@@ -22,7 +22,7 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 33	collodion	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 34	oogdruppels, suspensie	oog		NonInfuse	FALSE	G-Standaard	FALSE
 36	implantatiegaas	implantatie		NonInfuse	FALSE	G-Standaard	FALSE
-37	concentraat voor drank	or		NonInfuse	FALSE	G-Standaard	FALSE
+37	concentraat voor drank	or		NonInfuse	TRUE	G-Standaard	FALSE
 38	concentraat voor mondspoeling	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 40	pasta voor cutaan gebruik	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 41	pasta voor oromucosaal gebruik	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
@@ -54,7 +54,7 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 95	dispersie voor infusie	iv		Both	TRUE	G-Standaard	FALSE
 96	oogdruppels, emulsie	oog		NonInfuse	FALSE	G-Standaard	FALSE
 97	concentraat voor orale suspensie	or		NonInfuse	TRUE	G-Standaard	FALSE
-98	drank/mondspoeling	or;oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
+98	drank/mondspoeling	or;oromucosaal		NonInfuse	TRUE	G-Standaard	FALSE
 99	neuspoeder	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 100	zetpil	rect		NonInfuse	FALSE	G-Standaard	FALSE
 101	dispersie voor vernevelvloeistof	inh		NonInfuse	FALSE	G-Standaard	FALSE
@@ -104,9 +104,9 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 379	granulaat voor orale suspensie	or		NonInfuse	FALSE	G-Standaard	FALSE
 380	tablet voor vaginaal gebruik	vaginaal		NonInfuse	FALSE	G-Standaard	FALSE
 382	maagsapresistent granulaat	or		NonInfuse	FALSE	G-Standaard	FALSE
-400	drank	or		NonInfuse	FALSE	G-Standaard	FALSE
+400	drank	or		NonInfuse	TRUE	G-Standaard	FALSE
 405	drank/concentraat voor klysma	or;rect		NonInfuse	TRUE	G-Standaard	FALSE
-410	gorgeldrank	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
+410	gorgeldrank	oromucosaal		NonInfuse	TRUE	G-Standaard	FALSE
 420	mondspoeling	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 430	oplossing	or;rect;cutaan;lokaal;oor;oromucosaal;nasaal		Both	TRUE	G-Standaard	FALSE
 432	vloeistof voor inhalatiedamp	nasaal;inh		NonInfuse	FALSE	G-Standaard	FALSE

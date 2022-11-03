@@ -14,6 +14,9 @@ open Informedica.ZIndex.Lib.ATCGroup
 open Informedica.ZIndex.Lib.GenericProduct
 
 
+filterRouteShapeUnit "" "drank" ""
+
+
 MetaVision.getDrugFamilies "DrugFamilies"
 
 
@@ -27,6 +30,8 @@ let meds =
     GenPresProduct.get true
     |> Array.filter (fun gpp ->
         let n = gpp.Name |> String.toLower |> String.trim
+        n |> String.contains "fenta" ||
+        n |> String.contains "genta" ||
         n |> String.contains "cotri" ||
         n |> String.contains "amoxi" ||
         n |> String.contains "parac" ||
