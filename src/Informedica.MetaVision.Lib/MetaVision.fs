@@ -17,6 +17,22 @@ type GenericProduct = GenericProduct.GenericProduct
 module Constants =
 
 
+    let diluentsGroup = "Oplossingen"
+
+
+    let solutionGroup = "Verdunningen"
+
+
+    let solutionMeds =
+        [|
+            "water"
+            "NaCl 0,9%"
+            "gluc 5%"
+            "gluc 10%"
+            "emulsie"
+        |]
+
+
     let includeSols =
         [|
         "abatacept"
@@ -607,6 +623,7 @@ module Constants =
             "MinConc"
             "MaxConc"
         |]
+
 
 
 [<AutoOpen>]
@@ -1227,11 +1244,13 @@ module MetaVision =
                                     StrengthLEFTUnit = r.Unit
                                     StrengthRIGHT = "1"
                                     StrengthRIGHTUnit = "mL"
-                                    DiluentGroup = "Diluents"
+                                    DiluentGroup = Constants.solutionGroup
                                     ProductRequiresReconstitution = "FALSE"
                                     IsVolumeKnown = "FALSE"
                                     Volume = "0"
-                                    DiluentName = "water"
+                                    DiluentName =
+                                        if r.DoseForms |> String.contains "emulsie" then "emulsie"
+                                        else "water"
                                 |}
                             |]
                 |}
@@ -1271,31 +1290,31 @@ module MetaVision =
         |> ignore
 
         meds
-        |> Array.collect (fun r -> r.Products)
-        |> Array.map (fun r ->
+        |> Array.collect (fun p -> p.Products)
+        |> Array.map (fun p ->
             [|
-                "ExternalCode", r.Id
-                "ProductID", r.ProductID
-                "ProductName", r.ProductName
-                "MedicationName", r.MedicationName
-                "Manufacturer", r.Manufacturer
-                "DoseForm", r.DoseForm
-                "Routes", r.Routes
+                "ExternalCode", p.Id
+                "ProductID", p.ProductID
+                "ProductName", p.ProductName
+                "MedicationName", p.MedicationName
+                "Manufacturer", p.Manufacturer
+                "DoseForm", p.DoseForm
+                "Routes", p.Routes
                 "Status", "Active"
-                "Format", r.Format
-                "IncrementValue", r.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros
+                "Format", p.Format
+                "IncrementValue", p.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros
 //                "Unit", r.Unit
-                "DefaultUnit", r.DefaultUnit
-                "IsUnknownStrength", r.IsUnknownStrength
-                "StrengthLEFT", r.StrengthLEFT |> Double.toStringNumberNLWithoutTrailingZeros
-                "StrengthLEFTUnit", r.StrengthLEFTUnit
-                "StrengthRIGHT", r.StrengthRIGHT
-                "StrengthRIGHTUnit", r.StrengthRIGHTUnit
-                "DiluentGroup", r.DiluentGroup
-                "ProductRequiresReconstitution", r.ProductRequiresReconstitution
-                "IsVolumeKnown", r.IsVolumeKnown
-                "Volume", r.Volume
-                "DiluentName", "water"
+                "DefaultUnit", p.DefaultUnit
+                "IsUnknownStrength", p.IsUnknownStrength
+                "StrengthLEFT", p.StrengthLEFT |> Double.toStringNumberNLWithoutTrailingZeros
+                "StrengthLEFTUnit", p.StrengthLEFTUnit
+                "StrengthRIGHT", p.StrengthRIGHT
+                "StrengthRIGHTUnit", p.StrengthRIGHTUnit
+                "DiluentGroup", p.DiluentGroup
+                "ProductRequiresReconstitution", p.ProductRequiresReconstitution
+                "IsVolumeKnown", p.IsVolumeKnown
+                "Volume", p.Volume
+                "DiluentName", p.DiluentName
             |]
             |> mapProd
         )
@@ -1304,25 +1323,25 @@ module MetaVision =
         |> ignore
 
         meds
-        |> Array.map (fun r ->
+        |> Array.map (fun m ->
             [|
-                "ExternalCode", r.ExternalCode
-                "MedicationName", r.MedicationName
-                "Unit", r.Unit
-                "ATCCode", r.ATC
-                "Status", r.Status
-                "Format", r.Format
-                "IncrementValue", $"{r.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros}"
-                "CodeSnippetName", r.CodeSnippetName
-                "Frequencies", r.Frequencies
-                "DoseForms", r.DoseForms
-                "Routes", r.Routes
-                "AdditivesGroup", r.AdditivesGroup
-                "DiluentsGroup", r.DiluentsGroup
-                "DrugInDiluentGroup", r.DrugInDiluentGroup
-                "DrugFamily", r.DrugFamily
-                "DrugSubfamily", r.DrugSubfamily
-                "IsFormulary", $"{r.IsFormulary |> mapBool}"
+                "ExternalCode", m.ExternalCode
+                "MedicationName", m.MedicationName
+                "Unit", m.Unit
+                "ATCCode", m.ATC
+                "Status", m.Status
+                "Format", m.Format
+                "IncrementValue", $"{m.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros}"
+                "CodeSnippetName", m.CodeSnippetName
+                "Frequencies", m.Frequencies
+                "DoseForms", m.DoseForms
+                "Routes", m.Routes
+                "AdditivesGroup", m.AdditivesGroup
+                "DiluentsGroup", m.DiluentsGroup
+                "DrugInDiluentGroup", m.DrugInDiluentGroup
+                "DrugFamily", m.DrugFamily
+                "DrugSubfamily", m.DrugSubfamily
+                "IsFormulary", $"{m.IsFormulary |> mapBool}"
 
             |]
             |> mapMeds
