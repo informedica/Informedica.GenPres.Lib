@@ -1,6 +1,6 @@
 ExternalCode	RouteName	OrderingType	RouteLocations
 0	toedieningsweg niet ingevuld	NonInfuse	
-1	niet van toepassing	NonInfuse	
+1	niet van toepassing	Both	
 2	im	Both	
 5	iv	Both	
 6	nasaal	Both	
@@ -34,7 +34,7 @@ ExternalCode	RouteName	OrderingType	RouteLocations
 76	extra-amnionaal	NonInfuse	
 77	intra-amnionaal	NonInfuse	
 78	hemodialyse	Both	
-97	niet gespecificeerd of meervoudig	NonInfuse	
+97	niet gespecificeerd of meervoudig	Both	
 110	dentaal	Both	
 113	intra-oculair	Both	
 115	uterien	Both	

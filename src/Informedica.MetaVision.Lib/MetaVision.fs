@@ -1,4 +1,4 @@
-﻿namespace Informedica.MetaVision.Lib
+namespace Informedica.MetaVision.Lib
 
 open ClosedXML.Excel
 
@@ -651,7 +651,7 @@ module Utils =
 
 
     let mappingRouteShape =
-        Web.getDataFromSheet "RouteShape2"
+        Web.getDataFromSheet "RouteShapeUnit"
 
 
     let mappingFreqs =
@@ -929,13 +929,20 @@ module MetaVision =
         |> print None path
 
 
-    let shapeUnits name =
+    let routeShapeUnits name =
         GenPresProduct.get true
         //|> Array.filter (fun gpp -> gpp.Shape |> String.toLower |> String.contains "concentraat" )
         |> Array.collect (fun gpp -> gpp.GenericProducts)
-        |> Array.map (fun gp -> gp.Shape, gp.Substances[0].ShapeUnit)
+        |> Array.collect (fun gp ->
+            gp.Route
+            |> Array.map (fun r ->
+                r |> String.toLower |> String.trim
+                , gp.Shape |> String.toLower |> String.trim
+                , gp.Substances[0].ShapeUnit |> String.toLower |> String.trim
+            )
+        )
         |> Array.distinct
-        |> Array.map (fun (s, u) -> $"{s |> String.trim |> String.toLower}\t{u |> String.trim |> String.toLower}")
+        |> Array.map (fun (r, s, u) -> $"{r}\t{s}\t{u}")
         |> print None name
 
 
@@ -1144,7 +1151,7 @@ module MetaVision =
                     Status = "Active"
                     Format = "1,234.5 (Include Zero)"
                     IncrementValue = 0.1
-                    CodeSnippetName = $"GPK-{gp.Id}"
+                    CodeSnippetName = $"GPK-{gp.Id} {System.Guid.NewGuid().ToString()}"
                     Frequencies =
                         let freqs = gp.Id |> getFrequencies
                         if freqs |> String.isNullOrWhiteSpace then "[All]"
@@ -1160,11 +1167,12 @@ module MetaVision =
                         |> Array.map mapRoute
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
-                    DiluentsGroup =
+                    DiluentsGroup = // "Verduninngen"
                         if gp.Shape |> shapeInSolution "" gp.Substances[0].ShapeUnit then "Verdunningen"
                         else ""
-                    DrugInDiluentGroup =
-                        if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit then "Oplossingen"
+                    DrugInDiluentGroup = // "Oplossingen"
+                        if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
+                           gp.Shape |> shapeInSolution "" gp.Substances[0].ShapeUnit then "Oplossingen"
                         else
                             "[None]"
                     DrugFamily = g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""

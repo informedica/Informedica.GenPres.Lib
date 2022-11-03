@@ -1,6 +1,12 @@
 ExternalCode	BrandName	Manufacturer	MedicationName
 	APC TABLET		acetylsalicylzuur/paracetamol/cof tab 250/250/50mg
 	EXCEDRIN		acetylsalicylzuur/paracetamol/cof tab 250/250/65mg
+	RAPIFEN		alfentanil injvlst 0,5mg/ml
+	ABELCET		amfotericine b infconc 5mg/ml (lipidencompl)
+	FUNGIZONE		amfotericine b infusiepoeder  50mg
+	AMBISOME		amfotericine b infusiepoeder  50mg (liposomaal)
+	FUNGIZONE		amfotericine b susp oraal 100mg/ml
+	AMPHO-MORONAL		amfotericine b zuigtablet 10mg
 	AUGMENTIN		amoxicilline/clavulaanzuur sus oraal 100/12,5mg/ml
 	AUGMENTIN		amoxicilline/clavulaanzuur tablet 500/125mg
 	APO-GO		apomorfine infvlst 5mg/ml
@@ -8,6 +14,70 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	APO-GO		apomorfine inj/infopl 10mg/ml
 	APO-GO		apomorfine injvlst 10mg/ml
 	DACEPTON		apomorfine injvlst 10mg/ml
+	BACTRIMEL		cotrimoxazol  96 infopl conc 16/80mg/ml
+	SEPTRIN		cotrimoxazol 480 tablet  80/400mg
+	DEXAMYTREX		dexamethason/gentamicine oogdr 1/3mg/ml
+	DEXAGENTA POS		dexamethason/gentamicine oogdr 1/3mg/ml
+	DEXAMYTREX		dexamethason/gentamicine oogzalf 0,3/3mg/g
+	FENTANYL PIRAMAL		fentanyl injvlst 0,05mg/ml
+	INSTANYL		fentanyl neusspray  50ug
+	INSTANYL		fentanyl neusspray  50ug/do
+	INSTANYL		fentanyl neusspray 100ug
+	INSTANYL		fentanyl neusspray 100ug/do
+	PECFENT		fentanyl neusspray 100ug/do
+	INSTANYL		fentanyl neusspray 200ug
+	INSTANYL		fentanyl neusspray 200ug/do
+	PECFENT		fentanyl neusspray 400ug/do
+	DUROGESIC		fentanyl pleister  12ug/uur (generiek+durogesic)
+	DUROGESIC		fentanyl pleister  25ug/uur (generiek+durogesic)
+	DUROGESIC		fentanyl pleister  50ug/uur (generiek+durogesic)
+	DUROGESIC		fentanyl pleister  75ug/uur (generiek+durogesic)
+	DUROGESIC		fentanyl pleister 100ug/uur (generiek+durogesic)
+	EFFENTORA		fentanyl tablet buccaal 100ug
+	EFFENTORA		fentanyl tablet buccaal 200ug
+	EFFENTORA		fentanyl tablet buccaal 400ug
+	ABSTRAL		fentanyl tablet sublinguaal 100ug
+	RECIVIT		fentanyl tablet sublinguaal 133ug
+	ABSTRAL		fentanyl tablet sublinguaal 200ug
+	RECIVIT		fentanyl tablet sublinguaal 267ug
+	ABSTRAL		fentanyl tablet sublinguaal 300ug
+	ABSTRAL		fentanyl tablet sublinguaal 400ug
+	RECIVIT		fentanyl tablet sublinguaal 400ug
+	ABSTRAL		fentanyl tablet sublinguaal 600ug
+	ABSTRAL		fentanyl tablet sublinguaal 800ug
+	ACTIQ		fentanyl zuigtablet  200ug
+	ACTIQ		fentanyl zuigtablet  400ug
+	ACTIQ		fentanyl zuigtablet  600ug
+	ACTIQ		fentanyl zuigtablet  800ug
+	COPAL		gentami/vancomy p v cem 11,628/46,512mg/g
+	REFOCOLL		gentamicine implantatiegaas   8,125mg (2,5x2,5cm)
+	REFOCOLL		gentamicine implantatiegaas  32,5mg (5x5cm)
+	SEPTOCOLL E		gentamicine implantatiegaas  35mg (5x4cm)
+	REFOCOLL		gentamicine implantatiegaas  65mg (5x10cm)
+	SEPTOCOLL E		gentamicine implantatiegaas  70mg (5x8cm)
+	REFOCOLL		gentamicine implantatiegaas 130mg (10x10cm)
+	SEPTOCOLL E		gentamicine implantatiegaas 140mg (10x8cm)
+	HERAFILL		gentamicine implantatiekraal 2,5mg
+	SEPTOPAL		gentamicine implantatiekraal 2,8mg
+	SEPTOPAL		gentamicine implantatiekraal 7,5mg
+	GARACOL		gentamicine implantatiespons  32,5mg
+	GARACOL		gentamicine implantatiespons 130mg
+	PALACOS		gentamicine pd v cement 10mg/g
+	PALACOS		gentamicine pd v cement 12,16mg/g
+	PALAMED		gentamicine pd v cement 12,5mg/g
+	PALACOS		gentamicine pd v cement 12,5mg/g
+	REFOBACIN		gentamicine pd v cement 12,5mg/g
+	REFOBACIN PLUS		gentamicine pd v cement 12,5mg/g
+	OPTIPAC REFOBACIN		gentamicine pd v cement 12,5mg/g
+	OPTIPAC REFOBACIN PLUS		gentamicine pd v cement 12,5mg/g
+	PALACOS MV+G		gentamicine pd v cement 13,75mg/g
+	PALACOS MV+G		gentamicine pd v cement 13,833mg/g
+	PALACOS MV+G		gentamicine pd v cement 14mg/g
+	REFOBACIN		gentamicine pd v cement 25mg/g
+	REFOBACIN REVISION		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
+	COPAL		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
+	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
+	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g
 	ORAMORPH		morfine drank  2mg/ml (sulfaat)
 	ORAMORPH		morfine drank  6mg/ml (sulfaat)
 	ORAMORPH		morfine drank 20mg/ml (sulfaat)
@@ -65,8 +135,18 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	LIVSANE		paracetamol/coffeine tablet 500/50mg
 	PANADOL PLUS		paracetamol/coffeine tablet omhuld 500/65mg
 	ANTIGRIPPINE		paracetamol/coffeine/ascorb tablet 250/25/25mg
+	DIPRIVAN		propofol inj.emulsie 10mg/ml
+	PROPOFOL LIPURO		propofol inj.emulsie 10mg/ml
+	DIPRIVAN		propofol inj.emulsie 20mg/ml
+	PROPOFOL LIPURO		propofol inj.emulsie 20mg/ml
 	HOOFDPIJNPOEDERS 'DARO'		propyfenazon/paracetamol/coffeine pdr 150/250/46mg
 	SARIDON		propyfenazon/paracetamol/coffeine tab 150/250/50mg
 	PARADON HTP		propyfenazon/paracetamol/coffeine tab 150/250/50mg
 	SANALGIN		propyfenazon/paracetamol/coffeine tab 250/250/46mg
+	ULTIVA		remifentanil injectiepoeder 1mg
+	ULTIVA		remifentanil injectiepoeder 2mg
+	ULTIVA		remifentanil injectiepoeder 5mg
+	SUFENTA		sufentanil injvlst  5ug/ml
+	SUFENTA		sufentanil injvlst 50ug/ml
 	ZALDIAR		tramadol/paracetamol tablet 37,5/325mg
+	ROKIPRIM		trimethoprim/sulfametrol infvlst 0,64/3,2mg/ml

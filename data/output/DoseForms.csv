@@ -20,14 +20,14 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 31	maagsapresistente tablet + tablet	or		NonInfuse	FALSE	G-Standaard	FALSE
 32	emulsie voor infusie	iv		Both	TRUE	G-Standaard	FALSE
 33	collodion	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
-34	oogdruppels, suspensie	oog		NonInfuse	FALSE	G-Standaard	FALSE
+34	oogdruppels, suspensie	oog		NonInfuse	TRUE	G-Standaard	FALSE
 36	implantatiegaas	implantatie		NonInfuse	FALSE	G-Standaard	FALSE
-37	concentraat voor drank	or		NonInfuse	TRUE	G-Standaard	FALSE
+37	concentraat voor drank	or		Both	TRUE	G-Standaard	FALSE
 38	concentraat voor mondspoeling	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 40	pasta voor cutaan gebruik	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 41	pasta voor oromucosaal gebruik	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 44	poeder voor suspensie voor injectie	im;sc;intra-derm		Both	TRUE	G-Standaard	FALSE
-45	vloeistof voor oromucosaal gebruik	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
+45	vloeistof voor oromucosaal gebruik	oromucosaal		NonInfuse	TRUE	G-Standaard	FALSE
 46	spray voor sublinguaal gebruik	sublinguaal		NonInfuse	FALSE	G-Standaard	FALSE
 47	kit voor radiofarmaceutisch preparaat	iv		Both	TRUE	G-Standaard	FALSE
 54	druppels voor oraal gebruik, oplossing	oromucosaal;sublinguaal		NonInfuse	FALSE	G-Standaard	FALSE
@@ -52,14 +52,14 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 93	pasta voor oraal gebruik	or		NonInfuse	FALSE	G-Standaard	FALSE
 94	spray voor transdermaal gebruik, oplossing	transdermaal		NonInfuse	FALSE	G-Standaard	FALSE
 95	dispersie voor infusie	iv		Both	TRUE	G-Standaard	FALSE
-96	oogdruppels, emulsie	oog		NonInfuse	FALSE	G-Standaard	FALSE
-97	concentraat voor orale suspensie	or		NonInfuse	TRUE	G-Standaard	FALSE
+96	oogdruppels, emulsie	oog		NonInfuse	TRUE	G-Standaard	FALSE
+97	concentraat voor orale suspensie	or		Both	TRUE	G-Standaard	FALSE
 98	drank/mondspoeling	or;oromucosaal		NonInfuse	TRUE	G-Standaard	FALSE
 99	neuspoeder	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 100	zetpil	rect		NonInfuse	FALSE	G-Standaard	FALSE
 101	dispersie voor vernevelvloeistof	inh		NonInfuse	FALSE	G-Standaard	FALSE
 102	dispersie voor injectie met vertraagde afgifte	peri-neuraal;lokaal		NonInfuse	TRUE	G-Standaard	FALSE
-103	poeder voor oplossing voor intravesicaal gebruik	intra-vesicaal		NonInfuse	FALSE	G-Standaard	FALSE
+103	poeder voor oplossing voor intravesicaal gebruik	intra-vesicaal		NonInfuse	TRUE	G-Standaard	FALSE
 104	gel voor intra-uterien gebruik	uterien;intra-cervic		NonInfuse	FALSE	G-Standaard	FALSE
 110	oogzalf	oog		NonInfuse	FALSE	G-Standaard	FALSE
 120	ovule	vaginaal		NonInfuse	FALSE	G-Standaard	FALSE
@@ -74,19 +74,19 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 172	gel voor endocervicaal gebruik	endo-cervic		NonInfuse	FALSE	G-Standaard	FALSE
 180	maagsapresistente capsule	or		NonInfuse	FALSE	G-Standaard	FALSE
 190	inhalatiepoeder	inh		NonInfuse	FALSE	G-Standaard	FALSE
-200	poeder voor oraal gebruik	or		NonInfuse	FALSE	G-Standaard	FALSE
+200	poeder voor oraal gebruik	or		NonInfuse	TRUE	G-Standaard	FALSE
 213	strooipoeder	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 214	inhalatiepoeder voor nasaal gebruik	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 224	poeder voor oplossing	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 225	poeder voor drank	or		NonInfuse	TRUE	G-Standaard	FALSE
 226	poeder voor orale suspensie	or		NonInfuse	TRUE	G-Standaard	FALSE
 227	poeder voor klysma	rect		NonInfuse	TRUE	G-Standaard	FALSE
-229	poeder voor instillatievloeistof	intra-vesicaal		NonInfuse	FALSE	G-Standaard	FALSE
+229	poeder voor instillatievloeistof	intra-vesicaal		NonInfuse	TRUE	G-Standaard	FALSE
 230	tablet	or		NonInfuse	FALSE	G-Standaard	FALSE
 231	tablet + bruisgranulaat	or		NonInfuse	FALSE	G-Standaard	FALSE
 235	reep	or		NonInfuse	FALSE	G-Standaard	FALSE
-241	implantaat	sc;intra-vitreaal		Both	TRUE	G-Standaard	FALSE
-242	implantatiestift	sc		Both	TRUE	G-Standaard	FALSE
+241	implantaat	sc;intra-vitreaal		NonInfuse	FALSE	G-Standaard	FALSE
+242	implantatiestift	sc		NonInfuse	FALSE	G-Standaard	FALSE
 250	maagsapresistente tablet	or		NonInfuse	FALSE	G-Standaard	FALSE
 260	kauwtablet	or		NonInfuse	FALSE	G-Standaard	FALSE
 261	kauwgom	or		NonInfuse	FALSE	G-Standaard	FALSE
@@ -104,7 +104,7 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 379	granulaat voor orale suspensie	or		NonInfuse	FALSE	G-Standaard	FALSE
 380	tablet voor vaginaal gebruik	vaginaal		NonInfuse	FALSE	G-Standaard	FALSE
 382	maagsapresistent granulaat	or		NonInfuse	FALSE	G-Standaard	FALSE
-400	drank	or		NonInfuse	TRUE	G-Standaard	FALSE
+400	drank	or		Both	TRUE	G-Standaard	FALSE
 405	drank/concentraat voor klysma	or;rect		NonInfuse	TRUE	G-Standaard	FALSE
 410	gorgeldrank	oromucosaal		NonInfuse	TRUE	G-Standaard	FALSE
 420	mondspoeling	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
@@ -113,20 +113,20 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 434	vloeistof	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 436	spoeling voor urethraal gebruik	urethraal		NonInfuse	TRUE	G-Standaard	FALSE
 437	concentraat voor oplossing	niet gespecificeerd of meervoudig		NonInfuse	FALSE	G-Standaard	FALSE
-440	blaasspoeling	intra-vesicaal		NonInfuse	FALSE	G-Standaard	FALSE
+440	blaasspoeling	intra-vesicaal		NonInfuse	TRUE	G-Standaard	FALSE
 460	klysma	rect		NonInfuse	TRUE	G-Standaard	FALSE
 464	tablet voor klysma	rect		NonInfuse	FALSE	G-Standaard	FALSE
 470	stroop	or		NonInfuse	TRUE	G-Standaard	FALSE
-480	suspensie voor oraal gebruik	or		NonInfuse	FALSE	G-Standaard	FALSE
+480	suspensie voor oraal gebruik	or		NonInfuse	TRUE	G-Standaard	FALSE
 481	emulsie voor oraal gebruik	or		NonInfuse	TRUE	G-Standaard	FALSE
 482	suspensie voor cutaan gebruik	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 486	endotracheopulmonaire instillatie, suspensie	endo-tracheopulm		NonInfuse	FALSE	G-Standaard	FALSE
 491	kruidenthee	or		NonInfuse	FALSE	G-Standaard	FALSE
-500	oogdruppels	oog		NonInfuse	FALSE	G-Standaard	FALSE
-510	oordruppels	oor		NonInfuse	FALSE	G-Standaard	FALSE
+500	oogdruppels	oog		NonInfuse	TRUE	G-Standaard	FALSE
+510	oordruppels	oor		NonInfuse	TRUE	G-Standaard	FALSE
 520	neusdruppels	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
 521	neusspray	nasaal		NonInfuse	FALSE	G-Standaard	FALSE
-530	vernevelvloeistof	inh		NonInfuse	FALSE	G-Standaard	FALSE
+530	vernevelvloeistof	inh		NonInfuse	TRUE	G-Standaard	FALSE
 531	aerosol	inh		NonInfuse	FALSE	G-Standaard	FALSE
 535	inhalatiegas	inh		NonInfuse	FALSE	G-Standaard	FALSE
 540	infusievloeistof	iv;sc;peritoneaal;intra-thecaal;intra-coronair;epiduraal;peri-neuraal;lokaal;peri-bulbair;im;or;extra-corporaal;intra-cerebraal		Both	TRUE	G-Standaard	FALSE
@@ -138,17 +138,17 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 559	poeder voor injectie/infusieoplossing	iv;sc;im;intra-vesicaal		Both	TRUE	G-Standaard	FALSE
 571	oplossing voor hemodialyse	extra-corporaal;hemodialyse		Both	TRUE	G-Standaard	FALSE
 573	concentraat voor oplossing voor hemodialyse	hemodialyse		Both	TRUE	G-Standaard	FALSE
-574	oplossing voor peritoneale dialyse	peritoneaal		NonInfuse	FALSE	G-Standaard	FALSE
+574	oplossing voor peritoneale dialyse	peritoneaal		Both	TRUE	G-Standaard	FALSE
 575	oplossing voor hemofiltratie/hemodialyse	iv;extra-corporaal		Both	TRUE	G-Standaard	FALSE
-590	druppels voor oraal gebruik	or;cutaan;lokaal		NonInfuse	FALSE	G-Standaard	FALSE
+590	druppels voor oraal gebruik	or;cutaan;lokaal		NonInfuse	TRUE	G-Standaard	FALSE
 591	druppels voor oromucosaal gebruik	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
 602	spray	niet gespecificeerd of meervoudig;lokaal;or;oromucosaal;sublinguaal;cutaan		NonInfuse	FALSE	G-Standaard	FALSE
-611	spoeling	niet gespecificeerd of meervoudig;cutaan;peritoneaal;lokaal;vaginaal		NonInfuse	TRUE	G-Standaard	FALSE
-621	instillatievloeistof	peritoneaal		NonInfuse	FALSE	G-Standaard	FALSE
+611	spoeling	niet gespecificeerd of meervoudig;cutaan;peritoneaal;lokaal;vaginaal		Both	TRUE	G-Standaard	FALSE
+621	instillatievloeistof	peritoneaal		Both	TRUE	G-Standaard	FALSE
 630	oogwassing	oog		NonInfuse	FALSE	G-Standaard	FALSE
 652	huidspray	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 654	spray voor oromucosaal gebruik	oromucosaal		NonInfuse	FALSE	G-Standaard	FALSE
-657	vloeistof voor vaginaal gebruik	vaginaal		NonInfuse	FALSE	G-Standaard	FALSE
+657	vloeistof voor vaginaal gebruik	vaginaal		NonInfuse	TRUE	G-Standaard	FALSE
 660	oplosmiddel voor parenteraal gebruik	niet van toepassing;sc		Both	TRUE	G-Standaard	FALSE
 710	shampoo	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
 720	huidstift	cutaan		NonInfuse	FALSE	G-Standaard	FALSE
@@ -165,7 +165,7 @@ ExternalCode	DoseFormName	Routes	DefaultUnit	OrderingType	IsDrugInSolution	Categ
 800	poeder voor vernevelvloeistof	inh		NonInfuse	FALSE	G-Standaard	FALSE
 904	weefsellijm	epilesionaal		NonInfuse	FALSE	G-Standaard	FALSE
 905	maagsapresistente tablet met gereguleerde afgifte	or		NonInfuse	FALSE	G-Standaard	FALSE
-906	suspensie voor implantatie	intra-articulair		NonInfuse	FALSE	G-Standaard	FALSE
+906	suspensie voor implantatie	intra-articulair		Both	TRUE	G-Standaard	FALSE
 920	implantatiekraal	implantatie		NonInfuse	FALSE	G-Standaard	FALSE
 991	poeder voor lokaal gebruik	or;lokaal		NonInfuse	FALSE	G-Standaard	FALSE
 993	weefsellijm matrix	epilesionaal		NonInfuse	FALSE	G-Standaard	FALSE

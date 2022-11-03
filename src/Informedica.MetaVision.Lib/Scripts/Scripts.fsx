@@ -14,10 +14,12 @@ open Informedica.ZIndex.Lib.ATCGroup
 open Informedica.ZIndex.Lib.GenericProduct
 
 
-filterRouteShapeUnit "" "drank" ""
 
 
 MetaVision.getDrugFamilies "DrugFamilies"
+
+
+MetaVision.routeShapeUnits "RouteShapeUnits"
 
 
 MetaVision.createRoutes (Some "data/output/DrugDatabaseForImport.xlsx") "Routes"
@@ -32,14 +34,17 @@ let meds =
         let n = gpp.Name |> String.toLower |> String.trim
         n |> String.contains "fenta" ||
         n |> String.contains "genta" ||
-        n |> String.contains "cotri" ||
+        n |> String.contains "trime" ||
         n |> String.contains "amoxi" ||
         n |> String.contains "parac" ||
         n |> String.contains "norad" ||
-        n |> String.contains "morfi"
+        n |> String.contains "morfi" ||
+        n |> String.contains "propo" ||
+        n |> String.contains "amfo"
     )
-    //|> Array.collect (fun gpp -> gpp.GenericProducts |> Array.map (fun gp -> gp.Name))
     |> MetaVision.createImport MetaVision.config
+
+
 
 
 meds

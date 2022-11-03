@@ -1,21 +1,38 @@
 ExternalCode	IngredientName	Unit
 795	acetylsalicylzuur	mg
+29319	alfentanil	mg
+5851	amfotericine b	mg
 23167	amoxicilline	mg
 36854	apomorfine	mg
 1724	ascorbinezuur	mg
 37621	bupivacaine	mg
 31232	clavulaanzuur	mg
+38784	clindamycine	mg
 38938	codeine	mg
 34193	coffeine	mg
+38962	colistine	mg
 20435	dexamethason	mg
 14419	droperidol	mg
+40827	fentanyl	mg
+41335	gentamicine	mg
+76775	levobupivacaine	mg
 44598	morfine	mg
 45233	noradrenaline	mg
 906	paracetamol	mg
+58602	propofol	mg
 18325	propyfenazon	mg
+73458	remifentanil	mg
+71447	ropivacaine	mg
+48240	sufentanil	µg
+6424	sulfamethoxazol	mg
+28371	sulfametrol	mg
 48534	tamoxifen	mg
+49069	tobramycine	mg
 68993	tramadol	mg
+6416	trimethoprim	mg
+49573	vancomycine	mg
 	stuk	stuk
 	mL	mL
-	mg	mg
 	g	g
+	dosis	dosis
+	mg	mg
