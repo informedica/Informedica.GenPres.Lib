@@ -1,6 +1,7 @@
 ExternalCode	BrandName	Manufacturer	MedicationName
 	APC TABLET		acetylsalicylzuur/paracetamol/cof tab 250/250/50mg
 	EXCEDRIN		acetylsalicylzuur/paracetamol/cof tab 250/250/65mg
+	ETALPHA		alfacalcidol druppels 2ug/ml
 	RAPIFEN		alfentanil injvlst 0,5mg/ml
 	ABELCET		amfotericine b infconc 5mg/ml (lipidencompl)
 	FUNGIZONE		amfotericine b infusiepoeder  50mg
@@ -14,11 +15,60 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	APO-GO		apomorfine inj/infopl 10mg/ml
 	APO-GO		apomorfine injvlst 10mg/ml
 	DACEPTON		apomorfine injvlst 10mg/ml
+	IOPIDINE		apraclonidine oogdruppels  5mg/ml
+	IOPIDINE		apraclonidine oogdruppels 10mg/ml
+	ATROPINESULFAAT MINIMS		atropine oogdruppels 10mg/ml
+	POLLIVAL		azelastine oogdruppels 0,5mg/ml
+	ALLERGODIL		azelastine oogdruppels 0,5mg/ml
+	CARELASTIN		azelastine oogdruppels 0,5mg/ml
+	AZYTER		azitromycine oogdruppels 15mg/g
+	BACICOLINE-B		bacitracine/colistine/hydrocortison oordruppels
+	BENPERIDOL-NEURAXPHARM		benperidol druppels 2mg/ml
+	BETOPTIC		betaxolol oogdruppels 2,5mg/ml
+	LUMIGAN		bimatoprost oogdruppels 0,1mg/ml
+	LUMIGAN		bimatoprost oogdruppels 0,3mg/ml
+	GANMONO		bimatoprost oogdruppels 0,3mg/ml
+	ALPHAGAN		brimonidine oogdruppels 2mg/ml
+	AZOPT		brinzolamide oogdruppels 10mg/ml
+	SIMBRINZA		brinzolamide/brimonidine oogdruppel 10/2mg/ml
+	YELLOX		broomfenac oogdruppels 0,9mg/ml
+	BISOLVON		broomhexine druppels 2mg/ml
+	IMPROMEN		broomperidol druppels 2mg/ml
+	CELLUVISC		carmellose oogdruppels 10mg/ml
+	CARTEABAK		carteolol oogdruppels 20mg/ml
+	CHLOORAMPHENICOL, MINIMS		chlooramfenicol oogdruppels 5mg/ml
+	IKERVIS		ciclosporine oogdr emulsie 1mg/ml
+	CIPRAMIL		citalopram druppels 40mg/ml
+	RIVOTRIL		clonazepam druppels 2,5mg/ml
+	D-CURA		colecalciferol druppels 2400ie/ml
+	DAVITAMON		colecalciferol druppels 960ie/ml
 	BACTRIMEL		cotrimoxazol  96 infopl conc 16/80mg/ml
 	SEPTRIN		cotrimoxazol 480 tablet  80/400mg
+	ALLERGO-COMOD		cromoglicinezuur oogdruppels 20mg/ml
+	PREVALIN		cromoglicinezuur oogdruppels 20mg/ml
+	LECROLYN		cromoglicinezuur oogdruppels 40mg/ml
+	CYCLOPENTOLAATHYDROCHLORIDE MINIMS		cyclopentolaat oogdruppels  5mg/ml
+	CYCLOGYL		cyclopentolaat oogdruppels 10mg/ml
+	CYCLOPENTOLAATHYDROCHLORIDE MINIMS		cyclopentolaat oogdruppels 10mg/ml
+	MINRIN		desmopressine neusdruppels 0,1mg/ml
+	DEXA POS		dexamethason oogdr 1mg/ml (di-na-fosfaat)
+	DEXMONO		dexamethason oogdr 1mg/ml (fosfaat)
+	DEXAMETHASON MONOFREE		dexamethason oogdr 1mg/ml (fosfaat)
+	SOFRADEX		dexamethason/framycetine/gramicidine oogdr
+	SOFRADEX		dexamethason/framycetine/gramicidine oordr
 	DEXAMYTREX		dexamethason/gentamicine oogdr 1/3mg/ml
 	DEXAGENTA POS		dexamethason/gentamicine oogdr 1/3mg/ml
 	DEXAMYTREX		dexamethason/gentamicine oogzalf 0,3/3mg/g
+	TOBRADEX		dexamethason/tobramycine oogdr 1/3mg/ml
+	BRADEXA		dexamethason/tobramycine oogdr 1/3mg/ml
+	DURATEARS-OOGDRUPPELS		dextran 70/hypromellose oogdr 1/3mg/ml
+	NACLOF		diclofenac-natrium oogdruppels 1mg/ml
+	DICLOABAK		diclofenac-natrium oogdruppels 1mg/ml
+	FENISTIL		dimetindeen druppels 1mg/ml
+	TRUSOPT		dorzolamide oogdruppels 20mg/ml
+	TRUSMONO		dorzolamide oogdruppels 20mg/ml
+	EMADINE		emedastine oogdruppels 0,5mg/ml
+	LEXAPRO		escitalopram druppels 20mg/ml
 	FENTANYL PIRAMAL		fentanyl injvlst 0,05mg/ml
 	INSTANYL		fentanyl neusspray  50ug
 	INSTANYL		fentanyl neusspray  50ug/do
@@ -49,6 +99,14 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ACTIQ		fentanyl zuigtablet  400ug
 	ACTIQ		fentanyl zuigtablet  600ug
 	ACTIQ		fentanyl zuigtablet  800ug
+	FENYLEFRINEHYDROCHLORIDE, MINIMS		fenylefrine oogdruppels  25mg/ml
+	FENYLEFRINEHYDROCHLORIDE MONOFREE		fenylefrine oogdruppels  50mg/ml
+	FENYLEFRINEHYDROCHLORIDE, MINIMS		fenylefrine oogdruppels 100mg/ml
+	LOCACORTEN-VIOFORM		flumetason/clioquinol oordruppels 0,2/10mg/ml
+	FLUORESCEINENATRIUM, MINIMS		fluoresceine oogdruppels 20mg/ml
+	LIDOCAINE/FLUORESCEINE, MINIMS		fluoresceine/lidocaine oogdr 2,5/40mg/ml
+	FML LIQUIFILM		fluormetholon oogdruppels 1mg/ml
+	FLIXONASE		fluticason neusdruppels 1mg/ml
 	COPAL		gentami/vancomy p v cem 11,628/46,512mg/g
 	REFOCOLL		gentamicine implantatiegaas   8,125mg (2,5x2,5cm)
 	REFOCOLL		gentamicine implantatiegaas  32,5mg (5x5cm)
@@ -78,6 +136,34 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	COPAL		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
 	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
 	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g
+	HYLAN		hyaluron/carbom oogdr 0,15/0,15mg/ml (carb 981)
+	HYLO-FRESH		hyaluronzuur oogdruppels 0,3mg/ml
+	HYLO-DUAL		hyaluronzuur oogdruppels 0,5mg/ml
+	HYLO COMOD		hyaluronzuur oogdruppels 1mg/ml
+	HYLO DUAL INTENSE		hyaluronzuur oogdruppels 2mg/ml
+	SOFTACOR		hydrocortison oogdruppels 3,35mg/ml
+	TERRA CORTRIL MET POLYMYXINE B		hydrocortison/oxytetracycline/polymyxine b oordrup
+	ARTELAC		hypromellose oogdruppels  3,2mg/ml
+	HYPROMELLOSE MONOFREE		hypromellose oogdruppels  3mg/ml
+	INDOCOLLYRE		indometacine oogdruppels  1mg/ml
+	ACULAR		ketorolac oogdruppels 5mg/ml
+	ZADITEN		ketotifen oogdruppels 0,25mg/ml
+	ALTRIABAK		ketotifen oogdruppels 0,25mg/ml
+	KETAZED		ketotifen oogdruppels 0,25mg/ml
+	XALATAN		latanoprost oogdruppels 50ug/ml
+	VIZILATAN		latanoprost oogdruppels 50ug/ml
+	MONOPROST		latanoprost oogdruppels 50ug/ml
+	XALMONO		latanoprost oogdruppels 50ug/ml
+	XALOF		latanoprost oogdruppels 50ug/ml
+	LIVOCAB		levocabastine oogdruppels 0,5mg/ml
+	OTALGAN		lidocaine oordruppels 5mg/g
+	CYSTADROPS		mercaptamine oogdruppels 3,8mg/ml (als hcl)
+	SOLU-MEDROL		methylprednisolon infusiepoeder  125mg
+	SOLU-MEDROL		methylprednisolon infusiepoeder  500mg
+	SOLU-MEDROL		methylprednisolon infusiepoeder 1000mg
+	SOLU-MEDROL		methylprednisolon injectiepoeder   40mg
+	DEPO-MEDROL		methylprednisolon injvlst 40mg/ml (acetaat)
+	DEPO-MEDROL-LIDOCAINE		methylprednisolon/lidocaine injv 40/10mg/ml
 	ORAMORPH		morfine drank  2mg/ml (sulfaat)
 	ORAMORPH		morfine drank  6mg/ml (sulfaat)
 	ORAMORPH		morfine drank 20mg/ml (sulfaat)
@@ -90,9 +176,20 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	MS CONTIN		morfine tablet mga  30mg (sulfaat)
 	MS CONTIN		morfine tablet mga  60mg (sulfaat)
 	MS CONTIN		morfine tablet mga 100mg (sulfaat)
+	VIGAMOX		moxifloxacine oogdruppels 5mg/ml
+	NEVANAC		nepafenac oogdruppels 1mg/ml
+	NEVANAC		nepafenac oogdruppels 3mg/ml
 	SINORA		noradrenaline infopl conc 1mg/ml
 	SINORA		noradrenaline infvlst 0,1mg/ml
 	SINORA		noradrenaline infvlst 0,2mg/ml
+	TRAFLOXAL		ofloxacine oogdruppels 3mg/ml
+	OTIFLOX		ofloxacine oordruppels 3mg/ml
+	OPATANOL		olopatadine oogdruppels 1mg/ml
+	DROPIZOL		opium tinctuur druppels 10mg morfine/ml
+	SC NITRILE ULTRA ONDERZOEKSHANDSCHOEN XS		otc druppels met vitamine k2 270 ug/ml
+	OXYBUPROCAINEHYDROCHLORIDE, MINIMS		oxybuprocaine oogdruppels 4mg/ml
+	OXYBUPROCAINEHYDROCHLORIDE MONOFREE		oxybuprocaine oogdruppels 4mg/ml
+	PANOTILE		panotile oordruppels
 	ROTER		paracetamol capsule 500mg
 	WITTE KRUIS		paracetamol granulaat 500mg
 	SINASPRIL PARACETAMOL		paracetamol kauwtablet 120mg
@@ -135,6 +232,18 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	LIVSANE		paracetamol/coffeine tablet 500/50mg
 	PANADOL PLUS		paracetamol/coffeine tablet omhuld 500/65mg
 	ANTIGRIPPINE		paracetamol/coffeine/ascorb tablet 250/25/25mg
+	NISYLEEN PELARGONIUM		pelargonium druppels 821mg/ml (extract)
+	PILOCARPINENITRAAT, MINIMS		pilocarpine oogdr 20mg/ml (nitraat)
+	DIPIPERON		pipamperon druppels 40mg/ml
+	PROTAGENS		povidon oogdruppels 20mg/ml
+	DURATEARS-OOGDRUPPELS		povidon oogdruppels 20mg/ml
+	OCULOTECT		povidon oogdruppels 50mg/ml
+	VIDISIC		povidon oogdruppels 50mg/ml
+	POVIDON JODIUM, MINIMS		povidonjodium oogdruppels 50mg/ml
+	DI-ADRESON-F		prednisolon na-succinaat inj 25mg (parenter, rect)
+	PREDNISOLONNATRIUM, MINIMS		prednisolon oogdr  5mg/ml dinatriumfosfaat
+	PRED FORTE		prednisolon oogdr, susp 10mg/ml acetaat
+	ULTRACORTENOL		prednisolon oogzalf 5mg/g
 	DIPRIVAN		propofol inj.emulsie 10mg/ml
 	PROPOFOL LIPURO		propofol inj.emulsie 10mg/ml
 	DIPRIVAN		propofol inj.emulsie 20mg/ml
@@ -148,5 +257,36 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ULTIVA		remifentanil injectiepoeder 5mg
 	SUFENTA		sufentanil injvlst  5ug/ml
 	SUFENTA		sufentanil injvlst 50ug/ml
+	SAFLUTAN		tafluprost oogdruppels 15ug/ml
+	TETRACAINEHYDROCHLORIDE, MINIMS		tetracaine oogdruppels  5mg/ml
+	MINIMS TETRACAINE HCL		tetracaine oogdruppels 10mg/ml
+	TIMO-COMOD		timolol oogdruppels 2,5mg/ml
+	TIMOPTOL		timolol oogdruppels 2,5mg/ml
+	TIMO-COMOD		timolol oogdruppels 5mg/ml
+	TIMOPTOL		timolol oogdruppels 5mg/ml
+	GANFORT		timolol/bimatoprost oogdruppels 5/0,3mg/ml
+	COMBIGAN		timolol/brimonidine oogdruppels 5/2mg/ml
+	AZARGA		timolol/brinzolamide oogdruppels 5/10mg/ml
+	COSOPT		timolol/dorzolamide oogdruppels 5/20mg/ml
+	DUALKOPT		timolol/dorzolamide oogdruppels 5/20mg/ml
+	COSOPT MULTIDOSE		timolol/dorzolamide oogdruppels 5/20mg/ml
+	XALACOM		timolol/latanoprost oogdr 5mg/50ug/ml
+	LATANOTIM		timolol/latanoprost oogdr 5mg/50ug/ml
+	FIXAPROST		timolol/latanoprost oogdr 5mg/50ug/ml
+	TAPTIQOM		timolol/tafluprost oogdruppels 5mg/15ug/ml
+	TOBREX BID		tobramycine oogdruppels  3mg/ml
+	TRAMAL		tramadol druppels 100mg/ml
 	ZALDIAR		tramadol/paracetamol tablet 37,5/325mg
+	TRAVATAN		travoprost oogdruppels 40ug/ml
+	VIZITRAV		travoprost oogdruppels 40ug/ml
+	DUOTRAV		travoprost/timolol oogdruppels 40ug/5mg/ml
 	ROKIPRIM		trimethoprim/sulfametrol infvlst 0,64/3,2mg/ml
+	TROPICAMIDE, MINIMS		tropicamide oogdruppels  5mg/ml
+	TROPICAMIDE MONOFREE		tropicamide oogdruppels  5mg/ml
+	TROPICAMIDE, MINIMS		tropicamide oogdruppels 10mg/ml
+	BRINTELLIX		vortioxetine druppels 20mg/ml
+	KINDERNEUSDRUPPELS XYLOMETAZOLINE HTP		xylometazoline neusdruppels 0,5mg/ml
+	OTRIVIN		xylometazoline neusdruppels 1mg/ml
+	NEUSDRUPPELS XYLOMETAZOLINE HTP		xylometazoline neusdruppels 1mg/ml
+	IDYL		xylometazoline neusdruppels 1mg/ml
+	CISORDINOL		zuclopentixol druppels 20mg/ml

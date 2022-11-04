@@ -749,6 +749,18 @@ module Utils =
         |> Array.fold (fun acc b -> acc || b) false
 
 
+    let shapeDoseUnit rts unt shape =
+        rts
+        |> Array.collect (fun rt -> filterRouteShapeUnit rt shape unt)
+        |> Array.fold (fun acc xs ->
+            match acc with
+            | None   -> Some xs[3]
+            | Some u ->
+                if u |> String.startsWithCapsInsens xs[3] then acc
+                else Some ""
+        ) None
+
+
     let getATCCodes (gpp : GenPresProduct) =
         gpp.GenericProducts
         |> Array.map (fun gp -> gp.ATC |> String.trim)
@@ -874,21 +886,24 @@ module Utils =
         |> Array.distinct
 
 
-    let getFrequencies (id : int) =
-        RuleFinder.createFilter
-            None
-            None
-            None
-            (Some id)
-            ""
-            ""
-            ""
-        |> RuleFinder.find true
+    let getFrequencies (drs : DoseRule.DoseRule []) =
+        drs
         |> Array.map (fun dr -> $"{dr.Freq.Frequency} {dr.Freq.Time}")
         |> Array.distinct
         |> Array.collect mapFreq
         |> Array.distinct
         |> String.concat ";"
+
+
+    let getDoseUnit (drs: DoseRule.DoseRule[]) =
+        drs
+        |> Array.fold(fun acc dr ->
+            match acc with
+            | None -> Some dr.Unit
+            | Some u ->
+                if u = dr.Unit then acc
+                else Some ""
+        ) None
 
 
     let loadDataImport (file : string) (sheet : string) xs =
@@ -1112,6 +1127,17 @@ module MetaVision =
             |> Array.filter (fun gp -> gp.Substances |> Array.isEmpty |> not)
             |> Array.distinct
             |> Array.map (fun gp ->
+                let drs =
+                    RuleFinder.createFilter
+                        None
+                        None
+                        None
+                        (Some gp.Id)
+                        ""
+                        ""
+                        ""
+                    |> RuleFinder.find true
+
                 let name =
                     gp.Name
                     |> String.trim
@@ -1124,12 +1150,24 @@ module MetaVision =
                         |> String.contains (gp.ATC |> String.subString 0 4)
                     )
                     |> Array.tryHead
+                let rts =
+                    GenPresProduct.get true
+                        |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
+                        |> Array.collect (fun gpp -> gpp.Route)
+                        |> Array.collect (String.splitAt ',')
+                        |> Array.filter ((String.equalsCapInsens "Parenteraal") >> not)
+                        |> Array.distinct
+
                 let su =
                     gp.Substances[0].ShapeUnit
                     |> mapUnit
+
                 let un =
-                    gp.Substances[0].SubstanceUnit
+                    match gp.Shape |> shapeDoseUnit rts gp.Substances[0].ShapeUnit with
+                    | Some u when u |> String.isNullOrWhiteSpace |> not -> u
+                    | _ -> gp.Substances[0].SubstanceUnit
                     |> mapUnit
+
                 let assort =
                     gp.Id
                     |> getFormulary
@@ -1153,17 +1191,12 @@ module MetaVision =
                     IncrementValue = 0.1
                     CodeSnippetName = $"GPK-{gp.Id} {System.Guid.NewGuid().ToString()}"
                     Frequencies =
-                        let freqs = gp.Id |> getFrequencies
+                        let freqs = drs |> getFrequencies
                         if freqs |> String.isNullOrWhiteSpace then "[All]"
                         else freqs
                     DoseForms = gp.Shape |> String.toLower |> String.trim
                     Routes =
-                        GenPresProduct.get true
-                        |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
-                        |> Array.collect (fun gpp -> gpp.Route)
-                        |> Array.collect (String.splitAt ',')
-                        |> Array.filter ((String.equalsCapInsens "Parenteraal") >> not)
-                        |> Array.distinct
+                        rts
                         |> Array.map mapRoute
                         |> String.concat ";"
                     AdditivesGroup = "[None]"

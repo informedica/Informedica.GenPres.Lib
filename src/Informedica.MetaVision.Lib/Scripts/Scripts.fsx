@@ -14,6 +14,8 @@ open Informedica.ZIndex.Lib.ATCGroup
 open Informedica.ZIndex.Lib.GenericProduct
 
 
+"oogdruppels"
+|> shapeDoseUnit [| "oculair" |] "gram"
 
 
 MetaVision.getDrugFamilies "DrugFamilies"
@@ -40,7 +42,9 @@ let meds =
         n |> String.contains "norad" ||
         n |> String.contains "morfi" ||
         n |> String.contains "propo" ||
-        n |> String.contains "amfo"
+        n |> String.contains "predn" ||
+        n |> String.contains "amfo"  ||
+        gpp.Shape |> String.toLower |> String.contains "druppel"
     )
     |> MetaVision.createImport MetaVision.config
 

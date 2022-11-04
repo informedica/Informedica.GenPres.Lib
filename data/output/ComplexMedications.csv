@@ -1,4 +1,5 @@
 ComplexMedicationName	IngredientName	Concentration	ConcentrationUnit	In	InUnit
+acetylcysteine oogdruppels  50mg/ml	acetylcysteine	50	mg		
 acetylsalicylzuur/paracetamol/cof tab 250/250/50mg	acetylsalicylzuur	250	mg		
 acetylsalicylzuur/paracetamol/cof tab 250/250/50mg	paracetamol	250	mg		
 acetylsalicylzuur/paracetamol/cof tab 250/250/50mg	coffeine	50	mg		
@@ -7,9 +8,14 @@ acetylsalicylzuur/paracetamol/cof tab 250/250/65mg	acetylsalicylzuur	250	mg
 acetylsalicylzuur/paracetamol/cof tab 250/250/65mg	paracetamol	250	mg		
 acetylsalicylzuur/paracetamol/cof tab 250/250/65mg	coffeine	65	mg		
 acetylsalicylzuur/paracetamol/cof tab 250/250/65mg	stuk	1	stuk		
+alfacalcidol druppels 2ug/ml	alfacalcidol	2	µg		
 alfentanil infuus	alfentanil	1	mg		
 alfentanil infuus	mg	1	mg		
 alfentanil injvlst 0,5mg/ml	alfentanil	0,5	mg		
+aluminiumacetotartraat oordruppels  1,2% (12mg/g)	aluminiumacetotartraat	12	mg		
+aluminiumacetotartraat oordruppels  1,2% (12mg/g)	g	1	g		
+aluminiumacetotartraat oordruppels 12% (120mg/g)	aluminiumacetotartraat	120	mg		
+aluminiumacetotartraat oordruppels 12% (120mg/g)	g	1	g		
 amfotericine b infconc 5mg/ml (lipidencompl)	amfotericine b	5	mg		
 amfotericine b infusiepoeder  50mg	amfotericine b	50	mg		
 amfotericine b infusiepoeder  50mg	stuk	1	stuk		
@@ -91,6 +97,41 @@ amoxicilline/clavulaanzuur tablet 875/125mg	stuk	1	stuk
 apomorfine infvlst 5mg/ml	apomorfine	5	mg		
 apomorfine inj/infopl 10mg/ml	apomorfine	10	mg		
 apomorfine injvlst 10mg/ml	apomorfine	10	mg		
+apraclonidine oogdruppels  5mg/ml	apraclonidine	5	mg		
+apraclonidine oogdruppels 10mg/ml	apraclonidine	10	mg		
+ascorbinezuur oogdruppels 100mg/ml	ascorbinezuur	100	mg		
+atropine oogdruppels  0,1mg/ml	atropine	0,1	mg		
+atropine oogdruppels  0,5mg/ml	atropine	0,5	mg		
+atropine oogdruppels  1mg/ml	atropine	1	mg		
+atropine oogdruppels  2,5mg/ml	atropine	2,5	mg		
+atropine oogdruppels  5mg/ml	atropine	5	mg		
+atropine oogdruppels 10mg/ml	atropine	10	mg		
+azelastine oogdruppels 0,5mg/ml	azelastine	0,5	mg		
+azijnzuur oordruppels	azijnzuur	7,2	mg		
+azijnzuur oordruppels	g	1	g		
+azijnzuur/hydrocortison oordruppels 7,2/10mg/g	azijnzuur	7,2	mg		
+azijnzuur/hydrocortison oordruppels 7,2/10mg/g	hydrocortison	10	mg		
+azijnzuur/hydrocortison oordruppels 7,2/10mg/g	g	1	g		
+azijnzuur/triamcinolonacetonide oordr 7,2/1mg/g	azijnzuur	7,2	mg		
+azijnzuur/triamcinolonacetonide oordr 7,2/1mg/g	triamcinolonacetonide	1	mg		
+azijnzuur/triamcinolonacetonide oordr 7,2/1mg/g	g	1	g		
+azitromycine oogdruppels 15mg/g	azitromycine	15	mg		
+azitromycine oogdruppels 15mg/g	g	1	g		
+bacitracine/colistine/hydrocortison oordruppels	hydrocortison	10	mg		
+bacitracine/colistine/hydrocortison oordruppels	colistine	250000	IE		
+bacitracine/colistine/hydrocortison oordruppels	bacitracine	500	IE		
+benperidol druppels 2mg/ml	benperidol	2	mg		
+betaxolol oogdruppels 2,5mg/ml	betaxolol	2,5	mg		
+bevacizumab oogdruppels 5mg/ml	bevacizumab	5	mg		
+bimatoprost oogdruppels 0,1mg/ml	bimatoprost	0,1	mg		
+bimatoprost oogdruppels 0,3mg/ml	bimatoprost	0,3	mg		
+brimonidine oogdruppels 2mg/ml	brimonidine	2	mg		
+brinzolamide oogdruppels 10mg/ml	brinzolamide	10	mg		
+brinzolamide/brimonidine oogdruppel 10/2mg/ml	brimonidine	2	mg		
+brinzolamide/brimonidine oogdruppel 10/2mg/ml	brinzolamide	10	mg		
+broomfenac oogdruppels 0,9mg/ml	broomfenac	0,9	mg		
+broomhexine druppels 2mg/ml	broomhexine	2	mg		
+broomperidol druppels 2mg/ml	broomperidol	2	mg		
 bupivacaine/fentanyl infvlst 1,25mg/2,5ug/ml	fentanyl	2,5	µg		
 bupivacaine/fentanyl infvlst 1,25mg/2,5ug/ml	bupivacaine	1,25	mg		
 bupivacaine/morfine infvlst 1,25/0,02mg/ml	morfine	0,02	mg		
@@ -111,6 +152,50 @@ bupivacaine/sufentanil infvlst 1mg/1ug/ml	sufentanil	1	µg
 bupivacaine/sufentanil infvlst 1mg/1ug/ml	bupivacaine	1	mg		
 bupivacaine/sufentanil infvlst 2,5mg/1ug/ml	sufentanil	1	µg		
 bupivacaine/sufentanil infvlst 2,5mg/1ug/ml	bupivacaine	2,5	mg		
+cannabidiol druppels sublin  20mg/ml	cannabidiol	20	mg		
+cannabidiol druppels sublin 100mg/ml	cannabidiol	100	mg		
+cannabidiol/dronabinol druppels sublin 10/6,5mg/ml	dronabinol	6,5	mg		
+cannabidiol/dronabinol druppels sublin 10/6,5mg/ml	cannabidiol	10	mg		
+cannabidiol/dronabinol druppels sublin 20/13mg/ml	dronabinol	13	mg		
+cannabidiol/dronabinol druppels sublin 20/13mg/ml	cannabidiol	20	mg		
+cannabidiol/dronabinol druppels sublin 24/20mg/ml	dronabinol	20	mg		
+cannabidiol/dronabinol druppels sublin 24/20mg/ml	cannabidiol	24	mg		
+cannabidiol/dronabinol druppels sublin 40/28mg/ml	dronabinol	28	mg		
+cannabidiol/dronabinol druppels sublin 40/28mg/ml	cannabidiol	40	mg		
+cannabidiol/dronabinol druppels sublin 50/ 20mg/ml	dronabinol	20	mg		
+cannabidiol/dronabinol druppels sublin 50/ 20mg/ml	cannabidiol	50	mg		
+cannabidiol/dronabinol druppels sublin 50/ 50mg/ml	dronabinol	50	mg		
+cannabidiol/dronabinol druppels sublin 50/ 50mg/ml	cannabidiol	50	mg		
+cannabidiol/dronabinol druppels sublin 50/100mg/ml	dronabinol	100	mg		
+cannabidiol/dronabinol druppels sublin 50/100mg/ml	cannabidiol	50	mg		
+carmellose oogdruppels 10mg/ml	carmellose	10	mg		
+carteolol oogdruppels 20mg/ml	carteolol	20	mg		
+cefazoline oogdruppels 50mg/ml	cefazoline	50	mg		
+ceftazidim oogdruppels 50mg/ml	ceftazidim	50	mg		
+chlooramfenicol oogdruppels 4mg/ml	chlooramfenicol	4	mg		
+chlooramfenicol oogdruppels 5mg/ml	chlooramfenicol	5	mg		
+chloorhexidine oogdruppels 0,2mg/ml	chloorhexidine	0,2	mg		
+ciclosporine oogdr emulsie 1mg/ml	ciclosporine	1	mg		
+ciclosporine oogdruppels 0,5mg/ml	ciclosporine	0,5	mg		
+ciclosporine oogdruppels 1mg/ml	ciclosporine	1	mg		
+citalopram druppels 40mg/ml	citalopram	40	mg		
+clonazepam druppels 2,5mg/ml	clonazepam	2,5	mg		
+cocaine neusdruppels  30mg/ml	cocaine	30	mg		
+cocaine neusdruppels  70mg/ml	cocaine	70	mg		
+cocaine neusdruppels 100mg/ml	cocaine	100	mg		
+cocaine oogdruppels 50mg/ml	cocaine	50	mg		
+cocaine/adrenaline neusdruppels 50/0,01mg/ml	cocaine	50	mg		
+cocaine/adrenaline neusdruppels 50/0,01mg/ml	adrenaline	0,01	mg		
+cocaine/adrenaline neusdruppels 63/1mg/ml	cocaine	63	mg		
+cocaine/adrenaline neusdruppels 63/1mg/ml	adrenaline	0,55	mg		
+colecal/menaqui druppels 20.000ie/240ug/ml	colecalciferol	20000	IE		
+colecal/menaqui druppels 20.000ie/240ug/ml	menaquinon 7	240	µg		
+colecal/menaqui druppels 24.000ie/2400ug/ml	colecalciferol	24000	IE		
+colecal/menaqui druppels 24.000ie/2400ug/ml	menaquinon 7	2400	µg		
+colecalciferol druppels 2400ie/ml	colecalciferol	2400	IE		
+colecalciferol druppels 50.000ie/ml	colecalciferol	50000	IE		
+colecalciferol druppels 7000ie/ml	colecalciferol	7000	IE		
+colecalciferol druppels 960ie/ml	colecalciferol	960	IE		
 cotrimoxazol  48 susp oraal 8/40mg/ml	trimethoprim	8	mg		
 cotrimoxazol  48 susp oraal 8/40mg/ml	sulfamethoxazol	40	mg		
 cotrimoxazol  96 infopl conc 16/80mg/ml	trimethoprim	16	mg		
@@ -124,11 +209,49 @@ cotrimoxazol 480 tablet  80/400mg	stuk	1	stuk
 cotrimoxazol 960 tablet 160/800mg	trimethoprim	160	mg		
 cotrimoxazol 960 tablet 160/800mg	sulfamethoxazol	800	mg		
 cotrimoxazol 960 tablet 160/800mg	stuk	1	stuk		
+cromoglicinezuur oogdruppels 20mg/ml	cromoglicinezuur	20	mg		
+cromoglicinezuur oogdruppels 40mg/ml	cromoglicinezuur	40	mg		
+cyclopentolaat oogdruppels  5mg/ml	cyclopentolaat	5	mg		
+cyclopentolaat oogdruppels 10mg/ml	cyclopentolaat	10	mg		
+desmopressine neusdruppels 0,1mg/ml	desmopressine	0,1	mg		
+dexamethason oogdr 1mg/ml (base)	dexamethason	1	mg		
+dexamethason oogdr 1mg/ml (di-na-fosfaat)	dexamethason	1	mg		
+dexamethason oogdr 1mg/ml (fosfaat)	dexamethason	1	mg		
+dexamethason/chlooramfenicol/polymyxine oogdruppel	dexamethason	0,66	mg		
+dexamethason/chlooramfenicol/polymyxine oogdruppel	chlooramfenicol	2,5	mg		
+dexamethason/chlooramfenicol/polymyxine oogdruppel	polymyxine b	1	mg		
+dexamethason/chlooramfenicol/polymyxine oordruppel	dexamethason	0,66	mg		
+dexamethason/chlooramfenicol/polymyxine oordruppel	chlooramfenicol	2,5	mg		
+dexamethason/chlooramfenicol/polymyxine oordruppel	polymyxine b	1	mg		
+dexamethason/framycetine/gramicidine oogdr	framycetine	5	mg		
+dexamethason/framycetine/gramicidine oogdr	gramicidine	0,05	mg		
+dexamethason/framycetine/gramicidine oogdr	dexamethason	0,5	mg		
+dexamethason/framycetine/gramicidine oordr	framycetine	5	mg		
+dexamethason/framycetine/gramicidine oordr	gramicidine	0,05	mg		
+dexamethason/framycetine/gramicidine oordr	dexamethason	0,5	mg		
 dexamethason/gentamicine oogdr 1/3mg/ml	dexamethason	1	mg		
 dexamethason/gentamicine oogdr 1/3mg/ml	gentamicine	3	mg		
 dexamethason/gentamicine oogzalf 0,3/3mg/g	gentamicine	3	mg		
 dexamethason/gentamicine oogzalf 0,3/3mg/g	dexamethason	0,3	mg		
 dexamethason/gentamicine oogzalf 0,3/3mg/g	g	1	g		
+dexamethason/tobramycine oogdr 1/3mg/ml	dexamethason	1	mg		
+dexamethason/tobramycine oogdr 1/3mg/ml	tobramycine	3	mg		
+dextran 70/hypromellose oogdr 1/3mg/ml	dextran 70	1	mg		
+dextran 70/hypromellose oogdr 1/3mg/ml	hypromellose	3	mg		
+diclofenac-natrium oogdruppels 1mg/ml	diclofenac	1	mg		
+dimetindeen druppels 1mg/ml	dimetindeen	1	mg		
+dorzolamide oogdruppels 20mg/ml	dorzolamide	20	mg		
+dronabinol druppels sublin 100mg/ml	dronabinol	100	mg		
+dronabinol druppels sublin 10mg/ml	dronabinol	10	mg		
+dronabinol druppels sublin 20mg/ml	dronabinol	20	mg		
+dronabinol druppels sublin 50mg/ml	dronabinol	50	mg		
+dronabinol druppels sublin 5mg/ml	dronabinol	5	mg		
+echinacea extract druppels	echinacea	340	mg		
+echinacea extract druppels	echinacea	17,5	mg		
+edetinezuur oogdruppels  4mg/ml	edetinezuur	4	mg		
+edetinezuur oogdruppels 20mg/ml	edetinezuur	20	mg		
+emedastine oogdruppels 0,5mg/ml	emedastine	0,5	mg		
+escitalopram druppels 20mg/ml	escitalopram	20	mg		
 fentanyl druppels oromuc 50ug/ml (als citraat)	fentanyl	50	µg		
 fentanyl druppels oromuc 50ug/ml (citraat)	fentanyl	0,05	mg		
 fentanyl infvlst 0,05mg/ml	fentanyl	0,05	mg		
@@ -207,6 +330,31 @@ fentanyl zuigtablet  600ug	fentanyl	600	µg
 fentanyl zuigtablet  600ug	stuk	1	stuk		
 fentanyl zuigtablet  800ug	fentanyl	800	µg		
 fentanyl zuigtablet  800ug	stuk	1	stuk		
+fenylefrine oogdruppels   1,25mg/ml	fenylefrine	1,25	mg		
+fenylefrine oogdruppels  10mg/ml	fenylefrine	10	mg		
+fenylefrine oogdruppels  25mg/ml	fenylefrine	25	mg		
+fenylefrine oogdruppels  50mg/ml	fenylefrine	50	mg		
+fenylefrine oogdruppels 100mg/ml	fenylefrine	100	mg		
+fenylefrine/tropicamide oogdruppels 25/5mg/ml	tropicamide	5	mg		
+fenylefrine/tropicamide oogdruppels 25/5mg/ml	fenylefrine	25	mg		
+fenylefrine/tropicamide oogdruppels 50/5mg/ml	tropicamide	5	mg		
+fenylefrine/tropicamide oogdruppels 50/5mg/ml	fenylefrine	50	mg		
+flumetason/clioquinol oordruppels 0,2/10mg/ml	flumetason	0,2	mg		
+flumetason/clioquinol oordruppels 0,2/10mg/ml	clioquinol	10	mg		
+fluoresceine oogdruppels 20mg/ml	fluoresceine	20	mg		
+fluoresceine/lidocaine oogdr 2,5/40mg/ml	fluoresceine	2,5	mg		
+fluoresceine/lidocaine oogdr 2,5/40mg/ml	lidocaine	40	mg		
+fluoresceine/oxybuprocaine oogdruppels 2,5/4mg/ml	oxybuprocaine	4	mg		
+fluoresceine/oxybuprocaine oogdruppels 2,5/4mg/ml	fluoresceine	2,5	mg		
+fluormetholon oogdruppels 1mg/ml	fluormetholon	1	mg		
+fluticason neusdruppels 1mg/ml	fluticason	1	mg		
+folinezuur oogdruppels 0,3mg/ml	folinezuur	0,3	mg		
+folinezuur oogdruppels 10mg/ml	folinezuur	10	mg		
+foscarnet oogdruppels 12mg/ml	foscarnet	12	mg		
+foscarnet oogdruppels 24mg/ml	foscarnet	24	mg		
+fytomenadion concentraat 10mg/g	fytomenadion	10	mg		
+fytomenadion concentraat 10mg/g	g	1	g		
+fytomenadion concentraat 10mg/ml	fytomenadion	10	mg		
 gentami/vancomy p v cem 11,628/46,512mg/g	gentamicine	11,628	mg		
 gentami/vancomy p v cem 11,628/46,512mg/g	vancomycine	46,512	mg		
 gentami/vancomy p v cem 11,628/46,512mg/g	g	1	g		
@@ -271,6 +419,30 @@ gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g	g	1	g
 gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g	clindamycine	23,5	mg		
 gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g	gentamicine	23,5	mg		
 gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g	g	1	g		
+homatropine hydrobromide oogdr 20mg/ml	homatropine	20	mg		
+hyaluron/carbom oogdr 0,15/0,15mg/ml (carb 981)	hyaluronzuur	0,15	mg		
+hyaluron/carbom oogdr 0,15/0,15mg/ml (carb 981)	carbomeer	0,15	mg		
+hyaluronzuur oogdruppels 0,3mg/ml	hyaluronzuur	0,3	mg		
+hyaluronzuur oogdruppels 0,5mg/ml	hyaluronzuur	0,5	mg		
+hyaluronzuur oogdruppels 1,5mg/ml	hyaluronzuur	1,5	mg		
+hyaluronzuur oogdruppels 1,8mg/ml	hyaluronzuur	1,8	mg		
+hyaluronzuur oogdruppels 1mg/ml	hyaluronzuur	1	mg		
+hyaluronzuur oogdruppels 2mg/ml	hyaluronzuur	2	mg		
+hydrocortison oogdruppels 3,35mg/ml	hydrocortison	3,35	mg		
+hydrocortison/oxytetracycline/polymyxine b oordrup	hydrocortison	15	mg		
+hydrocortison/oxytetracycline/polymyxine b oordrup	oxytetracycline	5	mg		
+hydrocortison/oxytetracycline/polymyxine b oordrup	polymyxine b	10000	IE		
+hydrocortison/tetracycline oordruppels 10/10mg/ml	hydrocortison	10	mg		
+hydrocortison/tetracycline oordruppels 10/10mg/ml	tetracycline	10	mg		
+hypromellose oogdruppels  3,2mg/ml	hypromellose	3,2	mg		
+hypromellose oogdruppels  3mg/ml	hypromellose	3	mg		
+indometacine oogdruppels  1mg/ml	indometacine	1	mg		
+interferon alfa 2b oogdruppels 1me/ml	interferon alfa 2b	1000000	IE		
+jodium/kaliumjodide druppels 40/80mg/ml	jodium	40	mg		
+jodium/kaliumjodide druppels 40/80mg/ml	kaliumjodide	80	mg		
+ketorolac oogdruppels 5mg/ml	ketorolac	5	mg		
+ketotifen oogdruppels 0,25mg/ml	ketotifen	0,25	mg		
+latanoprost oogdruppels 50ug/ml	latanoprost	50	µg		
 levobupivacaine/sufentanil inf 0,625mg/0,5ug/ml	sufentanil	0,5	µg		
 levobupivacaine/sufentanil inf 0,625mg/0,5ug/ml	levobupivacaine	0,625	mg		
 levobupivacaine/sufentanil inf 1,25mg/0,5ug/ml	sufentanil	0,5	µg		
@@ -279,6 +451,34 @@ levobupivacaine/sufentanil inf 1,25mg/1ug/ml	sufentanil	1	µg
 levobupivacaine/sufentanil inf 1,25mg/1ug/ml	levobupivacaine	1,25	mg		
 levobupivacaine/sufentanil inf 2,5mg/1ug/ml	sufentanil	1	µg		
 levobupivacaine/sufentanil inf 2,5mg/1ug/ml	levobupivacaine	2,5	mg		
+levocabastine oogdruppels 0,5mg/ml	levocabastine	0,5	mg		
+lidocaine oordruppels 5mg/g	lidocaine	5	mg		
+lidocaine oordruppels 5mg/g	g	1	g		
+mercaptamine oogdruppels 3,8mg/ml (als hcl)	mercaptamine	3,8	mg		
+methylcellulose oogdruppels  5mg/ml	methylcellulose	5	mg		
+methylprednisolon capsule 100mg	methylprednisolon	100	mg		
+methylprednisolon capsule 100mg	stuk	1	stuk		
+methylprednisolon infusiepoeder  125mg	methylprednisolon	125	mg		
+methylprednisolon infusiepoeder  125mg	stuk	1	stuk		
+methylprednisolon infusiepoeder  500mg	methylprednisolon	500	mg		
+methylprednisolon infusiepoeder  500mg	stuk	1	stuk		
+methylprednisolon infusiepoeder 1000mg	methylprednisolon	1000	mg		
+methylprednisolon infusiepoeder 1000mg	stuk	1	stuk		
+methylprednisolon infvlst 10mg/ml	methylprednisolon	10	mg		
+methylprednisolon infvlst 5mg/ml	methylprednisolon	5	mg		
+methylprednisolon injectie/infuus	methylprednisolon	1	mg		
+methylprednisolon injectie/infuus	mg	1	mg		
+methylprednisolon injectiepoeder   40mg	methylprednisolon	40	mg		
+methylprednisolon injectiepoeder   40mg	stuk	1	stuk		
+methylprednisolon injvlst 40mg/ml (acetaat)	methylprednisolon	40	mg		
+methylprednisolon tablet 100mg	methylprednisolon	100	mg		
+methylprednisolon tablet 100mg	stuk	1	stuk		
+methylprednisolon/lidocaine injv 40/10mg/ml	methylprednisolon	40	mg		
+methylprednisolon/lidocaine injv 40/10mg/ml	lidocaine	10	mg		
+miconazol oordruppels 20mg/g	miconazol	20	mg		
+miconazol oordruppels 20mg/g	g	1	g		
+mitomycine oogdruppels 0,2mg/ml	mitomycine	0,2	mg		
+mitomycine oogdruppels 0,4mg/ml	mitomycine	0,4	mg		
 morfine drank  1mg/ml (hcl)	morfine	1	mg		
 morfine drank  2mg/ml (sulfaat)	morfine	2	mg		
 morfine drank  5mg/ml (hcl)	morfine	5	mg		
@@ -367,6 +567,14 @@ morfine/dexamethason infvlst 20/0,08mg/ml	morfine	20	mg
 morfine/dexamethason infvlst 20/0,08mg/ml	dexamethason	0,08	mg		
 morfine/dexamethason infvlst 5/0,07mg/ml	morfine	5	mg		
 morfine/dexamethason infvlst 5/0,07mg/ml	dexamethason	0,07	mg		
+moxifloxacine oogdruppels 5mg/ml	moxifloxacine	5	mg		
+moxisylyt oogdruppels 5mg/ml	moxisylyt	5	mg		
+nafazoline oogdruppels 0,25mg/ml	nafazoline	0,25	mg		
+natriumcarbonaat oordruppels 100mg/ml	natriumcarbonaat	100	mg		
+natriumchloride neusdruppels 8mg/ml(0,8%)	natriumchloride	8	mg		
+natriumchloride oogdruppels 50mg/ml	natriumchloride	50	mg		
+nepafenac oogdruppels 1mg/ml	nepafenac	1	mg		
+nepafenac oogdruppels 3mg/ml	nepafenac	3	mg		
 noradrenaline infopl conc 1mg/ml	noradrenaline	1	mg		
 noradrenaline infuus	noradrenaline	1	mg		
 noradrenaline infuus	mg	1	mg		
@@ -381,6 +589,22 @@ noradrenaline infvlst 0,5mg/ml	noradrenaline	0,5	mg
 noradrenaline infvlst 1mg/ml	noradrenaline	1	mg		
 noradrenaline injvlst  5ug/ml	noradrenaline	5	µg		
 noradrenaline injvlst 10ug/ml	noradrenaline	0,02	mg		
+ofloxacine oogdruppels 3mg/ml	ofloxacine	3	mg		
+ofloxacine oordruppels 3mg/ml	ofloxacine	3	mg		
+olopatadine oogdruppels 1mg/ml	olopatadine	1	mg		
+opium tinctuur druppels 10mg morfine/ml	opium	10	mg		
+otc druppels met vitamine k2 270 ug/ml	menaquinon 7	270	µg		
+oxybuprocain/xylomet neusdruppel 6,667/0,333mg/ml	oxybuprocaine	6,667	mg		
+oxybuprocain/xylomet neusdruppel 6,667/0,333mg/ml	xylometazoline	0,333	mg		
+oxybuprocain/xylomet neusdruppels 10/0,5mg/ml	oxybuprocaine	10	mg		
+oxybuprocain/xylomet neusdruppels 10/0,5mg/ml	xylometazoline	0,5	mg		
+oxybuprocaine neusdruppels 10mg/ml	oxybuprocaine	10	mg		
+oxybuprocaine oogdruppels 2mg/ml	oxybuprocaine	2	mg		
+oxybuprocaine oogdruppels 4mg/ml	oxybuprocaine	4	mg		
+panotile oordruppels	fludrocortison	1	mg		
+panotile oordruppels	neomycine	10	mg		
+panotile oordruppels	polymyxine b	10000	IE		
+panotile oordruppels	lidocaine	40	mg		
 paracetamol bruistablet 1000mg	paracetamol	1000	mg		
 paracetamol bruistablet 1000mg	stuk	1	stuk		
 paracetamol capsule 500mg	paracetamol	500	mg		
@@ -477,6 +701,85 @@ paracetamol/coffeine/ascorb tablet 250/25/25mg	paracetamol	250	mg
 paracetamol/coffeine/ascorb tablet 250/25/25mg	ascorbinezuur	25	mg		
 paracetamol/coffeine/ascorb tablet 250/25/25mg	coffeine	25	mg		
 paracetamol/coffeine/ascorb tablet 250/25/25mg	stuk	1	stuk		
+pelargonium druppels 821mg/ml (extract)	pelargonium	821	mg		
+pilocarpine oogdr  1,25mg/ml	pilocarpine	1,25	mg		
+pilocarpine oogdr 10mg/ml (hcl)	pilocarpine	10	mg		
+pilocarpine oogdr 20mg/ml (hcl)	pilocarpine	20	mg		
+pilocarpine oogdr 20mg/ml (nitraat)	pilocarpine	20	mg		
+pilocarpine oogdr 30mg/ml (hcl)	pilocarpine	30	mg		
+pilocarpine oogdr 40mg/ml (hcl)	pilocarpine	40	mg		
+pipamperon druppels 40mg/ml	pipamperon	40	mg		
+polymyxine b oogdruppels 10.000ie/ml	polymyxine b	10000	IE		
+polymyxine b oordruppels 10.000ie/ml	polymyxine b	10000	IE		
+povidon oogdruppels 20mg/ml	povidon	20	mg		
+povidon oogdruppels 50mg/ml	povidon	50	mg		
+povidonjodium oogdruppels  3mg/ml	povidonjodium	3	mg		
+povidonjodium oogdruppels 10mg/ml	povidonjodium	10	mg		
+povidonjodium oogdruppels 50mg/ml	povidonjodium	50	mg		
+prednisolon capsule 10mg	prednisolon	10	mg		
+prednisolon capsule 10mg	stuk	1	stuk		
+prednisolon capsule 15mg	prednisolon	15	mg		
+prednisolon capsule 15mg	stuk	1	stuk		
+prednisolon capsule 20mg	prednisolon	20	mg		
+prednisolon capsule 20mg	stuk	1	stuk		
+prednisolon capsule 25mg	prednisolon	25	mg		
+prednisolon capsule 25mg	stuk	1	stuk		
+prednisolon capsule 30mg	prednisolon	30	mg		
+prednisolon capsule 30mg	stuk	1	stuk		
+prednisolon capsule 35mg	prednisolon	35	mg		
+prednisolon capsule 35mg	stuk	1	stuk		
+prednisolon capsule 40mg	prednisolon	40	mg		
+prednisolon capsule 40mg	stuk	1	stuk		
+prednisolon capsule 45mg	prednisolon	45	mg		
+prednisolon capsule 45mg	stuk	1	stuk		
+prednisolon capsule 50mg	prednisolon	50	mg		
+prednisolon capsule 50mg	stuk	1	stuk		
+prednisolon capsule 55mg	prednisolon	55	mg		
+prednisolon capsule 55mg	stuk	1	stuk		
+prednisolon capsule 60mg	prednisolon	60	mg		
+prednisolon capsule 60mg	stuk	1	stuk		
+prednisolon capsule 65mg	prednisolon	65	mg		
+prednisolon capsule 65mg	stuk	1	stuk		
+prednisolon capsule 70mg	prednisolon	70	mg		
+prednisolon capsule 70mg	stuk	1	stuk		
+prednisolon capsule 75mg	prednisolon	75	mg		
+prednisolon capsule 75mg	stuk	1	stuk		
+prednisolon drank 1mg/ml	prednisolon	1	mg		
+prednisolon drank 5mg/ml	prednisolon	5	mg		
+prednisolon injvlst 12,5mg/ml	prednisolon	12,5	mg		
+prednisolon na-succinaat inj 25mg (parenter, rect)	prednisolon	25	mg		
+prednisolon na-succinaat inj 25mg (parenter, rect)	stuk	1	stuk		
+prednisolon na-succinaat injpdr 25mg (parenteraal)	prednisolon	25	mg		
+prednisolon na-succinaat injpdr 25mg (parenteraal)	stuk	1	stuk		
+prednisolon na-succinaat injpdr 26,2mg	prednisolon	26,2	mg		
+prednisolon na-succinaat injpdr 26,2mg	stuk	1	stuk		
+prednisolon oogdr  5mg/ml dinatriumfosfaat	prednisolon	5	mg		
+prednisolon oogdr, susp 10mg/ml acetaat	prednisolon	10	mg		
+prednisolon oogzalf 5mg/g	prednisolon	5	mg		
+prednisolon oogzalf 5mg/g	g	1	g		
+prednisolon tablet   1mg	prednisolon	1	mg		
+prednisolon tablet   1mg	stuk	1	stuk		
+prednisolon tablet   2mg	prednisolon	2	mg		
+prednisolon tablet   2mg	stuk	1	stuk		
+prednisolon tablet   2mg (dinatriumfosfaat)	prednisolon	2	mg		
+prednisolon tablet   2mg (dinatriumfosfaat)	stuk	1	stuk		
+prednisolon tablet  2,5mg	prednisolon	2,5	mg		
+prednisolon tablet  2,5mg	stuk	1	stuk		
+prednisolon tablet  5mg	prednisolon	5	mg		
+prednisolon tablet  5mg	stuk	1	stuk		
+prednisolon tablet 20mg	prednisolon	20	mg		
+prednisolon tablet 20mg	stuk	1	stuk		
+prednisolon tablet 30mg	prednisolon	30	mg		
+prednisolon tablet 30mg	stuk	1	stuk		
+prednisolon zetpil 10mg	prednisolon	10	mg		
+prednisolon zetpil 10mg	stuk	1	stuk		
+prednisolon zetpil 20mg	prednisolon	20	mg		
+prednisolon zetpil 20mg	stuk	1	stuk		
+prednison tablet 20mg	prednison	20	mg		
+prednison tablet 20mg	stuk	1	stuk		
+prednison tablet 5mg	prednison	5	mg		
+prednison tablet 5mg	stuk	1	stuk		
+propamidine oogdruppels 1mg/ml	propamidine	1	mg		
 propofol inj.emulsie 10mg/ml	propofol	10	mg		
 propofol inj.emulsie 20mg/ml	propofol	20	mg		
 propofol injectie/infuus	propofol	1	mg		
@@ -521,6 +824,7 @@ ropivacaine/sufentanil injvlst 2mg/0,5ug/ml	sufentanil	0,5	µg
 ropivacaine/sufentanil injvlst 2mg/0,5ug/ml	ropivacaine	2	mg		
 ropivacaine/sufentanil injvlst 2mg/1ug/ml	sufentanil	1	µg		
 ropivacaine/sufentanil injvlst 2mg/1ug/ml	ropivacaine	2	mg		
+scopolamine oogdruppels 2,5mg/ml	scopolamine	2,5	mg		
 sdd mondpasta (ahz/sahz)	colistine	20	mg		
 sdd mondpasta (ahz/sahz)	amfotericine b	20	mg		
 sdd mondpasta (ahz/sahz)	tobramycine	20	mg		
@@ -554,15 +858,46 @@ sufentanil injvlst  5ug/ml	sufentanil	5	µg
 sufentanil injvlst 50ug/ml	sufentanil	50	µg		
 sufentanil spray 5,6ug/do	sufentanil	5,6	µg		
 sufentanil spray 5,6ug/do	dosis	1	dosis		
+tacrolimus oogdruppels 0,3mg/ml	tacrolimus	0,3	mg		
+tafluprost oogdruppels 15ug/ml	tafluprost	15	µg		
 tamoxifen tablet 10mg	tamoxifen	10	mg		
 tamoxifen tablet 10mg	stuk	1	stuk		
 tamoxifen tablet 20mg	tamoxifen	20	mg		
 tamoxifen tablet 20mg	stuk	1	stuk		
 tamoxifen tablet 40mg	tamoxifen	40	mg		
 tamoxifen tablet 40mg	stuk	1	stuk		
+temazepam druppels 30mg/ml	temazepam	30	mg		
+tetracaine oogdruppels  5mg/ml	tetracaine	5	mg		
+tetracaine oogdruppels 10mg/ml	tetracaine	10	mg		
+tetracycline oogdruppels 5mg/ml	tetracycline	5	mg		
+timolol oogdruppels 2,5mg/ml	timolol	2,5	mg		
+timolol oogdruppels 5mg/ml	timolol	5	mg		
+timolol/bimatoprost oogdruppels 5/0,3mg/ml	timolol	5	mg		
+timolol/bimatoprost oogdruppels 5/0,3mg/ml	bimatoprost	0,3	mg		
+timolol/brimonidine oogdruppels 5/2mg/ml	timolol	5	mg		
+timolol/brimonidine oogdruppels 5/2mg/ml	brimonidine	2	mg		
+timolol/brinzolamide oogdruppels 5/10mg/ml	timolol	5	mg		
+timolol/brinzolamide oogdruppels 5/10mg/ml	brinzolamide	10	mg		
+timolol/dorzolamide oogdruppels 5/20mg/ml	timolol	5	mg		
+timolol/dorzolamide oogdruppels 5/20mg/ml	dorzolamide	20	mg		
+timolol/latanoprost oogdr 5mg/50ug/ml	timolol	5	mg		
+timolol/latanoprost oogdr 5mg/50ug/ml	latanoprost	50	µg		
+timolol/tafluprost oogdruppels 5mg/15ug/ml	timolol	5	mg		
+timolol/tafluprost oogdruppels 5mg/15ug/ml	tafluprost	15	µg		
+tobramycine oogdruppels  3mg/ml	tobramycine	3	mg		
+tobramycine oogdruppels 14mg/ml	tobramycine	14	mg		
+tobramycine oogdruppels 14mg/ml (als sulfaat)	tobramycine	14	mg		
+tobramycine oogdruppels 15mg/ml	tobramycine	15	mg		
+tramadol druppels 100mg/ml	tramadol	100	mg		
 tramadol/paracetamol tablet 37,5/325mg	paracetamol	325	mg		
 tramadol/paracetamol tablet 37,5/325mg	tramadol	37,5	mg		
 tramadol/paracetamol tablet 37,5/325mg	stuk	1	stuk		
+travoprost oogdruppels 40ug/ml	travoprost	40	µg		
+travoprost/timolol oogdruppels 40ug/5mg/ml	timolol	5	mg		
+travoprost/timolol oogdruppels 40ug/5mg/ml	travoprost	40	µg		
+triamcinolonacetonide oordruppels 1mg/ml	triamcinolonacetonide	1	mg		
+triamcinolonacetonide/salicylzuur oordr 1/20mg/ml	triamcinolonacetonide	1	mg		
+triamcinolonacetonide/salicylzuur oordr 1/20mg/ml	salicylzuur	20	mg		
 trimethoprim drank 10mg/ml	trimethoprim	10	mg		
 trimethoprim susp oraal 10mg/ml	trimethoprim	10	mg		
 trimethoprim tablet 100mg	trimethoprim	100	mg		
@@ -571,3 +906,19 @@ trimethoprim tablet 300mg	trimethoprim	300	mg
 trimethoprim tablet 300mg	stuk	1	stuk		
 trimethoprim/sulfametrol infvlst 0,64/3,2mg/ml	trimethoprim	0,64	mg		
 trimethoprim/sulfametrol infvlst 0,64/3,2mg/ml	sulfametrol	3,2	mg		
+tropicamide oogdruppels  5mg/ml	tropicamide	5	mg		
+tropicamide oogdruppels 10mg/ml	tropicamide	10	mg		
+vancomycine oogdruppels 14mg/ml (als hcl)	vancomycine	14	mg		
+vancomycine oogdruppels 14mg/ml (hcl)	vancomycine	14	mg		
+vancomycine oogdruppels 25mg/ml (als hcl)	vancomycine	25	mg		
+vancomycine oogdruppels 50mg/ml (als hcl)	vancomycine	50	mg		
+vancomycine oogdruppels 50mg/ml (hcl)	vancomycine	50	mg		
+voriconazol oogdruppels 10mg/ml	voriconazol	10	mg		
+voriconazol oordruppels 10mg/ml	voriconazol	10	mg		
+vortioxetine druppels 20mg/ml	vortioxetine	20	mg		
+xylometazoline neusdruppels 0,25mg/ml	xylometazoline	0,25	mg		
+xylometazoline neusdruppels 0,5mg/ml	xylometazoline	0,5	mg		
+xylometazoline neusdruppels 1mg/ml	xylometazoline	1	mg		
+xylometazoline/tetracaine neusdruppels 1/20mg/ml	tetracaine	20	mg		
+xylometazoline/tetracaine neusdruppels 1/20mg/ml	xylometazoline	1	mg		
+zuclopentixol druppels 20mg/ml	zuclopentixol	20	mg		
