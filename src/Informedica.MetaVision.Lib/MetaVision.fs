@@ -743,10 +743,12 @@ module Utils =
         |> Array.fold (fun acc b -> acc || b) false
 
 
-    let shapeInSolution rte unt shape =
-        filterRouteShapeUnit rte shape unt
-        |> Array.map (fun xs -> xs[6] = "TRUE")
-        |> Array.fold (fun acc b -> acc || b) false
+    let shapeIsSolution rte unt shape =
+        if unt |> String.equalsCapInsens "druppel" then true
+        else
+            filterRouteShapeUnit rte shape unt
+            |> Array.map (fun xs -> xs[6] = "TRUE")
+            |> Array.fold (fun acc b -> acc || b) false
 
 
     let shapeDoseUnit rts unt shape =
@@ -801,7 +803,7 @@ module Utils =
         | Some r -> r[2]
         | None   ->
             printfn $"cannot find {un} in mapping"
-            ""
+            un
 
 
     let mapBool b =
@@ -1028,7 +1030,7 @@ module MetaVision =
                         | Both -> Both
                     ) NonInfuse
                 IsDrugInSolution =
-                    s |> shapeInSolution "" "" ||
+                    s |> shapeIsSolution "" "" ||
                     s |> shapeInDiluent "" ""
                 Category = "G-Standaard"
                 IsDispensableAmountAllowed = false
@@ -1201,20 +1203,23 @@ module MetaVision =
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
                     DiluentsGroup = // "Verduninngen"
-                        if gp.Shape |> shapeInSolution "" gp.Substances[0].ShapeUnit then "Verdunningen"
+                        if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then "Verdunningen"
                         else ""
                     DrugInDiluentGroup = // "Oplossingen"
-                        if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
-                           gp.Shape |> shapeInSolution "" gp.Substances[0].ShapeUnit then "Oplossingen"
+                        if gp.Shape |> shapeIsSolution "" un then "[None]"
                         else
-                            "[None]"
+                            if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
+                               gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then "Oplossingen"
+                            else
+                                "[None]"
                     DrugFamily = g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
                     DrugSubfamily = g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
                     IsFormulary = assort |> List.isEmpty |> not
                     IsSolution = gp.Substances[0].ShapeUnit |> isSolutionUnit
 
                     ComplexMedications =
-                        if gp.Substances |> Array.length > 4 then [||]
+                        if gp.Substances |> Array.length > 4 ||
+                           un = "keer" then [||]
                         else
                             let cms =
                                 gp.Substances
@@ -1404,7 +1409,7 @@ module MetaVision =
         |> Array.filter (fun gp ->
             let su = gp.Substances[0].ShapeUnit
             gp.Shape |> shapeInDiluent "" su ||
-            gp.Shape |> shapeInSolution "" su
+            gp.Shape |> shapeIsSolution "" su
         )
         |> Array.sortBy (fun gp -> gp.Name, gp.Shape, gp.Route)
         |> Array.collect (fun gp ->

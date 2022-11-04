@@ -1,149 +1,525 @@
 ExternalCode	IngredientName	Unit
+86614	abatacept	mg
 10189	acetylcysteine	mg
 795	acetylsalicylzuur	mg
+31119	aciclovir	mg
+82368	adalimumab	mg
+83623	adapaleen	mg
 20621	adrenaline	mg
+95621	afamelanotide	mg
+13897	albumine	mg
 16659	alfacalcidol	µg
 29319	alfentanil	mg
+95249	alirocumab	mg
 10766	aluminiumacetotartraat	mg
+50784	aluminiumchloride	mg
+92177	aluminiumdistearaat	niet van toepassing
+50792	aluminiumhydroxychloride	mg
+50733	aluminiumkaliumsulfaat	mg
 5851	amfotericine b	mg
+80438	aminolevulinezuur	mg
+36722	amitriptyline	mg
 23167	amoxicilline	mg
+81280	amylcinnamaldehyde, alfa-	niet van toepassing
+82058	anakinra	mg
+32352	angelica preparaat	niet van toepassing
 36854	apomorfine	mg
 71943	apraclonidine	mg
+11460	arnica	mg
 1724	ascorbinezuur	mg
+98981	asfotase alfa	mg
+7781	asparaginase	IE
 36935	atropine	mg
+34134	azacitidine	mg
+56529	azelainezuur	mg
 67679	azelastine	mg
 3468	azijnzuur	mg
 67776	azitromycine	mg
 5762	bacitracine	IE
+15687	baclofen	mg
+93475	basiscreme	niet van toepassing
+358	bastaardsmeerwortel	mg
+90204	belimumab	mg
 14400	benperidol	mg
+97144	benralizumab	mg
+37222	benzalkonium	mg
+264	benzocaine	niet van toepassing
+3476	benzoezuur	mg
+3344	benzoylperoxide	mg
+37265	benzydamine	mg
+11428	benzylbenzoaat	mg
+3115	benzylparahydroxybenzoaat	niet van toepassing
+3816	betamethason	mg
 35556	betaxolol	mg
 84484	bevacizumab	mg
 82139	bimatoprost	mg
+544	bimekizumab	mg
+7552	bleomycine	IE
+99597	bloemenallergeen	niet van toepassing
+15156	bofvaccin	CCID50
+99570	boompollenallergeen	niet van toepassing
+83607	bortezomib	mg
 76120	brimonidine	mg
 78875	brinzolamide	mg
+96679	brodalumab	mg
+54704	bronopol	niet van toepassing
 90131	broomfenac	mg
 37583	broomhexine	mg
 29491	broomperidol	mg
+31267	budesonide	niet van toepassing
+21113	buiktyfusvaccin	µg
 37621	bupivacaine	mg
+97284	burosumab	mg
+37656	busereline	mg
+3107	butylparahydroxybenzoaat	niet van toepassing
+31135	c1-esteraseremmer	IE
+10529	calamine	mg
+66591	calcipotriol	µg
+37753	calcitonine	IE
+23442	calcitriol	µg
+51675	calciumgluconaat	mg
+10596	calciumhydroxide	mg
+91596	camellia sinensis	mg
+88730	canakinumab	mg
 94153	cannabidiol	mg
+98213	caplacizumab	mg
+77348	capsaicine	mg
+81248	carbamatenmix	niet van toepassing
 66370	carbomeer	mg
 37982	carmellose	mg
 63711	carteolol	mg
+854	casirivimab	mg
 27413	cefazoline	mg
 29386	ceftazidim	mg
+38296	cerium(iii)nitraat	mg
+88633	certolizumab pegol	mg
+16934	cetostearylalcohol	niet van toepassing
+3220	cetrimide	mg
+77380	cetrorelix	mg
+16942	cetylalcohol	niet van toepassing
+24694	chelidonium preparaat	niet van toepassing
+73083	chloorallylhexaminium	niet van toepassing
 5533	chlooramfenicol	mg
 38474	chloorhexidine	mg
+7390	chloormethine	µg
+5924	chloorquinaldol	niet van toepassing
+3034	chloorxylenol	mg
+81043	choriogonadotropine alfa	µg
+8931	choriongonadotrofine	IE
+70289	ciclopirox	mg
 31283	ciclosporine	mg
+20567	cinchocaine	niet van toepassing
+76163	cinnamaldehyde	niet van toepassing
+81299	cinnamylalcohol	niet van toepassing
 62138	citalopram	mg
+70300	cladribine	mg
+65765	claritromycine	niet van toepassing
 31232	clavulaanzuur	mg
 38784	clindamycine	mg
 5932	clioquinol	mg
+38806	clobetasol	mg
+38814	clobetason	mg
 1988	clonazepam	mg
+38857	clonidine	mg
+5991	clotrimazol	mg
 24740	cocaine	mg
 38938	codeine	mg
 34193	coffeine	mg
 16624	colecalciferol	IE
+20974	colestyramine	mg
 38962	colistine	IE
+65455	collagenase	mg
+22381	colofonium	niet van toepassing
+89036	corifollitropine alfa	µg
 39004	cromoglicinezuur	mg
+81388	cyclohexylfenylparafenyleendiamine	niet van toepassing
 39152	cyclopentolaat	mg
+6297	cytarabine	mg
+62677	dalteparine	IE
+96199	daratumumab	mg
+81485	darbepoetine alfa	µg
+38431	decyloleaat	mg
+39292	deferoxamine	mg
+87947	degarelix	mg
+89184	denosumab	mg
 35386	desmopressine	mg
+3913	desoximetason	mg
 20435	dexamethason	mg
 13978	dextran 70	mg
+86584	diazolidinylureum	niet van toepassing
 39640	diclofenac	mg
+99600	dierallergeen	niet van toepassing
+67210	difencypron	mg
+81396	difenylparafenyleendiamine	niet van toepassing
+1244	dimethylsulfoxide	mg
+21628	dimeticon	mg
 39918	dimetindeen	mg
+81434	dipentamethyleenthiuramdisulfide	niet van toepassing
+16330	disulfiram	niet van toepassing
+11207	ditranol	mg
+99619	diverse allergenen	niet van toepassing
 71900	dorzolamide	mg
 50687	dronabinol	mg
 14419	droperidol	mg
+93599	dulaglutide	mg
+96938	dupilumab	mg
 23523	echinacea	mg
 59706	edetinezuur	mg
+40134	efedrine	mg
+67733	eflornithine	mg
+81256	eikenmos	niet van toepassing
 77682	emedastine	mg
+97217	emicizumab	mg
+60062	enoxaparine	IE
+67245	epoetine alfa	IE
+67253	epoetine beta	IE
+87297	epoetine zeta	IE
+81213	epoxyhars	niet van toepassing
+137	erenumab	mg
+5312	erytromycine	mg
 83933	escitalopram	mg
+78646	esketamine	mg
+78182	etanercept	mg
+22209	ethanol, gedenatureerd	mg
+40568	ethyleendiamine	niet van toepassing
+3123	ethylparahydroxybenzoaat	niet van toepassing
+77879	etonogestrel	mg
+49840	eucerine	niet van toepassing
+17205	eugenol	niet van toepassing
+94730	evolocumab	mg
+86258	exenatide	µg
+337	fenol	mg
 40827	fentanyl	mg
+40835	fentolamine	mg
 40851	fenylefrine	mg
+1856	fenytoine	mg
+54437	ferrichloride	mg
 18279	fludrocortison	mg
 41033	flumetason	mg
+3999	fluocinonide	mg
 41076	fluoresceine	mg
 4030	fluormetholon	mg
+7749	fluorouracil	mg
 65773	fluticason	mg
 9822	folinezuur	mg
+73423	follitropine	IE
+81612	fondaparinux	mg
+2895	formaldehyde	niet van toepassing
 60275	foscarnet	mg
 41122	framycetine	mg
+72	fremanezumab	mg
+51632	fusidinezuur	mg
 1511	fytomenadion	mg
+98671	galcanezumab	mg
+80969	ganirelix	mg
+15261	gelekoortsvaccin	IE
 41335	gentamicine	mg
+81329	geraniol	niet van toepassing
+455	givosiran	mg
+72397	glatirameer	mg
+1627	glucagon	mg
+10588	glycerol	niet van toepassing
+21814	glycerylmono-oleaat	mg
+88641	golimumab	mg
+23434	gonadoreline	mg
+62413	gosereline	mg
 27138	gramicidine	mg
+99546	graspollenallergeen	niet van toepassing
+96997	guselkumab	mg
+66281	haemophilus-influenzae-b-vaccin	µg
+14427	haloperidol	mg
+18295	heparine	IE
+58068	heparinoiden	mg
+68543	hepatitis-a-vaccin	E
+31186	hepatitis-b-immunoglobuline	IE
+34169	hepatitis-b-vaccin	µg
 41637	homatropine	mg
+11282	houtteer	mg
+99554	huisstofmijtenallergeen	niet van toepassing
+20591	hyaluronidase	niet van toepassing
 41653	hyaluronzuur	mg
+18236	hydrochinon	mg
 4073	hydrocortison	mg
+41793	hydromorfon	mg
+41807	hydroxocobalamine	µg
+81302	hydroxycitronellal	niet van toepassing
+25224	hypericum	niet van toepassing
 25178	hypromellose	mg
+89389	iberis amara	niet van toepassing
+1155	ibuprofen	mg
+87564	icatibant	mg
+21741	ichthammol	mg
+862	imdevimab	mg
+69922	imidureum	niet van toepassing
+75817	imiquimod	mg
+75108	immunocyanine	mg
+46507	immunoglobuline, normaal	mg
+749	inclisiran	mg
 1252	indometacine	mg
-58300	interferon alfa 2b	IE
+76848	infliximab	mg
+36196	influenzavaccin	niet van toepassing
+42021	insectenallergeen	niet van toepassing
+77798	insuline aspart	E
+81191	insuline aspart, protamine	E
+92134	insuline degludec	E
+82716	insuline detemir	E
+79677	insuline glargine	E
+84050	insuline glulisine	E
+72796	insuline lispro	E
+78700	insuline lispro, protamine	E
+42064	insuline, gewoon	IE
+12211	insuline, isofaan	IE
+68888	interferon gamma 1b	mg
+81310	isoeugenol	niet van toepassing
+2887	isopropanol	mg
+81361	isopropylfenylparafenyleendiamine	niet van toepassing
+18333	isopropylmyristaat	mg
+73296	isopropylpalmitaat	niet van toepassing
+60194	ivermectine	mg
+95303	ixekizumab	mg
 3174	jodium	mg
+18341	jodoform	mg
+51373	kaliumcarbonaat	niet van toepassing
+81442	kaliumdichromaat(vi)	niet van toepassing
+18457	kaliumhydroxide	mg
 3182	kaliumjodide	mg
+11584	kamille	niet van toepassing
+89605	karwijvrucht	niet van toepassing
+42617	ketamine	mg
+28487	ketoconazol	mg
 64599	ketorolac	mg
 23132	ketotifen	mg
+51462	kobalt(ii)chloride	niet van toepassing
+19313	koolteer preparaat	mg
+42889	lactose	niet van toepassing
+98930	lanadelumab	mg
+75701	lanreotide	mg
 73237	latanoprost	µg
+88900	lauromacrogol 600	mg
+16462	lecithine	niet van toepassing
+60208	leuproreline	mg
 76775	levobupivacaine	mg
 67261	levocabastine	mg
+10987	levomenthol	mg
+20796	levomepromazine	mg
 4634	lidocaine	mg
+92363	lipegfilgrastim	mg
+88285	liraglutide	mg
+92118	lixisenatide	µg
+1338	lumasiran	mg
+95842	luspatercept	mg
+81035	lutropine alfa	IE
+59048	macrogol	mg
+18732	magnesiumstearaat	niet van toepassing
+18759	magnesiumsulfaat	mg
+89400	mariadistel	niet van toepassing
+15199	mazelenvaccin	CCID50
+72028	mecasermine	mg
+58610	mecetronium	mg
+43389	medroxyprogesteron	mg
+25313	melissa	niet van toepassing
+11630	melkzuur	mg
 88501	menaquinon 7	µg
+8923	menopauzegonadotrofine	IE
+87777	mepolizumab	mg
 72958	mercaptamine	mg
+81353	mercaptobenzothiazool	niet van toepassing
+81272	mercaptomix	niet van toepassing
+44180	methadon	mg
+7684	methotrexaat	mg
+11649	methoxsaleen	mg
+86789	methoxypolyethyleenglycolepoetine beta	µg
+82961	methylaminolevulinaat	mg
 8656	methylcellulose	mg
+81345	methylchloorisothiazolinon	niet van toepassing
+44334	methylergometrine	mg
+81337	methylisothiazolinon	niet van toepassing
+87432	methylnaltrexon	mg
+3093	methylparahydroxybenzoaat	niet van toepassing
 4154	methylprednisolon	mg
+4804	methylrosaniline	mg
+44431	metoclopramide	mg
+1427	metreleptine	mg
+6114	metronidazol	mg
 22535	miconazol	mg
+29114	midazolam	mg
+21245	minoxidil	mg
 7609	mitomycine	mg
+66893	mometason	mg
+92851	monochloorazijnzuur	mg
 44598	morfine	mg
 77747	moxifloxacine	mg
 64866	moxisylyt	mg
+56448	mupirocine	mg
+63053	nadroparine	IE
 44652	nafazoline	mg
+57614	nalbufine	mg
+44695	naloxon	mg
+85642	natalizumab	mg
 18953	natriumcarbonaat	mg
 8729	natriumchloride	mg
+2933	natriumhypochloriet	mg
+3190	natriumjodide	mg
+17272	natriumlaurylsulfaat	niet van toepassing
+44962	natriumthiosulfaat	mg
 45012	neomycine	mg
+45020	neostigmine	mg
 87300	nepafenac	mg
+45144	nikkel(ii)sulfaat	niet van toepassing
 45233	noradrenaline	mg
+5916	nystatine	E
+58750	octreotide	mg
+89176	ofatumumab	mg
 58467	ofloxacine	mg
+43567	olie, vet	mg
+16810	oliezuur	niet van toepassing
 81914	olopatadine	mg
+81906	omalizumab	mg
 655	opium	mg
 45608	oxybuprocaine	mg
+34584	oxybutynine	mg
+45624	oxycodon	mg
 45705	oxytetracycline	mg
+71722	pantoprazol	niet van toepassing
 906	paracetamol	mg
+81418	parafenyleendiamine	niet van toepassing
+45853	paraffine	mg
+81221	paratertiairbutylfenolformaldehydehars	niet van toepassing
+85596	parathyroidhormoon	µg
+91081	pasireotide	mg
+8109	patentblauw v	mg
+82414	pegfilgrastim	mg
+80551	peginterferon alfa 2a	µg
+80578	peginterferon alfa 2b	µg
+93289	peginterferon beta 1a "biogen idec"	µg
+83259	pegvisomant	mg
 87467	pelargonium	mg
+25321	pepermunt	niet van toepassing
+66532	permetrine	mg
+91693	pertuzumab	mg
+11118	perubalsem	niet van toepassing
+46582	pethidine	mg
 20826	pilocarpine	mg
+80357	pimecrolimus	mg
 46655	pipamperon	mg
+787	piritramide	mg
+88498	plerixafor	mg
+46175	pneumokokkenvaccin	niet van toepassing
+60100	podofyllotoxine	mg
+11010	podofyllum	mg
 46868	polymyxine b	IE
+74179	polyoxyethyleen(20)cetylstearylether	niet van toepassing
+17728	polysorbaat 80	niet van toepassing
 13986	povidon	mg
 3204	povidonjodium	mg
+20931	pramocaine	mg
 4170	prednisolon	mg
 4235	prednison	mg
+47112	prilocaine	mg
+9571	progesteron	mg
+47333	promazine	mg
 73393	propamidine	mg
+58378	propanol	mg
 58602	propofol	mg
+47368	propranolol	mg
 18325	propyfenazon	mg
+10626	propyleenglycol	mg
+3131	propylparahydroxybenzoaat	niet van toepassing
 73458	remifentanil	mg
+20494	resorcinol	mg
+98302	risankizumab	mg
+75191	rituximab	mg
+87920	romiplostim	µg
+99856	romosozumab	mg
+145	ropeginterferon alfa 2b	µg
 71447	ropivacaine	mg
+15237	rubellavaccin	CCID50
+16187	salbutamol	mg
 5983	salicylzuur	mg
+96598	sarilumab	mg
+536	satralizumab	mg
 34185	scopolamine	mg
+37699	scopolaminebutyl	mg
+93610	secukinumab	mg
+11258	seleensulfide	mg
+97470	semaglutide	mg
+78778	sirolimus	mg
+59005	somatropine	IE
+3603	sorbinezuur	mg
+17574	sorbitanoleaat	niet van toepassing
+8524	sorbitol	mg
 48240	sufentanil	µg
+57746	sulconazol	mg
 6424	sulfamethoxazol	mg
 28371	sulfametrol	mg
+65463	sumatriptan	mg
 71668	tacrolimus	mg
 89109	tafluprost	µg
+10499	talk	mg
 48534	tamoxifen	mg
+73598	technetium tc-99m nanocolloide	niet van toepassing
 14591	temazepam	mg
+65676	terbinafine	mg
+83046	teriparatide	µg
+59811	tetanusimmunoglobuline	IE
 48593	tetracaine	mg
 48712	tetracycline	mg
+81426	tetramethylthiurammonosulfide	niet van toepassing
+48771	thiamine	mg
+27057	thiomersal	niet van toepassing
+3611	thiram	niet van toepassing
+98396	tildrakizumab	mg
 48941	timolol	mg
+68195	tinzaparine	IE
+1044	tirbanibuline	mg
+60674	tixocortol	niet van toepassing
 49069	tobramycine	mg
+87912	tocilizumab	mg
+16683	tocoferol, dl-alfa-	IE
+323	tralokinumab	mg
 68993	tramadol	mg
+79685	trastuzumab	mg
 81884	travoprost	µg
+85952	treprostinil	mg
+11231	tretinoine	mg
 4278	triamcinolonacetonide	mg
+10944	trichloorazijnzuur	mg
+99198	trifaroteen	µg
 6416	trimethoprim	mg
+11703	trioxysaleen	mg
+49409	tripelennamine	mg
+58475	triptoreline	mg
+60313	trometamol	niet van toepassing
 13374	tropicamide	mg
+8001	ureum	mg
+56979	urofollitropine	IE
+87904	ustekinumab	mg
+12157	valeriaan	niet van toepassing
 49573	vancomycine	mg
+57568	vaseline	mg
+93203	vedolizumab	mg
+49816	voedingsallergeen	niet van toepassing
+1109	volanesorsen	mg
 81167	voriconazol	mg
 92673	vortioxetine	mg
+17124	walschot	niet van toepassing
+43761	was	mg
+16985	water	niet van toepassing
+16853	wolvet	mg
+29793	wolvetalcoholen	niet van toepassing
 49867	xylometazoline	mg
+3433	zilvernitraat	mg
+6734	zilversulfadiazine	mg
+10537	zinkoxide	mg
+17213	zoethout	niet van toepassing
 38865	zuclopentixol	mg
+11266	zwavel	mg
 	mL	mL
 	stuk	stuk
 	g	g
 	dosis	dosis
 	mg	mg
+		
+	µg	µg
+	IE	IE
+	E	E

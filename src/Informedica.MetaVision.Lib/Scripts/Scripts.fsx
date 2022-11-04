@@ -44,7 +44,8 @@ let meds =
         n |> String.contains "propo" ||
         n |> String.contains "predn" ||
         n |> String.contains "amfo"  ||
-        gpp.Shape |> String.toLower |> String.contains "druppel"
+        gpp.Shape |> String.toLower |> String.contains "druppel" ||
+        gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
     )
     |> MetaVision.createImport MetaVision.config
 
