@@ -23,6 +23,14 @@ module Constants =
     let solutionGroup = "Verdunningen"
 
 
+    let excludeShapes =
+        [|
+            "infuus"
+            "injectie"
+            "injectie/infuus"
+        |]
+
+
     let solutionMeds =
         [|
             "water"
@@ -744,7 +752,8 @@ module Utils =
 
 
     let shapeIsSolution rte unt shape =
-        if unt |> String.equalsCapInsens "druppel" then true
+        if unt |> String.equalsCapInsens "druppel" ||
+           unt = "mL" || unt = "µL" then true
         else
             filterRouteShapeUnit rte shape unt
             |> Array.map (fun xs -> xs[6] = "TRUE")
@@ -795,6 +804,7 @@ module Utils =
 
     let mapUnit un =
         let un = un |> String.trim |> String.toLower
+
         mappingUnits
         |> Array.tryFind (fun r ->
             r[0] = un || r[1] = un
@@ -842,14 +852,19 @@ module Utils =
 
 
     let isSolutionUnit un =
-        un
-        |> String.trim
-        |> String.toLower = "milliliter"
+        let un = un |> String.trim |> String.toLower
+        un = "milliliter" || un = "druppel"
 
 
     let filter gpps =
         gpps
-        |> Array.filter (hasNoUnit >> not)
+        |> Array.filter (fun gpp ->
+            gpp |> hasNoUnit |> not &&
+            Constants.excludeShapes
+            |> Array.exists (fun s -> gpp.Shape |> String.equalsCapInsens s)
+            |> not
+
+        )
         |> Array.map (fun gpp ->
             { gpp with
                 GenericProducts =
@@ -1061,12 +1076,11 @@ module MetaVision =
         |> print file name
 
 
-    let createIngredients file name (gpps : GenPresProduct[]) =
+    let createIngredients file name (gp : GenericProduct[]) =
         let mapIngrs = (Array.mapStringHeadings Constants.ingredientHeadings) >> (String.concat "\t")
 
         let substs =
-            gpps
-            |> Array.collect (fun gpp -> gpp.GenericProducts)
+            gp
             |> Array.collect (fun gp -> gp.Substances)
 
         // Ingredients
@@ -1119,15 +1133,18 @@ module MetaVision =
         let mapBrand = (Array.mapStringHeadings Constants.brandHeadings) >> (String.concat "\t")
         let mapProd = (Array.mapStringHeadings Constants.productHeadings) >> (String.concat "\t")
 
-        meds |> createIngredients file ingrName
-
-        let meds =
+        let gps =
             meds
             |> filter
             |> Array.collect (fun gpp -> gpp.GenericProducts)
             |> Array.map removeEmptyUnitSubstances
             |> Array.filter (fun gp -> gp.Substances |> Array.isEmpty |> not)
             |> Array.distinct
+
+        gps |> createIngredients file ingrName
+
+        let meds =
+            gps
             |> Array.map (fun gp ->
                 let drs =
                     RuleFinder.createFilter
@@ -1145,6 +1162,7 @@ module MetaVision =
                     |> String.trim
                     |> String.toLower
                     |> String.replace "'" ""
+
                 let g =
                     ATCGroup.get ()
                     |> Array.filter (fun g ->
@@ -1152,6 +1170,7 @@ module MetaVision =
                         |> String.contains (gp.ATC |> String.subString 0 4)
                     )
                     |> Array.tryHead
+
                 let rts =
                     GenPresProduct.get true
                         |> Array.filter (fun gpp -> gpp.GenericProducts |> Array.exists ((=) gp))
@@ -1212,10 +1231,11 @@ module MetaVision =
                                gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then "Oplossingen"
                             else
                                 "[None]"
-                    DrugFamily = g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
-                    DrugSubfamily = g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
+                    DrugFamily = "" //g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
+                    DrugSubfamily = "" //g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
                     IsFormulary = assort |> List.isEmpty |> not
-                    IsSolution = gp.Substances[0].ShapeUnit |> isSolutionUnit
+                    IsSolution =
+                        gp.Substances[0].ShapeUnit |> isSolutionUnit 
 
                     ComplexMedications =
                         if gp.Substances |> Array.length > 4 ||
@@ -1234,12 +1254,17 @@ module MetaVision =
                                         ConcentrationUnit =
                                             s.SubstanceUnit
                                             |> mapUnit
-                                        In = ""
-                                        InUnit = ""
+                                        In =
+                                            if gp.Shape |> shapeIsSolution "" un  then "1" else ""
+                                        InUnit =
+                                            if gp.Shape |> shapeIsSolution "" un |> not then ""
+                                            else
+                                                 if un = "druppel" then "mL" else un
                                     |}
                                 )
 
-                            if gp.Substances[0].ShapeUnit |> isSolutionUnit then [||]
+                            if gp.Substances[0].ShapeUnit |> isSolutionUnit ||
+                               un |> isSolutionUnit || un = su then [||]
                             else
                                 [|
                                     {|
@@ -1270,6 +1295,7 @@ module MetaVision =
                 {| r with
                     Products =
                         if r.IsSolution |> not ||
+                           r.Unit = "druppel" || r.Unit = "mL" ||
                            r.ComplexMedications |> Array.isEmpty then [||]
                         else
                             [|

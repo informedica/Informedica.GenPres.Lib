@@ -1,12 +1,66 @@
 ExternalCode	BrandName	Manufacturer	MedicationName
+	HEPATODORON		aardbeiblad/wijnstokblad kauwtablet 40/40mg
+	ZIAGEN		abacavir drank 20mg/ml
+	ZIAGEN		abacavir tablet 300mg
+	KIVEXA		abacavir/lamivudine tablet 600/300mg
+	TRIZIVIR		abacavir/lamivudine/zidovudine tab 300/150/300mg
+	ORENCIA		abatacept infusiepoeder 250mg
 	ORENCIA		abatacept injvlst 125mg/ml
+	VERZENIOS		abemaciclib tablet  50mg
+	VERZENIOS		abemaciclib tablet 100mg
+	VERZENIOS		abemaciclib tablet 150mg
+	ZYTIGA		abirateron tablet 250mg
+	ZYTIGA		abirateron tablet 500mg
+	CIBINQO		abrocitinib tablet 100mg
+	CIBINQO		abrocitinib tablet 200mg
+	CIBINQO		abrocitinib tablet 50mg
+	CALQUENCE		acalabrutinib capsule 100mg
+	CAMPRAL		acamprosaat tablet msr 333mg
+	GLUCOBAY		acarbose tablet  50mg
+	BIOFENAC		aceclofenac tablet omhuld 100mg
+	SINTROM		acenocoumarol tablet 4mg
+	DIAMOX		acetazolamide injectiepoeder 500mg
+	DIAMOX		acetazolamide tablet 250mg
+	FLUIMUCIL		acetylcysteine bruistablet 200mg
+	FLUIMUCIL		acetylcysteine bruistablet 600mg
+	HOESTBRUISTABLET HTP		acetylcysteine bruistablet 600mg
+	BISOLBRUIS		acetylcysteine bruistablet 600mg
+	BOOTS PHARMACEUTICALS		acetylcysteine bruistablet 600mg
+	IDYL		acetylcysteine bruistablet 600mg
+	LIVSANE		acetylcysteine bruistablet 600mg
+	FLUIMUCIL		acetylcysteine drank 20mg/ml
+	FLUIMUCIL		acetylcysteine drank 40mg/ml
+	FLUIMUCIL		acetylcysteine infopl conc 200mg/ml
+	FLUIMUCIL		acetylcysteine tablet 600mg
+	FLUIMUCIL		acetylcysteine vernevelvlst 100mg/ml
+	FLUIMUCIL		acetylcysteine zuigtablet 200mg
+	ALKA SELTZER		acetylsalicylzuur bruistablet 324mg
+	ASPRO		acetylsalicylzuur bruistablet 500mg
+	ASPEGIC		acetylsalicylzuur pdr v injvlst 500mg
+	ASPIRINE		acetylsalicylzuur tablet 100mg
+	ASPIRINE		acetylsalicylzuur tablet 500mg
+	ASPIRINE PROTECT		acetylsalicylzuur tabletmsr 100mg
+	ASPIRINE C		acetylsalicylzuur/ascorbinezuur bruistab 400/240mg
+	DUOPLAVIN		acetylsalicylzuur/clopidogrel tablet 100/75mg
+	MIGRAFIN		acetylsalicylzuur/metoclopramide poeder 900/10mg
 	APC TABLET		acetylsalicylzuur/paracetamol/cof tab 250/250/50mg
 	EXCEDRIN		acetylsalicylzuur/paracetamol/cof tab 250/250/65mg
 	ZOVIRAX KOORTSLIP		aciclovir creme  50mg/g
 	KOORTSLIPCREME HTP		aciclovir creme  50mg/g
 	IDYL		aciclovir creme  50mg/g
 	LIVSANE		aciclovir creme  50mg/g
+	ZOVIRAX		aciclovir infusiepoeder 250mg
+	ZOVIRAX		aciclovir oogzalf 30mg/g
+	ZOVIRAX		aciclovir susp oraal 40mg/ml
 	ZOVIRAX DUO		aciclovir/hydrocortison creme 50/10mg/g
+	NEDIOS		acipimox capsule 250mg
+	OLBETAM		acipimox capsule 250mg
+	NEOTIGASON		acitretine capsule 10mg
+	NEOTIGASON		acitretine capsule 25mg
+	EKLIRA		aclidinium inhalatiepoeder 322ug/do
+	BRETARIS		aclidinium inhalatiepoeder 322ug/do
+	DUAKLIR GENUAIR		aclidinium/formoterol inhpdr 340/12ug/do
+	SEMPREX		acrivastine capsule 8mg
 	IMRALDI		adalimumab injvlst  50mg/ml
 	AMGEVITA		adalimumab injvlst  50mg/ml
 	HYRIMOZ		adalimumab injvlst  50mg/ml
@@ -17,26 +71,160 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	HUKYNDRA		adalimumab injvlst 100mg/ml
 	DIFFERIN		adapaleen gel 1mg/g
 	EFFEZEL		adapaleen/benzoylperoxide gel 1/25mg/g
+	HEPSERA		adefovir tablet 10mg
+	ADENOCOR		adenosine injectievlst 3mg/ml
 	EPIPEN JUNIOR		adrenaline injvlst 0,5mg/ml
 	EPIPEN		adrenaline injvlst 1mg/ml
 	JEXT		adrenaline injvlst 1mg/ml
 	EMERADE		adrenaline injvlst 1mg/ml
 	SCENESSE		afamelanotide implantaat 16mg
+	GIOTRIF		afatinib tablet 20mg
+	GIOTRIF		afatinib tablet 30mg
+	GIOTRIF		afatinib tablet 40mg
+	GIOTRIF		afatinib tablet 50mg
+	ZALTRAP		aflibercept infopl conc 25mg/ml
+	EYLEA		aflibercept injvlst 40mg/ml
+	REPLAGAL		agalsidase alfa infopl conc 1mg/ml
+	FABRAZYME		agalsidase beta infusiepoeder  5mg
+	FABRAZYME		agalsidase beta infusiepoeder 35mg
+	VALDOXAN		agomelatine tablet 25mg
+	DIPEPTIVEN		alanylglutamine infopl conc 200mg/ml
+	ESKAZOLE		albendazol tablet 400mg
+	ALBUMAN		albumine infvlst  40mg/ml
+	ALBUNORM		albumine infvlst  50mg/ml
+	ALBUREX		albumine infvlst  50mg/ml
+	ALBUMINE HUMAAN BAXALTA		albumine infvlst 200mg/ml
+	ALBUMAN		albumine infvlst 200mg/ml
+	ALBUREX		albumine infvlst 200mg/ml
+	ALBUNORM		albumine infvlst 200mg/ml
+	FLEXBUMIN		albumine infvlst 200mg/ml
 	ALBUMIN		albumine oplosmid parent 0,3mg/ml
+	IDELVION		albutrepenonacog alfa injpdr  250ie
+	IDELVION		albutrepenonacog alfa injpdr  500ie
+	IDELVION		albutrepenonacog alfa injpdr 1000ie
+	IDELVION		albutrepenonacog alfa injpdr 2000ie
 	PROLEUKIN		aldesleukine pdr inj/infopl 22me
+	ALECENSA		alectinib capsule 150mg
+	LEMTRADA		alemtuzumab infopl conc 10mg/ml
+	BONASOL		alendroninezuur drank 0,7mg/ml
+	FOSAMAX		alendroninezuur tablet 70mg
+	FOSAVANCE		alendroninezuur/colecalciferol tablet 70mg/2800ie
+	ADROVANCE		alendroninezuur/colecalciferol tablet 70mg/2800ie
+	VANTAVO		alendroninezuur/colecalciferol tablet 70mg/2800ie
+	FOSAVANCE		alendroninezuur/colecalciferol tablet 70mg/5600ie
+	ADROVANCE		alendroninezuur/colecalciferol tablet 70mg/5600ie
+	RESPREEZA		alfa-1-proteinaseremmer infusiepoeder 1000mg
+	PROLASTIN		alfa-1-proteinaseremmer infusiepoeder 1000mg
+	RESPREEZA		alfa-1-proteinaseremmer infusiepoeder 4000mg
+	RESPREEZA		alfa-1-proteinaseremmer infusiepoeder 5000mg
+	ETALPHA		alfacalcidol capsule 0,25ug
+	ETALPHA		alfacalcidol capsule 0,5ug
+	ETALPHA		alfacalcidol capsule 1ug
 	ETALPHA		alfacalcidol druppels 2ug/ml
+	ETALPHA		alfacalcidol injvlst 2ug/ml
 	RAPIFEN		alfentanil injvlst 0,5mg/ml
+	XATRAL		alfuzosine tablet mga 10mg
+	MAALOX		algeldraat/magnesiumhydroxide kauwtablet 200/400mg
+	GASTILOX		algeldraat/magnesiumhydroxide kauwtablet 200/400mg
+	GASTILOX		algeldraat/magnesiumhydroxide sus oraal 90/60mg/ml
+	GASTILOX		algeldraat/magnesiumhydroxide susp zakje 900/600mg
+	GASTILOX PLUS		algeldraat/magnesiumhydroxide/dimeticon kauwtablet
+	GAVISCON		alginezuur/nahco3/caco3 kauwtab 250/106,5/187,5mg
+	GAVISCON		alginezuur/nahco3/caco3 kauwtab 250/133,5/80mg
+	GAVISCON		alginezuur/nahco3/caco3 sus 50/21,3/32,5mg/ml
+	GAVISCON		alginezuur/natriumwaterstofcarbon susp 50/27mg/ml
+	MYOZYME		alglucosidase alfa infusiepoeder 50mg
 	PRALUENT		alirocumab injvlst  75mg/ml
 	PRALUENT		alirocumab injvlst 150mg/ml
+	RASILEZ		aliskiren tablet 150mg
+	RASILEZ		aliskiren tablet 300mg
+	RASILEZ HCT		aliskiren/hydrochloorthiazide tablet 150/12,5mg
+	RASILEZ HCT		aliskiren/hydrochloorthiazide tablet 300/12,5mg
+	RASILEZ HCT		aliskiren/hydrochloorthiazide tablet 300/25mg
+	TOCTINO		alitretinoine capsule 10mg
+	ALIZEM		alitretinoine capsule 10mg
+	TOCTINO		alitretinoine capsule 30mg
+	ALIZEM		alitretinoine capsule 30mg
+	ACEPURIN		allopurinol infusiepoeder 1g
+	ZYLORIC		allopurinol tablet 100mg
+	ZYLORIC		allopurinol tablet 200mg
+	ZYLORIC		allopurinol tablet 300mg
+	ALMOGRAN		almotriptan tablet omhuld 12,5mg
+	PIQRAY		alpelisib tablet 150mg
+	PIQRAY		alpelisib tablet 200mg
+	XANAX		alprazolam tablet mga 0,5mg
+	XANAX		alprazolam tablet mga 1mg
+	XANAX		alprazolam tablet mga 2mg
+	VITAROS		alprostadil creme 3mg/g
+	PROSTIN VR		alprostadil infopl conc 0,5mg/ml
+	ACTILYSE		alteplase infusiepoeder 20mg
+	ACTILYSE		alteplase infusiepoeder 50mg
+	SYMMETREL		amantadine capsule 100mg
+	VOLIBRIS		ambrisentan tablet  5mg
+	VOLIBRIS		ambrisentan tablet 10mg
+	MUCOANGIN		ambroxol zuigtablet 20mg
 	ABELCET		amfotericine b infconc 5mg/ml (lipidencompl)
 	FUNGIZONE		amfotericine b infusiepoeder  50mg
 	AMBISOME		amfotericine b infusiepoeder  50mg (liposomaal)
 	FUNGIZONE		amfotericine b susp oraal 100mg/ml
 	AMPHO-MORONAL		amfotericine b zuigtablet 10mg
+	GASTROGRAFIN		amidotrizoinezuur drank/klysmaconc 370mgi/ml
+	UROGRAFIN		amidotrizoinezuur infvlst 300mg/ml
+	FIRDAPSE		amifampridine tablet 10mg
+	ARIKAYCE		amikacine disp v vernevel 59mg/ml (liposomaal)
 	ALACARE		aminolevulinezuur pleister 8mg
+	GLIOLAN		aminolevulinezuur poeder v drank 1500mg
+	AMINOMIX 1 NOVUM		aminomix 1 novum infvlst
+	AMINOMIX 2 NOVUM		aminomix 2 novum infvlst
+	AMINOMIX 3 NOVUM		aminomix 3 novum infvlst
+	AMINOPLASMAL B.BRAUN		aminoplasmal e vrij infvlst 100mg/ml
+	CORDARONE		amiodaron injvlst 50mg/ml
+	AKTIPROL		amisulpride tablet  50mg
+	AKTIPROL		amisulpride tablet 100mg
+	AKTIPROL		amisulpride tablet 200mg
+	AKTIPROL		amisulpride tablet 400mg
+	NORVASC		amlodipine tablet   5mg
+	NORVASC		amlodipine tablet 10mg
+	NATRIXAM		amlodipine/indapamide tablet mga  5/1,5mg
+	NATRIXAM		amlodipine/indapamide tablet mga 10/1,5mg
+	EXFORGE		amlodipine/valsartan tablet  5/ 80mg
+	COPALIA		amlodipine/valsartan tablet  5/ 80mg
+	EXFORGE		amlodipine/valsartan tablet  5/160mg
+	COPALIA		amlodipine/valsartan tablet  5/160mg
+	EXFORGE		amlodipine/valsartan tablet 10/160mg
+	COPALIA		amlodipine/valsartan tablet 10/160mg
+	EXFORGE HCT		amlodipine/valsartan/hct tablet  5/160/12,5mg
+	EXFORGE HCT		amlodipine/valsartan/hct tablet  5/160/25mg
+	EXFORGE HCT		amlodipine/valsartan/hct tablet 10/160/12,5mg
+	EXFORGE HCT		amlodipine/valsartan/hct tablet 10/160/25mg
+	EXFORGE HCT		amlodipine/valsartan/hct tablet 10/320/25mg
 	AUGMENTIN		amoxicilline/clavulaanzuur sus oraal 100/12,5mg/ml
 	AUGMENTIN		amoxicilline/clavulaanzuur tablet 500/125mg
+	AMSIDINE		amsacrine infopl conc 50mg/ml
+	CREON		amyla/lipa/protea ca msr (creo f+25000/gen/pantri)
+	PANTRIOZYME		amyla/lipa/protea ca msr (creo f+25000/gen/pantri)
+	CREON		amyla/lipa/protea ca msr (creo xtra f+ creo 40000)
+	CREON		amyla/lipa/protea ca msr (creon 35000)
+	CREON		amyla/lipa/protea cap msr (creon+creon 10000)
+	PANZYTRAT		amyla/lipa/protea cap msr (pancreahl/panzyt 25.000
+	PANCREASE		amyla/lipa/protea cap msr (pancreahl/panzyt 25.000
+	PANZYTRAT		amyla/lipa/protea cap msr (panzytrat 10.000)
+	CREON		amylase/lipase/proteas gran msr (creon+creon 5000)
+	PANZYTRAT		amylase/lipase/protease gran msr (panzytrat)
+	STREPSILS		amylmetacresol/dichloorbenzylalcohol zuigtablet
+	XAGRID		anagrelide capsule 0,5mg
 	KINERET		anakinra injvlst 150mg/ml
+	ARIMIDEX		anastrozol tablet 1mg
+	ONDEXXYA		andexanet alfa infusiepoeder 200mg
+	GIAPREZA		angiotensine ii infopl conc 2,5mg/ml
+	ECALTA		anidulafungine infusiepoeder 100mg
+	SAPHNELO		anifrolumab infopl conc 150mg/ml
+	ATENATIV		antitrombine iii infusiepoeder  500ie
+	ANTITROMBINE III		antitrombine iii infusiepoeder  500ie
+	ATENATIV		antitrombine iii infusiepoeder 1000ie
+	ERLEADA		apalutamide tablet 60mg
+	ELIQUIS		apixaban tablet 2,5mg
+	ELIQUIS		apixaban tablet 5mg
 	APO-GO		apomorfine infvlst 5mg/ml
 	DACEPTON		apomorfine infvlst 5mg/ml
 	APO-GO		apomorfine inj/infopl 10mg/ml
@@ -44,25 +232,156 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	DACEPTON		apomorfine injvlst 10mg/ml
 	IOPIDINE		apraclonidine oogdruppels  5mg/ml
 	IOPIDINE		apraclonidine oogdruppels 10mg/ml
+	OTEZLA		apremilast tablet 10mg
+	OTEZLA		apremilast tablet 20mg
+	OTEZLA		apremilast tablet 30mg
+	EMEND		aprepitant capsule  80mg
+	EMEND		aprepitant capsule 125mg
+	EMEND		aprepitant pdr v suspensie 125mg
+	TRASYLOL		aprotinine infvlst 10000ke/ml
+	ARGANOVA MULTIDOSE		argatroban infopl conc 100mg/ml
+	LYSAKARE		arginine/lysine infvlst 25/25mg/ml
+	EMPRESSINE		argipressine infopl conc 20ie/ml
+	ABILIFY		aripiprazol injvlst 7,5mg/ml
+	ABILIFY MAINTENA		aripiprazol pdr v injsusp 400mg
+	ABILIFY		aripiprazol tablet 10mg
+	ABILIFY		aripiprazol tablet 15mg
+	ABILIFY		aripiprazol tablet 30mg
+	TRISENOX		arseentrioxide infopl conc 2mg/ml
+	RIAMET		artemether/lumefantrine tablet 20/120mg
+	EURARTESIM		artenimol/piperaquine tablet 40/320mg
+	MALACEF		artesunaat pdr v injvlst 60mg
+	ULTRACAIN D-S		articaine/adrenaline injv 40/0,01mg/ml
+	SEPTANEST		articaine/adrenaline injv 40/0,01mg/ml
+	ULTRACAIN D-S		articaine/adrenaline injvlst 40/0,005mg/ml
+	SEPTANEST		articaine/adrenaline injvlst 40/0,005mg/ml
+	VITAMIN C 500		ascorbinezuur injvlst 100mg/ml
 	STRENSIQ		asfotase alfa injvlst  40mg/ml
 	STRENSIQ		asfotase alfa injvlst 100mg/ml
+	SPECTRILA		asparaginase infpoeder 10.000e (coli)
+	TRANSLARNA		ataluren gran voor susp  125mg
+	TRANSLARNA		ataluren gran voor susp  250mg
+	TRANSLARNA		ataluren gran voor susp 1000mg
+	REYATAZ		atazanavir capsule 150mg
+	REYATAZ		atazanavir capsule 200mg
+	REYATAZ		atazanavir capsule 300mg
+	TECENTRIQ		atezolizumab infopl conc 60mg/ml
+	STRATTERA		atomoxetine capsule  10mg
+	STRATTERA		atomoxetine capsule  18mg
+	STRATTERA		atomoxetine capsule  25mg
+	STRATTERA		atomoxetine capsule  40mg
+	STRATTERA		atomoxetine capsule  60mg
+	STRATTERA		atomoxetine capsule  80mg
+	STRATTERA		atomoxetine capsule 100mg
+	AUDALIS		atomoxetine tablet  10mg
+	AUDALIS		atomoxetine tablet  18mg
+	AUDALIS		atomoxetine tablet  25mg
+	AUDALIS		atomoxetine tablet  40mg
+	AUDALIS		atomoxetine tablet  60mg
+	AUDALIS		atomoxetine tablet  80mg
+	AUDALIS		atomoxetine tablet 100mg
+	LIPITOR		atorvastatine kauwtablet 10mg
+	LIPITOR		atorvastatine kauwtablet 20mg
+	LIPITOR		atorvastatine tablet 10mg
+	LIPITOR		atorvastatine tablet 20mg
+	LIPITOR		atorvastatine tablet 40mg
+	TRACTOCILE		atosiban infopl conc 7,5mg/ml
+	TRACTOCILE		atosiban injvlst 7,5mg/ml
+	WELLVONE		atovaquon susp oraal 150mg/ml
+	MALARONE		atovaquon/proguanil tablet fo  62,5/25mg
+	MALARONE		atovaquon/proguanil tablet fo 250/100mg
+	TRACRIUM		atracurium injvlst 10mg/ml
 	ATROPINESULFAAT MINIMS		atropine oogdruppels 10mg/ml
+	HOLOCLAR		autologe limba corne (st)cel weef equ 197500ce/cm2
+	TAVNEOS		avacopan capsule 10mg
+	SPEDRA		avanafil tablet  50mg
+	SPEDRA		avanafil tablet 100mg
+	SPEDRA		avanafil tablet 200mg
+	AYVAKYT		avapritinib tablet 100mg
+	AYVAKYT		avapritinib tablet 200mg
+	AYVAKYT		avapritinib tablet 300mg
+	DOPTELET		avatrombopag tablet 20mg
+	BAVENCIO		avelumab infopl conc 20mg/ml
+	INLYTA		axitinib tablet 1mg
+	INLYTA		axitinib tablet 5mg
+	INLYTA		axitinib tablet 7mg
 	VIDAZA		azacitidine pdr v injsusp 100mg
+	ONUREG		azacitidine tablet 200mg
+	ONUREG		azacitidine tablet 300mg
+	IMURAN		azathioprine tablet  25mg
+	IMURAN		azathioprine tablet  50mg
+	CARELASTIN		azelastine neusspray 1,5mg/ml
+	ALLERGODIL		azelastine neusspray 1mg/ml
+	CARELASTIN		azelastine neusspray 1mg/ml
 	POLLIVAL		azelastine oogdruppels 0,5mg/ml
 	ALLERGODIL		azelastine oogdruppels 0,5mg/ml
 	CARELASTIN		azelastine oogdruppels 0,5mg/ml
+	DYMISTA		azelastine/fluticason neusspray 137/50ug/do
 	AZYTER		azitromycine oogdruppels 15mg/g
+	ZITHROMAX		azitromycine susp oraal 40mg/ml
+	ZITHROMAX		azitromycine tablet 250mg
+	ZITHROMAX		azitromycine tablet 500mg
+	CAYSTON		aztreonam pdr v vernevelv 75mg
 	BACICOLINE-B		bacitracine/colistine/hydrocortison oordruppels
+	GABLOFEN		baclofen inj/infopl 0,05mg/ml
+	GABLOFEN		baclofen inj/infopl 0,5mg/ml
+	GABLOFEN		baclofen inj/infopl 2mg/ml
+	LIORESAL		baclofen tablet  5mg
+	LIORESAL		baclofen tablet 10mg
+	XOFLUZA		baloxavir tablet 20mg
+	XOFLUZA		baloxavir tablet 40mg
+	OLUMIANT		baricitinib tablet 2mg
+	OLUMIANT		baricitinib tablet 4mg
+	MICROTRAST		bariumsulfaat pasta oraal 700mg/g
+	EZHD		bariumsulfaat pdr v suspensie 980mg/g
+	MICROPAQUE		bariumsulfaat susp oraal 1g/ml
+	E Z CAT		bariumsulfaat susp oraal 49mg/ml
+	MICROPAQUE		bariumsulfaat susp oraal 50mg/ml
+	CYRESS		barnidipine capsule mga 10mg
+	VASEXTEN		barnidipine capsule mga 10mg
+	LIBRADIN		barnidipine capsule mga 10mg
+	CYRESS		barnidipine capsule mga 20mg
+	VASEXTEN		barnidipine capsule mga 20mg
+	LIBRADIN		barnidipine capsule mga 20mg
+	SIMULECT		basiliximab infusiepoeder 10mg
+	SIMULECT		basiliximab infusiepoeder 20mg
 	TRIMAPLANT		bastaardsmeerwortel  creme
+	CONBRIZA		bazedoxifeen tablet 20mg
+	BCG VACCIN AJV		bcg-vaccin pdr v injsusp 0,75mg
+	BCG-MEDAC		bcg-vaccin pdr v instill.vlst 200mk
+	TRIMBOW		beclomet/formot/glycopyr aerosol 172/5/9ug/do
+	TRIMBOW		beclomet/formot/glycopyr aerosol 87/5/9ug/do
+	TRIMBOW		beclomet/formot/glycopyr inhpdr  88/5/9ug/do
+	QVAR		beclometason aerosol  50ug/do
+	QVAR		beclometason aerosol 100ug/do
+	FOSTER		beclometason/formoterol aerosol 100/6ug/do
+	FORMODUAL		beclometason/formoterol aerosol 100/6ug/do
+	FOSTER		beclometason/formoterol aerosol 200/6ug/do
+	FOSTER		beclometason/formoterol inhalatiepoeder 100/6ug/do
+	FOSTER		beclometason/formoterol inhalatiepoeder 200/6ug/do
+	SIRTURO		bedaquiline tablet 100mg
+	NULOJIX		belatacept infusiepoeder 250mg
+	BENLYSTA		belimumab infusiepoeder 120mg
+	BENLYSTA		belimumab infusiepoeder 400mg
 	BENLYSTA		belimumab injvlst 200mg/ml
+	NILEMDO		bempedoinezuur tablet 180mg
+	CIBACEN		benazepril tablet 20mg
+	LEVACT		bendamustine infusiepoeder  25mg
+	LEVACT		bendamustine infusiepoeder 100mg
 	BENPERIDOL-NEURAXPHARM		benperidol druppels 2mg/ml
 	FASENRA		benralizumab injvlst 30mg/ml
 	DETTOL		benzalkonium huidspray 2mg/g
+	DESURIC		benzbromaron tablet 100mg
 	BENZAC		benzoylperoxide gel  50mg/ml
 	ACNECARE		benzoylperoxide/miconazol creme 50/20mg/g
 	TANTUM		benzydamine creme 30mg/g
+	EXTENCIN		benzylpenicilline (depot) injsusp 1.200.000ie
+	BETASERC		betahistine tablet 16mg
+	CYSTADANE		betaine poeder 1g/g
 	DIPROSONE		betamethason creme 0,5mg/g
 	BETNELAN		betamethason huidemulsie 1mg/g
+	CELESTONE		betamethason injsusp 5,7mg/ml
+	BETNESOL		betamethason klysma 0,05mg/ml
 	DIPROSONE		betamethason opl cutaan 0,5mg/g
 	BETNELAN		betamethason opl cutaan 1mg/g
 	DIPROSONE		betamethason zalf 0,5mg/g
@@ -73,63 +392,357 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ENSTILAR		betamethason/calcipotriol schuim cutaan 0,5mg/50ug
 	DIPROSALIC		betamethason/salicylzuur zalf 0,5/ 30mg/g
 	BETOPTIC		betaxolol oogdruppels 2,5mg/ml
+	AVASTIN		bevacizumab infopl conc 25mg/ml
+	ZIRABEV		bevacizumab infopl conc 25mg/ml
+	MVASI		bevacizumab infopl conc 25mg/ml
+	AYBINTIO		bevacizumab infopl conc 25mg/ml
+	OYAVAS		bevacizumab infopl conc 25mg/ml
+	ALYMSYS		bevacizumab infopl conc 25mg/ml
+	TARGRETIN		bexaroteen capsule 75mg
+	BEZALIP		bezafibraat tablet mga 400mg
+	ZINPLAVA		bezlotoxumab infopl conc 25mg/ml
+	CASODEX		bicalutamide tablet  50mg
+	BILURON		bicalutamide tablet  50mg
+	BICAVERA		bicavera pd-opl gluc 42,5mg/ml calcium 1,25mmol/l
+	BICAVERA		bicavera pd-opl glucose 15mg/ml calcium 1,25mmol/l
+	BICAVERA		bicavera pd-opl glucose 23mg/ml calcium 1,25mmol/l
+	BIKTARVY		bictegravir/emtri/tenofoviralaf tab 50/200/25mg
 	PHARMALGEN		bijengif injectiepoeder 120ug
 	LUMIGAN		bimatoprost oogdruppels 0,1mg/ml
 	LUMIGAN		bimatoprost oogdruppels 0,3mg/ml
 	GANMONO		bimatoprost oogdruppels 0,3mg/ml
 	BIMZELX		bimekizumab injvlst 160mg/ml
+	MEKTOVI		binimetinib tablet 15mg
+	BIOMET PLUS		biomet plus poeder voor cement
+	AKINETON		biperideen injvlst 5mg/ml
+	AKINETON		biperideen tablet 2mg
+	BIPHOZYL		biphozyl hemofiltratie/dialyseoplossing
+	DULCOLAX		bisacodyl tablet msr 5mg
+	LAXEERTABLET		bisacodyl tablet msr 5mg
+	IDYL		bisacodyl tablet msr 5mg
+	LIVSANE		bisacodyl tablet msr 5mg
+	DULCOLAX		bisacodyl zetpil 10mg
+	DE-NOL		bismutoxide tablet 120mg
+	EMCOR		bisoprolol tablet   2,5mg
+	EMCOR DECO		bisoprolol tablet fo 7,5mg
+	COSIMPREL		bisoprolol/perindopril-arginine tablet  5/ 5mg
+	COSIMPREL		bisoprolol/perindopril-arginine tablet  5/10mg
+	COSIMPREL		bisoprolol/perindopril-arginine tablet 10/ 5mg
+	COSIMPREL		bisoprolol/perindopril-arginine tablet 10/10mg
 	BLEOMEDAC		bleomycine injectiepoeder 15usp-e
+	BLINCYTO		blinatumomab infusiepoeder 38,5ug
 	MMRVAXPRO		bof/mazelen/rubellavaccin  1 dosis (mmrvaxpro)
 	VELCADE		bortezomib injectiepoeder 1mg
 	VELCADE		bortezomib injectiepoeder 3,5mg
+	TRACLEER		bosentan dispertablet 32mg
+	TRACLEER		bosentan tablet fo  62,5mg
+	TRACLEER		bosentan tablet fo 125mg
+	BOSULIF		bosutinib tablet 100mg
+	BOSULIF		bosutinib tablet 400mg
+	BOSULIF		bosutinib tablet 500mg
+	BOTOX		botuline a toxine allergan injpdr 100e
+	BOCOUTURE		botuline a toxine merz injpdr  50e
+	XEOMIN		botuline a toxine merz injpdr  50e
+	XEOMIN		botuline a toxine merz injpdr 100e
+	BOCOUTURE		botuline a toxine merz injpdr 100e
+	XEOMIN		botuline a toxine merz injpdr 200e
+	AZZALURE		botuline a toxine speywood injpdr 125e
+	DYSPORT		botuline a toxine speywood injpdr 300e
+	DYSPORT		botuline a toxine speywood injpdr 500e
+	ALLUZIENCE		botuline a toxine speywood injvlst 200e/ml
+	ADCETRIS		brentuximab vedotine infusiepoeder 50mg
+	RXULTI		brexpiprazol tablet 1mg
+	RXULTI		brexpiprazol tablet 2mg
+	RXULTI		brexpiprazol tablet 3mg
+	RXULTI		brexpiprazol tablet 4mg
+	ALUNBRIG		brigatinib tablet  30mg
+	ALUNBRIG		brigatinib tablet  90mg
+	ALUNBRIG		brigatinib tablet 180mg
 	MIRVASO		brimonidine gel 3,3mg/g
 	ALPHAGAN		brimonidine oogdruppels 2mg/ml
 	AZOPT		brinzolamide oogdruppels 10mg/ml
 	SIMBRINZA		brinzolamide/brimonidine oogdruppel 10/2mg/ml
+	BRIVIACT		brivaracetam drank 10mg/ml
+	BRIVIACT		brivaracetam inj/infopl 10mg/ml
+	BRIVIACT		brivaracetam tablet  25mg
+	BRIVIACT		brivaracetam tablet  50mg
+	BRIVIACT		brivaracetam tablet  75mg
+	BRIVIACT		brivaracetam tablet 100mg
 	KYNTHEUM		brodalumab injvlst 140mg/ml
+	BEOVU		brolucizumab injvlst 120mg/ml
+	PARLODEL		bromocriptine tablet 2,5mg
 	YELLOX		broomfenac oogdruppels 0,9mg/ml
+	HOESTDRANK HTP		broomhexine drank 0,8mg/ml
+	BISOLVON		broomhexine drank 0,8mg/ml
+	IDYL		broomhexine drank 0,8mg/ml
+	BISOLVON		broomhexine drank 1,6mg/ml
+	HOESTDRANK HTP		broomhexine drank 1,6mg/ml
+	BOOTS PHARMACEUTICALS		broomhexine drank 1,6mg/ml
+	NATTERMAN		broomhexine drank 1,6mg/ml
+	IDYL		broomhexine drank 1,6mg/ml
+	LIVSANE		broomhexine drank 1,6mg/ml
 	BISOLVON		broomhexine druppels 2mg/ml
+	BISOLVON		broomhexine tablet 8mg
 	IMPROMEN		broomperidol druppels 2mg/ml
+	IMPROMEN DECANOAS		broomperidol injvlst 50mg/ml
+	LENDORMIN		brotizolam tablet 0,25mg
+	ENTOCORT		budesonide capsule mga 3mg
+	BUDENOFALK		budesonide capsule msr 3mg
+	BUDENOFALK		budesonide granulaat msr 9mg
+	PULMICORT		budesonide inhalatiepoeder 100ug/do
+	PULMICORT		budesonide inhalatiepoeder 200ug/do
+	BUDESONIDE NOVOLIZER		budesonide inhalatiepoeder 200ug/do
+	PULMICORT		budesonide inhalatiepoeder 400ug/do
+	BUDESONIDE NOVOLIZER		budesonide inhalatiepoeder 400ug/do
+	RHINOCORT		budesonide neusspray  32ug/do
+	BUDENOFALK		budesonide schuim rectaal 2mg/do
+	JORVEZA		budesonide smelttablet 1mg
+	CORTIMENT		budesonide tablet mga 9mg
+	ENTOCORT		budesonide tablet v klysma 2,3mg
+	PULMICORT		budesonide vernevelvlst 0,125mg/ml
+	PULMICORT		budesonide vernevelvlst 0,25mg/ml
+	PULMICORT		budesonide vernevelvlst 0,5mg/ml
+	SYMBICORT		budesonide/formoterol aerosol 100/3ug/do
+	SYMBICORT		budesonide/formoterol aerosol 200/6ug/do
+	SYMBICORT		budesonide/formoterol inhp  100/6ug/do
+	BUFOLER EASYHALER		budesonide/formoterol inhp  160/4,5ug/do
+	SYMBICORT		budesonide/formoterol inhp  200/6ug/do
+	DUORESP SPIROMAX		budesonide/formoterol inhp  200/6ug/do
+	BUFOLER EASYHALER		budesonide/formoterol inhp  320/9ug/do
+	SYMBICORT		budesonide/formoterol inhp  400/12ug/do
+	DUORESP SPIROMAX		budesonide/formoterol inhp  400/12ug/do
+	BUSALAIR		budesonide/salmeterol inhalcaps 120/20ug
+	BUSALAIR		budesonide/salmeterol inhalcaps 240/20ug
 	TYFUSVACCIN		buiktyfusvaccin injvlst 50ug/ml
+	BURINEX		bumetanide injvlst 0,5mg/ml
+	EXPAREL		bupivacaine inj disp mva 13,3mg/ml (mv-liposomaal)
+	MARCAINE		bupivacaine injvlst 2,5mg/ml (hcl)
+	MARCAINE		bupivacaine injvlst 5mg/ml (hcl)
+	MARCAINE-ADRENALINE		bupivacaine/adrenaline injvlst 2,5mg/5ug/ml
+	MARCAINE-ADRENALINE		bupivacaine/adrenaline injvlst 5mg/5ug/ml
+	MARCAINE-GLUCOSE		bupivacaine/glucose injvlst 5/80mg/ml
+	PANKAINE GLUCOSE		bupivacaine/glucose injvlst 5/80mg/ml
+	TEMGESIC		buprenorfine injvlst 0,3mg/ml
+	BUTRANS		buprenorfine pleister  5ug/uur
+	BUTRANS		buprenorfine pleister 10ug/uur
+	BUTRANS		buprenorfine pleister 20ug/uur
+	TRANSTEC		buprenorfine pleister 35ug/uur
+	TRANSTEC		buprenorfine pleister 52,5ug/uur
+	TRANSTEC		buprenorfine pleister 70ug/uur
+	TEMGESIC		buprenorfine tablet sublinguaal 0,2mg
+	SUBOXONE		buprenorfine/naloxon tablet sublingu  2/0,5mg
+	BUNALICT		buprenorfine/naloxon tablet sublingu  2/0,5mg
+	LIBROXAR		buprenorfine/naloxon tablet sublingu  2/0,5mg
+	SUBOXONE		buprenorfine/naloxon tablet sublingu  8/2mg
+	BUNALICT		buprenorfine/naloxon tablet sublingu  8/2mg
+	LIBROXAR		buprenorfine/naloxon tablet sublingu  8/2mg
+	ZUBSOLV		buprenorfine/naloxon tablet sublingu 1,4/0,36mg
+	ZUBSOLV		buprenorfine/naloxon tablet sublingu 11,4/2,9mg
+	SUBOXONE		buprenorfine/naloxon tablet sublingu 16/4mg
+	ZUBSOLV		buprenorfine/naloxon tablet sublingu 2,9/0,71mg
+	ZUBSOLV		buprenorfine/naloxon tablet sublingu 5,7/1,4mg
+	ZUBSOLV		buprenorfine/naloxon tablet sublingu 8,6/2,1mg
+	ZYBAN		bupropion tablet mga 150mg
+	WELLBUTRIN		bupropion tablet mga 150mg
+	WELLBUTRIN		bupropion tablet mga 300mg
 	CRYSVITA		burosumab injvlst 10mg/ml
 	CRYSVITA		burosumab injvlst 20mg/ml
 	CRYSVITA		burosumab injvlst 30mg/ml
 	SUPREFACT		busereline implantatiestift 9,45mg
+	SUPREFACT		busereline neusspray 100ug/do
+	BUSILVEX		busulfan infopl conc 6mg/ml
+	MYLERAN		busulfan tablet 2mg
+	GYNOMYK		butoconazol vaginaalcreme 20mg/g
 	BERINERT		c1-esteraseremmer injpdr 1500ie
 	BERINERT		c1-esteraseremmer injpdr 2000ie
 	BERINERT		c1-esteraseremmer injpdr 3000ie
 	CINRYZE		c1-esteraseremmer injpdr 500ie
+	BERINERT		c1-esteraseremmer pdr inj/infopl 500ie
+	JEVTANA		cabazitaxel infopl conc 40mg/ml
+	DOSTINEX		cabergoline tablet 0,5mg
+	VOCABRIA		cabotegravir injsusp 200mg/ml
+	VOCABRIA		cabotegravir tablet 30mg
+	COMETRIQ		cabozantinib capsule 20mg
+	COMETRIQ		cabozantinib capsule 80mg
+	CABOMETYX		cabozantinib tablet 20mg
+	CABOMETYX		cabozantinib tablet 40mg
+	CABOMETYX		cabozantinib tablet 60mg
+	CADDERA		cacl2 infvlst 14,7mg/ml (h2o) (0,1mmol ca)
+	HIDROFEROL		calcifediol capsule 0,266mg
 	CALCITONINE ESSPHARMA		calcitonine injvlst 100ie/ml
+	ROCALTROL		calcitriol capsule 0,25ug
+	ROCALTROL		calcitriol capsule 0,5ug
 	SILKIS		calcitriol zalf 3ug/g
+	OSVAREN		calciumacetaat/magnesiumsubcarbonaat tab 435/235mg
+	CAD		calciumcarb/colecal bruisgr 1,25g/440ie (500mg ca)
+	CAD		calciumcarb/colecal bruisgr 1,25g/880ie (500mg ca)
+	CAD		calciumcarb/colecal bruisgr 2,5g/880ie (1000mg ca)
+	CALCI CHEW		calciumcarb/colecal kauwt 1,25g/1000ie (500mg ca)
+	D-CURALCIUM		calciumcarb/colecal kauwt 2,5g/1000ie (1000mg ca)
+	CALCI CHEW		calciumcarb/colecalc kauwtb 1,25g/400ie (500mg ca)
+	TACAL		calciumcarb/colecalc kauwtb 1,25g/400ie (500mg ca)
+	CALCI CHEW		calciumcarb/colecalc kauwtb 1,25g/800ie (500mg ca)
+	TACAL		calciumcarb/colecalc kauwtb 1,25g/800ie (500mg ca)
+	CALCI CHEW		calciumcarb/colecalc kauwtb 2,5g/800ie (1000mg ca)
+	CALCI-BONED3		calciumcarb/colecalc kauwtb 2,5g/880ie (1000mg ca)
+	CACIT		calciumcarbonaat bruistablet 1,25g (500mg ca)
+	CALCI CHEW		calciumcarbonaat kauwtablet 1,25g (500mg ca)
+	CALCI CHEW		calciumcarbonaat kauwtablet 2,5g (1000mg ca)
+	RENNIE		calciumcarbonaat/magnesiumsubcarbonaat kauwtablet
+	RENNIE		calciumcarbonaat/mgsubcarb/alginezuur kauwtablet
+	RENNIE		calciumcarbonaat/mgsubcarb/dimeticon kauwtablet
+	CALISVIT		calciumfosfaat/colecalciferol pdr v sus 3,1g/800ie
 	VEREGEN		camellia sinensis zalf 100mg/g
+	INVOKANA		canagliflozine tablet 100mg
+	INVOKANA		canagliflozine tablet 300mg
 	ILARIS		canakinumab injvlst 150mg/ml
+	ATACAND		candesartan tablet  4mg
+	ATACAND		candesartan tablet  8mg
+	ATACAND		candesartan tablet 16mg
+	ATACAND		candesartan tablet 32mg
+	ATACAND PLUS		candesartan/hydrochloorthiazide tablet 16/12,5mg
+	KENGREXAL		cangrelor pdr inj/infopl 50mg
+	CAPD/DPCA		capd dpca 17 pd-opl + gluc 15mg/ml
+	CAPD/DPCA		capd dpca 18 pd-opl + gluc 42,5mg/ml
+	CAPD/DPCA		capd dpca 19 pd-opl + gluc 23mg/ml
+	XELODA		capecitabine tablet fo 150mg
+	XELODA		capecitabine tablet fo 500mg
 	CABLIVI		caplacizumab injectiepoeder 10mg
+	TABRECTA		capmatinib tablet 150mg
+	TABRECTA		capmatinib tablet 200mg
 	QUTENZA		capsaicine pleister 179mg
+	MIOSTAT		carbachol injvlst 0,1mg/ml
+	TEGRETOL		carbamazepine susp oraal 20mg/ml
+	TEGRETOL		carbamazepine tablet 100mg
+	TEGRETOL		carbamazepine tablet 200mg
+	TEGRETOL		carbamazepine tablet mga 200mg
+	TEGRETOL		carbamazepine tablet mga 400mg
+	ASCAL		carbasalaatcalcium bruistablet  38mg
+	ASCAL CARDIO NEURO		carbasalaatcalcium bruistablet 100mg
+	ASCAL CARDIO		carbasalaatcalcium poeder 100mg
+	ASCAL		carbasalaatcalcium poeder 600mg
+	PABAL		carbetocine injvlst 100ug/ml
+	MUCODYNE		carbocisteine drank 50mg/ml
+	VIDISIC		carbomeer ooggel 2mg/g (carbomeer 980)
+	LIPOSIC		carbomeer ooggel 2mg/g (carbomeer 980)
+	THILO TEARS		carbomeer ooggel 3mg/g (carbomeer 974p)
+	DRY EYE GEL		carbomeer ooggel 3mg/g (carbomeer 974p)
+	KYPROLIS		carfilzomib infusiepoeder 10mg
+	KYPROLIS		carfilzomib infusiepoeder 30mg
+	KYPROLIS		carfilzomib infusiepoeder 60mg
+	CARBAGLU		cargluminezuur dispertablet 200mg
+	UCEDANE		cargluminezuur dispertablet 200mg
+	REAGILA		cariprazine capsule 1,5mg
+	REAGILA		cariprazine capsule 3mg
+	REAGILA		cariprazine capsule 4,5mg
+	REAGILA		cariprazine capsule 6mg
 	CELLUVISC		carmellose oogdruppels 10mg/ml
 	CARTEABAK		carteolol oogdruppels 20mg/ml
 	RONAPREVE		casirivimab inj/infopl 120mg/ml
 	RONAPREVE		casirivimab/imdevimab inj/infopl 120/120mg/ml
+	CANCIDAS		caspofungine infusiepoeder 50mg
+	CANCIDAS		caspofungine infusiepoeder 70mg
+	KEFORAL		cefalexine tablet 500mg
+	KEFZOL		cefazoline pdr v injvlst 1000mg
+	ZINFORO		ceftaroline infusiepoeder 600mg
+	ZAVICEFTA		ceftazidim/avibactam infusiepoeder 2000/500mg
+	CEDAX		ceftibuten capsule 400mg
+	ZERBAXA		ceftolozaan/tazobactam infusiepoeder 1000/500mg
+	APROKAM		cefuroxim pdr v injvlst 50mg
+	XIMARACT		cefuroxim pdr v injvlst 50mg
+	ZINNAT		cefuroxim susp oraal 25mg/ml
+	ZINNAT		cefuroxim tablet 250mg
+	ZINNAT		cefuroxim tablet 500mg
+	CELEBREX		celecoxib capsule 100mg
+	CELEBREX		celecoxib capsule 200mg
+	LIBTAYO		cemiplimab infopl conc 50mg/ml
+	ONTOZRY		cenobamaat tablet 100mg
+	ONTOZRY		cenobamaat tablet 12,5mg
+	ONTOZRY		cenobamaat tablet 150mg
+	ONTOZRY		cenobamaat tablet 200mg
+	ONTOZRY		cenobamaat tablet 25mg
+	ONTOZRY		cenobamaat tablet 50mg
+	ZYKADIA		ceritinib capsule 150mg
+	ZYKADIA		ceritinib tablet 150mg
+	BRINEURA		cerliponase alfa infvlst 30mg/ml
+	CERNEVIT		cernevit injpdr
 	CIMZIA		certolizumab pegol injvlst 200mg/ml
+	ZYRTEC		cetirizine drank 1mg/ml
+	ZYRTEC		cetirizine tablet 10mg
+	REACTINE		cetirizine tablet 10mg
+	ALLERGIETABLET CETIRIZINE DIHCL HTP		cetirizine tablet 10mg
+	PREVALIN		cetirizine tablet 10mg
+	IDYL		cetirizine tablet 10mg
+	LIVSANE		cetirizine tablet 10mg
 	CETROTIDE		cetrorelix injectiepoeder 0,25mg
+	ERBITUX		cetuximab infvlst 5mg/ml
+	LEUKERAN		chloorambucil tablet fo 2mg
 	CHLOORAMPHENICOL, MINIMS		chlooramfenicol oogdruppels 5mg/ml
+	CHLOORHEXIDINE, UROTAINER		chloorhexidine blaassp 0,2mg/ml (diacet)
+	CORSODYL		chloorhexidine gel dentaal 10mg/g
+	CATHEJELL		chloorhexidine gel urethraal 0,5mg/g
+	CORSODYL		chloorhexidine mondspoeling 2mg/ml
 	CHLOORHEXIDINETINCTUUR FRESENIUS KABI		chloorhexidine opl cutaan  5mg/ml
 	CHLOORHEXIDINE/ALCOHOL DENTECK		chloorhexidine opl cutaan  5mg/ml
 	HIBISCRUB		chloorhexidine opl cutaan 40mg/ml
+	CORSODYL		chloorhexidine spray oromucos 2mg/ml
 	HIBICET		chloorhexidine/cetrimide opl cutaan 0,15/1,5mg/ml
 	CHLORAPREP		chloorhexidine/isopropanol opl cut 20/549,5mg/ml
 	CHLORAPREP GETINT		chloorhexidine/isopropanol opl cut 20/549,5mg/ml
 	LEDAGA		chloormethine gel 160ug/g
+	AMPRES		chloorprocaine injvlst 10mg/ml
+	TRUXAL		chloorprotixeen tablet fo 15mg
+	TRUXAL		chloorprotixeen tablet fo 50mg
 	DETTOL MED		chloorxylenol cutane opl. conc 48mg/g
+	A-CQ		chloroquine tablet 100mg (als difosfaat)
+	DUKORAL		choleravaccin oraal
 	OVITRELLE		choriogonadotropine alfa injvlst 500ug/ml
 	PREGNYL		choriongonadotrofine injectiepoeder  1500ie
 	PREGNYL		choriongonadotrofine injectiepoeder  5000ie
 	GONASI		choriongonadotrofine injectiepoeder  5000ie
+	ALVESCO		ciclesonide aerosol  80ug/do
+	ALVESCO		ciclesonide aerosol 160ug/do
 	LOPROX		ciclopirox creme 10mg/g
+	NEORAL		ciclosporine capsule zacht  25mg
+	NEORAL		ciclosporine capsule zacht 100mg
+	NEORAL		ciclosporine drank 100mg/ml
+	SANDIMMUNE		ciclosporine infopl conc 50mg/ml
 	IKERVIS		ciclosporine oogdr emulsie 1mg/ml
+	CIDOFOVIR TILLOMED		cidofovir infopl conc 75mg/ml
+	EVUSHELD		cilgavimab injvlst 100mg/ml
+	MIMPARA		cinacalcet granulaat 1mg
+	MIMPARA		cinacalcet granulaat 2,5mg
+	MIMPARA		cinacalcet granulaat 5mg
+	MIMPARA		cinacalcet tablet 30mg
+	MIMPARA		cinacalcet tablet 60mg
+	MIMPARA		cinacalcet tablet 90mg
+	LIVSANE		cinnarizine tablet 25mg
+	PRIMATOUR		cinnarizine/chloorcyclizine tablet 12,5/25mg
+	MODALIM		ciprofibraat tablet 100mg
+	CIPROXIN		ciprofloxacine susp oraal  50mg/ml
+	CIPROXIN		ciprofloxacine susp oraal 100mg/ml
+	NIMBEX		cisatracurium injvlst 2mg/ml
 	CIPRAMIL		citalopram druppels 40mg/ml
+	CIPRAMIL		citalopram tablet omhuld 20mg
+	CIPRAMIL		citalopram tablet omhuld 40mg
+	CITRASOL		citrasol hf-cit-post hemofiltratie opl
+	CITRASOL		citrasol hf-cit-pre  hemofiltratie opl
+	LEUSTATIN		cladribine infopl conc 1mg/ml
 	LITAK		cladribine injvlst 2mg/ml
+	MAVENCLAD		cladribine tablet 10mg
+	KLACID		claritromycine tablet mga 500mg
+	TAVEGYL		clemastine injvlst 1mg/ml
+	TAVEGYL		clemastine tablet 1mg
+	CLEVIPREX		clevidipine inj.emulsie 0,5mg/ml
+	DALACIN		clindamycine capsule 300mg
+	DALACIN		clindamycine susp oraal 15mg/ml
 	DUAC		clindamycine/benzoylperoxide gel 10/50mg/g
 	TRECLINAC		clindamycine/tretinoine gel 10/0,25mg/g
+	CLINIMIX		clinimix infvlst n14g30
+	CLINIMIX		clinimix infvlst n14g30e
+	CLINIMIX		clinimix infvlst n17g35e
+	FRISIUM		clobazam tablet 10mg
+	FRISIUM		clobazam tablet 20mg
 	DERMOVATE		clobetasol creme  0,5mg/g
 	ECZORIA		clobetasol creme  0,5mg/g
 	DERMOVATE		clobetasol opl cutaan 0,5mg/g
@@ -137,44 +750,190 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	CLOBEX		clobetasol shampoo 0,5mg/g
 	DERMOVATE		clobetasol zalf 0,5mg/g
 	EMOVATE		clobetason creme 0,5mg/g
+	BONEFOS		clodroninezuur tablet 800mg
+	OSTAC		clodroninezuur tablet omhuld 520mg
+	EVOLTRA		clofarabine infopl conc 1mg/ml
+	CLOMID		clomifeen tablet 50mg
 	RIVOTRIL		clonazepam druppels 2,5mg/ml
+	RIVOTRIL		clonazepam injopl conc 1mg/ml
+	RIVOTRIL		clonazepam tablet 0,5mg
+	RIVOTRIL		clonazepam tablet 2mg
 	CATAPRESAN		clonidine injvlst 0,15mg/ml
+	PLAVIX		clopidogrel tablet   75mg
+	ISCOVER		clopidogrel tablet   75mg
+	GREPID		clopidogrel tablet   75mg
+	PLAVIX		clopidogrel tablet  300mg
+	TRANXENE		clorazepinezuur capsule  5mg
+	TRANXENE		clorazepinezuur capsule 10mg
+	TRANXENE		clorazepinezuur tablet 20mg
+	TRANXENE		clorazepinezuur tablet 50mg
+	CANESTEN GYNO		clotrimazol capsule vaginaal 500mg
 	CANESTEN SKIN		clotrimazol creme 10mg/g
 	CANESTEN FOOT		clotrimazol creme 10mg/g
+	CANESTEN GYNO		clotrimazol vaginaalcreme  10mg/g
+	CANESTEN GYNO		clotrimazol vaginaalcreme  20mg/g
+	CANESTEN GYNO		clotrimazol vaginaalcreme 100mg/g
+	CANESTEN GYNO		clotrimazol vaginaaltablet 200mg
+	CANESTEN GYNO		clotrimazol vaginaaltablet 500mg
+	ZAPONEX		clozapine smelttablet  12,5mg
+	ZAPONEX		clozapine smelttablet  25mg
+	ZAPONEX		clozapine smelttablet  50mg
+	ZAPONEX		clozapine smelttablet 100mg
+	ZAPONEX		clozapine smelttablet 200mg
+	LEPONEX		clozapine tablet  25mg
+	LEPONEX		clozapine tablet 100mg
+	TYBOST		cobicistat tablet 150mg
+	COTELLIC		cobimetinib tablet 20mg
+	NATTERMAN		codeine stroop 0,5mg/ml
+	GENCEBOK		coffeine citraat opl paren/oraal 10mg/ml
+	PEYONA		coffeine citraat opl paren/oraal 20mg/ml
+	D-CURA		colecalciferol capsule   5600ie
+	D-CURA		colecalciferol capsule  25.000ie
+	THORENS		colecalciferol capsule  25.000ie
+	D-CURA		colecalciferol drank  25.000ie/ml
+	THORENS		colecalciferol drank 10.000ie/ml
+	D-CURA		colecalciferol drank 100.000ie/ml
 	D-CURA		colecalciferol druppels 2400ie/ml
 	DAVITAMON		colecalciferol druppels 960ie/ml
+	DEVARON		colecalciferol tablet   400ie
+	DIVISUN		colecalciferol tablet   800ie
+	OSFEROL-D3		colecalciferol tablet  7000ie
+	OSFEROL-D3		colecalciferol tablet 30.000ie
+	CHOLESTAGEL		colesevelam tablet 625mg
+	QUESTRAN		colestyramine poeder 4g
+	QUESTRAN A		colestyramine poeder 4g
+	TADIM		colistine infusiepoeder 1.000.000ie
+	COLOBREATHE		colistine inhalatiecapsule 1.662.500ie
+	COLISTIN		colistine pdr v vernevelvlst 1.000.000ie
+	TADIM		colistine pdr v vernevelvlst 1.000.000ie
+	COLISTIMETHAAT NATRIUM		colistine pdr v vernevelvlst 1.000.000ie
+	KOLNEB		colistine pdr v vernevelvlst 2.000.000ie
 	NOVUXOL		collagenase zalf 3mg/g
+	RUCONEST		conestat alfa pdr v injvlst 2100e
 	ELONVA		corifollitropine alfa injvlst 200ug/ml
 	ELONVA		corifollitropine alfa injvlst 300ug/ml
+	CRH FERRING		corticoreline pdr v injvlst 100ug
 	BACTRIMEL		cotrimoxazol  96 infopl conc 16/80mg/ml
 	SEPTRIN		cotrimoxazol 480 tablet  80/400mg
+	XALKORI		crizotinib capsule 200mg
+	XALKORI		crizotinib capsule 250mg
+	NALCROM		cromoglicinezuur drank 200mg
+	NALCROM		cromoglicinezuur granulaat 100mg
+	NALCROM		cromoglicinezuur granulaat 200mg
+	PREVALIN		cromoglicinezuur neusspray 20mg/ml
+	ALLERGO-COMOD		cromoglicinezuur neusspray 20mg/ml
+	ALLERGIENEUSSPRAY NATRIUMCROMOGLICAAT HTP		cromoglicinezuur neusspray 20mg/ml
+	PREVALIN		cromoglicinezuur neusspray 40mg/ml
 	ALLERGO-COMOD		cromoglicinezuur oogdruppels 20mg/ml
 	PREVALIN		cromoglicinezuur oogdruppels 20mg/ml
 	LECROLYN		cromoglicinezuur oogdruppels 40mg/ml
+	CUSTODIOL		custodiol infvlst
+	ENDOXAN		cyclofosfamide dragee 50mg
+	ENDOXAN		cyclofosfamide injectiepoeder  750mg
+	ENDOXAN		cyclofosfamide injectiepoeder 2000mg
 	CYCLOPENTOLAATHYDROCHLORIDE MINIMS		cyclopentolaat oogdruppels  5mg/ml
 	CYCLOGYL		cyclopentolaat oogdruppels 10mg/ml
 	CYCLOPENTOLAATHYDROCHLORIDE MINIMS		cyclopentolaat oogdruppels 10mg/ml
+	ANDROCUR		cyproteron tablet 10mg
+	ANDROCUR		cyproteron tablet 50mg
+	DECIGATAN		cytisinicline tablet 1,5mg
+	MEGALOTECT		cytomegalie-immunoglobuline infvls 100e/ml
+	PRADAXA		dabigatran etexilaat capsule  75mg
+	PRADAXA		dabigatran etexilaat capsule 110mg
+	PRADAXA		dabigatran etexilaat capsule 150mg
+	TAFINLAR		dabrafenib capsule 50mg
+	TAFINLAR		dabrafenib capsule 75mg
+	VIZIMPRO		dacomitinib tablet 15mg
+	VIZIMPRO		dacomitinib tablet 30mg
+	VIZIMPRO		dacomitinib tablet 45mg
+	COSMEGEN LYOVAC		dactinomycine pdr v injvlst 0,5mg
+	XYDALBA		dalbavancine infpdr 500mg
 	FRAGMIN		dalteparine injvlst 10.000ie/ml
 	FRAGMIN		dalteparine injvlst 12.500ie/ml
 	FRAGMIN		dalteparine injvlst 25.000ie/ml
+	JIVI		damoctocog alfa pegol injpdr  500ie
+	JIVI		damoctocog alfa pegol injpdr 1000ie
+	JIVI		damoctocog alfa pegol injpdr 2000ie
+	JIVI		damoctocog alfa pegol injpdr 3000ie
 	ORGARAN		danaparoide injvlst 1250axa-e/ml
+	DANATROL		danazol capsule 100mg
+	DANTRIUM		dantroleen capsule 25mg
+	DANTRIUM		dantroleen pdr v injvlst 20mg
+	FORXIGA		dapagliflozine tablet  5mg
+	FORXIGA		dapagliflozine tablet 10mg
+	XIGDUO		dapagliflozine/metformine tablet 5/ 850mg
+	XIGDUO		dapagliflozine/metformine tablet 5/1000mg
+	PRILIGY		dapoxetine tablet 30mg
+	PRILIGY		dapoxetine tablet 60mg
+	CUBICIN		daptomycine pdr inj/infopl 500mg
+	DARZALEX		daratumumab infopl conc 20mg/ml
 	DARZALEX		daratumumab injvlst 120mg/ml
 	ARANESP		darbepoetine alfa injvlst  25ug/ml
 	ARANESP		darbepoetine alfa injvlst  40ug/ml
 	ARANESP		darbepoetine alfa injvlst 100ug/ml
 	ARANESP		darbepoetine alfa injvlst 200ug/ml
 	ARANESP		darbepoetine alfa injvlst 500ug/ml
+	EMSELEX		darifenacine tablet mga 15mg
+	EMSELEX		darifenacine tablet mga 7,5mg
+	NUBEQA		darolutamide tablet 300mg
+	PREZISTA		darunavir susp oraal 100mg/ml
+	PREZISTA		darunavir tablet  75mg
+	PREZISTA		darunavir tablet 150mg
+	PREZISTA		darunavir tablet 300mg
+	PREZISTA		darunavir tablet 400mg
+	PREZISTA		darunavir tablet 600mg
+	PREZISTA		darunavir tablet 800mg
+	REZOLSTA		darunavir/cobicistat tablet 800/150mg
+	ALOFISEL		darvadstrocel injsusp 5 miljoen cellen/ml
+	SPRYCEL		dasatinib susp oraal 10mg/ml
+	SPRYCEL		dasatinib tablet  20mg
+	SPRYCEL		dasatinib tablet  50mg
+	SPRYCEL		dasatinib tablet  70mg
+	SPRYCEL		dasatinib tablet 100mg
+	VYXEOS		daunorubici/cytarabi infpdr 44/100mg (liposomaal)
+	CERUBIDINE		daunorubicine pdr v infvlst 20mg
+	DACOGEN		decitabine infusiepoeder 50mg
+	EXJADE		deferasirox dispertablet 125mg
+	EXJADE		deferasirox dispertablet 250mg
+	EXJADE		deferasirox dispertablet 500mg
+	EXJADE		deferasirox tablet  90mg
+	EXJADE		deferasirox tablet 180mg
+	EXJADE		deferasirox tablet 360mg
+	FERRIPROX		deferipron drank 100mg/ml
+	FERRIPROX		deferipron tablet 1000mg
+	FERRIPROX		deferipron tablet 500mg
 	DESFERAL		deferoxamine injectiepoeder 500mg
+	DEFITELIO		defibrotide infopl conc 80mg/ml
 	FIRMAGON		degarelix pdr v injvlst  80mg
 	FIRMAGON		degarelix pdr v injvlst 120mg
+	LEDERMYCIN		demeclocycline capsule 300mg
 	PROLIA		denosumab injvlst 60mg/ml
 	XGEVA		denosumab injvlst 70mg/ml
+	AERIUS		desloratadine drank 0,5mg/ml
+	AERIUS		desloratadine smelttablet 2,5mg
+	AERIUS		desloratadine smelttablet 5mg
+	AERIUS		desloratadine tablet 5mg
+	NEOCLARITYN		desloratadine tablet 5mg
 	MINRIN		desmopressine injvlst  4ug/ml
 	OCTOSTIM		desmopressine injvlst 15ug/ml
+	NOCDURNA		desmopressine lyophilisaat  25ug
+	NOCDURNA		desmopressine lyophilisaat  50ug
+	MINRIN MELT		desmopressine lyophilisaat  60ug
+	MINRIN MELT		desmopressine lyophilisaat 120ug
+	MINRIN MELT		desmopressine lyophilisaat 240ug
 	MINRIN		desmopressine neusdruppels 0,1mg/ml
+	MINRIN		desmopressine neusspray   2,5ug/do
+	MINRIN		desmopressine neusspray  10ug/do
+	OCTOSTIM		desmopressine neusspray 150ug/do
+	MINRIN		desmopressine tablet 0,1mg
+	MINRIN		desmopressine tablet 0,2mg
+	CERAZETTE		desogestrel tablet 0,075mg
+	DELAMONIE		desogestrel tablet 0,075mg
+	ZARELLE		desogestrel tablet 0,075mg
 	DESOXIMETASON BIPHARMA		desoximetason creme 2,5mg/g
 	TOPICORTE		desoximetason emulsie cutaan 2,5mg/g
 	ORADEXON		dexamethason dinatriumfosfaat injvlst 5mg/ml
+	OZURDEX		dexamethason implantaat 700ug
 	DEXA POS		dexamethason oogdr 1mg/ml (di-na-fosfaat)
 	DEXMONO		dexamethason oogdr 1mg/ml (fosfaat)
 	DEXAMETHASON MONOFREE		dexamethason oogdr 1mg/ml (fosfaat)
@@ -185,25 +944,174 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	DEXAMYTREX		dexamethason/gentamicine oogzalf 0,3/3mg/g
 	TOBRADEX		dexamethason/tobramycine oogdr 1/3mg/ml
 	BRADEXA		dexamethason/tobramycine oogdr 1/3mg/ml
+	TOBRADEX		dexamethason/tobramycine oogzalf 1/3mg/g
+	AMFEXA		dexamfetamine tablet   5mg
+	TENTIN		dexamfetamine tablet   5mg
+	TENTIN		dexamfetamine tablet  10mg
+	TENTIN		dexamfetamine tablet 20mg
+	STADIUM		dexketoprofen tablet fo 25mg
+	DEXDOR		dexmedetomidine infopl conc 100ug/ml
+	CARDIOXANE		dexrazoxaan infusiepoeder 500mg
+	SAVENE		dexrazoxaan infusiepoeder 500mg
 	DURATEARS-OOGDRUPPELS		dextran 70/hypromellose oogdr 1/3mg/ml
+	DARO		dextromethorfan capsule mga 29,5mg
+	DIALAC		dialac lactaat pdvlst 1,5/42
+	DIALAC		dialac lactaat pdvlst 1,5/45
+	DIALAC		dialac lactaat pdvlst 2,5/42
+	STESOLID		diazepam klysma 2mg/ml
+	STESOLID		diazepam klysma 4mg/ml
+	PROGLICEM		diazoxide capsule 100mg
 	VOLTAREN		diclofenac gel 11,6mg/g
 	VOLTAREN		diclofenac gel 23,2mg/g
+	VOLTAREN K		diclofenac-kalium tablet omhuld 12,5mg
+	VOLTAREN K		diclofenac-kalium tablet omhuld 25mg
+	CATAFLAM		diclofenac-kalium tablet omhuld 50mg
+	VOLTAREN		diclofenac-natrium injvlst 25mg/ml
 	NACLOF		diclofenac-natrium oogdruppels 1mg/ml
 	DICLOABAK		diclofenac-natrium oogdruppels 1mg/ml
+	ARTHROTEC		diclofenac/misoprostol tablet mga 50mg/200ug
+	ARTHROTEC		diclofenac/misoprostol tablet mga 75mg/200ug
+	KAPRUVIA		difelikefalin injvlst 50ug/ml
+	DOLACED		diflunisal tablet 250mg
+	LANOXIN		digoxine drank 0,05mg/ml
+	LANOXIN		digoxine injvlst 0,25mg/ml
+	LANOXIN		digoxine tablet 0,0625mg
+	LANOXIN		digoxine tablet 0,125mg
+	LANOXIN		digoxine tablet 0,25mg
+	DIHYDRAL		dihydrotachysterol tablet 0,2mg
+	TILDIEM		diltiazem capsule mga 200mg
+	TILDIEM		diltiazem capsule mga 300mg
+	TECFIDERA		dimethylfumaraat capsule msr 120mg
+	TECFIDERA		dimethylfumaraat capsule msr 240mg
+	SKILARENCE		dimethylfumaraat tablet msr   30mg
+	SKILARENCE		dimethylfumaraat tablet msr  120mg
+	LEFAX		dimeticon susp oraal 41,2mg/ml
 	FENISTIL		dimetindeen druppels 1mg/ml
+	PREPIDIL		dinoproston gel endocervicaal 0,167mg/g
+	PROSTIN E2		dinoproston gel vaginaal 0,333mg/g
+	PROSTIN E2		dinoproston gel vaginaal 0,667mg/g
+	PROPESS		dinoproston vaginaalsysteem 10mg
+	QARZIBA		dinutuximab beta infopl conc 4,5mg/ml
+	PERSANTIN		dipyridamol injvlst 5mg/ml
+	VUMERITY		diroximelfumaraat capsule msr 231mg
+	RITMOFORINE		disopyramide tablet mga 250mg
+	UBRETID		distigmine tablet 5mg
+	DISTIKSTOFOXIDE MEDICINAAL		distikstofoxide inhalatiegas 1ml/ml
+	ANTABUS		disulfiram bruistablet 400mg
+	REFUSAL		disulfiram tablet 250mg
+	TRIAXIS POLIO		dktp vaccin (triaxis polio)
+	VAXELIS		dktp-hib-hepb vaccin (vaxelis)
+	TAXOTERE		docetaxel infopl conc 40mg/ml
+	NORGALAX		docusinezuur klysma 12mg/g
+	KLYX		docusinezuur/sorbitol klysma 1/250mg/ml
+	TIVICAY		dolutegravir dispertablet 5mg
+	TIVICAY		dolutegravir tablet 10mg
+	TIVICAY		dolutegravir tablet 25mg
+	TIVICAY		dolutegravir tablet 50mg
+	TRIUMEQ		dolutegravir/abacavir/lamivudine tab 50/600/300mg
+	DOVATO		dolutegravir/lamivudine tablet 50/300mg
+	JULUCA		dolutegravir/rilpivirine tablet 50/25mg
+	MOTILIUM		domperidon susp oraal 1mg/ml
+	PERIDON		domperidon zetpil 30mg
+	NAVAZIL		donepezil tablet  5mg
+	DELSTRIGO		doravirin/lamivudin/tenofovirdiso t 100/300/245mg
+	PIFELTRO		doravirine tablet 100mg
 	TRUSOPT		dorzolamide oogdruppels 20mg/ml
 	TRUSMONO		dorzolamide oogdruppels 20mg/ml
+	PROTHIADEN		dosulepine capsule 25mg
+	PROTHIADEN		dosulepine dragee 75mg
+	CARDURA XL		doxazosine tablet mga 4mg
+	CARDURA XL		doxazosine tablet mga 8mg
+	SINEQUAN		doxepine capsule  25mg
+	CAELYX		doxorubicine inf conc 2mg/ml (peg-liposomaal)
+	MYOCET		doxorubicine infusiepoeder 50mg (liposomaal)
+	EFRACEA		doxycycline capsule mga 40mg
+	VIBRAMYCIN		doxycycline injvlst 20mg/ml
+	XONVEA		doxylamine/pyridoxine tablet msr 10/10mg
+	DEHYDROBENZPERIDOL		droperidol injvlst 2,5mg/ml
+	DROVELIS		drospirenon/ estetrol tablet 3/14,2mg
+	BOOSTRIX		dtk vaccin
+	DTP VACCIN		dtp vaccin (bilthoven biologicals)
+	REVAXIS		dtp vaccin (revaxis)
 	TRULICITY		dulaglutide injvlst 1,5mg/ml
 	TRULICITY		dulaglutide injvlst 3mg/ml
 	TRULICITY		dulaglutide injvlst 6mg/ml
 	TRULICITY		dulaglutide injvlst 9mg/ml
+	CYMBALTA		duloxetine capsule msr 30mg
+	CYMBALTA		duloxetine capsule msr 60mg
+	DUOSOL		duosol kalium 2mmol/l hemofilt opl
 	DUPIXENT		dupilumab injvlst 150mg/ml
 	DUPIXENT		dupilumab injvlst 175mg/ml
+	IMFINZI		durvalumab infopl conc 50mg/ml
+	AVODART		dutasteride capsule zacht 0,5mg
+	COMBODART		dutasteride/tamsulosine capsule 0,5/0,4mg
+	DUPHASTON		dydrogesteron tablet 10mg
+	KESTINE		ebastine tablet omhuld 10mg
+	VOGEL		echinacea extract conc voor suspensie
+	VOGEL		echinacea/salvia extract spray oromucosaal
+	SOLIRIS		eculizumab infopl conc 10mg/ml
+	LIXIANA		edoxaban tablet 15mg
+	LIXIANA		edoxaban tablet 30mg
+	LIXIANA		edoxaban tablet 60mg
+	STOCRIN		efavirenz tablet fo 200mg
+	STOCRIN		efavirenz tablet fo 600mg
 	VANIQA		eflornithine creme 115mg/g
+	ELOCTA		efmoroctocog alfa injpdr  250ie
+	ELOCTA		efmoroctocog alfa injpdr  500ie
+	ELOCTA		efmoroctocog alfa injpdr  750ie
+	ELOCTA		efmoroctocog alfa injpdr 1000ie
+	ELOCTA		efmoroctocog alfa injpdr 1500ie
+	ELOCTA		efmoroctocog alfa injpdr 2000ie
+	ELOCTA		efmoroctocog alfa injpdr 3000ie
+	ALPROLIX		eftrenonacog alfa injpdr  250ie
+	ALPROLIX		eftrenonacog alfa injpdr  500ie
+	ALPROLIX		eftrenonacog alfa injpdr 1000ie
+	ALPROLIX		eftrenonacog alfa injpdr 2000ie
+	ALPROLIX		eftrenonacog alfa injpdr 3000ie
+	ZEPATIER		elbasvir/grazoprevir tablet 50/100mg
+	RELPAX		eletriptan tablet fo 40mg
+	CERDELGA		eliglustat capsule 84mg
+	VIMIZIM		elosulfase alfa infopl conc 1mg/ml
+	EMPLICITI		elotuzumab infusiepoeder 300mg
+	EMPLICITI		elotuzumab infusiepoeder 400mg
+	REVOLADE		eltrombopag tablet 25mg
+	REVOLADE		eltrombopag tablet 50mg
+	REVOLADE		eltrombopag tablet 75mg
 	EMADINE		emedastine oogdruppels 0,5mg/ml
 	HEMLIBRA		emicizumab injvlst  30mg/ml
 	HEMLIBRA		emicizumab injvlst 150mg/ml
+	JARDIANCE		empagliflozine tablet 10mg
+	JARDIANCE		empagliflozine tablet 25mg
+	SYNJARDY		empagliflozine/metformine tablet 5/ 850mg
+	SYNJARDY		empagliflozine/metformine tablet 5/1000mg
+	EMTRIVA		emtricitabine capsule 200mg
+	ODEFSEY		emtricitabine/rilpi/tenofoviralaf tab 200/25/25mg
+	EVIPLERA		emtricitabine/rilpi/tenofovirdiso tab 200/25/245mg
+	DESCOVY		emtricitabine/tenofoviralaf tablet 200/ 10mg
+	DESCOVY		emtricitabine/tenofoviralaf tablet 200/ 25mg
+	TRUVADA		emtricitabine/tenofovirdiso tablet 200/245mg
+	ATRIPLA		emtricitabine/tenofovirdisop/efavi t 200/245/600mg
+	ENALAPRIL-RATIOPHARM		enalapril tablet  2,5mg
+	RENITEC		enalapril tablet 20mg
+	CO-RENITEC		enalapril/hydrochloorthiazide tablet 20/12,5mg
+	LERTEC		enalapril/lercanidipine tablet 10/10mg
+	LERTEC		enalapril/lercanidipine tablet 20/10mg
+	BRAFTOVI		encorafenib capsule 50mg
+	BRAFTOVI		encorafenib capsule 75mg
+	PADCEV		enfortumab vedotine infusiepoeder 20mg
+	PADCEV		enfortumab vedotine infusiepoeder 30mg
 	INHIXA		enoxaparine injvlst 10.000ie/ml (100mg/ml)
+	PERFAN		enoximon infopl conc 5mg/ml
+	COMTAN		entacapon tablet fo 200mg
+	COMTESS		entacapon tablet fo 200mg
+	BARACLUDE		entecavir tablet 0,5mg
+	BARACLUDE		entecavir tablet 1mg
+	ROZLYTREK		entrectinib capsule 100mg
+	ROZLYTREK		entrectinib capsule 200mg
+	XTANDI		enzalutamide capsule 40mg
+	XTANDI		enzalutamide tablet 40mg
+	INSPRA		eplerenon tablet 25mg
+	INSPRA		eplerenon tablet 50mg
 	EPREX		epoetine alfa injvlst  2000ie/ml
 	BINOCRIT		epoetine alfa injvlst  2000ie/ml
 	EPREX		epoetine alfa injvlst  4000ie/ml
@@ -221,24 +1129,176 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	RETACRIT		epoetine zeta injvlst  3333ie/ml
 	RETACRIT		epoetine zeta injvlst 10000ie/ml
 	RETACRIT		epoetine zeta injvlst 40000ie/ml
+	FLOLAN		epoprostenol infusiepoeder  500ug
+	VELETRI		epoprostenol infusiepoeder  500ug
+	FLOLAN		epoprostenol infusiepoeder 1500ug
+	VELETRI		epoprostenol infusiepoeder 1500ug
+	TEVETEN		eprosartan tablet omhuld 400mg
+	TEVETEN		eprosartan tablet omhuld 600mg
+	TEVETEN PLUS		eprosartan/hydrochloorthiazide tab fo 600/12,5mg
+	NOVOSEVEN		eptacog alfa geactiveerd injectiepdr 1mg
+	NOVOSEVEN		eptacog alfa geactiveerd injectiepdr 2mg
+	NOVOSEVEN		eptacog alfa geactiveerd injectiepdr 5mg
+	NOVOSEVEN		eptacog alfa geactiveerd injectiepdr 8mg
+	INTEGRILIN		eptifibatide infvlst 0,75mg/ml
+	INTEGRILIN		eptifibatide injvlst 2mg/ml
+	XERAVA		eravacycline infusiepoeder 100mg
 	AIMOVIG		erenumab injvlst 140mg/ml
 	AIMOVIG		erenumab injvlst 70mg/ml
+	HALAVEN		eribuline injvlst 0,44mg/ml
+	TARCEVA		erlotinib tablet  25mg
+	TARCEVA		erlotinib tablet 100mg
+	TARCEVA		erlotinib tablet 150mg
+	INVANZ		ertapenem infusiepoeder 1g
+	STEGLATRO		ertugliflozine tablet  5mg
+	STEGLATRO		ertugliflozine tablet 15mg
+	SEGLUROMET		ertugliflozine/metformine tablet 2,5/1000mg
+	SEGLUROMET		ertugliflozine/metformine tablet 7,5/1000mg
+	STEGLUJAN		ertugliflozine/sitagliptine tablet  5/100mg
+	STEGLUJAN		ertugliflozine/sitagliptine tablet 15/100mg
 	INDERM		erytromycine opl cutaan 10mg/g
+	ERYTHROCINE		erytromycine pdr v infvlst 1g
+	ERYTHROCINE		erytromycine susp oraal  25mg/ml
+	ERYTHROCINE		erytromycine susp oraal  50mg/ml
+	ERYTHROCINE		erytromycine tablet 250mg
+	SIMPLEX		erytromycine/colistine pdr v cement 500/240mg
 	LEXAPRO		escitalopram druppels 20mg/ml
+	LEXAPRO		escitalopram tablet 10mg
+	LEXAPRO		escitalopram tablet 15mg
+	LEXAPRO		escitalopram tablet 20mg
 	KETANEST S		esketamine injvlst  5mg/ml
 	ESKETIV		esketamine injvlst  5mg/ml
 	KETANEST S		esketamine injvlst 25mg/ml
 	ESKETIV		esketamine injvlst 25mg/ml
+	SPRAVATO		esketamine neusspray 28mg
+	NEXIUM		esomeprazol gran voor susp. 10mg
+	NEXIUM		esomeprazol pdr inj/infopl 40mg
+	NEXIUM		esomeprazol tablet msr 20mg
+	NEXIUM CONTROL		esomeprazol tablet msr 20mg
+	NEXIUM		esomeprazol tablet msr 40mg
+	PROGYNOVA		estradiol dragee 1mg
+	PROGYNOVA		estradiol dragee 2mg
+	OESTROGEL		estradiol gel 0,6mg/g
+	SYSTEN		estradiol pleister  50ug/24uur (systen)
+	SYSTEN		estradiol pleister  75ug/24uur (systen)
+	SYSTEN		estradiol pleister 100ug/24uur (systen)
+	LENZETTO		estradiol spray transdermaal 1,53mg/do
+	CETURA		estradiol tablet 0,5mg
+	TRISEQUENS		estradiol tablet 1mg
+	FEMOSTON		estradiol tablet 1mg
+	QLAIRA		estradiol tablet 1mg (valeraat)
+	ESTROFEM		estradiol tablet 2mg
+	TRISEQUENS		estradiol tablet 2mg
+	ZUMENON		estradiol tablet 2mg
+	FEMOSTON		estradiol tablet 2mg
+	QLAIRA		estradiol tablet 3mg
+	VAGIFEM		estradiol tablet vaginaal 10ug
+	VAGIRUX		estradiol tablet vaginaal 10ug
+	QLAIRA		estradiol/dienogest tablet 2/2mg
+	QLAIRA		estradiol/dienogest tablet 2/3mg
+	FEMOSTON		estradiol/dydrogesteron tablet 0,5/2,5mg
+	FEMOSTON		estradiol/dydrogesteron tablet 2/10mg
+	FEMOSTON		estradiol/dydrogesteron tablet omhuld 1/5mg
+	ZOELY		estradiol/nomegestrol tablet 1,5/2,5mg
+	TRISEQUENS		estradiol/norethisteron tablet 2/1mg
+	KLIOGEST		estradiol/norethisteron tablet 2/1mg
+	ACTIVELLE		estradiol/norethisteron tablet omhuld 1/0,5mg
+	ESTRACYT		estramustine capsule 140mg
+	SYNAPAUSE E3		estriol ovule 0,5mg
+	SYNAPAUSE E3		estriol tablet 1mg
+	SYNAPAUSE E3		estriol tablet 2mg
+	SYNAPAUSE E3		estriol vaginaalcreme 1mg/g
 	ENBREL		etanercept injpdr 10mg
 	ENBREL		etanercept injpdr 25mg
 	ENBREL		etanercept injvlst 50mg/ml
 	BENEPALI		etanercept injvlst 50mg/ml
 	ERELZI		etanercept injvlst 50mg/ml
+	PARSABIV		etelcalcetide injvlst 5mg/ml
+	MYAMBUTOL		ethambutol tablet 400mg
+	NUVARING		ethinylestra/etono ring 15/120mcg/24u (2,7/11,7mg)
+	ACELYN		ethinylestradiol tablet 0,05mg
+	SEASONIQUE		ethinylestradiol tablet 10ug
+	MERCILON		ethinylestradiol/desogestrel tablet 20/150ug
+	MARVELON		ethinylestradiol/desogestrel tablet 30/150ug
+	YAZ 24+4		ethinylestradiol/drospirenon tab 20ug/3mg
+	YASMIN		ethinylestradiol/drospirenon tab 30ug/3mg
+	ROSAL		ethinylestradiol/drospirenon tab 30ug/3mg
+	MINULET		ethinylestradiol/gestodeen tablet 30/75ug
+	TRIGYNON		ethinylestradiol/levonorgestrel dragee 30/ 50ug
+	TRINORDIOL		ethinylestradiol/levonorgestrel dragee 30/ 50ug
+	TRIGYNON		ethinylestradiol/levonorgestrel dragee 30/125ug
+	TRINORDIOL		ethinylestradiol/levonorgestrel dragee 30/125ug
+	TRIGYNON		ethinylestradiol/levonorgestrel dragee 40/75ug
+	TRINORDIOL		ethinylestradiol/levonorgestrel dragee 40/75ug
+	LOVETTE		ethinylestradiol/levonorgestrel tablet 20/100ug
+	MICROGYNON		ethinylestradiol/levonorgestrel tablet 30/150ug
+	STEDIRIL		ethinylestradiol/levonorgestrel tablet 30/150ug
+	SEASONIQUE		ethinylestradiol/levonorgestrel tablet 30/150ug
+	MICROGYNON		ethinylestradiol/levonorgestrel tablet 50/125ug
+	EVRA		ethinylestradiol/norelgestromin pleister 600ug/6mg
+	ETHYMAL		ethosuximide capsule 250mg
+	ETHYMAL		ethosuximide stroop 62,5mg/ml
+	ETOMIDAAT LIPURO		etomidaat injectie-emulsie 2mg/ml
+	HYPNOMIDATE		etomidaat injvlst 2mg/ml
 	IMPLANON NXT		etonogestrel implantaat 68mg
+	VEPESID		etoposide capsule  50mg
+	VEPESID		etoposide capsule 100mg
+	EPOSIN		etoposide infopl conc 20mg/ml
+	TOPOSIN		etoposide infopl conc 20mg/ml
+	ETOPOPHOS		etoposide infusiepoeder 1000mg
+	ARCOXIA		etoricoxib tablet fo  30mg
+	ARCOXIA		etoricoxib tablet fo  60mg
+	ARCOXIA		etoricoxib tablet fo  90mg
+	ARCOXIA		etoricoxib tablet fo 120mg
+	INTELENCE		etravirine tablet  25mg
+	INTELENCE		etravirine tablet 100mg
+	INTELENCE		etravirine tablet 200mg
+	CERTICAN		everolimus dispertablet 0,25mg
+	VOTUBIA		everolimus dispertablet 5mg
+	CERTICAN		everolimus tablet  0,25mg
+	CERTICAN		everolimus tablet  0,75mg
+	VOTUBIA		everolimus tablet  2,5mg
+	AFINITOR		everolimus tablet  2,5mg
+	AFINITOR		everolimus tablet  5mg
+	VOTUBIA		everolimus tablet  5mg
+	AFINITOR		everolimus tablet 10mg
+	VOTUBIA		everolimus tablet 10mg
 	REPATHA		evolocumab injvlst 140mg/ml
+	AROMASIN		exemestaan tablet omhuld 25mg
 	BYETTA		exenatide injvlst  5ug/do
 	BYETTA		exenatide injvlst 10ug/do
 	BYDUREON		exenatide pdr v injsusp 2mg
+	EZETROL		ezetimib tablet 10mg
+	ATOZET		ezetimib/atorvastatine tablet 10/10mg
+	ATOZET		ezetimib/atorvastatine tablet 10/20mg
+	ATOZET		ezetimib/atorvastatine tablet 10/40mg
+	INEGY		ezetimib/simvastatine tablet 10/20mg
+	INEGY		ezetimib/simvastatine tablet 10/40mg
+	INEGY		ezetimib/simvastatine tablet 10/80mg
+	FEIBA		f.e.i.b.a. injpdr  500e
+	FEIBA		f.e.i.b.a. injpdr 1000e
+	FACTOR VII		factor vii injectiepoeder 500ie
+	FACTOR VII		factor vii injectiepoeder 600ie
+	OCTANATE		factor viii concentraat injectiepdr  250ie
+	OCTANATE LV		factor viii concentraat injectiepdr  500ie
+	OCTANATE LV		factor viii concentraat injectiepdr 1000ie
+	FACTOR X P BEHRING		factor x/factor ix pdr inj/infopl 900/600ie
+	HEMOLEVEN		factor xi pdr v injvlst 1000e
+	CLUVOT		factor xiii pdr inj/infopl  250ie
+	CLUVOT		factor xiii pdr inj/infopl 1250ie
+	FAMPYRA		fampridine tablet mga 10mg
+	ADENURIC		febuxostat tablet  80mg
+	ADENURIC		febuxostat tablet 120mg
+	INREBIC		fedratinib capsule 100mg
+	TALOXA		felbamaat susp oraal 120mg/ml
+	TALOXA		felbamaat tablet 600mg
+	PLENDIL		felodipine tablet mga  2,5mg
+	BROXIL		feneticilline capsule 250mg
+	BROXIL		feneticilline capsule 500mg
+	BROXIL		feneticilline stroop 25mg/ml
+	BERODUAL		fenoterol/ipratropium aerosol 50/20ug/do
+	ACIPEN-V		fenoxymethylpenicilline capsule 250mg
+	MARCOUMAR		fenprocoumon tablet 3mg
 	FENTANYL PIRAMAL		fentanyl injvlst 0,05mg/ml
 	INSTANYL		fentanyl neusspray  50ug
 	INSTANYL		fentanyl neusspray  50ug/do
@@ -270,10 +1330,39 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ACTIQ		fentanyl zuigtablet  600ug
 	ACTIQ		fentanyl zuigtablet  800ug
 	REGITINE		fentolamine injvlst 10mg/ml
+	PHEBURANE		fenylboterzuur granulaat 483mg/g
+	AMMONAPS		fenylboterzuur granulaat 940mg/g
+	AMMONAPS		fenylboterzuur tablet 500mg
+	BIORPHEN		fenylefrine inj/infopl 0,1mg/ml (hcl)
 	BIORPHEN		fenylefrine injvlst 10mg/ml (hcl)
 	FENYLEFRINEHYDROCHLORIDE, MINIMS		fenylefrine oogdruppels  25mg/ml
 	FENYLEFRINEHYDROCHLORIDE MONOFREE		fenylefrine oogdruppels  50mg/ml
 	FENYLEFRINEHYDROCHLORIDE, MINIMS		fenylefrine oogdruppels 100mg/ml
+	DIPHANTOINE		fenytoine injvlst 50mg/ml
+	EPANUTIN		fenytoine injvlst na-zout 50mg/ml
+	DIPHANTOINE-Z		fenytoine tablet 23mg (= 25mg na-zout)
+	DIPHANTOINE-Z		fenytoine tablet 46mg (= 50mg na-zout)
+	DIPHANTOINE-Z		fenytoine tablet 69mg (= 75mg na-zout)
+	DIPHANTOINE-Z		fenytoine tablet 92mg (= 100mg na-zout)
+	FERINJECT		ferricarboxymaltose injvlst 50mgfe/ml
+	MONOFER		ferriderisomaltose inj/infopl 100mgfe/ml
+	DIAFER		ferriderisomaltose injvlst 50mgfe/ml
+	FERRACIN		ferrioxidesaccharaat injvlst 20mgfe/ml
+	VENOFER		ferrioxidesaccharaat injvlst 20mgfe/ml
+	LOSFERRON		ferrogluconaat bruistablet 695mg
+	FERO-GRADUMET		ferrosulfaat tablet mga 105mgfe
+	TOVIAZ		fesoterodine tablet mga 4mg
+	TOVIAZ		fesoterodine tablet mga 8mg
+	ALLEGRA FEXOTABS		fexofenadine tablet omhuld 120mg
+	TELFAST		fexofenadine tablet omhuld 180mg
+	VERASEAL		fibrinogeen oplossing 80mg/ml
+	HAEMOCOMPLETTAN		fibrinogeen pdr inj/infopl 1g
+	FIBRYGA		fibrinogeen pdr inj/infopl 1g
+	HAEMOCOMPLETTAN		fibrinogeen pdr inj/infopl 2g
+	TACHOSIL		fibrinogeen/trombine weefsellijm mat 5,5mg/2ie/cm2
+	DIFICLIR		fidaxomicine tablet 200mg
+	JYSELECA		filgotinib tablet 100mg
+	JYSELECA		filgotinib tablet 200mg
 	NEUPOGEN		filgrastim injvlst 30.000.000e/ml
 	NEUPOGEN		filgrastim injvlst 60.000.000e/ml
 	ZARZIO		filgrastim injvlst 60.000.000e/ml
@@ -284,18 +1373,78 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ZARZIO		filgrastim injvlst 96.000.000e/ml
 	NIVESTIM		filgrastim injvlst 96.000.000e/ml
 	ACCOFIL		filgrastim injvlst 96.000.000e/ml
+	PROPECIA		finasteride tablet 1mg
+	PROSCAR		finasteride tablet 5mg
+	KERENDIA		finerenon tablet 10mg
+	KERENDIA		finerenon tablet 20mg
+	GILENYA		fingolimod capsule 0,25mg
+	GILENYA		fingolimod capsule 0,5mg
+	URISPAS		flavoxaat dragee 200mg
+	TAMBOCOR		flecainide capsule mga  50mg
+	TAMBOCOR		flecainide capsule mga 100mg
+	TAMBOCOR		flecainide capsule mga 150mg
+	TAMBOCOR		flecainide capsule mga 200mg
+	TAMBOCOR		flecainide injvlst 10mg/ml
+	TAMBOCOR		flecainide tablet  50mg
+	TAMBOCOR		flecainide tablet 100mg
+	FLOXAPEN		flucloxacilline pdr v injvlst  250mg
+	FLOXAPEN		flucloxacilline pdr v injvlst  500mg
+	FLOXAPEN		flucloxacilline pdr v injvlst 1000mg
+	FLOXAPEN		flucloxacilline susp oraal 25mg/ml
+	DIFLUCAN		fluconazol susp oraal 10mg/ml
+	DIFLUCAN		fluconazol susp oraal 40mg/ml
+	FLUDARA		fludarabine tablet omhuld 10mg
+	FLUDRACE		fludrocortison tablet  62,5ug
+	FLORINEF		fludrocortison tablet 100ug
+	ANEXATE		flumazenil injvlst 0,1mg/ml
 	LOCACORTEN		flumetason creme 0,2mg/g
 	LOCACORTEN-VIOFORM		flumetason/clioquinol creme 0,2/30mg/g
 	LOCACORTEN-VIOFORM		flumetason/clioquinol oordruppels 0,2/10mg/ml
 	LOCASALEN		flumetason/salicylzuur zalf 0,2/30mg/g
+	SIBELIUM		flunarizine tablet 10mg
+	ILUVIEN		fluocinolonacetonide implantaat 190ug
+	FLUORESCITE		fluoresceine injvlst 100mg/ml (als di-na-zout)
 	FLUORESCEINENATRIUM, MINIMS		fluoresceine oogdruppels 20mg/ml
 	LIDOCAINE/FLUORESCEINE, MINIMS		fluoresceine/lidocaine oogdr 2,5/40mg/ml
 	FML LIQUIFILM		fluormetholon oogdruppels 1mg/ml
 	EFUDIX		fluorouracil creme 50mg/g
+	PROZAC		fluoxetine dispertablet 20mg
+	FLUANXOL		flupentixol injvlst  20mg/ml
+	FLUANXOL		flupentixol injvlst 100mg/ml
+	FLUANXOL		flupentixol tablet 0,5mg
+	FLUANXOL		flupentixol tablet 1mg
+	FLUANXOL		flupentixol tablet 5mg
+	STREPFEN		flurbiprofen spray oromucos 2,92mg/do
+	STREPFEN		flurbiprofen zuigtablet 8,75mg
+	IMAP		fluspirileen injsusp 2mg/ml
+	VIZAMYL		flutemetamol f-18 injvlst 400mq/ml
+	FLIXOTIDE		fluticason aerosol  50ug/do
+	FLIXOTIDE		fluticason aerosol 125ug/do
+	FLIXOTIDE		fluticason aerosol 250ug/do
 	CUTIVATE		fluticason creme 0,5mg/g
 	CORTIFIL		fluticason creme 0,5mg/g
+	FLIXOTIDE		fluticason inhalatiepoeder 100ug/do
+	FLIXOTIDE		fluticason inhalatiepoeder 250ug/do
+	FLIXOTIDE		fluticason inhalatiepoeder 500ug/do
 	FLIXONASE		fluticason neusdruppels 1mg/ml
+	FLIXOTIDE		fluticason vernevelvlst 0,25mg/ml
+	FLIXOTIDE		fluticason vernevelvlst 1mg/ml
 	CUTIVATE		fluticason zalf 0,05mg/g
+	AVAMYS		fluticason-furoaat neusspray 27,5ug/do
+	FLIXONASE		fluticason-propionaat neusspray 50ug/do
+	FLUTIFORM		fluticason/formoterol aerosol  50/5ug/do
+	FLUTIFORM		fluticason/formoterol aerosol 125/5ug/do
+	FLUTIFORM		fluticason/formoterol aerosol 250/10ug/do
+	TRELEGY ELLIPTA		fluticason/umeclidiniu/vilant inhpdr 92/55/22ug/do
+	RELVAR ELLIPTA		fluticason/vilanterol inhpdr  92/22ug/do
+	RELVAR ELLIPTA		fluticason/vilanterol inhpdr 184/22ug/do
+	LESCOL		fluvastatine tablet mga 80mg
+	FEVARIN		fluvoxamine tablet   50mg
+	FEVARIN		fluvoxamine tablet  100mg
+	RESCUVOLIN		folinezuur injvlst 10mg/ml
+	FOLIKABI		folinezuur injvlst 10mg/ml
+	VORINA		folinezuur injvlst 25mg/ml (na-zout)
+	RESCUVOLIN		folinezuur tablet 15mg
 	GONAL F		follitropine alfa injectiepoeder   75ie
 	GONAL F		follitropine alfa injectiepoeder  450ie
 	GONAL F		follitropine alfa injectiepoeder 1050ie
@@ -309,14 +1458,57 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	PERGOVERIS		follitropine/lutropine alfa injpdr 150/75ie
 	PERGOVERIS		follitropine/lutropine alfa injvlst 625/312,5ie/ml
 	ARIXTRA		fondaparinux injvlst 5mg/ml
+	ATIMOS		formoterol aerosol 12ug/do
+	FORADIL		formoterol inhalatiecapsule 12ug
+	OXIS		formoterol inhalatiepoeder  6ug/do
+	FORMOTEROL NOVOLIZER		formoterol inhalatiepoeder  6ug/do
+	OXIS		formoterol inhalatiepoeder 12ug/do
+	FORMOTEROL NOVOLIZER		formoterol inhalatiepoeder 12ug/do
+	TELZIR		fosamprenavir tablet fo 700mg
+	IVEMEND		fosaprepitant infusiepoeder 150mg
+	FOSCAVIR		foscarnet infvlst 24mg/ml
+	CUROSURF		fosfolipiden endotr inst sus 80mg/ml
+	MONURIL		fosfomycine granulaat 3g
+	FOMICYT		fosfomycine infusiepoeder 4g
+	FOSINORM		fosinopril tablet 10mg
+	FOSINORM		fosinopril tablet 20mg
+	RUKOBIA		fostemsavir tablet mga 600mg
 	AJOVY		fremanezumab injvlst 150mg/ml
+	FROMIREX		frovatriptan tablet 2,5mg
+	FASLODEX		fulvestrant injvlst 50mg/ml
+	LASIX		furosemide capsule mga 60mg
+	LASIX		furosemide tablet 500mg
 	FUCIDIN		fusidinezuur creme 20mg/g
 	AFFUSINE		fusidinezuur creme 20mg/g
+	FUCITHALMIC		fusidinezuur ooggel 10mg/g
+	FUCIDIN		fusidinezuur tablet omhuld 250mg
 	FUCIDIN		fusidinezuur zalf 20mg/g
+	ANTICHOLIUM		fysostigmine injvlst 0,4mg/ml
+	KONAKION		fytomenadion injvlst 10mg/ml (par/oraal)
+	NEURONTIN		gabapentine capsule 100mg
+	NEURONTIN		gabapentine capsule 300mg
+	NEURONTIN		gabapentine capsule 400mg
+	NEURONTIN		gabapentine tablet 600mg
+	NEURONTIN		gabapentine tablet 800mg
+	MULTIHANCE		gadobeenzuur injvlst 529mg/ml
+	GADOVIST		gadobutrol injvlst 1mmol/ml
+	ARTIREM		gadoteerzuur injvlst 0,0025mmol/ml(1,397mg/ml)
+	DOTAREM		gadoteerzuur injvlst 0,5mmol/ml(377mg/ml)
+	DOTAGRAF		gadoteerzuur injvlst 0,5mmol/ml(377mg/ml)
+	CLARISCAN		gadoteerzuur injvlst 0,5mmol/ml(377mg/ml)
+	PROHANCE		gadoteridol injvlst 279,3mg/ml
+	PRIMOVIST PFS		gadoxetinezuur injvlst 0,25mmol/ml
 	EMGALITY		galcanezumab injvlst 120mg/ml
+	NAGLAZYME		galsulfase infopl conc 1mg/ml
+	CYMEVENE		ganciclovir pdr v infvlst 500mg
 	ORGALUTRAN		ganirelix injvlst 0,5mg/ml
 	FYREMADEL		ganirelix injvlst 0,5mg/ml
+	IRESSA		gefitinib tablet 250mg
+	GELOPLASMA		gelatine, gemodificeerd infvlst 30mg/ml
+	GELOFUSINE		gelatine, gemodificeerd infvlst 40mg/ml
 	STAMARIL		gelekoortsvaccin injectiepoeder 1000ie
+	LOPID		gemfibrozil tablet 600mg
+	MYLOTARG		gemtuzumab ozogamicine infusiepoeder 5mg
 	COPAL		gentami/vancomy p v cem 11,628/46,512mg/g
 	REFOCOLL		gentamicine implantatiegaas   8,125mg (2,5x2,5cm)
 	REFOCOLL		gentamicine implantatiegaas  32,5mg (5x5cm)
@@ -346,56 +1538,204 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	COPAL		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
 	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,3/23,3mg/g
 	OPTIPAC REFOBACIN		gentamicine/clindamycine pdr v ceme 23,5/23,5mg/g
+	GENVOYA		genvoya tablet
+	XOSPATA		gilteritinib tablet 40mg
 	GIVLAARI		givosiran injvlst 189mg/ml
+	GLAMIN		glamin infusievloeistof
 	COPAXONE		glatirameer injvlst 20mg/ml
 	COPAXONE		glatirameer injvlst 40mg/ml
+	MAVIRET		glecaprevir/pibrentasvir tablet 100/40mg
+	DIAMICRON		gliclazide tablet mga 30mg
+	AMARYL		glimepiride tablet 1mg
+	AMARYL		glimepiride tablet 2mg
+	AMARYL		glimepiride tablet 3mg
+	AMARYL		glimepiride tablet 4mg
+	BAQSIMI		glucagon neuspoeder 3mg
 	GLUCAGEN		glucagon pdr v injvlst  1mg
+	DOLENIO		glucosamine tablet 1178mg
+	UROMATIC		glucose urethraal spoeling 50mg/ml
+	GLYCOPHOS		glycerofosforzuur infopl conc 1mmol/ml (fosfaat)
+	RAVICTI		glycerolfenylbutyraat drank 1,1g/ml
+	UROMATIC		glycine spoeling urethraal 15mg/ml
+	UROMATIC		glycine spoeling urethraal 21mg/ml
+	RYBRILA		glycopyrronium drank 160ug/ml (=200ug/ml bromide)
+	SIALANAR		glycopyrronium drank 320ug/ml (=400ug/ml bromide)
+	SEEBRI BREEZHALER		glycopyrronium inhalatiecapsule 50ug
+	TOVANOR BREEZHALER		glycopyrronium inhalatiecapsule 50ug
+	BEVESPI AEROSPHERE		glycopyrronium/formoterol aerosol 7,2/5ug/do
+	NOVISTIG		glycopyrronium/neostigmine injvlst 0,5/2,5mg/ml
 	SIMPONI		golimumab injvlst 100mg/ml
+	LUTRELEF		gonadoreline injvlst 0,1mg/ml (diacetaat)
 	LUTRELEF		gonadoreline pdr v injvlst 3,2mg
 	ZOLADEX		gosereline implantatiestift  3,6mg
 	ZOLADEX		gosereline implantatiestift 10,8mg
+	SANCUSO		granisetron pleister 3,1mg/24uur
+	KYTRIL		granisetron tablet 1mg
+	KYTRIL		granisetron tablet 2mg
+	INTUNIV		guanfacine tablet mga 1mg
+	INTUNIV		guanfacine tablet mga 2mg
+	INTUNIV		guanfacine tablet mga 3mg
+	INTUNIV		guanfacine tablet mga 4mg
 	TREMFYA		guselkumab injvlst 100mg/ml
 	ACT-HIB		haemophilus-influenzae-b-vaccin injpdr 10ug
 	HALDOL		haloperidol (depot) injvlst  50mg/ml decanoaat
 	HALDOL		haloperidol (depot) injvlst 100mg/ml decanoaat
+	HALDOL		haloperidol drank 2mg/ml
 	HALDOL		haloperidol injvlst   5mg/ml
+	HALDOL-JANSSEN		haloperidol tablet  1mg
+	HALDOL		haloperidol tablet 10mg
+	NORMOSANG		hemine infopl conc 25mg/ml
+	SUBSTITUTIEOPL V HEMOFILTRATIE		hemofiltratieoplossing hf32bic
 	HEPARINE 'LEO'		heparine injvlst  5.000ie/ml
 	HIRUDOID		heparinoiden creme 3mg/g
 	MOBILAT		heparinoiden/salicylzuur creme 2/20mg/g
+	TWINRIX		hepatitis-a+b-vaccin injsusp 720e/20ug/ml
+	AMBIRIX		hepatitis-a+b-vaccin injsusp 720e/20ug/ml
 	VAQTA		hepatitis-a-vaccin injsusp   50e/ml (msd)
 	AVAXIM		hepatitis-a-vaccin injsusp  320e/ml (aventis/past)
 	HAVRIX		hepatitis-a-vaccin injsusp 1440e/ml (gsk)
+	HEPATECT		hepatitis-b-immunoglobuline infvlst 50ie/ml
 	IMMUNOHBS		hepatitis-b-immunoglobuline injv 180ie/ml
 	ZUTECTRA		hepatitis-b-immunoglobuline injv 500ie/ml
 	HBVAXPRO		hepatitis-b-vaccin injsusp 10ug/ml spmsd
 	ENGERIX-B		hepatitis-b-vaccin injsusp 20ug/ml gsk al-adj
 	FENDRIX		hepatitis-b-vaccin injsusp 40ug/ml as04c-adj
 	HBVAXPRO		hepatitis-b-vaccin injsusp 40ug/ml spmsd
+	HEXVIX		hexaminolevulinaat pdr v inst.vlst 85mg
 	HYLAN		hyaluron/carbom oogdr 0,15/0,15mg/ml (carb 981)
+	HYASON		hyaluronidase injectiepoeder 150ie
+	CYSTISTAT		hyaluronzuur blaasspoeling 0,8mg/ml
+	VISCOSEAL		hyaluronzuur injvlst  5mg/ml (articulair)
+	OSTENIL		hyaluronzuur injvlst 10mg/ml (articulair)
+	SYNOCROM		hyaluronzuur injvlst 10mg/ml (articulair)
+	CURAVISC		hyaluronzuur injvlst 10mg/ml (articulair)
+	ADANT		hyaluronzuur injvlst 10mg/ml (articulair)
+	PROVISC		hyaluronzuur injvlst 10mg/ml (oculair)
+	ARTIVISC		hyaluronzuur injvlst 10mg/ml (oculair)
+	HEALON		hyaluronzuur injvlst 10mg/ml (oculair)
+	HEALON		hyaluronzuur injvlst 14mg/ml (oculair)
+	ARTIVISC		hyaluronzuur injvlst 14mg/ml (oculair)
+	ARTIVISC PLUS		hyaluronzuur injvlst 14mg/ml (oculair)
+	FERMATHRON PLUS		hyaluronzuur injvlst 15mg/ml (articulair)
+	HEALON		hyaluronzuur injvlst 18mg/ml (oculair)
+	BIOVISC		hyaluronzuur injvlst 20mg/ml (articulair)
+	DUROLANE		hyaluronzuur injvlst 20mg/ml (articulair/bursaal)
+	OSTENIL		hyaluronzuur injvlst 20mg/ml (articulair/bursaal)
+	HEALON		hyaluronzuur injvlst 23mg/ml (oculair)
+	HEALON		hyaluronzuur injvlst 30mg/ml (oculair)
 	HYLO-FRESH		hyaluronzuur oogdruppels 0,3mg/ml
 	HYLO-DUAL		hyaluronzuur oogdruppels 0,5mg/ml
 	HYLO COMOD		hyaluronzuur oogdruppels 1mg/ml
 	HYLO DUAL INTENSE		hyaluronzuur oogdruppels 2mg/ml
+	EFMODY		hydrocortison capsule mga 10mg
+	EFMODY		hydrocortison capsule mga 5mg
+	ALKINDI		hydrocortison granulaat 0,5mg
+	ALKINDI		hydrocortison granulaat 1mg
+	ALKINDI		hydrocortison granulaat 2mg
+	ALKINDI		hydrocortison granulaat 5mg
 	SOFTACOR		hydrocortison oogdruppels 3,35mg/ml
+	SOLU-CORTEF		hydrocortison pdr v injvlst 100mg
+	ACECORT		hydrocortison tablet  1mg
+	ACECORT		hydrocortison tablet  2mg
+	ACECORT		hydrocortison tablet  3mg
+	ACECORT		hydrocortison tablet  5mg
+	ACECORT		hydrocortison tablet 10mg
+	PLENADREN		hydrocortison tablet mga  5mg
+	PLENADREN		hydrocortison tablet mga 20mg
 	LOCOID		hydrocortison-butyraat creme  1mg/g
 	LOCOID		hydrocortison-butyraat huidemulsie 1mg/g
 	LOCOID		hydrocortison-butyraat opl cutaan 1mg/ml
+	PROCTOSEDYL		hydrocortison/cinchocaine/framycetine zalf rectaal
 	DAKTACORT		hydrocortison/miconazol creme 10/20mg/g
 	DAKTACORT		hydrocortison/miconazol zalf 10/20mg/g
+	TERRA CORTRIL MET POLYMYXINE B		hydrocortison/oxytetracycline/polymyxine b oogzalf
 	TERRA CORTRIL MET POLYMYXINE B		hydrocortison/oxytetracycline/polymyxine b oordrup
+	TERRA CORTRIL MET POLYMYXINE B		hydrocortison/oxytetracycline/polymyxine b oorzalf
+	INHIBIN		hydrokinine dragee 100mg
+	PALLADON		hydromorfon capsule 1,3mg
+	PALLADON		hydromorfon capsule 2,6mg
+	PALLADON		hydromorfon capsule mga  4mg
+	PALLADON		hydromorfon capsule mga  8mg
+	PALLADON		hydromorfon capsule mga 16mg
+	PALLADON		hydromorfon capsule mga 24mg
 	PALLADON		hydromorfon inj/infopl 10mg/ml
 	PALLADON		hydromorfon inj/infopl 50mg/ml
+	CYANOKIT		hydroxocobalamine infusiepoeder 5g
 	HYDROCOBAMINE		hydroxocobalamine injvlst  500ug/ml (hcl)
+	XYREM		hydroxyboterzuur drank 500mg/ml
+	XROMI		hydroxycarbamide drank 100mg/ml
+	SIKLOS		hydroxycarbamide tablet  100mg
+	SIKLOS		hydroxycarbamide tablet 1000mg
+	PLAQUENIL		hydroxychloroquine tablet omhuld 200mg
+	VENORUTON		hydroxyethylrutosiden tablet 500mg
+	VOLUVEN		hydroxyethylzetmeel infvlst  60mg/ml
+	LENTOGEST		hydroxyprogesteron injvlst 170,5mg/ml
+	OCUCOAT		hypromellose injvlst 20mg/ml
+	CELLUGEL		hypromellose injvlst 20mg/ml
 	ARTELAC		hypromellose oogdruppels  3,2mg/ml
 	HYPROMELLOSE MONOFREE		hypromellose oogdruppels  3mg/ml
+	BONVIVA		ibandroninezuur injvlst 1mg/ml
+	BONDRONAT		ibandroninezuur tablet  50mg
+	BONVIVA		ibandroninezuur tablet 150mg
+	IMBRUVICA		ibrutinib capsule 140mg
+	IMBRUVICA		ibrutinib tablet 140mg
+	IMBRUVICA		ibrutinib tablet 280mg
+	IMBRUVICA		ibrutinib tablet 420mg
+	IMBRUVICA		ibrutinib tablet 560mg
+	BRUFEN		ibuprofen bruisgranulaat 600mg
+	ADVIL		ibuprofen capsule zacht 200mg
+	NUROFEN		ibuprofen capsule zacht 200mg
+	ADVIL		ibuprofen capsule zacht 400mg
+	NUROFEN		ibuprofen capsule zacht 400mg
+	IDYL		ibuprofen capsule zacht 400mg
+	NUROFEN		ibuprofen dragee 200mg
+	PEDEA		ibuprofen injvlst 5mg/ml
+	NUROFEN		ibuprofen kauwcapsule 100mg
 	NUROFEN		ibuprofen pleister 200mg
+	NUROFEN		ibuprofen smelttablet 200mg
+	NUROFEN		ibuprofen susp oraal 20mg/ml
+	NUROFEN		ibuprofen susp oraal 40mg/ml
+	NUROFEN		ibuprofen tablet 200mg
+	IDYL		ibuprofen tablet 200mg
+	LIVSANE		ibuprofen tablet 200mg
+	NUROFEN		ibuprofen tablet 400mg
+	ADVIL		ibuprofen tablet 400mg
+	SPIDIFEN		ibuprofen tablet 400mg
+	BOOTS PHARMACEUTICALS		ibuprofen tablet 400mg
+	IDYL		ibuprofen tablet 400mg
+	LIVSANE		ibuprofen tablet 400mg
+	BRUFEN		ibuprofen tablet mga 800mg
+	CORVERT		ibutilide infvlst 87ug/ml
 	FIRAZYR		icatibant injvlst 10mg/ml
 	DARODERM TREKZALF		ichthammol zalf 100mg/g
 	SWAAB		ichthammol zalf 100mg/g
+	EXTRANEAL		icodextrine pd-opl 75mg/ml
+	ZAVEDOS		idarubicine injvlst 1mg/ml
+	PRAXBIND		idarucizumab inj/infopl 50mg/ml
+	RAXONE		idebenon tablet 150mg
+	ZYDELIG		idelalisib tablet 100mg
+	ZYDELIG		idelalisib tablet 150mg
+	ELAPRASE		idursulfase infopl conc 2mg/ml
+	HOLOXAN		ifosfamide injectiepoeder 1g
+	HOLOXAN		ifosfamide injectiepoeder 2g
+	HOLOXAN		ifosfamide injectiepoeder 500mg
+	VELPHORO		ijzer(iii)ox.hydrox.sacch.zetm.compl kauwt 500mgfe
+	COSMOFER		ijzerdextrancomplex injvlst 50mg/ml
+	ILOMEDINE		iloprost infopl conc 0,1mg/ml
+	VENTAVIS		iloprost vernevelvlst 10ug/ml
+	VENTAVIS		iloprost vernevelvlst 20ug/ml
+	GLIVEC		imatinib tablet 100mg
+	GLIVEC		imatinib tablet 400mg
 	RONAPREVE		imdevimab inj/infopl 120mg/ml
+	CEREZYME		imiglucerase infusiepoeder 400e
+	RECARBRIO		imipenem/cilastatine/relebactam infp 500/500/250mg
 	ZYCLARA		imiquimod creme 37,5mg/g
 	ALDARA		imiquimod creme 50mg/g
+	IDEFIRIX		imlifidase infusiepoeder 11mg
 	IMMUCOTHEL		immunocyanine injectiepoeder 1mg
+	IMMUCOTHEL		immunocyanine pdr v instill.vlst 10mg
+	GAMMAGARD S/D		immunoglobuline normaal infusiepoeder  5g
+	GAMMAGARD S/D		immunoglobuline normaal infusiepoeder 10g
 	OCTAGAM		immunoglobuline normaal infvlst  50mg/ml
 	NANOGAM		immunoglobuline normaal infvlst  50mg/ml
 	INTRATECT		immunoglobuline normaal infvlst  50mg/ml
@@ -413,11 +1753,30 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	HIZENTRA		immunoglobuline normaal injv 200mg/ml
 	CUVITRU		immunoglobuline normaal injv 200mg/ml
 	LEQVIO		inclisiran injvlst 189mg/ml
+	ENERZAIR BREEZHALER		indaca/glycopyr/mometa inhcap 150/50/160ug
+	ONBREZ BREEZHALER		indacaterol inhalatiecapsule 150ug
+	HIROBRIZ BREEZHALER		indacaterol inhalatiecapsule 150ug
+	ONBREZ BREEZHALER		indacaterol inhalatiecapsule 300ug
+	HIROBRIZ BREEZHALER		indacaterol inhalatiecapsule 300ug
+	ULTIBRO BREEZHALER		indacaterol/glycopyrronium inhalcaps 110/50ug
+	XOTERNA BREEZHALER		indacaterol/glycopyrronium inhalcaps 110/50ug
+	ATECTURA BREEZHALER		indacaterol/mometason inhalcaps 150/160ug
+	ATECTURA BREEZHALER		indacaterol/mometason inhalcaps 150/320ug
+	ATECTURA BREEZHALER		indacaterol/mometason inhalcaps 150/80ug
+	VERDYE		indocyaninegroen injectiepoeder 25mg
+	INFRACYANINE		indocyaninegroen injectiepoeder 25mg
+	VERDYE		indocyaninegroen injectiepoeder 50mg
 	INDOCOLLYRE		indometacine oogdruppels  1mg/ml
+	REMICADE		infliximab infusiepoeder 100mg
+	REMSIMA		infliximab infusiepoeder 100mg
+	INFLECTRA		infliximab infusiepoeder 100mg
+	FLIXABI		infliximab infusiepoeder 100mg
+	ZESSLY		infliximab infusiepoeder 100mg
 	REMSIMA		infliximab injvlst 120mg/ml
 	INFLUVAC		influenzavaccin 2022/2023 subunit
 	VAXIGRIP		influenzavaccin 2022/2023 tetra gesplitst
 	INFLUVAC		influenzavaccin 2022/2023 tetra subunit
+	BESPONSA		inotuzumab ozogamicine infpdr 1mg
 	NOVORAPID		insuline aspart injvlst 100e/ml
 	FIASP		insuline aspart injvlst 100e/ml
 	NOVOMIX 30		insuline aspart/protamine injs 30/70e/ml
@@ -459,31 +1818,191 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	HUMALOG		insuline lispro/protamine injs 25/75e/ml
 	HUMALOG		insuline lispro/protamine injs 50/50e/ml
 	INTRONA		interferon alfa 2b inj/infopl 6me/ml
+	AVONEX		interferon beta 1a biogen idec injvlst 12me/ml
 	REBIF		interferon beta 1a merck serono injvlst 12me/ml
 	REBIF		interferon beta 1a merck serono injvlst 24me/ml
 	BETAFERON		interferon beta 1b injectiepoeder 9,6me
 	IMMUKINE		interferon gamma 1b injvlst 0,2mg/ml
+	IONOLYTE		ionolyte infvlst
+	YERVOY		ipilimumab infopl conc 5mg/ml
+	ATROVENT		ipratropium aerosol 20ug/do
+	ATROVENT		ipratropium neusspray 21ug/do
+	ATROVENT		ipratropium vernevelvlst 125ug/ml
+	ATROVENT		ipratropium vernevelvlst 250ug/ml
+	IPRAXA STERI-NEB		ipratropium vernevelvlst 250ug/ml
+	APROVEL		irbesartan tablet  75mg
+	APROVEL		irbesartan tablet 150mg
+	APROVEL		irbesartan tablet 300mg
+	COAPROVEL		irbesartan/hydrochloorthiazide tablet 150/12,5mg
+	COAPROVEL		irbesartan/hydrochloorthiazide tablet 300/12,5mg
+	CONVERIDE		irbesartan/hydrochloorthiazide tablet 300/12,5mg
+	COAPROVEL		irbesartan/hydrochloorthiazide tablet 300/25mg
+	CONVERIDE		irbesartan/hydrochloorthiazide tablet 300/25mg
+	ONIVYDE		irinotecan infc 4,3mg/ml(peg-lipos)(5mg/ml hcl-3w)
+	SARCLISA		isatuximab infopl conc 20mg/ml
+	CRESEMBA		isavuconazol capsule 100mg
+	CRESEMBA		isavuconazol infusiepoeder 200mg
 	STERILLIUM		isopropanol/propanol/mecetronium opl cutaan
+	ISORDIL		isosorbidedinitraat tablet 30mg
+	ISORDIL		isosorbidedinitraat tablet sublinguaal 5mg
+	MONO-CEDOCARD		isosorbidemononitraat capsule mga  25mg
+	MONO-CEDOCARD		isosorbidemononitraat capsule mga  50mg
+	MONO-CEDOCARD		isosorbidemononitraat capsule mga 100mg
+	PROMOCARD		isosorbidemononitraat tablet mga  30mg
+	PROMOCARD		isosorbidemononitraat tablet mga  60mg
+	PROMOCARD		isosorbidemononitraat tablet mga 120mg
+	TRISPORAL		itraconazol drank 10mg/ml
+	PROCORALAN		ivabradine tablet 5mg
+	CORLENTOR		ivabradine tablet 5mg
+	PROCORALAN		ivabradine tablet 7,5mg
+	CORLENTOR		ivabradine tablet 7,5mg
+	KAFTRIO		ivacaft/tezacaft/elexacaftor tablet 37,5/25/50mg
+	KAFTRIO		ivacaft/tezacaft/elexacaftor tablet 75/50/100mg
+	KALYDECO		ivacaftor granulaat 25mg
+	KALYDECO		ivacaftor granulaat 50mg
+	KALYDECO		ivacaftor granulaat 75mg
+	KALYDECO		ivacaftor tablet 150mg
+	KALYDECO		ivacaftor tablet 75mg
 	SOOLANTRA		ivermectine creme 10mg/g
+	STROMECTOL		ivermectine tablet 3mg
+	NINLARO		ixazomib capsule 2,3mg
+	NINLARO		ixazomib capsule 3mg
+	NINLARO		ixazomib capsule 4mg
 	TALTZ		ixekizumab injvlst 80mg/ml
+	IXIARO		japanse-encefalitisvaccin injsusp 12au/ml
+	ADREVIEW		jobenguaan i-123 injvlst 74mq/ml
+	131I MIBG AMER		jobenguaan i-131 infvlst  0,46gq/ml
+	131I MIBG AMER		jobenguaan i-131 injvlst 13,88mq/ml
+	XENETIX		jobitridol injvlst 250mgi/ml
+	XENETIX		jobitridol injvlst 300mgi/ml
+	XENETIX		jobitridol injvlst 350mgi/ml
+	VISIPAQUE		jodixanol injvlst 270mgi/ml
+	VISIPAQUE		jodixanol injvlst 320mgi/ml
+	OMNIPAQUE		johexol injvlst 140mgi/ml
+	OMNIPAQUE		johexol injvlst 240mgi/ml
+	OMNIPAQUE		johexol injvlst 300mgi/ml
+	OMNIPAQUE		johexol injvlst 350mgi/ml
+	I123 IBZM		jolopride i-123 injvlst 74mq/ml
+	IOMERON		jomeprol injvlst 150mgi/ml
+	IOMERON		jomeprol injvlst 300mgi/ml
+	IOMERON		jomeprol injvlst 350mgi/ml
+	IOMERON		jomeprol injvlst 400mgi/ml
+	ULTRAVIST		jopromide injvlst 240mgi/ml
+	ULTRAVIST		jopromide injvlst 300mgi/ml
+	ULTRAVIST		jopromide injvlst 370mgi/ml
+	OPTIRAY		joversol injvlst 240mgi/ml
+	OPTIRAY		joversol injvlst 300mgi/ml
+	OPTIRAY		joversol injvlst 350mgi/ml
+	TELEBRIX		joxitalaminezuur oplossing 300mgi/ml (gastro)
+	JUNYELT		junyelt infopl conc
+	KABIVEN		kabiven centraal infusie-emulsie
+	KABIVEN		kabiven perifeer infusie-emulsie
+	SLOW-K		kaliumchloride tablet mga 600mg (8mmol)
+	DAMPO		kamfer/levomenthol/eucalyptus zalf v inhalatiedamp
 	NIZORAL		ketoconazol creme  20mg/g
 	KETOZOLIN		ketoconazol shampoo 20mg/g
+	RILIES		ketoprofen tablet 25mg
 	ACULAR		ketorolac oogdruppels 5mg/ml
 	ZADITEN		ketotifen oogdruppels 0,25mg/ml
 	ALTRIABAK		ketotifen oogdruppels 0,25mg/ml
 	KETAZED		ketotifen oogdruppels 0,25mg/ml
+	ZADITEN		ketotifen tablet 1mg
+	KIDIALYTE		kidialyte infvlst
+	A-QS		kinine tablet 200mg
+	PROSPAN		klimop blad stroop 7mg/ml
+	NORIT		kool geactiveerd capsule 200mg
+	NORIT		kool geactiveerd gran voor susp. 920mg/g
+	NORIT		kool geactiveerd tablet 125mg
 	DENOREX RX		koolteer/levomenthol shampoo 75/15mg/g
+	GYNEFIX		koper iud 200mm2
+	FLEXI-T+ 300		koper iud 300mm2
+	FLEXI-T 300		koper iud 300mm2
+	FLEXI-T 300D		koper iud 300mm2
+	BALLERINE		koper iud 300mm2
+	MULTI-SAFE CU		koper iud 375mm2
+	BE FREE		koper iud 375mm2
+	MI-DIU		koper iud 375mm2
+	FLEXI-T+ 380		koper iud 380mm2
+	MI-DIU		koper iud 380mm2
+	T-SAFE		koper iud 380mm2
+	BE FREE		koper iud 380mm2
+	T-PROTECT		koper iud 380mm2
+	KRYPTON GENERATOR GE HEALTHCARE		krypton kr-81m generator   1,11gq
+	KRYPTON GENERATOR GE HEALTHCARE		krypton kr-81m generator 220mbq
+	TRANDATE		labetalol injvlst 5mg/ml
+	TRANDATE		labetalol tablet 100mg
+	TRANDATE		labetalol tablet 200mg
+	VIMPAT		lacosamide infvlst 10mg/ml
+	VIMPAT		lacosamide stroop 10mg/ml
+	VIMPAT		lacosamide tablet  50mg
+	VIMPAT		lacosamide tablet 150mg
+	IMPORTAL		lactitol drank 667mg/ml
+	IMPORTAL		lactitol poeder 10g
+	LAXEERDRANK HTP		lactulose stroop 670mg/ml (500mg/g)
+	DUPHALAC		lactulose stroop 670mg/ml (500mg/g)
+	LIVSANE		lactulose stroop 670mg/ml (500mg/g)
+	ZEFFIX		lamivudine drank  5mg/ml
+	EPIVIR		lamivudine drank 10mg/ml
+	ZEFFIX		lamivudine tablet fo 100mg
+	EPIVIR		lamivudine tablet fo 150mg
+	EPIVIR		lamivudine tablet fo 300mg
+	COMBIVIR		lamivudine/zidovudine tablet omhuld 150/300mg
+	LAMICTAL		lamotrigine kauw-/dispertab   2mg
+	LAMICTAL		lamotrigine kauw-/dispertab   5mg
+	LAMICTAL		lamotrigine kauw-/dispertab  25mg
+	LAMICTAL		lamotrigine kauw-/dispertab  50mg
+	LAMICTAL		lamotrigine kauw-/dispertab 100mg
+	LAMICTAL		lamotrigine kauw-/dispertab 200mg
 	TAKHZYRO		lanadelumab injvlst 150mg/ml
+	RAPIBLOC		landiolol infusiepoeder 300mg
+	SOMATULINE		lanreotide injectiepoeder 30mg
 	MYTOLAC		lanreotide injvlst 120mg/ml
 	MYTOLAC		lanreotide injvlst 180mg/ml
 	MYTOLAC		lanreotide injvlst 240mg/ml
 	SOMATULINE		lanreotide injvlst 300mg/ml
+	PREZAL		lansoprazol capsule msr 30mg
+	FOSRENOL		lanthaancarbonaat kauwtablet  500mg
+	FOSRENOL		lanthaancarbonaat kauwtablet  750mg
+	FOSRENOL		lanthaancarbonaat kauwtablet 1000mg
+	FOSRENOL		lanthaancarbonaat poeder  750mg
+	FOSRENOL		lanthaancarbonaat poeder 1000mg
+	TYVERB		lapatinib tablet 250mg
+	ALDURAZYME		laronidase infopl conc 100e/ml
+	VITRAKVI		larotrectinib capsule  25mg
+	VITRAKVI		larotrectinib capsule 100mg
+	VITRAKVI		larotrectinib drank 20mg/ml
 	XALATAN		latanoprost oogdruppels 50ug/ml
 	VIZILATAN		latanoprost oogdruppels 50ug/ml
 	MONOPROST		latanoprost oogdruppels 50ug/ml
 	XALMONO		latanoprost oogdruppels 50ug/ml
 	XALOF		latanoprost oogdruppels 50ug/ml
+	AETHOXYSKLEROL		lauromacrogol 400 injvlst  5mg/ml
+	AETHOXYSKLEROL		lauromacrogol 400 injvlst 10mg/ml
+	AETHOXYSKLEROL		lauromacrogol 400 injvlst 20mg/ml
+	AETHOXYSKLEROL		lauromacrogol 400 injvlst 30mg/ml
+	HARVONI		ledipasvir/sofosbuvir tablet 90/400mg
+	ARAVA		leflunomide tablet  10mg
+	ARAVA		leflunomide tablet  20mg
+	ARAVA		leflunomide tablet 100mg
+	REVLIMID		lenalidomide capsule  2,5mg
+	REVLIMID		lenalidomide capsule  5mg
+	REVLIMID		lenalidomide capsule  7,5mg
+	REVLIMID		lenalidomide capsule 10mg
+	REVLIMID		lenalidomide capsule 15mg
+	REVLIMID		lenalidomide capsule 20mg
+	REVLIMID		lenalidomide capsule 25mg
+	LENVIMA		lenvatinib capsule  4mg
+	KISPLYX		lenvatinib capsule  4mg
+	LENVIMA		lenvatinib capsule 10mg
+	KISPLYX		lenvatinib capsule 10mg
 	SPIROLEPT		leptospirosevaccin injsusp 200me/ml
+	LERDIP		lercanidipine tablet omhuld 10mg
+	LERDIP		lercanidipine tablet omhuld 20mg
+	PREVYMIS		letermovir infopl conc 20mg/ml
+	PREVYMIS		letermovir tablet 240mg
+	PREVYMIS		letermovir tablet 480mg
+	FEMARA		letrozol tablet omhuld 2,5mg
+	LETROMAN		letrozol tablet omhuld 2,5mg
 	LUCRIN		leuproreline injectiepoeder  3,75mg
 	LUCRIN PDS		leuproreline injectiepoeder  3,75mg
 	ELIGARD		leuproreline injectiepoeder  7,5mg
@@ -491,37 +2010,313 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	ELIGARD		leuproreline injectiepoeder 22,5mg
 	LUCRIN PDS		leuproreline injectiepoeder 30mg
 	ELIGARD		leuproreline injectiepoeder 45mg
+	ELMISOL		levamisol tablet  5mg
+	ELMISOL		levamisol tablet 10mg
+	ELMISOL		levamisol tablet 25mg
+	ELMISOL		levamisol tablet 50mg
+	SPERTI PREPARATION H		levertraan/biergist zalf rectaal 30/10mg/g
+	SPERTI PREPARATION H		levertraan/biergist zetpil 69/23mg
+	KEPPRA		levetiracetam drank 100mg/ml
+	KEPPRA		levetiracetam infopl conc 100mg/ml
+	KEVESY		levetiracetam infvlst  5mg/ml
+	KEPPRA		levetiracetam tablet fo  250mg
+	MATEVER		levetiracetam tablet fo  250mg
+	KEPPRA		levetiracetam tablet fo  500mg
+	MATEVER		levetiracetam tablet fo  500mg
+	KEPPRA		levetiracetam tablet fo 1000mg
+	MATEVER		levetiracetam tablet fo 1000mg
+	LIVOCAB		levocabastine neusspray 0,5mg/ml
 	LIVOCAB		levocabastine oogdruppels 0,5mg/ml
+	CARNITENE		levocarnitine drank 100mg/ml
+	CARNEUS		levocarnitine drank 100mg/ml
+	CARNITENE		levocarnitine injvlst 200mg/ml
+	CARNITENE		levocarnitine tablet 330mg
+	XYZAL		levocetirizine drank 0,5mg/ml
+	XYZAL		levocetirizine tablet fo 5mg
+	MADOPAR		levodopa/benserazide capsule  50/12,5mg
+	MADOPAR		levodopa/benserazide capsule  mga 100/25mg
+	MADOPAR		levodopa/benserazide dispertablet 100/25mg
+	MADOPAR		levodopa/benserazide tablet 100/25mg
+	MADOPAR		levodopa/benserazide tablet 200/50mg
+	LECIGON		levodopa/carbi/entaca gel gastro-ent 20/5/20mg/ml
+	DUODOPA		levodopa/carbidopa gel gastro-ent 20/5mg/ml
+	SINEMET		levodopa/carbidopa tablet   50/12,5mg
+	SINEMET		levodopa/carbidopa tablet  100/25mg
+	ISICOM		levodopa/carbidopa tablet  100/25mg
+	SINEMET		levodopa/carbidopa tablet  250/25mg
+	SINEMET		levodopa/carbidopa tablet mga 100/25mg
+	SINEMET		levodopa/carbidopa tablet mga 200/50mg
+	STALEVO		levodopa/carbidopa/entacapon tablet  50/12,5/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet  50/12,5/200mg
+	STALEVO		levodopa/carbidopa/entacapon tablet  75/18,7/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet  75/18,7/200mg
+	STALEVO		levodopa/carbidopa/entacapon tablet 100/25/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet 100/25/200mg
+	STALEVO		levodopa/carbidopa/entacapon tablet 125/31,2/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet 125/31,2/200mg
+	STALEVO		levodopa/carbidopa/entacapon tablet 150/37,5/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet 150/37,5/200mg
+	STALEVO		levodopa/carbidopa/entacapon tablet 200/50/200mg
+	CORBILTA		levodopa/carbidopa/entacapon tablet 200/50/200mg
+	QUINSAIR		levofloxacine vernevelvlst 100mg/ml
 	NOZINAN		levomepromazine injvlst 25mg/ml
+	NOZINAN		levomepromazine tab  25mg (als waterstofmaleaat)
+	KYLEENA		levonorgestrel iud 19,5mg
+	MIRENA		levonorgestrel iud 52mg
+	LEVOSERT		levonorgestrel iud 52mg
+	NORLEVO		levonorgestrel tablet 1,5mg
+	ISTERANDA		levonorgestrel tablet 1,5mg
+	TIROSINT		levothyroxine capsule  13ug
+	TIROSINT		levothyroxine capsule  25ug
+	TIROSINT		levothyroxine capsule  50ug
+	TIROSINT		levothyroxine capsule  75ug
+	TIROSINT		levothyroxine capsule  88ug
+	TIROSINT		levothyroxine capsule 100ug
+	TIROSINT		levothyroxine capsule 112ug
+	TIROSINT		levothyroxine capsule 125ug
+	TIROSINT		levothyroxine capsule 137ug
+	TIROSINT		levothyroxine capsule 150ug
+	TIROSINT		levothyroxine capsule 175ug
+	TIROSINT		levothyroxine capsule 200ug
+	THYROFIX		levothyroxine tablet  13ug (natrium)
+	EUTHYROX		levothyroxine tablet  25ug (natrium)
+	THYROFIX		levothyroxine tablet  25ug (natrium)
+	THYRAX		levothyroxine tablet  25ug (zuur)
+	ELTROXIN		levothyroxine tablet  50ug (natrium)
+	EUTHYROX		levothyroxine tablet  50ug (natrium)
+	THYROFIX		levothyroxine tablet  50ug (natrium)
+	THYROFIX		levothyroxine tablet  62ug (natrium)
+	EUTHYROX		levothyroxine tablet  75ug (natrium)
+	THYROFIX		levothyroxine tablet  75ug (natrium)
+	EUTHYROX		levothyroxine tablet  88ug (natrium)
+	THYROFIX		levothyroxine tablet  88ug (natrium)
+	ELTROXIN		levothyroxine tablet 100ug (natrium)
+	EUTHYROX		levothyroxine tablet 100ug (natrium)
+	THYROFIX		levothyroxine tablet 100ug (natrium)
+	THYRAX		levothyroxine tablet 100ug (zuur)
+	EUTHYROX		levothyroxine tablet 112ug (natrium)
+	THYROFIX		levothyroxine tablet 112ug (natrium)
+	EUTHYROX		levothyroxine tablet 125ug (natrium)
+	THYROFIX		levothyroxine tablet 125ug (natrium)
+	EUTHYROX		levothyroxine tablet 137ug (natrium)
+	THYROFIX		levothyroxine tablet 137ug (natrium)
+	EUTHYROX		levothyroxine tablet 150ug (natrium)
+	THYROFIX		levothyroxine tablet 150ug (natrium)
+	THYRAX		levothyroxine tablet 150ug (zuur)
+	EUTHYROX		levothyroxine tablet 175ug (natrium)
+	THYROFIX		levothyroxine tablet 175ug (natrium)
+	EUTHYROX		levothyroxine tablet 200ug (natrium)
+	THYROFIX		levothyroxine tablet 200ug (natrium)
 	XYLOCAINE		lidocaine gel 20mg/g (hcl als 1-water)
+	DYNEXAN		lidocaine gel oromucosaal 20mg/g (hcl als 1-water)
+	LIDBREE		lidocaine gel uterien 42mg/ml
 	XYLOCAINE		lidocaine injvl 10mg/ml (hcl)
 	XYLOCAINE		lidocaine injvl 20mg/ml (hcl)
+	OPHTESIC		lidocaine ooggel 20mg/g
 	OTALGAN		lidocaine oordruppels 5mg/g
+	VERSATIS		lidocaine pleister 700mg
+	XYLOCAINE		lidocaine spray 100mg/ml
+	LIDOCAINE		lidocaine vaselinecreme 30mg/g
+	DENTINOX		lidocaine vlst oromucos 3,8mg/ml
 	XYLOCAINE		lidocaine zalf 50mg/g
 	XYLOCAINE-ADRENALINE		lidocaine/adrenaline injvl 10mg/ 5ug/ml
 	XYLOCAINE-ADRENALINE		lidocaine/adrenaline injvl 20mg/ 5ug/ml
 	LIGNOSPAN		lidocaine/adrenaline injvl 20mg/12,5ug/ml
+	TRACHSIL		lidocaine/amylmetacres/dichloorbenzylal zuigtablet
+	COLDREX		lidocaine/amylmetacres/dichloorbenzylal zuigtablet
+	INSTILLAGEL		lidocaine/chloorhexidine gel 20,9/0,523mg/ml
+	CATHEJELL		lidocaine/chloorhexidine gel 20/0.5mg/g
 	EMLA		lidocaine/prilocaine creme 25/25mg/g
 	EMLA		lidocaine/prilocaine pleister 25/25mg
+	TRACHITOL		lidocaine/propylparahydroxybenzoaat zuigt 1/1,8mg
 	RAPYDAN		lidocaine/tetracaine pleister 70/70mg
+	THERANAL		lidocaine/zinkoxide/bismutsubnitraat zalf rectaal
+	THERANAL		lidocaine/zinkoxide/bismutsubnitraat zetpil
+	VOGEL		lijnzaad/senna/rhamnus  gran 0,43g/0,14g/11,5mg/g
+	CONSTELLA		linaclotide capsule 290ug
+	TRAJENTA		linagliptine tablet 5mg
+	JENTADUETO		linagliptine/metformine tablet 2,5/ 850 mg
+	JENTADUETO		linagliptine/metformine tablet 2,5/1000 mg
+	ZYVOXID		linezolid infvlst 2mg/ml
+	ZYVOXID		linezolid tablet fo 600mg
+	CYTOMEL		liothyronine tablet  5ug (als na-zout)
+	CYTOMEL		liothyronine tablet 12,5ug (als na-zout)
+	CYTOMEL		liothyronine tablet 25ug (als na-zout)
+	CYNOMEL		liothyronine tablet 25ug (na-zout)
 	LONQUEX		lipegfilgrastim injvlst 10mg/ml
+	LIPOPLUS		lipoplus infusie-emulsie 200mg/ml
 	VICTOZA		liraglutide injvlst 6mg/ml
 	SAXENDA		liraglutide injvlst 6mg/ml
+	ELVANSE		lisdexamfetamine capsule 20mg
+	ELVANSE		lisdexamfetamine capsule 30mg
+	ELVANSE		lisdexamfetamine capsule 40mg
+	ELVANSE		lisdexamfetamine capsule 50mg
+	ELVANSE		lisdexamfetamine capsule 60mg
+	ELVANSE		lisdexamfetamine capsule 70mg
+	PRIADEL		lithiumcarbonaat tablet mga 400mg
+	CAMCOLIT		lithiumcarbonaat tablet mga 400mg
 	LYXUMIA		lixisenatide injvlst 20ug/do
+	LOJUXTA		lomitapide capsule  5mg
+	LOJUXTA		lomitapide capsule 10mg
+	LOJUXTA		lomitapide capsule 20mg
+	BELUSTINE		lomustine capsule 40mg
+	AFSTYLA		lonoctocog alfa injectiepoeder  250ie
+	AFSTYLA		lonoctocog alfa injectiepoeder  500ie
+	AFSTYLA		lonoctocog alfa injectiepoeder 1000ie
+	AFSTYLA		lonoctocog alfa injectiepoeder 1500ie
+	AFSTYLA		lonoctocog alfa injectiepoeder 2000ie
+	AFSTYLA		lonoctocog alfa injectiepoeder 2500ie
+	AFSTYLA		lonoctocog alfa injectiepoeder 3000ie
+	IMODIUM		loperamide capsule 2mg
+	DIARREEREMMER HTP		loperamide capsule 2mg
+	DIARREEREMMER LOPERAMIDE SAM		loperamide capsule 2mg
+	BOOTS PHARMACEUTICALS		loperamide capsule 2mg
+	IDYL		loperamide capsule 2mg
+	LIVSANE		loperamide capsule 2mg
+	IMODIUM		loperamide drank 0,2mg/ml
+	IMODIUM		loperamide smelttablet 2mg
+	LOSIMED DUO		loperamide/dimeticon tablet 2/125mg
+	KALETRA		lopinavir/ritonavir drank 80/20mg/ml
+	KALETRA		lopinavir/ritonavir tablet 100/25mg
+	KALETRA		lopinavir/ritonavir tablet 200/50mg
+	DORMONOCT		loprazolam tablet 1mg
+	ALLERFRE		loratadine tablet 10mg
+	HOOIKOORTSTABLET LORATADINE HTP		loratadine tablet 10mg
+	IDYL		loratadine tablet 10mg
+	BOOTS PHARMACEUTICALS		loratadine tablet 10mg
+	LIVSANE		loratadine tablet 10mg
+	LORVIQUA		lorlatinib tablet  25mg
+	LORVIQUA		lorlatinib tablet 100mg
+	COZAAR		losartan tablet fo  50mg
+	COZAAR		losartan tablet fo 100mg
+	HYZAAR		losartan/hydrochloorthiazide tab omhuld  50/12,5mg
+	FORTZAAR		losartan/hydrochloorthiazide tab omhuld 100/25mg
+	COZAAR PLUS		losartan/hydrochloorthiazide tablet 100/12,5mg
+	ORKAMBI		lumacaftor/ivacaftor granulaat 100/125mg
+	ORKAMBI		lumacaftor/ivacaftor granulaat 150/188mg
+	ORKAMBI		lumacaftor/ivacaftor tablet 100/125mg
+	ORKAMBI		lumacaftor/ivacaftor tablet 200/125mg
 	OXLUMO		lumasiran injvlst 189mg/ml
+	LATUDA		lurasidon tablet 18,6mg
+	LATUDA		lurasidon tablet 37,2mg
+	LATUDA		lurasidon tablet 74,5mg
 	REBLOZYL		luspatercept injectiepoeder 25mg
 	REBLOZYL		luspatercept injectiepoeder 75mg
+	LUTATHERA		lutetium lu-177 oxodotreotide infvlst 370mq/ml
 	LUVERIS		lutropine alfa injpdr 75ie
+	ATGAM		lymfocytenimmunoglobuline infopl conc 50mg/ml
+	ORGAMETRIL		lynestrenol tablet 5mg
+	OPSUMIT		macitentan tablet 10mg
+	FORLAX		macrogol poeder v drank  4g
+	FORLAX		macrogol poeder v drank 10g
+	MOVICOLON LIQUID		macrogol/zouten conc. voor drank
+	MOVICOLON UNITDOSE		macrogol/zouten drank
+	CLENSIA		macrogol/zouten pdr v drank (clensia)
+	COLOFORT		macrogol/zouten pdr v drank (colofort)
+	KLEAN PREP		macrogol/zouten pdr v drank (klean prep)
+	MOVICOLON		macrogol/zouten pdr v drank (movic/molax/laxt/gen)
+	MOLAXOLE		macrogol/zouten pdr v drank (movic/molax/laxt/gen)
+	MOVICOLON JUNIOR		macrogol/zouten pdr v drank (movico/gen jr nat)
+	MOVICOLON CHOCOLATE		macrogol/zouten pdr v drank (movicolon chocolate)
+	MOVICOLON JUNIOR		macrogol/zouten pdr v drank (movicolon jr chocola)
+	MOVICOLON NATUREL		macrogol/zouten pdr v drank (movicolon+generiek)
+	MOVIPREP		macrogol/zouten pdr v drank (moviprep)
+	PLEINVUE		macrogol/zouten pdr v drank (pleinvue)
+	UROTAINER SOLUTIO R		magnesiumcitraat/gluconolac/citroenz blaassp
+	UROTAINER SUBY G		magnesiumcitraat/natriumcit/citroenz blaassp
+	MAINTELYTE		maintelyte infvlst
+	OSMOSTERIL		mannitol infvlst 200mg/ml
+	CELSENTRI		maraviroc tablet  25mg
+	CELSENTRI		maraviroc tablet  75mg
+	CELSENTRI		maraviroc tablet 150mg
+	CELSENTRI		maraviroc tablet 300mg
+	WORMKUURTABLET HTP		mebendazol tablet 100mg
+	IDYL		mebendazol tablet 100mg
+	LIVSANE		mebendazol tablet 100mg
+	DUSPATAL		mebeverine capsule mga 200mg
 	INCRELEX		mecasermine injvlst 10mg/ml
+	SUPRIMAL		meclozine tablet 12,5mg
+	EMESAFENE		meclozine/pyridoxine tablet 12,5/25mg
+	EMESAFENE		meclozine/pyridoxine zetpil 12,5/25mg
 	DEPO-PROVERA		medroxyprogesteron injsusp 150mg/ml
 	SAYANA PRESS		medroxyprogesteron injsusp 160mg/ml
+	PROVERA		medroxyprogesteron tablet   5mg
+	PROVERA		medroxyprogesteron tablet  10mg
+	PROVERA		medroxyprogesteron tablet 200mg
+	PROVERA		medroxyprogesteron tablet 250mg
+	LARIAM		mefloquine tablet 250mg
+	MELATONINE PHARMA NORD		melatonine tablet 3mg
+	DAVITAMON		melatonine tablet 3mg
+	SHIEPZ		melatonine tablet 3mg
+	VALDISPERT		melatonine tablet 3mg
+	NYTOL		melatonine tablet 5mg
+	DAVITAMON		melatonine tablet 5mg
+	SHIEPZ		melatonine tablet 5mg
+	VALDISPERT		melatonine tablet 5mg
+	CIRCADIN		melatonine tablet mga  2mg
+	ALKERAN		melfalan infusiepoeder  50mg
+	ALKERAN		melfalan tablet fo 2mg
+	EBIXA		memantine drank 10mg/ml
+	EBIXA		memantine tablet fo  5mg
+	EBIXA		memantine tablet fo 10mg
+	EBIXA		memantine tablet fo 15mg
+	EBIXA		memantine tablet fo 20mg
+	MENVEO		meningokokkenvaccin acwy injpdr (menveo)
+	NIMENRIX		meningokokkenvaccin acwy injpdr (nimenrix)
+	MENQUADFI		meningokokkenvaccin acwy injvlst (menquadfi)
+	BEXSERO		meningokokkenvaccin b injsusp (bexsero)
+	TRUMENBA		meningokokkenvaccin b injsusp (trumenba)
+	NEISVAC-C		meningokokkenvaccin c injsusp (neisvac-c)
 	MENOPUR		menopauzegonadotrofine injectiepoeder  75ie
 	MERIOFERT		menopauzegonadotrofine injectiepoeder  75ie
 	MERIOFERT		menopauzegonadotrofine injectiepoeder 150ie
 	MENOPUR		menopauzegonadotrofine injectiepoeder 150ie
+	SCANDONEST		mepivacaine injvlst 30mg/ml
 	NUCALA		mepolizumab injectiepoeder 100mg
 	NUCALA		mepolizumab injvlst 100mg/ml
+	CYSTAGON		mercaptamine capsule  50mg
+	CYSTAGON		mercaptamine capsule 150mg
+	PROCYSBI		mercaptamine capsule msr 75mg
 	CYSTADROPS		mercaptamine oogdruppels 3,8mg/ml (als hcl)
+	UROMITEXAN		mercapto-ethaansulfonzuur (mesna) injvls 100mg/ml
+	UROMITEXAN		mercapto-ethaansulfonzuur (mesna) tablet 400mg
+	UROMITEXAN		mercapto-ethaansulfonzuur (mesna) tablet 600mg
+	XALUPRINE		mercaptopurine susp oraal 20mg/ml (als 1-water)
+	MERCAPTOPURIN MEDICE		mercaptopurine tablet 10mg (1-water)
+	PURI-NETHOL		mercaptopurine tablet 50mg (1-water)
+	SALOFALK GRANU-STIX		mesalazine granulaat mga  500mg
+	SALOFALK GRANU-STIX		mesalazine granulaat mga 1,5g
+	SALOFALK GRANU-STIX		mesalazine granulaat mga 1g
+	PENTASA COMPACT		mesalazine granulaat mga 1g
+	PENTASA COMPACT		mesalazine granulaat mga 2g
+	SALOFALK GRANU-STIX		mesalazine granulaat mga 3g
+	PENTASA COMPACT		mesalazine granulaat mga 4g
+	PENTASA		mesalazine klysma 10mg/ml
+	SALOFALK		mesalazine klysma 33,3mg/g
+	SALOFALK		mesalazine klysma 66,7mg/g
+	SALOFALK		mesalazine schuim rectaal 1g/do
+	PENTASA		mesalazine tablet mga  500mg
+	MEZAVANT		mesalazine tablet mga 1,2g
+	YALDIGO		mesalazine tablet mga 1,6g
+	PENTASA		mesalazine tablet mga 1g
+	ASACOL		mesalazine tablet msr 400mg
+	SALOFALK		mesalazine tablet msr 500mg
+	ASACOL		mesalazine tablet msr 800mg
+	PENTASA		mesalazine zetpil 1g
+	SALOFALK		mesalazine zetpil 1g
+	KIUDRO		mesalazine zetpil 1g
+	SALOFALK		mesalazine zetpil 500mg
+	NOVALGIN		metamizol injvlst 500mg/ml
+	DOLAMIZOL		metamizol tablet 250mg
+	NOVAMINSULFON-RATIOPHARM		metamizol tablet 500mg
+	DOLAMIZOL		metamizol tablet 500mg
+	GLUCOPHAGE		metformine tablet   850mg
+	GLUCIENT		metformine tablet mga  500mg
+	GLUCIENT		metformine tablet mga  750mg
+	GLUCIENT		metformine tablet mga 1000mg
+	GLUCOVANCE		metformine/glibenclamide tablet fo 500/2,5mg
+	GLUCOVANCE		metformine/glibenclamide tablet fo 500/5mg
+	XCYST		methenamine tablet msr 500mg
 	EMTHEXATE		methotrexaat injvlst   2,5mg/ml
 	EBETREX		methotrexaat injvlst  20mg/ml
 	EMTHEXATE		methotrexaat injvlst  25mg/ml
@@ -529,6 +2324,7 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	INJEXATE		methotrexaat injvlst  50mg/ml
 	METOJECT PEN		methotrexaat injvlst  50mg/ml
 	EMTHEXATE		methotrexaat injvlst 100mg/ml
+	PENTHROX		methoxyfluraan vlst v inh.damp 0,999ml/ml
 	MIRCERA		methoxypeg-epo beta injvlst 100ug/ml
 	MIRCERA		methoxypeg-epo beta injvlst 167ug/ml
 	MIRCERA		methoxypeg-epo beta injvlst 250ug/ml
@@ -539,7 +2335,32 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	MIRCERA		methoxypeg-epo beta injvlst 667ug/ml
 	MIRCERA		methoxypeg-epo beta injvlst 833ug/ml
 	METVIX		methylaminolevulinaat creme 160mg/g
+	PRESINOL		methyldopa tablet 125mg
 	METHERGIN		methylergometrine injvlst 0,2mg/ml
+	MEDIKINET		methylfenidaat capsule mga  5mg
+	EQUASYM		methylfenidaat capsule mga 10mg
+	MEDIKINET		methylfenidaat capsule mga 10mg
+	EQUASYM		methylfenidaat capsule mga 20mg
+	MEDIKINET		methylfenidaat capsule mga 20mg
+	EQUASYM		methylfenidaat capsule mga 30mg
+	MEDIKINET		methylfenidaat capsule mga 30mg
+	MEDIKINET		methylfenidaat capsule mga 40mg
+	EQUASYM		methylfenidaat capsule mga 40mg
+	EQUASYM		methylfenidaat capsule mga 50mg
+	MEDIKINET		methylfenidaat capsule mga 50mg
+	MEDIKINET		methylfenidaat capsule mga 60mg
+	MEDIKINET		methylfenidaat tablet  5mg
+	RITALIN		methylfenidaat tablet 10mg
+	MEDIKINET		methylfenidaat tablet 10mg
+	MEDIKINET		methylfenidaat tablet 20mg
+	CONCERTA		methylfenidaat tablet mga 18mg
+	KINECTEEN		methylfenidaat tablet mga 18mg
+	CONCERTA		methylfenidaat tablet mga 27mg
+	KINECTEEN		methylfenidaat tablet mga 27mg
+	CONCERTA		methylfenidaat tablet mga 36mg
+	KINECTEEN		methylfenidaat tablet mga 36mg
+	CONCERTA		methylfenidaat tablet mga 54mg
+	KINECTEEN		methylfenidaat tablet mga 54mg
 	RELISTOR		methylnaltrexon injvlst 20mg/ml
 	SOLU-MEDROL		methylprednisolon infusiepoeder  125mg
 	SOLU-MEDROL		methylprednisolon infusiepoeder  500mg
@@ -547,18 +2368,64 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	SOLU-MEDROL		methylprednisolon injectiepoeder   40mg
 	DEPO-MEDROL		methylprednisolon injvlst 40mg/ml (acetaat)
 	DEPO-MEDROL-LIDOCAINE		methylprednisolon/lidocaine injv 40/10mg/ml
+	PRIMPERAN		metoclopramide drank 1mg/ml
+	PRIMPERAN		metoclopramide injvlst  5mg/ml (hcl)
+	PRIMPERAN		metoclopramide zetpil 10mg
+	SELOKEEN		metoprolol injvlst 1mg/ml
+	SELOKEEN		metoprolol tablet mga  25mg (succinaat)
+	SELOKEEN		metoprolol tablet mga  50mg (succinaat)
+	SELOKEEN		metoprolol tablet mga 100mg (succinaat)
+	SELOKEEN		metoprolol tablet mga 200mg (succinaat)
 	MYALEPTA		metreleptine injectiepoeder 11,3mg
 	MYALEPTA		metreleptine injectiepoeder 3mg
 	MYALEPTA		metreleptine injectiepoeder 5,8mg
 	METROSA		metronidazol gel  7,5mg/g
+	FLAGYL		metronidazol ovule 500mg
+	FLAGYL		metronidazol susp oraal 40mg/ml
+	METOPIRONE		metyrapon capsule 250mg
+	TOLVON		mianserine tablet 30mg
+	MYCAMINE		micafungine infusiepoeder  50mg
+	MYCAMINE		micafungine infusiepoeder 100mg
 	DAKTARIN		miconazol creme 20mg/g
 	ANTISCHIMMELCREME HTP		miconazol creme 20mg/g
 	LIVSANE		miconazol creme 20mg/g
+	DAKTARIN		miconazol gel oraal 20mg/g
 	DAKTARIN		miconazol opl cutaan 20mg/ml
 	DAKTARIN		miconazol strooipoeder 20mg/g
+	GYNO-DAKTARIN		miconazol vaginaalcapsule  400mg
+	GYNO-DAKTARIN		miconazol vaginaalcapsule 1200mg
+	OZALIN		midazolam drank 2mg/ml (base)
 	DORMICUM		midazolam injvlst 5mg/ml
+	DORMICUM		midazolam tablet  7,5mg
+	DORMICUM		midazolam tablet 15mg
+	GUTRON		midodrine tablet 5mg
+	RYDAPT		midostaurine capsule 25mg
+	MEPACT		mifamurtide infusiepoeder 4mg
+	MIFEGYNE		mifepriston tablet 200mg
+	ZAVESCA		miglustat capsule 100mg
+	COROTROPE		milrinon injvlst 1mg/ml
+	LONNOTEN		minoxidil tablet 10mg
+	BETMIGA		mirabegron tablet mga 50mg
+	REMERON		mirtazapine smelttablet 15mg
+	REMERON		mirtazapine smelttablet 30mg
+	REMERON		mirtazapine smelttablet 45mg
+	CYTOTEC		misoprostol tablet 200ug
+	ANGUSTA		misoprostol tablet 25ug
+	LYSODREN		mitotaan tablet 500mg
+	MIVACRON		mivacurium injvlst 2mg/ml
+	MIZOLLEN		mizolastine tablet mga 10mg
+	AURORIX		moclobemide tablet omhuld 150mg
+	MODIODAL		modafinil tablet 100mg
+	ASPENDOS		modafinil tablet 100mg
+	LUCOVITAAL		moederkruid capsule 100mg
+	POTELIGEO		mogamulizumab infopl conc 4mg/ml
+	NASONEX		mometason neusspray 50ug/do
 	ELOCON		mometason opl cutaan 1mg/g
 	ELOCON		mometason zalf  1mg/g
+	SINGULAIR		montelukast granulaat 4mg
+	SINGULAIR		montelukast kauwtablet 4mg
+	SINGULAIR		montelukast kauwtablet 5mg
+	SINGULAIR		montelukast tablet omhuld 10mg
 	ORAMORPH		morfine drank  2mg/ml (sulfaat)
 	ORAMORPH		morfine drank  6mg/ml (sulfaat)
 	ORAMORPH		morfine drank 20mg/ml (sulfaat)
@@ -571,39 +2438,351 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	MS CONTIN		morfine tablet mga  30mg (sulfaat)
 	MS CONTIN		morfine tablet mga  60mg (sulfaat)
 	MS CONTIN		morfine tablet mga 100mg (sulfaat)
+	REFACTO AF		moroctocog alfa injectiepoeder  250ie
+	REFACTO AF		moroctocog alfa injectiepoeder  500ie
+	REFACTO AF		moroctocog alfa injectiepoeder 1000ie
+	REFACTO AF		moroctocog alfa injectiepoeder 2000ie
+	LUNSUMIO		mosunetuzumab infopl conc 1mg/ml
 	VIGAMOX		moxifloxacine oogdruppels 5mg/ml
+	MULTIBIC		multibic kalium 2mmol/l hemofilt/diaopl
+	MULTIBIC		multibic kalium 3mmol/l hemofilt/diaopl
+	MULTIBIC		multibic kalium 4mmol/l hemofilt/diaopl
+	MULTIBIC		multibic kaliumvrij hemofilt/dialopl
+	BACTROBAN		mupirocine neuszalf 20mg/g
 	BACTROBAN		mupirocine zalf 20mg/g
+	CELLCEPT		mycofenolaat mofetil capsule 250mg
+	CELLCEPT		mycofenolaat mofetil infusiepoeder 500mg
+	CELLCEPT		mycofenolaat mofetil susp oraal 200mg/ml
+	CELLCEPT		mycofenolaat mofetil tablet 500mg
+	MYFENAX		mycofenolaat mofetil tablet 500mg
+	MYFORTIC		mycofenolzuur tablet msr 180mg
+	MYFORTIC		mycofenolzuur tablet msr 360mg
+	GELODURAT		myrtol capsule msr 300mg
+	MEBUTAN		nabumeton dispertablet 1g
+	MEBUTAN		nabumeton tablet omhuld 1g
+	MEBUTAN		nabumeton tablet omhuld 500mg
+	PRISMOCITRATE		nacl/natriumcitraat hemofiltr opl 5,03/5,29mg/ml
+	REGIOCIT		nacl/natriumcitraat hemofiltr opl 5,03/5,29mg/ml
 	FRAXIPARINE		nadroparine injvlst  9500ie/ml
 	FRAXIPARINE FORTE		nadroparine injvlst 19000ie/ml
 	FRAXODI		nadroparine injvlst 19000ie/ml
+	SYNAREL		nafareline neusspray 200ug/do
 	NUBAIN		nalbufine injvlst 10mg/ml
+	SELINCRO		nalmefeen tablet 18,06mg
+	MOVENTIG		naloxegol tablet 12,5mg
+	MOVENTIG		naloxegol tablet 25mg
+	MYSIMBA		naltrexon/bupropion tablet mga 8/90mg
+	DECA-DURABOLIN		nandrolon injvlst  50mg/ml
+	ALEVE FEMINAX		naproxen-natrium tablet 275mg
+	ALEVE SELECT		naproxen-natrium tablet 275mg
+	ALEVE INTENSE		naproxen-natrium tablet 550mg
+	ALEVE CLASSIC		naproxen-natrium tablet omhuld 220mg
+	VIMOVO		naproxen/esomeprazol tablet mga 500/20mg
+	NARAMIG		naratriptan tablet omhuld 2,5mg
+	TYSABRI		natalizumab infopl conc 20mg/ml
 	TYSABRI		natalizumab injvlst 150mg/ml
+	EZICLEN		natrium-/magnesium-/kaliumsulfaat drank
+	UROTAINER		natriumchloride blaasspoeling 9mg/ml
 	UROMATIC		natriumchloride spoeling   9mg/ml
+	DURAPHAT		natriumfluoride susp dentaal 50mg/ml
+	DURAPHAT		natriumfluoride tandpasta 11,051mg/g
+	EN DE KAY		natriumfluoride/waterstoffl gel dentaal 4mg/ml
+	COLEX		natriumfosfaten klysma (colex)
+	123I SODIUM IODIDE CAPSULES GE HEALTHCARE		natriumjodide i-123 capsule 19,425mq
+	123I SODIUM IODIDE INJECTION GE HEALTHCARE		natriumjodide i-123 injvlst 101,75mq/ml
+	SODIUM IODIDE (131I) AMER		natriumjodide i-131 capsule  3,7mq
+	THERACAP 131		natriumjodide i-131 capsule 3,238gq
+	SODIUM IODIDE I131 CAPSULE T		natriumjodide i-131 capsule 3718,5mq
+	THERACAP 131		natriumjodide i-131 capsule 388,5mq
+	SODIUM IODIDE (131I) AMER		natriumjodide i-131 injvlst  74mq/ml
+	SODIUM IODIDE (131I) AMER		natriumjodide i-131 injvlst 925mq/ml
+	MICROLAX		natriumlaurylsulfoacet/sorbitol klysma 9/625mg/ml
+	SELENASE		natriumseleniet drank 50ug se/ml
+	SELENASE		natriumseleniet injvlst 166ug/ml (50ug se/ml)
+	LOKELMA		natriumzirkoniumcyclosilicaat pdr v suspensie  5g
+	LOKELMA		natriumzirkoniumcyclosilicaat pdr v suspensie 10g
+	NEBILET		nebivolol tablet 5mg
+	ATRIANCE		nelarabine infvlst 5mg/ml
 	PROSTIGMIN		neostigmine injvlst 0,5mg/ml
 	NEVANAC		nepafenac oogdruppels 1mg/ml
 	NEVANAC		nepafenac oogdruppels 3mg/ml
+	NERLYNX		neratinib tablet 40mg
+	AKYNZEO		netupitant/palonosetron capsule 300/0,5mg
+	VIRAMUNE		nevirapine susp oraal 10mg/ml
+	VIRAMUNE		nevirapine tablet 200mg
+	VIRAMUNE		nevirapine tablet mga 400mg
+	CARDENE		nicardipine infopl conc 1mg/ml
+	YOMESAN		niclosamide kauwtablet 500mg
+	IKOREL		nicorandil tablet 10mg
+	NICORANDIL		nicorandil tablet 10mg
+	NICORETTE		nicotine kauwgom 2mg
+	NICOTINELL		nicotine kauwgom 2mg
+	NICOTINELL		nicotine kauwgom 4mg
+	NICORETTE		nicotine kauwgom 4mg
+	NICOTINELL TTS		nicotine pleister  7mg/24uur (nicotinel/nicopatch)
+	NIQUITIN CLEAR		nicotine pleister  7mg/24uur (niquitin)
+	NICOTINELL TTS		nicotine pleister 14mg/24uur (nicotinel/nicopatch)
+	NIQUITIN CLEAR		nicotine pleister 14mg/24uur (niquitin)
+	NICOTINELL TTS		nicotine pleister 21mg/24uur (nicotinel/nicopatch)
+	NIQUITIN CLEAR		nicotine pleister 21mg/24uur (niquitin)
+	NICORETTE		nicotine spray oromucos 1mg/do
+	NICORETTE FRUIT & MINT		nicotine spray oromucos 1mg/do
+	NIQUITIN		nicotine zuigtablet 1,5mg
+	NICOTINELL		nicotine zuigtablet 1mg
+	NICOTINELL		nicotine zuigtablet 2mg
+	NIQUITIN		nicotine zuigtablet 2mg
+	NIQUITIN		nicotine zuigtablet 4mg
+	CORACTEN		nifedipine capsule mga 10mg
+	NIFEDIPIN-RATIOPHARM		nifedipine tablet retard 20mg
+	TASIGNA		nilotinib capsule 150mg
+	TASIGNA		nilotinib capsule 200mg
+	ANANDRON		nilutamide tablet 150mg
+	NIMOTOP		nimodipine infvlst 0,2mg/ml
+	NIMOTOP		nimodipine tablet 30mg
+	OFEV		nintedanib capsule 100mg
+	VARGATEF		nintedanib capsule 100mg
+	OFEV		nintedanib capsule 150mg
+	VARGATEF		nintedanib capsule 150mg
+	ZEJULA		niraparib capsule 100mg
+	ORFADIN		nitisinon capsule  2mg
+	ORFADIN		nitisinon capsule  5mg
+	ORFADIN		nitisinon capsule 10mg
+	ORFADIN		nitisinon capsule 20mg
+	ORFADIN		nitisinon susp oraal 4mg/ml
+	FURADANTINE		nitrofurantoine capsule   50mg
+	FURABID		nitrofurantoine capsule mga 100mg
+	NITRO POHL		nitroglycerine infvlst 1mg/ml
+	DEPONIT T		nitroglycerine pleister  5mg/24uur (deponit t)
+	MINITRAN		nitroglycerine pleister  5mg/24uur (minitran)
+	TRANSIDERM-NITRO		nitroglycerine pleister  5mg/24uur (transiderm n)
+	DEPONIT T		nitroglycerine pleister 10mg/24uur (deponit t)
+	MINITRAN		nitroglycerine pleister 10mg/24uur (minitran)
+	TRANSIDERM-NITRO		nitroglycerine pleister 10mg/24uur (transiderm n)
+	MINITRAN		nitroglycerine pleister 15mg/24uur (minitran)
+	NITROLINGUAL		nitroglycerine spray subling. 0,4mg/do
+	NIPRUSS		nitroprusside infusiepoeder 60mg
+	OPDIVO		nivolumab infopl conc 10mg/ml
+	BENEFIX		nonacog alfa injectiepoeder  250ie
+	BENEFIX		nonacog alfa injectiepoeder  500ie
+	BENEFIX		nonacog alfa injectiepoeder 1000ie
+	BENEFIX		nonacog alfa injectiepoeder 2000ie
+	BENEFIX		nonacog alfa injectiepoeder 3000ie
+	REFIXIA		nonacog beta pegol injpdr  500ie
+	REFIXIA		nonacog beta pegol injpdr 1000ie
+	REFIXIA		nonacog beta pegol injpdr 2000ie
+	RIXUBIS		nonacog gamma injectiepoeder  250ie
+	RIXUBIS		nonacog gamma injectiepoeder  500ie
+	RIXUBIS		nonacog gamma injectiepoeder 1000ie
+	RIXUBIS		nonacog gamma injectiepoeder 2000ie
+	RIXUBIS		nonacog gamma injectiepoeder 3000ie
 	SINORA		noradrenaline infopl conc 1mg/ml
 	SINORA		noradrenaline infvlst 0,1mg/ml
 	SINORA		noradrenaline infvlst 0,2mg/ml
+	PRIMOLUT-N		norethisteron tablet 5mg
+	NORTRILEN		nortriptyline tablet 10mg
+	NORTRILEN		nortriptyline tablet 25mg
+	NORTRILEN		nortriptyline tablet 50mg
+	HOESTDRANK		noscapine stroop 1mg/ml
+	NATTERMAN NOSCASAN		noscapine stroop 1mg/ml
+	BISOLNEX		noscapine stroop 1mg/ml
+	BOOTS PHARMACEUTICALS		noscapine stroop 1mg/ml
+	LIVSANE		noscapine stroop 1mg/ml
+	NOSCAPECT		noscapine tablet 15mg
+	NUMETA		numeta g13%e infusie emulsie
+	NUMETA		numeta g16%e infusie emulsie
+	NUMETA		numeta g19%e infusie emulsie
+	SPINRAZA		nusinersen injvlst 2,4mg/ml
+	NUTRIFLEX		nutriflex 48/150 infvlst
+	NUTRIFLEX		nutriflex 70/240 infvlst
+	NUTRIFLEX		nutriflex lipid plus infvlst
+	NUTRIFLEX		nutriflex lipid special infvlst
+	NUTRIFLEX OMEGA PLUS		nutriflex omega plus infusie emulsie
+	NUTRIFLEX OMEGA SPECIAL		nutriflex omega special infusie emulsie
+	NUTRINEAL PD4		nutrineal pd4 pd-opl + aminozuur 11g/l
+	NUTRITRACE		nutritrace infopl conc
+	NUTRYELT		nutryelt infopl conc
+	TOXOGONIN		obidoxim injvlst 250mg/ml
+	GAZYVARO		obinutuzumab infopl conc 25mg/ml
+	OCREVUS		ocrelizumab infopl conc 30mg/ml
+	JETREA		ocriplasmine injvlst conc 2,5mg/ml
+	ADVATE		octocog alfa injectiepdr  250ie (baxter)
+	ADVATE		octocog alfa injectiepdr  500ie (baxter)
+	ADVATE		octocog alfa injectiepdr 1000ie (baxter)
+	KOVALTRY		octocog alfa injectiepdr 1000ie (bayer)
+	ADVATE		octocog alfa injectiepdr 1500ie (baxter)
+	ADVATE		octocog alfa injectiepdr 2000ie (baxter)
+	ADVATE		octocog alfa injectiepdr 3000ie (baxter)
 	SANDOSTATINE		octreotide injvlst 0,05mg/ml
 	SIROCTID		octreotide injvlst 0,05mg/ml
 	SANDOSTATINE		octreotide injvlst 0,1mg/ml
 	SIROCTID		octreotide injvlst 0,1mg/ml
 	SANDOSTATINE		octreotide injvlst 0,5mg/ml
 	SIROCTID		octreotide injvlst 0,5mg/ml
+	SANDOSTATINE		octreotide pdr v injsusp 10mg
+	SANDOSTATINE		octreotide pdr v injsusp 20mg
+	SANDOSTATINE		octreotide pdr v injsusp 30mg
+	DAGYNIL		oestrogenen geconjugeerd tablet 0,625mg
+	DUAVIVE		oestrogenen/bazedoxifeen tablet mga 0,45/20mg
 	KESIMPTA		ofatumumab injvlst 50mg/ml
 	TRAFLOXAL		ofloxacine oogdruppels 3mg/ml
+	TRAFLOXAL		ofloxacine oogzalf 3mg/g
 	OTIFLOX		ofloxacine oordruppels 3mg/ml
+	ELMEX		olaflur/dectaflur/natriumfl gel dentaal 12,5mg/g
+	ZYPREXA		olanzapine pdr v injopl 10mg
+	ZYPADHERA		olanzapine pdr v injsusp 210mg
+	ZYPADHERA		olanzapine pdr v injsusp 300mg
+	ZYPADHERA		olanzapine pdr v injsusp 405mg
+	ZYPREXA		olanzapine smelttablet  5mg
+	ZYPREXA		olanzapine smelttablet 10mg
+	ZYPREXA		olanzapine smelttablet 15mg
+	ZYPREXA		olanzapine smelttablet 20mg
+	ZYPREXA		olanzapine tablet  2,5mg
+	ZYPREXA		olanzapine tablet  5mg
+	ZYPREXA		olanzapine tablet 10mg
+	ZYPREXA		olanzapine tablet 15mg
+	ZYPREXA		olanzapine tablet 20mg
+	LYNPARZA		olaparib capsule 50mg
+	LYNPARZA		olaparib tablet 100mg
+	LYNPARZA		olaparib tablet 150mg
+	CLINOLEIC		olijfolie/sojaolie infemu 200mg/ml
+	OLIMEL		olimel n12 inf emulsie
+	OLIMEL		olimel n12e inf emulsie
+	OLIMEL		olimel n5e inf emulsie
+	OLIMEL		olimel n7e inf emulsie
+	OLIMEL		olimel n9 inf emulsie
+	OLIMEL		olimel n9e inf emulsie
+	OLIMEL		olimel perifeer n4e inf emulsie
+	OLMETEC		olmesartan tablet fo 10mg
+	OLMETEC		olmesartan tablet fo 20mg
+	OLMETEC		olmesartan tablet fo 40mg
+	SEVIKAR		olmesartan/amlodipine tablet 20/5mg
+	SEVIKAR		olmesartan/amlodipine tablet 40/ 5mg
+	SEVIKAR		olmesartan/amlodipine tablet 40/10mg
+	SEVIKAR HCT		olmesartan/amlodipine/hct tab 20/5/12,5mg
+	SEVIKAR HCT		olmesartan/amlodipine/hct tab 40/ 5/12,5mg
+	SEVIKAR HCT		olmesartan/amlodipine/hct tab 40/ 5/25mg
+	SEVIKAR HCT		olmesartan/amlodipine/hct tab 40/10/12,5mg
+	SEVIKAR HCT		olmesartan/amlodipine/hct tab 40/10/25mg
+	OLMETEC HCTZ		olmesartan/hydrochloorthiazide tablet 20/12,5mg
+	OLMETEC HCTZ		olmesartan/hydrochloorthiazide tablet 20/25mg
+	OLMETEC HCTZ		olmesartan/hydrochloorthiazide tablet 40/12,5mg
+	OLMETEC HCTZ		olmesartan/hydrochloorthiazide tablet 40/25mg
+	STRIVERDI		olodaterol vernevelvlst 2,5ug/do
 	OPATANOL		olopatadine oogdruppels 1mg/ml
+	DIPENTUM		olsalazine capsule 250mg
+	DIPENTUM		olsalazine tablet 500mg
 	XOLAIR		omalizumab injectiepoeder 150mg
 	XOLAIR		omalizumab injvlst 150mg/ml
+	VIEKIRAX		ombitasvir/paritaprevir/ritonavir tab 12,5/75/50mg
+	OMEGAVEN		omega-3-olie gezuiverd inf-emuls 100mg/ml
+	OMACOR		omega-3-vetzuur capsule zacht 1000mg
+	OMEGOMEL		omegomel inf emulsie
+	OMECAT		omeprazol capsule msr 10mg
+	OMECAT		omeprazol capsule msr 20mg
+	MAAGZUURREMMER OMEPRAZOL CF		omeprazol capsule msr 20mg
+	OMECAT		omeprazol capsule msr 40mg
+	PEDIPPI		omeprazol susp oraal 2mg/ml
+	LOSEC MUPS		omeprazol tablet msr 10mg
+	LOSEC MUPS		omeprazol tablet msr 20mg
+	LOSECOSAN		omeprazol tablet msr 20mg
+	LOSEC MUPS		omeprazol tablet msr 40mg
+	ZOLGENSMA		onasemnogene abeparvovec infvlst 20tv/ml
+	ZOFRAN ZYDIS		ondansetron smelttablet 4mg
+	ZOFRAN ZYDIS		ondansetron smelttablet 8mg
+	ZOFRAN		ondansetron stroop 0,8mg/ml
+	DURATEARS Z		oogzalf (duratears z)
 	DROPIZOL		opium tinctuur druppels 10mg morfine/ml
+	ALLI		orlistat capsule  60mg
+	XENICAL		orlistat capsule 120mg
+	TAMIFLU		oseltamivir capsule 30mg
+	TAMIFLU NVI		oseltamivir capsule 30mg
+	EBILFUMIN		oseltamivir capsule 30mg
+	TAMIFLU		oseltamivir capsule 45mg
+	TAMIFLU NVI		oseltamivir capsule 45mg
+	EBILFUMIN		oseltamivir capsule 45mg
+	TAMIFLU		oseltamivir capsule 75mg
+	TAMIFLU NVI		oseltamivir capsule 75mg
+	EBILFUMIN		oseltamivir capsule 75mg
+	OSELTAMIVIR NVI		oseltamivir poeder v drank 75mg
+	TAMIFLU		oseltamivir susp oraal  6mg/ml
+	TAMIFLU NVI		oseltamivir susp oraal 12mg/ml
+	ISTURISA		osilodrostat tablet 10mg
+	ISTURISA		osilodrostat tablet 1mg
+	ISTURISA		osilodrostat tablet 5mg
+	TAGRISSO		osimertinib tablet 40mg
+	TAGRISSO		osimertinib tablet 80mg
 	SC NITRILE ULTRA ONDERZOEKSHANDSCHOEN XS		otc druppels met vitamine k2 270 ug/ml
+	OXALISIN		oxaliplatine infopl conc 5mg/ml
+	SERESTA		oxazepam tablet 10mg
+	SERESTA		oxazepam tablet 50mg
+	TRILEPTAL		oxcarbazepine susp oraal 60mg/ml
+	TRILEPTAL		oxcarbazepine tablet fo 300mg
+	TRILEPTAL		oxcarbazepine tablet fo 600mg
+	TOPLEXIL		oxomemazine stroop 0,33mg/ml
 	OXYBUPROCAINEHYDROCHLORIDE, MINIMS		oxybuprocaine oogdruppels 4mg/ml
 	OXYBUPROCAINEHYDROCHLORIDE MONOFREE		oxybuprocaine oogdruppels 4mg/ml
+	VESOLOX		oxybutynine blaasspoeling 1mg/ml
+	KENTERA		oxybutynine pleister 3,9mg/24uur
+	DRIDASE		oxybutynine stroop 1mg/ml
+	OXYNORM		oxycodon capsule  5mg
+	OXYNORM		oxycodon capsule 10mg
+	OXYNORM		oxycodon capsule 20mg
+	OXYNORM		oxycodon drank 10mg/ml
 	OXYNORM		oxycodon injvlst 10mg/ml
 	OXYNORM		oxycodon injvlst 50mg/ml
+	OXYNORM		oxycodon smelttablet  5mg
+	OXYNORM		oxycodon smelttablet 10mg
+	OXYNORM		oxycodon smelttablet 20mg
+	OXYCONTIN		oxycodon tablet mga   5mg
+	OXYCONTIN		oxycodon tablet mga  10mg
+	OXYCONTIN		oxycodon tablet mga  15mg
+	OXYCONTIN		oxycodon tablet mga  20mg
+	OXYCONTIN		oxycodon tablet mga  30mg
+	OXYCONTIN		oxycodon tablet mga  40mg
+	OXYCONTIN		oxycodon tablet mga  60mg
+	OXYCONTIN		oxycodon tablet mga  80mg
+	OXYCONTIN		oxycodon tablet mga 120mg
+	TARGINACT		oxycodon/naloxon tablet mga  5/2,5mg
+	TARGINACT		oxycodon/naloxon tablet mga 10/5mg
+	TARGINACT		oxycodon/naloxon tablet mga 20/10mg
+	TARGINACT		oxycodon/naloxon tablet mga 40/20mg
+	SINEX VICKS		oxymetazoline neusspray 0,5mg/ml
+	SINEX VICKS ALOE		oxymetazoline neusspray 0,5mg/ml
+	SYNTOCINON		oxytocine injvlst  5ie/ml
+	SYNTOCINON		oxytocine neusspray 4ie/do
+	ZEPOSIA		ozanimod capsule 0,23mg
+	ZEPOSIA		ozanimod capsule 0,46mg
+	ZEPOSIA		ozanimod capsule 0,92mg
+	ABRAXANE		paclitaxel infusiepoeder 100mg (nanodeeltjes)
+	PAZENIR		paclitaxel infusiepoeder 100mg (nanodeeltjes)
+	IBRANCE		palbociclib capsule  75mg
+	IBRANCE		palbociclib capsule 100mg
+	IBRANCE		palbociclib capsule 125mg
+	IBRANCE		palbociclib tablet 100mg
+	IBRANCE		palbociclib tablet 125mg
+	IBRANCE		palbociclib tablet 75mg
+	XEPLION		paliperidon injsusp 100mg/ml
+	TREVICTA		paliperidon injsusp 200mg/ml
+	BYANNLI		paliperidon injsusp 200mg/ml
+	INVEGA		paliperidon tablet mga 3mg
+	INVEGA		paliperidon tablet mga 6mg
+	INVEGA		paliperidon tablet mga 9mg
+	SYNAGIS		palivizumab injvlst 100mg/ml
+	PAMIPRO		pamidroninezuur infopl conc 3mg/ml (als 5-water)
+	VECTIBIX		panitumumab infopl conc 20mg/ml
+	FARYDAK		panobinostat capsule 10mg
+	FARYDAK		panobinostat capsule 15mg
+	FARYDAK		panobinostat capsule 20mg
 	PANOTILE		panotile oordruppels
+	PANTOZOL		pantoprazol injectiepoeder 40mg
+	PANTOZOL		pantoprazol tablet msr 20mg
+	MAAGZUURTABLET PANTOPRAZOL HTP		pantoprazol tablet msr 20mg
+	MAAGZUURTABLET PANTOPRAZOL SAM		pantoprazol tablet msr 20mg
+	PANTOZOL		pantoprazol tablet msr 40mg
+	ANDROSKAT		papaverine/fentolamine inj 15/0,5mg/ml
+	GARDASIL 9		papillomavirusvacc in (6,11,16,18,31,33,45,52,58)
+	CERVARIX		papillomavirusvaccin inj (type 16,18)
+	GARDASIL		papillomavirusvaccin inj (type 6,11,16,18)
 	ROTER		paracetamol capsule 500mg
 	WITTE KRUIS		paracetamol granulaat 500mg
 	SINASPRIL PARACETAMOL		paracetamol kauwtablet 120mg
@@ -650,9 +2829,25 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	NATPAR		parathyroidhormoon injpdr  50ug/do
 	NATPAR		parathyroidhormoon injpdr  75ug/do
 	NATPAR		parathyroidhormoon injpdr 100ug/do
+	DYNASTAT		parecoxib injectiepoeder 40mg
+	ZEMPLAR		paricalcitol injvlst 5ug/ml
+	HUMATIN		paromomycine capsule 250mg
+	SEROXAT		paroxetine susp oraal 2mg/ml
+	SEROXAT		paroxetine tablet 20mg
+	SEROXAT		paroxetine tablet 30mg
 	SIGNIFOR		pasireotide injvlst 0,6mg/ml
 	SIGNIFOR		pasireotide injvlst 0,9mg/ml
+	SIGNIFOR		pasireotide pdr v injsusp 20mg
+	SIGNIFOR		pasireotide pdr v injsusp 40mg
+	SIGNIFOR		pasireotide pdr v injsusp 60mg
 	BLEU PATENTE V GUERBET		patentblauw injvlst 25mg/ml
+	VELTASSA		patiromeer pdr v suspensie  8,4g
+	VELTASSA		patiromeer pdr v suspensie 16,8g
+	ONPATTRO		patisiran infopl conc 2mg/ml
+	VOTRIENT		pazopanib tablet 200mg
+	VOTRIENT		pazopanib tablet 400mg
+	PEDITRACE		peditrace infopl conc
+	ONCASPAR		pegaspargase pdr inj/infopl 3750e
 	NEULASTA		pegfilgrastim injvlst 10mg/ml
 	PELGRAZ		pegfilgrastim injvlst 10mg/ml
 	ZIEXTENZO		pegfilgrastim injvlst 10mg/ml
@@ -669,17 +2864,104 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	SOMAVERT		pegvisomant injectiepoeder 25mg
 	SOMAVERT		pegvisomant injectiepoeder 30mg
 	NISYLEEN PELARGONIUM		pelargonium druppels 821mg/ml (extract)
+	NISYLEEN PELARGONIUM		pelargonium tablet 20mg (gedroogd extract)
+	KEYTRUDA		pembrolizumab infopl conc 25mg/ml
+	KEYTRUDA		pembrolizumab infusiepoeder 50mg
+	ARMISARTE		pemetrexed infopl conc 25mg/ml
+	ALIMTA		pemetrexed infusiepoeder 100mg
+	ALIMTA		pemetrexed infusiepoeder 500mg
+	PENTACARINAT		pentamidine injectiepoeder 300mg
+	PENTACARINAT		pentamidine pdr v vernevelv 300mg
+	ELMIRON		pentosanpolysulfaat natrium capsule 100mg
+	TRENTAL		pentoxifylline tablet mga 400mg
+	TEMPOCOL		pepermunt olie capsule msr 182mg
+	FYCOMPA		perampanel susp oraal 0,5mg/ml
+	FYCOMPA		perampanel tablet  2mg
+	FYCOMPA		perampanel tablet  4mg
+	FYCOMPA		perampanel tablet  6mg
+	FYCOMPA		perampanel tablet  8mg
+	FYCOMPA		perampanel tablet 10mg
+	FYCOMPA		perampanel tablet 12mg
+	COVERSYL ARG		perindopril tablet  2,5mg (arginine)
+	COVERSYL ARG		perindopril tablet  5mg (arginine)
+	COVERSYL ARG		perindopril tablet 10mg (arginine)
+	COVERAM ARG		perindopril-arg/amlodipine tablet  5/ 5mg
+	COVERAM ARG		perindopril-arg/amlodipine tablet  5/10mg
+	COVERAM ARG		perindopril-arg/amlodipine tablet 10/ 5mg
+	COVERAM ARG		perindopril-arg/amlodipine tablet 10/10mg
+	COVERSYL PLUS ARG		perindopril/indapamide tablet  5/1,25mg (arginine)
+	COVERSYL PLUS ARG		perindopril/indapamide tablet 10/2,5mg (arginine)
+	TRIPLIXAM		perindopril/indapamide/amlodipine tab  5/1,25/ 5mg
+	TRIPLIXAM		perindopril/indapamide/amlodipine tab  5/1,25/10mg
+	TRIPLIXAM		perindopril/indapamide/amlodipine tab 10/2,5/ 5mg
+	TRIPLIXAM		perindopril/indapamide/amlodipine tab 10/2,5/10mg
+	PERIOMEGOMEL		periomegomel inf emulsie
 	LOXAZOL		permetrine creme 50mg/g
+	PERJETA		pertuzumab infopl conc 30mg/ml
 	PHESGO		pertuzumab/trastuzumab injvlst 60/60mg/ml
 	PHESGO		pertuzumab/trastuzumab injvlst 80/40mg/ml
+	PHOXILIUM		phoxilium 1,2mmol/l fosfaat hemofilt/dialopl
+	PHYSIONEAL		physioneal 35 pd-opl + glucos 13,6mg/ml
+	PHYSIONEAL		physioneal 35 pd-opl + glucos 22,7mg/ml
+	PHYSIONEAL		physioneal 35 pd-opl + glucos 38,6mg/ml
+	PHYSIONEAL		physioneal 40 pd-opl + glucos 13,6mg/ml
+	PHYSIONEAL		physioneal 40 pd-opl + glucos 22,7mg/ml
+	PHYSIONEAL		physioneal 40 pd-opl + glucos 38,6mg/ml
+	CITRAFLEET		picozwavelzuur/mgo/citroenzuur pdr (citrafleet)
+	PICOPREP		picozwavelzuur/mgo/citroenzuur pdr (picoprep)
 	PILOCARPINENITRAAT, MINIMS		pilocarpine oogdr 20mg/ml (nitraat)
+	SALAGEN		pilocarpine tablet omhuld 5mg
 	ELIDEL		pimecrolimus creme 10mg/g
+	ORAP		pimozide tablet 1mg
+	ORAP		pimozide tablet 4mg
+	ACTOS		pioglitazon tablet 30mg
+	ACTOS		pioglitazon tablet 45mg
+	COMPETACT		pioglitazon/metformine tablet 15/850mg
 	DIPIPERON		pipamperon druppels 40mg/ml
+	DIPIPERON		pipamperon tablet 40mg
+	NOOTROPIL		piracetam tablet  800mg
+	NOOTROPIL		piracetam tablet 1200mg
+	ESBRIET		pirfenidon capsule 267mg
+	ESBRIET		pirfenidon tablet 267mg
+	ESBRIET		pirfenidon tablet 801mg
 	DIPIDOLOR		piritramide injvlst 10mg/ml
+	WAKIX		pitolisant tablet  4,5mg
+	WAKIX		pitolisant tablet 18mg
+	PIXUVRI		pixantron infusiepoeder 29mg
+	SANDOMIGRAN		pizotifeen tablet 0,5mg
+	VOLCOLON		plantago ovata granulaat 3,66g
+	VOLCOLON		plantago ovata granulaat 3,6g
+	METAMUCIL SUIKERVRIJ		plantago ovata poeder 3,4g
+	AGIOLAX		plantago ovata/senna granulaat
+	PLASMA-LYTE 148		plasma-lyte 148 infusievloeistof
 	MOZOBIL		plerixafor injvlst 20mg/ml
 	WARTEC		podofyllotoxine creme 1,5mg/g
 	CONDYLINE		podofyllotoxine opl cutaan 5mg/ml
+	POLIVY		polatuzumab vedotine infusiepoeder  30mg
+	POLIVY		polatuzumab vedotine infusiepoeder 140mg
 	POLIOMYELITISVACCIN		poliomyelitisvaccin injsusp
+	SORBISTERIT		polystyreensulfon ca pdr susp or/rec 900mg/g
+	RESONIUM A		polystyreensulfon na pdr susp or/rec 1000mg/g
+	IMNOVID		pomalidomide capsule 1mg
+	IMNOVID		pomalidomide capsule 2mg
+	IMNOVID		pomalidomide capsule 3mg
+	IMNOVID		pomalidomide capsule 4mg
+	ICLUSIG		ponatinib tablet 15mg
+	ICLUSIG		ponatinib tablet 30mg
+	ICLUSIG		ponatinib tablet 45mg
+	PONVORY		ponesimod tablet 10mg
+	PONVORY		ponesimod tablet 20mg
+	PONVORY		ponesimod tablet 2mg
+	PONVORY		ponesimod tablet 3mg
+	PONVORY		ponesimod tablet 4mg
+	PONVORY		ponesimod tablet 5mg
+	PONVORY		ponesimod tablet 6mg
+	PONVORY		ponesimod tablet 7mg
+	PONVORY		ponesimod tablet 8mg
+	PONVORY		ponesimod tablet 9mg
+	NOXAFIL		posaconazol infopl conc 18mg/ml
+	NOXAFIL		posaconazol susp oraal 40mg/ml
+	NOXAFIL		posaconazol tablet msr 100mg
 	PROTAGENS		povidon oogdruppels 20mg/ml
 	DURATEARS-OOGDRUPPELS		povidon oogdruppels 20mg/ml
 	OCULOTECT		povidon oogdruppels 50mg/ml
@@ -690,41 +2972,373 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	BETADINE		povidonjodium shampoo 75mg/ml
 	BETADINE		povidonjodium zalf 100mg/g
 	BRAUNOL		povidonjodium zalf 100mg/g
+	SIFROL		pramipexol tablet 0,125mg (0,088mg base)
+	MIRAPEXIN		pramipexol tablet 0,125mg (0,088mg base)
+	GLEPARK		pramipexol tablet 0,125mg (0,088mg base)
+	GLEPARK		pramipexol tablet 0,25mg (0,18mg base)
+	GLEPARK		pramipexol tablet 0,5mg (0,35mg base)
+	SIFROL		pramipexol tablet 1mg (0,7mg base)
+	MIRAPEXIN		pramipexol tablet 1mg (0,7mg base)
+	GLEPARK		pramipexol tablet 1mg (0,7mg base)
+	SIFROL		pramipexol tablet mga 0,375mg (0,26mg base)
+	MIRAPEXIN		pramipexol tablet mga 0,375mg (0,26mg base)
+	OPRYMEA		pramipexol tablet mga 0,375mg (0,26mg base)
+	SIFROL		pramipexol tablet mga 1,5mg (1,05mg base)
+	MIRAPEXIN		pramipexol tablet mga 1,5mg (1,05mg base)
+	OPRYMEA		pramipexol tablet mga 1,5mg (1,05mg base)
+	SIFROL		pramipexol tablet mga 2,25mg (1,57mg base)
+	SIFROL		pramipexol tablet mga 3 mg (2,1mg base)
+	MIRAPEXIN		pramipexol tablet mga 3 mg (2,1mg base)
+	OPRYMEA		pramipexol tablet mga 3 mg (2,1mg base)
+	SIFROL		pramipexol tablet mga 3,75mg (2,62mg base)
+	SIFROL		pramipexol tablet mga 4,5mg (3,15mg base)
+	MIRAPEXIN		pramipexol tablet mga 4,5mg (3,15mg base)
+	OPRYMEA		pramipexol tablet mga 4,5mg (3,15mg base)
 	NESTOSYL		pramocaine/zinkoxide creme 10/100mg/g
+	EFIENT		prasugrel tablet  5mg
+	EFIENT		prasugrel tablet 10mg
+	PRAVAFENIX		pravastatine/fenofibraat capsule 40/160mg
+	REAPAM		prazepam tablet 10mg
+	BILTRICIDE		praziquantel tablet 600mg
 	DI-ADRESON-F		prednisolon na-succinaat inj 25mg (parenter, rect)
 	PREDNISOLONNATRIUM, MINIMS		prednisolon oogdr  5mg/ml dinatriumfosfaat
 	PRED FORTE		prednisolon oogdr, susp 10mg/ml acetaat
 	ULTRACORTENOL		prednisolon oogzalf 5mg/g
+	LYRICA		pregabaline capsule  25mg
+	LYRICA		pregabaline capsule  75mg
+	LYRICA		pregabaline capsule 150mg
+	LYRICA		pregabaline capsule 300mg
+	CITANEST		prilocaine injvlst 10mg/ml
+	CITANEST		prilocaine injvlst 20mg/ml
+	PRILOTEKAL		prilocaine injvlst 20mg/ml
+	CITANEST-OCTAPRESSINE		prilocaine/felypressine injvl 30mg/0,54ug/ml
+	A-PQ		primaquine tablet 30mg
+	PRIMENE		primene infusievloeistof 10%
+	MYSOLINE		primidon tablet 250mg
+	PRISMASOL		prismasol 2mmol/l kalium hemofilt/dialopl
+	PRISMASOL		prismasol 4mmol/l kalium hemofilt/dialopl
+	NATULAN		procarbazine capsule 50mg
+	UTROGESTAN		progesteron capsule 100mg
+	UTROGESTAN		progesteron capsule vaginaal 200mg
+	UTROGESTAN		progesteron capsule vaginaal 300mg
+	CRINONE		progesteron gel vaginaal 80mg/g
 	PROLUTEX		progesteron injvlst 22,48mg/ml
+	CYCLOGEST		progesteron ovule 400mg
+	LUTINUS		progesteron tablet vaginaal 100mg
+	RYTMONORM		propafenon tablet omhuld 150mg
+	RYTMONORM		propafenon tablet omhuld 300mg
 	DIPRIVAN		propofol inj.emulsie 10mg/ml
 	PROPOFOL LIPURO		propofol inj.emulsie 10mg/ml
 	DIPRIVAN		propofol inj.emulsie 20mg/ml
 	PROPOFOL LIPURO		propofol inj.emulsie 20mg/ml
+	HEMANGIOL		propranolol drank  3,75mg/ml (base)
 	HOOFDPIJNPOEDERS 'DARO'		propyfenazon/paracetamol/coffeine pdr 150/250/46mg
 	SARIDON		propyfenazon/paracetamol/coffeine tab 150/250/50mg
 	PARADON HTP		propyfenazon/paracetamol/coffeine tab 150/250/50mg
 	SANALGIN		propyfenazon/paracetamol/coffeine tab 250/250/46mg
+	PROTAMINE MPH		protamine injvlst 1000ie/ml (hcl)
+	CEPROTIN		proteine c injectiepoeder  500ie
+	OCTAPLEX		protrombinecomplex infpdr 1000ie
+	PROTHROMPLEX		protrombinecomplex injpdr  600ie
+	COFACT		protrombinecomplex injpdr 250ie
+	BERIPLEX P/N		protrombinecomplex injpdr 250ie
+	COFACT		protrombinecomplex injpdr 500ie
+	BERIPLEX P/N		protrombinecomplex injpdr 500ie
+	OCTAPLEX		protrombinecomplex injpdr 500ie
+	RESOLOR		prucalopride tablet 1mg
+	RESOLOR		prucalopride tablet 2mg
+	MESTINON		pyridostigmine dragee 60mg
+	MESTINON		pyridostigmine tablet 10mg
+	DARAPRIM		pyrimethamine tablet 25mg
+	SEROQUEL		quetiapine tablet fo  25mg
+	SEROQUEL		quetiapine tablet fo 100mg
+	SEROQUEL		quetiapine tablet fo 200mg
+	SEROQUEL		quetiapine tablet fo 300mg
+	SEROQUEL		quetiapine tablet mga  50mg
+	SEROQUEL		quetiapine tablet mga 150mg
+	SEROQUEL		quetiapine tablet mga 200mg
+	SEROQUEL		quetiapine tablet mga 300mg
+	SEROQUEL		quetiapine tablet mga 400mg
+	NORPROLAC		quinagolide tablet 25ug
+	NORPROLAC		quinagolide tablet 50ug
+	NORPROLAC		quinagolide tablet 75ug
+	PARIET		rabeprazol tablet msr 10mg
+	PARIET		rabeprazol tablet msr 20mg
+	RABIPUR		rabiesvaccin injpdr 2,5ie (kippenembryocellen)
+	RABIESVACCIN MERIEUX		rabiesvaccin injpdr 2,5ie (menselijk diploid cel)
+	XOFIGO		radium ra-223 dichloride injvlst 1100kq/ml
+	EVISTA		raloxifeen tablet fo 60mg
+	ISENTRESS		raltegravir tablet 400mg
+	ISENTRESS		raltegravir tablet 600mg
+	CYRAMZA		ramucirumab infopl conc 10mg/ml
+	LUCENTIS		ranibizumab injvlst 10mg/ml
+	AZILECT		rasagiline tablet 1mg
+	FASTURTEC		rasburicase infusiepoeder 1,5mg
+	FASTURTEC		rasburicase infusiepoeder 7,5mg
+	ULTOMIRIS		ravulizumab infopl conc 100mg/ml
+	RAPISCAN		regadenoson injvlst 80ug/ml
+	REGKIRONA		regdanvimab infopl conc 60mg/ml
+	STIVARGA		regorafenib tablet 40mg
+	ORS MYLAN		rehydratiezout bruistablet mylan
+	ORS SANIAS		rehydratiezout bruistablet sanias
+	ORS TEVA		rehydratiezout bruistablet teva
+	ORS APOTEX		rehydratiezout poeder voor drank apotex
+	CARE PLUS ORS		rehydratiezout poeder voor drank careplus/san
+	ORS SAN		rehydratiezout poeder voor drank careplus/san
+	HEALTHYPHARM ORS		rehydratiezout poeder voor drank healthypharm
+	NORIT ORS		rehydratiezout poeder voor drank norit
+	VEKLURY		remdesivir infusiepoeder 100mg
 	ULTIVA		remifentanil injectiepoeder 1mg
 	ULTIVA		remifentanil injectiepoeder 2mg
 	ULTIVA		remifentanil injectiepoeder 5mg
+	BYFAVO		remimazolam injectiepoeder 20mg
+	NOVONORM		repaglinide tablet 0,5mg
+	NOVONORM		repaglinide tablet 1mg
+	NOVONORM		repaglinide tablet 2mg
+	CINQAERO		reslizumab infopl conc 10mg/ml
+	RHOPHYLAC		rhesus(d)immunoglobuline injvlst 500ie/ml
+	RHESONATIV		rhesus(d)immunoglobuline injvlst 625ie/ml
+	RHOPHYLAC		rhesus(d)immunoglobuline injvlst 750ie/ml
+	REBETOL		ribavirine capsule 200mg
+	KISQALI		ribociclib tablet 200mg
+	MYCOBUTIN		rifabutine capsule 150mg
+	RIFADIN		rifampicine capsule 150mg
+	RIFADIN		rifampicine capsule 300mg
+	RIFADIN		rifampicine infusiepoeder 600mg
+	RIFADIN		rifampicine susp oraal 20mg/ml
+	RIFINAH		rifampicine/isoniazide dragee 300/150mg
+	NORMIX		rifaximine tablet 200mg
+	XIFAXAN		rifaximine tablet 550mg
+	TIXTELLER		rifaximine tablet 550mg
+	REKAMBYS		rilpivirine injsusp 300mg/ml
+	EDURANT		rilpivirine tablet 25mg
+	RILUTEK		riluzol tablet 50mg
+	GLENTEK		riluzol tablet 50mg
+	VYDURA		rimegepant lyophilisaat 75mg
+	RINGER		ringer spoeling (usp)
+	IRRISOL		ringer/lactaat spoeling
+	ADEMPAS		riociguat tablet 0,5mg
+	ADEMPAS		riociguat tablet 1,5mg
+	ADEMPAS		riociguat tablet 1mg
+	ADEMPAS		riociguat tablet 2,5mg
+	ADEMPAS		riociguat tablet 2mg
 	SKYRIZI		risankizumab injvlst 150mg/ml
+	ACTONEL		risedroninezuur tablet fo  5mg
+	ACTONEL		risedroninezuur tablet fo 35mg
+	ACTONEL		risedroninezuur tablet fo 75mg
+	RISPERDAL		risperidon drank 1mg/ml
+	RISPERDAL CONSTA		risperidon pdr v injsusp 25mg
+	RISPERDAL CONSTA		risperidon pdr v injsusp 37,5mg
+	RISPERDAL CONSTA		risperidon pdr v injsusp 50mg
+	RISPERDAL		risperidon tablet omhuld 0,5mg
+	RISPERDAL		risperidon tablet omhuld 1mg
+	RISPERDAL		risperidon tablet omhuld 2mg
+	RISPERDAL		risperidon tablet omhuld 3mg
+	RISPERDAL		risperidon tablet omhuld 4mg
+	NORVIR		ritonavir capsule zacht 100mg
+	NORVIR		ritonavir pdr v suspensie 100mg
+	NORVIR		ritonavir tablet 100mg
+	MABTHERA		rituximab infopl conc 10mg/ml
+	RIXATHON		rituximab infopl conc 10mg/ml
+	TRUXIMA		rituximab infopl conc 10mg/ml
+	RUXIENCE		rituximab infopl conc 10mg/ml
 	MABTHERA		rituximab injvlst 120mg/ml
+	XARELTO		rivaroxaban susp oraal 1mg/ml
+	XARELTO		rivaroxaban tablet  2,5mg
+	XARELTO		rivaroxaban tablet 10mg
+	XARELTO		rivaroxaban tablet 15mg
+	XARELTO		rivaroxaban tablet 20mg
+	EXELON		rivastigmine capsule 1,5mg
+	EXELON		rivastigmine capsule 3mg
+	EXELON		rivastigmine capsule 4,5mg
+	EXELON		rivastigmine capsule 6mg
+	PROMETAX		rivastigmine capsule 6mg
+	EXELON		rivastigmine pleister  4,6mg/24uur (1ap/ex/te/sdz)
+	EXELON		rivastigmine pleister  9,5mg/24uur (1ap/ex/te/sdz)
+	EXELON		rivastigmine pleister 13,3mg/24uur (ex/1a/sdz/te)
+	MAXALT		rizatriptan smelttablet 10mg
+	MAXALT		rizatriptan tablet 10mg
+	ESMERON		rocuronium injvlst 10mg/ml
+	DAXAS		roflumilast tablet 250ug
+	DAXAS		roflumilast tablet 500ug
 	NPLATE		romiplostim injectiepoeder 125ug
 	NPLATE		romiplostim injectiepoeder 250ug
 	NPLATE		romiplostim injectiepoeder 500ug
 	EVENITY		romosozumab injvlst 90mg/ml
 	BESREMI		ropeginterferon alfa 2b injvlst 500ug/ml
+	REQUIP MODUTAB		ropinirol tablet mga 2mg
+	REQUIP MODUTAB		ropinirol tablet mga 4mg
+	REQUIP MODUTAB		ropinirol tablet mga 8mg
+	REQUIP		ropinirol tablet omhuld 0,25mg
+	REQUIP		ropinirol tablet omhuld 1mg
+	REQUIP		ropinirol tablet omhuld 2mg
+	REQUIP		ropinirol tablet omhuld 5mg
+	CRESTOR		rosuvastatine tablet  5mg
+	CRESTOR		rosuvastatine tablet 10mg
+	CRESTOR		rosuvastatine tablet 20mg
+	CRESTOR		rosuvastatine tablet 40mg
+	CHOLECOMB		rosuvastatine/ezetimib capsule 10/10mg
+	CHOLECOMB		rosuvastatine/ezetimib capsule 20/10mg
+	ROTARIX		rotavirusvaccin suspensie 1.000.000cc/do
+	NEUPRO		rotigotine pleister 1mg/24uur
+	NEUPRO		rotigotine pleister 2mg/24uur
+	NEUPRO		rotigotine pleister 3mg/24uur
+	NEUPRO		rotigotine pleister 4mg/24uur
+	NEUPRO		rotigotine pleister 6mg/24uur
+	NEUPRO		rotigotine pleister 8mg/24uur
+	EVRENZO		roxadustat tablet 100mg
+	EVRENZO		roxadustat tablet 150mg
+	EVRENZO		roxadustat tablet 20mg
+	EVRENZO		roxadustat tablet 50mg
+	EVRENZO		roxadustat tablet 70mg
+	RUBRACA		rucaparib tablet 200mg
+	RUBRACA		rucaparib tablet 250mg
+	RUBRACA		rucaparib tablet 300mg
+	INOVELON		rufinamide susp oraal 40mg/ml
+	INOVELON		rufinamide tablet 200mg
+	INOVELON		rufinamide tablet 400mg
+	RUPAFIN		rupatadine drank 1mg/ml
+	RUPAFIN		rupatadine tablet 10mg
+	ADYNOVI		rurioctocog alfa pegol injpdr  250ie
+	ADYNOVI		rurioctocog alfa pegol injpdr  500ie
+	ADYNOVI		rurioctocog alfa pegol injpdr 1000ie
+	ADYNOVI		rurioctocog alfa pegol injpdr 2000ie
+	JAKAVI		ruxolitinib tablet  5mg
+	JAKAVI		ruxolitinib tablet 10mg
+	JAKAVI		ruxolitinib tablet 15mg
+	JAKAVI		ruxolitinib tablet 20mg
+	ENTRESTO		sacubitril/valsartan tablet 24/26mg
+	ENTRESTO		sacubitril/valsartan tablet 49/51mg
+	ENTRESTO		sacubitril/valsartan tablet 97/103mg
+	XADAGO		safinamide tablet  50mg
+	XADAGO		safinamide tablet 100mg
+	AIROMIR		salbutamol aerosol 100ug/do
+	VENTOLIN		salbutamol aerosol 100ug/do
+	VENTOLIN		salbutamol infopl conc 1mg/ml
+	SALBUTAMOL NOVOLIZER		salbutamol inhalatiepoeder 100ug/do
+	VENTOLIN		salbutamol inhalatiepoeder 200ug/do
 	VENTOLIN		salbutamol injvlst 0,5mg/ml
+	VENTOLIN		salbutamol vernevelvlst 1mg/ml
+	VENTOLIN		salbutamol vernevelvlst 2mg/ml
+	SALAMOL STERI-NEB		salbutamol vernevelvlst 2mg/ml
+	VENTOLIN		salbutamol vernevelvlst 5mg/ml
+	COMBIVENT		salbutamol/ipratropium vernevelvlst 1/0,2mg/ml
+	IPRAMOL STERI-NEB		salbutamol/ipratropium vernevelvlst 1/0,2mg/ml
 	FORMULE W		salicylzuur collodion 170mg/g
+	PYRALVEX		salicylzuur/rheumextract vlst oromucosaal
+	SEREVENT		salmeterol aerosol 25ug/do
+	SEREVENT		salmeterol inhalatiepoeder 50ug/do
+	SERETIDE		salmeterol/fluticason aerosol  25/50ug/do
+	SERETIDE		salmeterol/fluticason aerosol 25/125ug/do
+	AIRFLUSAL		salmeterol/fluticason aerosol 25/125ug/do
+	SERETIDE		salmeterol/fluticason aerosol 25/250ug/do
+	AIRFLUSAL		salmeterol/fluticason aerosol 25/250ug/do
+	SERETIDE		salmeterol/fluticason inhalatiepoeder 50/100ug/do
+	SERETIDE		salmeterol/fluticason inhalatiepoeder 50/250ug/do
+	SERETIDE		salmeterol/fluticason inhalatiepoeder 50/500ug/do
+	AIRFLUSAL FORSPIRO		salmeterol/fluticason inhalatiepoeder 50/500ug/do
+	SALFULER		salmeterol/fluticason inhalatiepoeder 50/500ug/do
+	SALFLUTIN		salmeterol/fluticason inhalatiepoeder 50/500ug/do
+	QUADRAMET		samarium sm-153 lexidronam injvlst 1300mbq/ml
+	KUVAN		sapropterine tablet oplos 100mg
+	INVIRASE		saquinavir tablet 500mg
 	KEVZARA		sarilumab injvlst 131,6mg/ml
 	KEVZARA		sarilumab injvlst 175mg/ml
 	ENSPRYNG		satralizumab injvlst 120mg/ml
+	ONGLYZA		saxagliptine tablet 2,5mg
+	ONGLYZA		saxagliptine tablet 5mg
+	SCOPODERM TTS		scopolamine pleister 1,5mg
+	BUSCOPAN		scopolaminebutyl dragee 10mg
 	BUSCOPAN		scopolaminebutyl injvlst 20mg/ml
+	BUSCOPAN		scopolaminebutyl tablet 10mg
+	BUSCOPAN		scopolaminebutyl zetpil 10mg
+	KANUMA		sebelipase alfa infopl conc 2mg/ml
 	COSENTYX		secukinumab injvlst 150mg/ml
 	SELSUN		seleensulfide suspensie 25mg/ml
+	SEHCAT		selenium se-75 tauroselcholinezuur capsule 370kq
+	UPTRAVI		selexipag tablet  200ug
+	UPTRAVI		selexipag tablet  400ug
+	UPTRAVI		selexipag tablet  600ug
+	UPTRAVI		selexipag tablet  800ug
+	UPTRAVI		selexipag tablet 1000ug
+	UPTRAVI		selexipag tablet 1200ug
+	UPTRAVI		selexipag tablet 1400ug
+	UPTRAVI		selexipag tablet 1600ug
+	RETSEVMO		selpercatinib capsule 40mg
+	RETSEVMO		selpercatinib capsule 80mg
 	OZEMPIC		semaglutide injvlst 0,25mg/do
 	OZEMPIC		semaglutide injvlst 0,5mg/do
 	OZEMPIC		semaglutide injvlst 1mg/do
+	RYBELSUS		semaglutide tablet  3mg
+	RYBELSUS		semaglutide tablet  7mg
+	RYBELSUS		semaglutide tablet 14mg
+	XPRAEP		sennosiden a+b stroop 2mg/ml
+	SERDOLECT		sertindol tablet omhuld  4mg
+	SERDOLECT		sertindol tablet omhuld 16mg
+	ZOLOFT		sertraline conc voor drank 20mg/ml
+	ZOLOFT		sertraline tablet  50mg
+	RENVELA		sevelameer pdr v suspensie 0,8g
+	RENVELA		sevelameer pdr v suspensie 2,4g
+	RENVELA		sevelameer tablet 800mg (carbonaat)
+	RENAGEL		sevelameer tablet fo 800mg (hcl)
+	REVATIO		sildenafil injvlst 0,8mg/ml
+	REVATIO		sildenafil susp oraal 10mg/ml
+	REVATIO		sildenafil tablet   20mg
+	BALCOGA		sildenafil tablet   20mg
+	VIAGRA		sildenafil tablet   25mg
+	VIAGRA		sildenafil tablet   50mg
+	VIAGRA		sildenafil tablet  100mg
+	SILODYX		silodosine capsule 4mg
+	SILODYX		silodosine capsule 8mg
+	SYLVANT		siltuximab infusiepoeder 100mg
+	SYLVANT		siltuximab infusiepoeder 400mg
+	NUWIQ		simoctocog alfa injectiepoeder  250ie
+	NUWIQ		simoctocog alfa injectiepoeder  500ie
+	NUWIQ		simoctocog alfa injectiepoeder 1000ie
+	NUWIQ		simoctocog alfa injectiepoeder 2000ie
+	NUWIQ		simoctocog alfa injectiepoeder 2500ie
+	NUWIQ		simoctocog alfa injectiepoeder 3000ie
+	NUWIQ		simoctocog alfa injectiepoeder 4000ie
+	SIMPLEX		simplex p bone poeder voor cement 40g
+	ZOCOR		simvastatine tablet fo 10mg
+	ZOCOR		simvastatine tablet fo 20mg
+	ZOCOR		simvastatine tablet fo 40mg
+	MAYZENT		siponimod tablet 0,25mg
+	MAYZENT		siponimod tablet 2mg
+	RAPAMUNE		sirolimus drank 1mg/ml
+	RAPAMUNE		sirolimus tablet fo 1mg
+	RAPAMUNE		sirolimus tablet fo 2mg
+	JANUVIA		sitagliptine tablet  25mg
+	XELEVIA		sitagliptine tablet  25mg
+	RISTABEN		sitagliptine tablet  25mg
+	TESAVEL		sitagliptine tablet  25mg
+	JANUVIA		sitagliptine tablet  50mg
+	XELEVIA		sitagliptine tablet  50mg
+	RISTABEN		sitagliptine tablet  50mg
+	TESAVEL		sitagliptine tablet  50mg
+	JANUVIA		sitagliptine tablet 100mg
+	XELEVIA		sitagliptine tablet 100mg
+	RISTABEN		sitagliptine tablet 100mg
+	JANUMET		sitagliptine/metformine tablet 50/ 850mg
+	JANUMET		sitagliptine/metformine tablet 50/1000mg
+	VELMETIA		sitagliptine/metformine tablet 50/1000mg
+	SMOFKABIVEN		smofkabiven elektrolytvrij inf emulsie
+	SMOFKABIVEN		smofkabiven extra amino elec vrij inf emulsie
+	SMOFKABIVEN		smofkabiven extra amino inf emulsie
+	SMOFKABIVEN		smofkabiven inf emulsie
+	SMOFKABIVEN		smofkabiven low osmo perifeer inf emul
+	SMOFKABIVEN		smofkabiven perifeer inf emulsie
+	SMOFLIPID		smoflipid infemu 200mg/ml
+	VOSEVI		sofosbuvi/velpatasvi/voxilaprevi tab 400/100/100mg
+	SOVALDI		sofosbuvir tablet 400mg
+	EPCLUSA		sofosbuvir/velpatasvir tablet 400/100mg
+	INTRALIPID		sojaolie gezuiverd infemu 200mg/ml
+	VESICARE		solifenacine susp oraal 1mg/ml
+	VESICARE		solifenacine tablet  5mg
+	VESICARE		solifenacine tablet 10mg
+	VESOMNI		solifenacine/tamsulosine tablet mga 6/0,4mg
+	SOLUVIT N		soluvit n infusiepoeder
+	GHRH FERRING		somatoreline injectiepoeder 50ug
 	GENOTROPIN		somatropine injectiepoeder  5mg
 	OMNITROPE		somatropine injectiepoeder  5mg
 	GENOTROPIN GOQUICK		somatropine injectiepoeder  5mg
@@ -742,30 +3356,165 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	NORDITROPIN FLEXPRO		somatropine injvlst  6,67mg/ml
 	NORDITROPIN SIMPLEXX		somatropine injvlst 10mg/ml
 	OMNITROPE		somatropine injvlst 10mg/ml
+	ODOMZO		sonidegib capsule 200mg
+	NEXAVAR		sorafenib tablet 200mg
+	IRRISOL		sorbitol spoeling 50mg/ml
+	PURISOLE		sorbitol/mannitol blaassp 27/5,4mg/ml
+	LUMYKRAS		sotorasib tablet 120mg
+	NORMACOL		sterculiagom granulaat 6,2g
+	NORMACOL		sterculiagom granulaat 620mg/g
+	STEROFUNDIN		sterofundin iso
+	STEROFUNDIN ISO		sterofundin iso
+	DIACOMIT		stiripentol capsule 250mg
+	DIACOMIT		stiripentol capsule 500mg
+	DIACOMIT		stiripentol pdr v suspensie 250mg
+	DIACOMIT		stiripentol pdr v suspensie 500mg
+	STRIBILD		stribild tablet
+	SUCRALAN		sucralfaat susp oraal 1g
 	SUFENTA		sufentanil injvlst  5ug/ml
 	SUFENTA		sufentanil injvlst 50ug/ml
+	BRIDION		sugammadex injvlst 100mg/ml
 	MYK 1		sulconazol creme 10mg/g
 	MYK 1		sulconazol opl cutaan 10mg/ml
+	SALAZOPYRINE		sulfasalazine tablet msr 500mg
+	SALAZOPYRINE		sulfasalazine zetpil 500mg
+	DOGMATIL		sulpiride capsule 50mg
+	DOGMATIL		sulpiride tablet 400mg
+	NALADOR		sulproston injectiepoeder 500ug
+	OSPOLOT		sultiam tablet  50mg
+	OSPOLOT		sultiam tablet 200mg
+	IMIGRAN FTAB		sumatriptan dispertablet  50mg
+	IMIGRAN FTAB		sumatriptan dispertablet 100mg
 	IMIGRAN		sumatriptan injvlst 12mg/ml
+	IMIGRAN		sumatriptan neusspray 10mg
+	IMIGRAN		sumatriptan neusspray 20mg
+	SUTENT		sunitinib capsule 12,5mg
+	SUTENT		sunitinib capsule 25mg
+	SUTENT		sunitinib capsule 50mg
+	SUPLIVEN		supliven infopl conc
+	OBIZUR		susoctocog alfa injpdr  500e
+	SYMTUZA		symtuza tablet
+	PROGRAFT		tacrolimus capsule 0,5mg
+	ADPORT		tacrolimus capsule 0,5mg
+	PROGRAFT		tacrolimus capsule 1mg
+	ADPORT		tacrolimus capsule 1mg
+	PROGRAFT		tacrolimus capsule 5mg
+	ADPORT		tacrolimus capsule 5mg
+	ADVAGRAF		tacrolimus capsule mga 0,5mg (dailiport/advagraf)
+	ADVAGRAF		tacrolimus capsule mga 1mg (dailiport/advagraf)
+	ADVAGRAF		tacrolimus capsule mga 3mg (dailiport/advagraf)
+	ADVAGRAF		tacrolimus capsule mga 5mg (dailiport/advagraf)
+	MODIGRAF		tacrolimus gran voor susp 0,2mg
+	PROGRAFT		tacrolimus infopl conc 5mg/ml
+	ENVARSUS		tacrolimus tablet mga 0,75mg (envarsus)
+	ENVARSUS		tacrolimus tablet mga 1mg (envarsus)
+	ENVARSUS		tacrolimus tablet mga 4mg (envarsus)
 	PROTOPIC		tacrolimus zalf 0,3mg/g
 	PROTOPIC		tacrolimus zalf 1mg/g
+	CIALIS		tadalafil tablet fo  5mg
+	CIALIS		tadalafil tablet fo 10mg
+	CIALIS		tadalafil tablet fo 20mg
+	ADCIRCA		tadalafil tablet fo 20mg
+	TALMANCO		tadalafil tablet fo 20mg
+	VYNDAQEL		tafamidis capsule zacht 20mg (meglumine)
+	VYNDAQEL		tafamidis capsule zacht 61mg (zuur)
 	SAFLUTAN		tafluprost oogdruppels 15ug/ml
+	TALZENNA		talazoparib capsule 0,25mg
+	TALZENNA		talazoparib capsule 1mg
+	IMLYGIC		talimogeen laherparepvec injvlst 100milj pfu/ml
+	IMLYGIC		talimogeen laherparepvec injvlst 1milj pfu/ml
+	OMNIC		tamsulosine tablet mga 0,4mg
+	PALEXIA		tapentadol tablet mga  50mg
+	PALEXIA		tapentadol tablet mga 100mg
+	PALEXIA		tapentadol tablet mga 150mg
+	PALEXIA		tapentadol tablet mga 200mg
+	PALEXIA		tapentadol tablet mga 250mg
+	BEROMUN		tasonermine infusiepoeder 1mg
+	TAUROLIN		taurolidine instillatievlst 20mg/ml
+	TAUROLIN		taurolidine spoeling 5mg/ml
+	TEYSUNO		tegafur/gimeracil/oteracil capsule 15/4,35/11,8mg
+	TEYSUNO		tegafur/gimeracil/oteracil capsule 20/5,8/15,8mg
+	TARGOCID		teicoplanine injectiepoeder 200mg
+	TARGOCID		teicoplanine injectiepoeder 400mg
+	FSME IMMUN		tekenencefalitisvaccin injsusp 4,8ug/ml
+	MICARDIS		telmisartan tablet 20mg
+	MICARDIS		telmisartan tablet 40mg
+	MICARDIS		telmisartan tablet 80mg
+	MICARDISPLUS		telmisartan/hydrochloorthiazide tablet 40/12,5mg
+	ACTELSAR HCT		telmisartan/hydrochloorthiazide tablet 40/12,5mg
+	MICARDISPLUS		telmisartan/hydrochloorthiazide tablet 80/12,5mg
+	ACTELSAR HCT		telmisartan/hydrochloorthiazide tablet 80/12,5mg
+	MICARDISPLUS		telmisartan/hydrochloorthiazide tablet 80/25mg
+	XERMELO		telotristat ethyl tablet 250mg
+	FOSCAN		temoporfine injvlst 1mg/ml
+	TEMODAL		temozolomide capsule  20mg
+	TEMODAL		temozolomide capsule 100mg
+	TEMODAL		temozolomide capsule 250mg
+	TORISEL		temsirolimus infopl conc 25mg/ml
+	METALYSE		tenecteplase pdr v injvlst 50mg
+	VEMLIDY		tenofovir alafenamide tablet 25mg
+	VIREAD		tenofovir disoproxil granulaat 33mg/g
+	VIREAD		tenofovir disoproxil tablet 123mg
+	VIREAD		tenofovir disoproxil tablet 163mg
+	VIREAD		tenofovir disoproxil tablet 204mg
+	VIREAD		tenofovir disoproxil tablet 245mg
+	TEPMETKO		tepotinib tablet 225mg
+	HYTRIN		terazosine tablet  2mg
+	HYTRIN		terazosine tablet  5mg
+	HYTRIN		terazosine tablet 10mg
 	LAMISIL		terbinafine creme 10mg/g
 	ANTISCHIMMELCREME HTP		terbinafine creme 10mg/g
 	IDYL		terbinafine creme 10mg/g
 	LAMISIL		terbinafine huidspray 10mg/g
 	LAMISIL		terbinafine opl cutaan 10mg/g
+	BRICANYL		terbutaline inhalatiepoeder 0,25mg/do
+	BRICANYL		terbutaline inhalatiepoeder 0,5mg/do
+	AUBAGIO		teriflunomide tablet 14mg
+	AUBAGIO		teriflunomide tablet 7mg
 	FORSTEO		teriparatide injvlst 250ug/ml
 	SONDELBAY		teriparatide injvlst 250ug/ml
 	MOVYMIA		teriparatide injvlst 250ug/ml
+	GLYPRESSIN		terlipressin in 0,1mg/ml (als diacetaat)
+	ANDRIOL		testosteron capsule 40mg
+	ANDROGEL		testosteron gel 10mg/g
+	ANDROGEL		testosteron gel 16,2mg/g
+	TOSTRAN		testosteron gel 20mg/g
+	TESTAVAN		testosteron gel 20mg/g
+	SUSTANON 250		testosteron injvlst 250mg/ml (sustanon)
+	NEBIDO		testosteron injvlst 250mg/ml (undecanoaat)
 	TETAGAM		tetanusimmunoglobuline injvlst 250ie/ml
+	TETANUSVACCIN		tetanusvaccin injsusp 80ie/ml
+	XENAZINE		tetrabenazine tablet 25mg
+	TETMODIS		tetrabenazine tablet 25mg
 	TETRACAINEHYDROCHLORIDE, MINIMS		tetracaine oogdruppels  5mg/ml
 	MINIMS TETRACAINE HCL		tetracaine oogdruppels 10mg/ml
+	SYNACTHEN		tetracosactide injvlst 0,25mg/ml
+	SYMKEVI		tezacaftor/ivacaftor tablet 100/150mg
+	SYMKEVI		tezacaftor/ivacaftor tablet 50/75mg
+	THEOPHYLLIN RETARD RATIOPHARM		theofylline capsule mga 250mg
+	STRUMAZOL		thiamazol tablet 10mg
+	STRUMAZOL		thiamazol tablet 30mg
+	PENTOTHAL		thiopental injectiepoeder 500mg
+	TEPADINA		thiotepa infusiepoeder  15mg
+	TEPADINA		thiotepa infusiepoeder 100mg
+	GRAFALON		thymocytenimmunoglobuline inf conc 20mg/ml (k)
+	THYMOGLOBULINE		thymocytenimmunoglobuline infusiepoeder 25mg (k)
+	THYROGEN		thyrotropine alfa injectiepoeder 0,9mg
+	SURGAM		tiaprofeenzuur tablet 300mg
+	LIVIAL		tibolon tablet 2,5mg
+	TIBOLINIA		tibolon tablet 2,5mg
+	BRILIQUE		ticagrelor smelttablet 90mg
+	BRILIQUE		ticagrelor tablet 60mg
+	BRILIQUE		ticagrelor tablet 90mg
+	TYGACIL		tigecycline infusiepoeder 50mg
+	BRONCHOSTOP		tijm extract/althaea wortelext drank 8/55,333mg/ml
+	BRONCHOSTOP		tijm extract/althaea wortelext pastille 51,1/4,5mg
 	ILUMETRI		tildrakizumab injvlst 100mg/ml
 	TIMO-COMOD		timolol oogdruppels 2,5mg/ml
 	TIMOPTOL		timolol oogdruppels 2,5mg/ml
 	TIMO-COMOD		timolol oogdruppels 5mg/ml
 	TIMOPTOL		timolol oogdruppels 5mg/ml
+	TIMOGEL		timolol ooggel 1mg/g
 	GANFORT		timolol/bimatoprost oogdruppels 5/0,3mg/ml
 	COMBIGAN		timolol/brimonidine oogdruppels 5/2mg/ml
 	AZARGA		timolol/brinzolamide oogdruppels 5/10mg/ml
@@ -777,22 +3526,121 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	FIXAPROST		timolol/latanoprost oogdr 5mg/50ug/ml
 	TAPTIQOM		timolol/tafluprost oogdruppels 5mg/15ug/ml
 	INNOHEP		tinzaparine injvlst 20.000ie/ml
+	THIOSIX		tioguanine tablet 10mg
+	THIOSIX		tioguanine tablet 20mg
+	LANVIS		tioguanine tablet 40mg
+	TIOTRUS		tiotropium inhalatiecapsule 13ug
+	SPIRIVA		tiotropium inhalatiecapsule 18ug
+	TAVULUS		tiotropium inhalatiecapsule 18ug
+	SPIRIVA		tiotropium vernevelvlst 2,5ug/do
+	SPIOLTO		tiotropium/olodaterol vernevelvlst 2,5/2,5ug/do
 	KLISYRI		tirbanibuline zalf 10mg/g
+	AGGRASTAT		tirofiban infvlst 0,05mg/ml
+	FOTIVDA		tivozanib capsule  890ug
+	FOTIVDA		tivozanib capsule 1340ug
+	EVUSHELD		tixagevimab injvlst 100mg/ml
+	EVUSHELD		tixagevimab/cilgavimab injvlst 100/100mg/ml
+	SIRDALUD		tizanidine capsule mga  6mg
+	SIRDALUD		tizanidine tablet 2mg
+	SIRDALUD		tizanidine tablet 4mg
+	TOBI PODHALER		tobramycine inhalatiecapsule 28mg
+	OBRACIN		tobramycine injvlst 40mg/ml
 	TOBREX BID		tobramycine oogdruppels  3mg/ml
+	TOBREX		tobramycine oogzalf 3mg/g
+	SIMPLEX		tobramycine poeder v cement  500mg
+	SIMPLEX		tobramycine poeder v cement 1000mg
+	TOBI		tobramycine vernevelvlst  60mg/ml
+	TOBRAMYCINE STERI-NEB		tobramycine vernevelvlst  60mg/ml
+	BRAMITOB		tobramycine vernevelvlst  75mg/ml
+	VANTOBRA		tobramycine vernevelvlst 100mg/ml
+	ROACTEMRA		tocilizumab infopl conc 20mg/ml
 	ROACTEMRA		tocilizumab injvlst 180mg/ml
+	VEDROP		tocofersolan drank 50mg d-alfa-tocoferol/ml
+	XELJANZ		tofacitinib drank 1mg/ml
+	XELJANZ		tofacitinib tablet  5mg
+	XELJANZ		tofacitinib tablet 10mg
+	XELJANZ		tofacitinib tablet mga 11mg
+	TASMAR		tolcapon tablet omhuld 100mg
+	TOLPERMYO		tolperison tablet 150mg
+	TOLPERMYO		tolperison tablet 50mg
+	DETRUSITOL		tolterodine capsule mga 2mg
+	DETRUSITOL		tolterodine capsule mga 4mg
+	DETRUSITOL		tolterodine tablet omhuld 1mg
+	DETRUSITOL		tolterodine tablet omhuld 2mg
+	JINARC		tolvaptan tablet 15mg
+	JINARC		tolvaptan tablet 30mg
+	JINARC		tolvaptan tablet 45mg
+	JINARC		tolvaptan tablet 60mg
+	JINARC		tolvaptan tablet 90mg
+	TOPAMAX		topiramaat capsule 15mg
+	TOPAMAX		topiramaat capsule 25mg
+	TOPAMAX		topiramaat capsule 50mg
+	TOPAMAX		topiramaat tablet omhuld  25mg
+	TOPAMAX		topiramaat tablet omhuld 100mg
+	TOPAMAX		topiramaat tablet omhuld 200mg
+	HYCAMTIN		topotecan capsule 0,25mg
+	HYCAMTIN		topotecan capsule 1mg
+	HYCAMTIN		topotecan infusiepoeder 4mg
+	YONDELIS		trabectedine infusiepoeder 0,25mg
+	YONDELIS		trabectedine infusiepoeder 1mg
 	ADTRALZA		tralokinumab injvlst 150mg/ml
+	TRAMAL		tramadol capsule 50mg
 	TRAMAL		tramadol druppels 100mg/ml
+	TRAMAL		tramadol injvlst 50mg/ml
+	TRAMAL		tramadol tablet mga 100mg
+	TRAMAGETIC		tramadol tablet mga 200mg
+	TRAMAGETIC		tramadol tablet mga 300mg
 	ZALDIAR		tramadol/paracetamol tablet 37,5/325mg
+	BISOLNASAL		tramazoline neusspray 1,18mg/ml
+	MEKINIST		trametinib tablet 0,5mg
+	MEKINIST		trametinib tablet 2mg
+	CYKLOKAPRON		tranexaminezuur injvlst 100mg/ml
+	TRAXIDOT		tranexaminezuur injvlst 100mg/ml
+	CYKLOKAPRON		tranexaminezuur tablet fo 500mg
+	PARNATE		tranylcypromine tablet 10mg
+	TRACYDAL		tranylcypromine tablet 20mg
+	KADCYLA		trastuzumab emtansine infpdr 100mg (kadcyla)
+	KADCYLA		trastuzumab emtansine infpdr 160mg (kadcyla)
+	HERCEPTIN		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	HERZUMA		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	KANJINTI		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	OGIVRI		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	TRAZIMERA		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	ONTRUZANT		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	ZERCEPAC		trastuzumab inf 150mg(her/kan/ogi/ont/tra/zer)
+	KANJINTI		trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)
+	HERZUMA		trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)
+	TRAZIMERA		trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)
+	OGIVRI		trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)
+	ONTRUZANT		trastuzumab infpdr 420mg (her/kan/ogi/ont/trazim)
+	ZERCEPAC		trastuzumab infusiepoeder 60mg (zercepac)
 	HERCEPTIN		trastuzumab injvlst 120mg/ml (herceptin)
 	TRAVATAN		travoprost oogdruppels 40ug/ml
 	VIZITRAV		travoprost oogdruppels 40ug/ml
 	DUOTRAV		travoprost/timolol oogdruppels 40ug/5mg/ml
+	TRAZOLAN		trazodon tablet 100mg
+	TRECONDI		treosulfan infusiepoeder 1000mg
+	TRECONDI		treosulfan infusiepoeder 5000mg
 	REMODULIN		treprostinil infvlst  1mg/ml
 	REMODULIN		treprostinil infvlst  2,5mg/ml
 	REMODULIN		treprostinil infvlst  5mg/ml
 	REMODULIN		treprostinil infvlst 10mg/ml
+	VESANOID		tretinoine capsule 10mg
 	EFFEDERM		tretinoine creme 0,5mg/g
+	KENACORT-A		triamcinolonacetonide injsusp 10mg/ml
+	KENACORT-A		triamcinolonacetonide injsusp 40mg/ml (parent)
+	VISTREC		triamcinolonacetonide injsusp 40mg/ml (vitreaal)
+	NASACORT		triamcinolonacetonide neusspray 55ug/do
+	TRIANAL		triamcinolonacetonide/lidocaine zalf rectaal
+	TRIANAL		triamcinolonacetonide/lidocaine zetpil 0,5/50mg
+	TRISPAN		triamcinolonhexacetonide injsusp 20mg/ml
+	CUFENCE		trientine capsule 200mg
+	CUPRIOR		trientine tablet 150mg
 	AKLIEF		trifaroteen creme 50ug/g
+	LONSURF		trifluridine/tipiracil tablet 15/6,14mg
+	LONSURF		trifluridine/tipiracil tablet 20/8,19mg
+	ARTANE		trihexyfenidyl tablet 2mg
+	ARTANE		trihexyfenidyl tablet 5mg
 	ROKIPRIM		trimethoprim/sulfametrol infvlst 0,64/3,2mg/ml
 	AZARON		tripelennamine creme 20mg/g
 	AZARON		tripelennamine huidstift 20mg/g
@@ -803,26 +3651,203 @@ ExternalCode	BrandName	Manufacturer	MedicationName
 	PAMORELIN		triptoreline pdr v injsusp 11,25mg
 	SALVACYL		triptoreline pdr v injsusp 11,25mg
 	PAMORELIN		triptoreline pdr v injsusp 22,5mg
+	VERASEAL		trombine oplossing 500ie/ml
+	TISSEEL		trombine/calciumchl (tisse/tissu) 500ie/4,44mg/ml
+	ARTISS		trombine/calciumchloride opl 4ie/4,44mg/ml 1ml
+	MYDRANE		tropica/fenylefri/lidocain injvlst 0,2/3,1/10mg/ml
 	TROPICAMIDE, MINIMS		tropicamide oogdruppels  5mg/ml
 	TROPICAMIDE MONOFREE		tropicamide oogdruppels  5mg/ml
 	TROPICAMIDE, MINIMS		tropicamide oogdruppels 10mg/ml
+	MYDRIASERT		tropicamide/fenylefrine ooginsert 0,28/5,4mg
+	TUBERCULINE		tuberculine injvlst 20te/ml
+	TUKYSA		tucatinib tablet 150mg
+	TUKYSA		tucatinib tablet 50mg
+	NOVOEIGHT		turoctocog alfa injpdr  250ie
+	NOVOEIGHT		turoctocog alfa injpdr  500ie
+	NOVOEIGHT		turoctocog alfa injpdr 1000ie
+	NOVOEIGHT		turoctocog alfa injpdr 1500ie
+	NOVOEIGHT		turoctocog alfa injpdr 2000ie
+	NOVOEIGHT		turoctocog alfa injpdr 3000ie
+	ESPEROCT		turoctocog alfa pegol injpdr  500ie
+	ESPEROCT		turoctocog alfa pegol injpdr 1000ie
+	ESPEROCT		turoctocog alfa pegol injpdr 1500ie
+	ESPEROCT		turoctocog alfa pegol injpdr 2000ie
+	ESPEROCT		turoctocog alfa pegol injpdr 3000ie
+	ELLAONE		ulipristal tablet 30mg
+	ESMYA		ulipristal tablet 5mg
+	INCRUSE ELLIPTA		umeclidinium inhalatiepoeder 55ug/do
+	ANORO ELLIPTA		umeclidinium/vilanterol inhpdr 55/22ug/do
+	RINVOQ		upadacitinib tablet mga 15mg
+	RINVOQ		upadacitinib tablet mga 30mg
+	RINVOQ		upadacitinib tablet mga 45mg
+	HELICOBACTER		ureum c 13 poeder v drank  45mg
+	HELICOBACTER		ureum c 13 poeder v drank  75mg
+	PYLOBACTELL		ureum c 13 tablet oplos 100mg
 	FOSTIMON		urofollitropine injectiepoeder  75ie
 	FOSTIMON		urofollitropine injectiepoeder 150ie
 	FOSTIMON		urofollitropine injectiepoeder 225ie
+	MEDACINASE		urokinase infusiepoeder  10.000ie
+	MEDACINASE		urokinase infusiepoeder  50.000ie
+	MEDACINASE		urokinase infusiepoeder 100.000ie
+	MEDACINASE		urokinase infusiepoeder 250.000ie
+	MEDACINASE		urokinase infusiepoeder 500.000ie
+	URSOFALK		ursodeoxycholzuur capsule 250mg
+	GRINTEROL		ursodeoxycholzuur capsule 250mg
+	URSOFALK		ursodeoxycholzuur susp oraal 50mg/ml
+	URSOCHOL		ursodeoxycholzuur tablet 300mg
+	URSOCHOL		ursodeoxycholzuur tablet 450mg
+	URSOFALK		ursodeoxycholzuur tablet 500mg
+	URSONORM		ursodeoxycholzuur tablet 500mg
+	URSOCHOL		ursodeoxycholzuur tablet 600mg
+	STELARA		ustekinumab infopl conc 5mg/ml
 	STELARA		ustekinumab injvlst 90mg/ml
+	ZELITREX		valaciclovir tablet  250mg
+	ZELITREX		valaciclovir tablet  500mg
+	VALDISPERT		valeriaan wortelextract tablet  45mg
+	VALDISPERT		valeriaan wortelextract tablet 450mg
+	VALCYTE		valganciclovir drank 50mg/ml
+	VALCYTE		valganciclovir tablet fo 450mg
+	DEPAKINE		valproinezuur drank 300mg/ml
+	DEPAKINE		valproinezuur drank 40mg/ml
+	DEPAKINE		valproinezuur granulaat mga  100mg (zuur+na-zout)
+	DEPAKINE		valproinezuur granulaat mga  250mg (zuur+na-zout)
+	DEPAKINE		valproinezuur granulaat mga  500mg (zuur+na-zout)
+	DEPAKINE		valproinezuur granulaat mga  750mg (zuur+na-zout)
+	DEPAKINE		valproinezuur granulaat mga 1000mg (zuur+na-zout)
+	DEPAKINE		valproinezuur injectiepoeder 400mg
+	ORFIRIL		valproinezuur injvlst 100mg/ml
+	DEPAKINE		valproinezuur tablet mga 300mg (zuur+na-zout)
+	DEPAKINE		valproinezuur tablet mga 500mg (zuur+na-zout)
+	DEPAKINE		valproinezuur tablet msr 150mg
+	DEPAKINE		valproinezuur tablet msr 300mg
+	DEPAKINE		valproinezuur tablet msr 500mg
+	DIOVAN		valsartan drank 3mg/ml
+	DIOVAN		valsartan tablet omhuld  80mg
+	DIOVAN		valsartan tablet omhuld 160mg
+	DIOVAN		valsartan tablet omhuld 320mg
+	CODIOVAN		valsartan/hydrochloorthiazide tab omh  80/12,5mg
+	CODIOVAN		valsartan/hydrochloorthiazide tab omh 160/12,5mg
+	CODIOVAN		valsartan/hydrochloorthiazide tab omh 160/25mg
+	CODIOVAN		valsartan/hydrochloorthiazide tab omh 320/12,5mg
+	CODIOVAN		valsartan/hydrochloorthiazide tab omh 320/25mg
+	VAMIN		vamin 14 zonder electr infvlst
+	VAMIN		vamin 18 zonder electr infvlst
+	VAMINOLACT		vaminolact infvlst
+	VANCOCIN		vancomycine capsule 250mg
+	CAPRELSA		vandetanib tablet 100mg
+	CAPRELSA		vandetanib tablet 300mg
+	LEVITRA		vardenafil tablet fo  5mg
+	LEVITRA		vardenafil tablet fo 10mg
+	LEVITRA		vardenafil tablet fo 20mg
+	CHAMPIX		varenicline tablet 0,5mg
+	CHAMPIX		varenicline tablet 1mg
 	PROVARIVAX		varicellavaccin injpdr  1350pfu (levend)
+	ENTYVIO		vedolizumab infusiepoeder 300mg
 	ENTYVIO		vedolizumab injvlst 158,8mg/ml
+	VPRIV		velaglucerase alfa infusiepoeder 400e
+	ZELBORAF		vemurafenib tablet 240mg
+	VENCLYXTO		venetoclax tablet  10mg
+	VENCLYXTO		venetoclax tablet  50mg
+	VENCLYXTO		venetoclax tablet 100mg
+	EFEXOR		venlafaxine capsule mga  37,5mg
+	EFEXOR		venlafaxine capsule mga  75mg
+	EFEXOR		venlafaxine capsule mga 150mg
+	ISOPTIN		verapamil tablet mga 120mg
+	ISOPTIN		verapamil tablet mga 180mg
+	ISOPTIN		verapamil tablet mga 240mg
+	TARKA		verapamil/trandolapril capsule mga 180/2mg
+	BRINAVESS		vernakalant infopl conc 20mg/ml
+	VISUDYNE		verteporfine infusiepoeder 15mg
+	LIPIODOL ULTRA FLUIDE		vetzuurethylesters gejodeerd injvl 1ml/ml
+	VAPORUB VICKS		vicks vaporub/luuf voor kinderen inhalatiezalf
+	SABRIL		vigabatrine granulaat 500mg
+	SABRIL		vigabatrine tablet 500mg
+	GALVUS		vildagliptine tablet 50mg
+	JALRA		vildagliptine tablet 50mg
+	EUCREAS		vildagliptine/metformine tablet 50/ 850mg
+	EUCREAS		vildagliptine/metformine tablet 50/1000mg
+	NAVELBINE		vinorelbine capsule 20mg
+	NAVELBINE		vinorelbine capsule 30mg
+	ERIVEDGE		vismodegib capsule 150mg
+	VITINTRA		vitintra adult infopl conc
+	VITINTRA		vitintra infant infopl conc
 	WAYLIVRA		volanesorsen injvlst 190mg/ml
+	VOLULYTE		volulyte infvlst 60mg/ml
+	WILFACTIN		von willebrandfactor pdr v injvlst 1000ie
+	VEYVONDI		vonicog alfa injpdr  650ie
+	VEYVONDI		vonicog alfa injpdr 1300ie
+	LUXTURNA		voretigeen neparvovec injopl conc 5tv/ml
+	VFEND		voriconazol infusiepoeder 200mg
+	VFEND		voriconazol susp oraal 40mg/ml
+	VFEND		voriconazol tablet fo  50mg
+	VFEND		voriconazol tablet fo 200mg
 	BRINTELLIX		vortioxetine druppels 20mg/ml
+	BRINTELLIX		vortioxetine tablet  5mg
+	BRINTELLIX		vortioxetine tablet 10mg
+	BRINTELLIX		vortioxetine tablet 15mg
+	BRINTELLIX		vortioxetine tablet 20mg
+	HAEMATE		willebrandf/factor viii injpdr  1200/500ie
+	WILATE		willebrandf/factor viii injpdr  500/500ie
+	HAEMATE		willebrandf/factor viii injpdr  600/250ie
+	WILATE		willebrandf/factor viii injpdr 1000/1000ie
+	HAEMATE		willebrandf/factor viii injpdr 2400/1000ie
 	KINDERNEUSDRUPPELS XYLOMETAZOLINE HTP		xylometazoline neusdruppels 0,5mg/ml
 	OTRIVIN		xylometazoline neusdruppels 1mg/ml
 	NEUSDRUPPELS XYLOMETAZOLINE HTP		xylometazoline neusdruppels 1mg/ml
 	IDYL		xylometazoline neusdruppels 1mg/ml
+	KINDERNEUSSPRAY XYLOMETAZOLINE SAM		xylometazoline neusspray 0,5mg/ml
+	KINDERNEUSSPRAY XYLOMETAZOLINE HTP		xylometazoline neusspray 0,5mg/ml
+	BOOTS PHARMACEUTICALS		xylometazoline neusspray 0,5mg/ml
+	IDYL		xylometazoline neusspray 0,5mg/ml
+	LIVSANE		xylometazoline neusspray 0,5mg/ml
+	COLDREX XYLOSEL		xylometazoline neusspray 0,5mg/ml
+	OTRIVIN		xylometazoline neusspray 0,5mg/ml
+	NEUSSPRAY XYLOMETAZOLINE SAM		xylometazoline neusspray 1mg/ml
+	NEUSSPRAY XYLOMETAZOLINE HTP		xylometazoline neusspray 1mg/ml
+	BOOTS PHARMACEUTICALS		xylometazoline neusspray 1mg/ml
+	LIVSANE		xylometazoline neusspray 1mg/ml
+	COLDREX XYLOSEL		xylometazoline neusspray 1mg/ml
+	OTRIVIN		xylometazoline neusspray 1mg/ml
+	IDYL		xylometazoline neusspray 1mg/ml
+	OTRIVIN DUO		xylometazoline/ipratropium neusspray 0,5/0,6mg/ml
+	YTRACIS		yttrium y-90 chloride rad opl 1,85gq/ml
+	YTTRIUM 90Y COLLOIDENSUSPENSIE CIS		yttrium y-90 citraatcolloide injsusp 203,5mq/ml
+	VOGEL		zaagbladpalm capsule 320mg
+	DECTOVA		zanamivir infvlst 10mg/ml
+	RELENZA		zanamivir inhalatiepoeder 5mg/do
+	RELENZA NVI		zanamivir inhalatiepoeder 5mg/do
+	PRIALT		ziconotide infvlst 100ug/ml
+	RETROVIR		zidovudine capsule 100mg
+	RETROVIR		zidovudine drank 10mg/ml
+	RETROVIR		zidovudine infopl conc 10mg/ml
 	FLAMMAZINE		zilversulfadiazine creme 10mg/g
 	FLAMMACERIUM		zilversulfadiazine/ceriumnitraat creme 10/22mg/g
+	WILZIN		zinkacetaat capsule  84mg (25mg zn)
+	WILZIN		zinkacetaat capsule 168mg (50mg zn)
 	SWAAB		zinkoxide pasta 600mg/g (smeersel)
 	SWAAB		zinkoxide zalf 100mg/g
 	DARODERM ZINKZALF		zinkoxide zalf 100mg/g
+	ZOFIL		zofenopril tablet omhuld  7,5mg
+	ZOFIL		zofenopril tablet omhuld 30mg
+	ZOMETA		zoledroninezuur infopl conc 0,8mg/ml
+	ZOMETA		zoledroninezuur infvlst 0,04mg/ml
+	ACLASTA		zoledroninezuur infvlst 0,05mg/ml
+	ZOMIG ZIP		zolmitriptan smelttablet 2,5mg
+	ZOMIG		zolmitriptan tablet omhuld 2,5mg
+	STILNOCT		zolpidem tablet 10mg
+	ZONEGRAN		zonisamide capsule  25mg
+	ZONEGRAN		zonisamide capsule  50mg
+	ZONEGRAN		zonisamide capsule 100mg
+	IMOVANE		zopiclon tablet 7,5mg
 	ZOSTAVAX		zostervaccin injpdr 19400pfu (levend)
 	SHINGRIX		zostervaccin injpdr 50ug (recombinant)
+	CISORDINOL		zuclopentixol (depot) injvlst 200mg/ml
+	CISORDINOL		zuclopentixol (depot) injvlst 500mg/ml
 	CISORDINOL		zuclopentixol druppels 20mg/ml
+	CISORDINOL		zuclopentixol injvlst  50mg/ml
+	CISORDINOL		zuclopentixol tablet  2mg
+	CISORDINOL		zuclopentixol tablet 10mg
+	CISORDINOL		zuclopentixol tablet 25mg
+	ZUURSTOF MEDICINAAL		zuurstof inhalatiegas 0,22ml/ml
+	ZUURSTOF MEDICINAAL		zuurstof inhalatiegas 1ml/ml
+	SONOVUE		zwavelhexafluoride injectiepoeder 40ul

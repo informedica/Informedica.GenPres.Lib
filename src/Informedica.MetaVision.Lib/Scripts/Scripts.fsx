@@ -32,21 +32,21 @@ MetaVision.createDoseForms (Some "data/output/DrugDatabaseForImport.xlsx") "Dose
 
 let meds =
     GenPresProduct.get true
-    |> Array.filter (fun gpp ->
-        let n = gpp.Name |> String.toLower |> String.trim
-        n |> String.contains "fenta" ||
-        n |> String.contains "genta" ||
-        n |> String.contains "trime" ||
-        n |> String.contains "amoxi" ||
-        n |> String.contains "parac" ||
-        n |> String.contains "norad" ||
-        n |> String.contains "morfi" ||
-        n |> String.contains "propo" ||
-        n |> String.contains "predn" ||
-        n |> String.contains "amfo"  ||
-        gpp.Shape |> String.toLower |> String.contains "druppel" ||
-        gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
-    )
+    //|> Array.filter (fun gpp ->
+        //let n = gpp.Name |> String.toLower |> String.trim
+        //n |> String.contains "fenta" ||
+        //n |> String.contains "genta" ||
+        //n |> String.contains "trime" ||
+        //n |> String.contains "amoxi" ||
+        //n |> String.contains "parac" ||
+        //n |> String.contains "norad" ||
+        //n |> String.contains "morfi" ||
+        //n |> String.contains "propo" ||
+        //n |> String.contains "predn" ||
+        //n |> String.contains "amfo"  ||
+        //gpp.Shape |> String.toLower |> String.contains "druppel" ||
+        //gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
+    //)
     |> MetaVision.createImport MetaVision.config
 
 
