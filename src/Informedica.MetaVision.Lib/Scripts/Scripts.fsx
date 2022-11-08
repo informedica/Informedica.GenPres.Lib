@@ -32,7 +32,7 @@ MetaVision.createDoseForms (Some "data/output/DrugDatabaseForImport.xlsx") "Dose
 
 let meds =
     GenPresProduct.get true
-    //|> Array.filter (fun gpp ->
+    |> Array.filter (fun gpp ->
         //let n = gpp.Name |> String.toLower |> String.trim
         //n |> String.contains "fenta" ||
         //n |> String.contains "genta" ||
@@ -44,11 +44,10 @@ let meds =
         //n |> String.contains "propo" ||
         //n |> String.contains "predn" ||
         //n |> String.contains "amfo"  ||
-        //gpp.Shape |> String.toLower |> String.contains "druppel" ||
-        //gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
-    //)
+        gpp.Shape |> String.toLower |> String.contains "druppel" ||
+        gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
+    )
     |> MetaVision.createImport MetaVision.config
-
 
 
 

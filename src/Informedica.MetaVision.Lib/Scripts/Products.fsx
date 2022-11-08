@@ -16,10 +16,9 @@ open Informedica.ZIndex.Lib.GenericProduct
 
 let prods =
     GenPresProduct.get true
-    |> filter
-    |> Array.collect (fun gpp -> gpp.GenericProducts)
+    |> filterGenericProducts
 
 
 prods
-|> Array.tryFind (fun gp -> gp.Id = 101656)
+|> Array.tryFind (fun gp -> gp.Id = 190152)
 

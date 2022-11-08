@@ -696,6 +696,7 @@ module Utils =
             | [|s1; s2|] -> $"{s1 |> String.capitalize}-{s2 |> String.capitalize}"
             | _ -> s |> String.capitalize
 
+
     let capitalizeRoute route =
         route
         |> capitalize
@@ -856,27 +857,6 @@ module Utils =
         un = "milliliter" || un = "druppel"
 
 
-    let filter gpps =
-        gpps
-        |> Array.filter (fun gpp ->
-            gpp |> hasNoUnit |> not &&
-            Constants.excludeShapes
-            |> Array.exists (fun s -> gpp.Shape |> String.equalsCapInsens s)
-            |> not
-
-        )
-        |> Array.map (fun gpp ->
-            { gpp with
-                GenericProducts =
-                    gpp.GenericProducts
-                    |> Array.filter (fun gp ->
-                        gp.Substances
-                        |> Array.forall (fun s -> s.SubstanceUnit <> NA)
-                    )
-            }
-        )
-
-
     let removeEmptyUnitSubstances (gp : GenericProduct) =
         { gp with
             Substances =
@@ -885,6 +865,35 @@ module Utils =
                     s.SubstanceUnit <> NA
                 )
         }
+
+
+    let filterGenericProducts gpps =
+        gpps
+        |> Array.filter (fun gpp ->
+            gpp |> hasNoUnit |> not &&
+            Constants.excludeShapes
+            |> Array.exists (fun s -> gpp.Shape |> String.equalsCapInsens s)
+            |> not
+        )
+        |> Array.map (fun gpp ->
+            { gpp with
+                GenericProducts =
+                    gpp.GenericProducts
+                    |> Array.filter (fun gp ->
+                        gp.Substances
+                        |> Array.forall (fun s ->
+                            s.SubstanceUnit
+                            |> String.trim
+                            |> String.equalsCapInsens NA
+                            |> not
+                        )
+                    )
+            }
+        )
+        |> Array.collect (fun gpp -> gpp.GenericProducts)
+        |> Array.map removeEmptyUnitSubstances
+        |> Array.filter (fun gp -> gp.Substances |> Array.isEmpty |> not)
+        |> Array.distinct
 
 
     let getSynonyms (gp: GenericProduct) =
@@ -1135,11 +1144,7 @@ module MetaVision =
 
         let gps =
             meds
-            |> filter
-            |> Array.collect (fun gpp -> gpp.GenericProducts)
-            |> Array.map removeEmptyUnitSubstances
-            |> Array.filter (fun gp -> gp.Substances |> Array.isEmpty |> not)
-            |> Array.distinct
+            |> filterGenericProducts
 
         gps |> createIngredients file ingrName
 
@@ -1163,7 +1168,7 @@ module MetaVision =
                     |> String.toLower
                     |> String.replace "'" ""
 
-                let g =
+                let grps =
                     ATCGroup.get ()
                     |> Array.filter (fun g ->
                         g.ATC5
@@ -1186,12 +1191,10 @@ module MetaVision =
                 let un =
                     match gp.Shape |> shapeDoseUnit rts gp.Substances[0].ShapeUnit with
                     | Some u when u |> String.isNullOrWhiteSpace |> not -> u
-                    | _ -> gp.Substances[0].SubstanceUnit
+                    | _ -> gp.Substances[0].GenericUnit
                     |> mapUnit
 
-                let assort =
-                    gp.Id
-                    |> getFormulary
+                let assort = gp.Id |> getFormulary
 
                 {|
                     ExternalCode = $"GPK-{gp.Id}"
@@ -1234,8 +1237,7 @@ module MetaVision =
                     DrugFamily = "" //g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
                     DrugSubfamily = "" //g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
                     IsFormulary = assort |> List.isEmpty |> not
-                    IsSolution =
-                        gp.Substances[0].ShapeUnit |> isSolutionUnit 
+                    IsSolution = gp.Substances[0].ShapeUnit |> isSolutionUnit
 
                     ComplexMedications =
                         if gp.Substances |> Array.length > 4 ||
@@ -1250,9 +1252,9 @@ module MetaVision =
                                             s.SubstanceName
                                             |> String.toLower
                                             |> String.trim
-                                        Concentration = s.SubstanceQuantity
+                                        Concentration = s.GenericQuantity
                                         ConcentrationUnit =
-                                            s.SubstanceUnit
+                                            s.GenericUnit
                                             |> mapUnit
                                         In =
                                             if gp.Shape |> shapeIsSolution "" un  then "1" else ""
@@ -1262,6 +1264,7 @@ module MetaVision =
                                                  if un = "druppel" then "mL" else un
                                     |}
                                 )
+                                |> Array.distinct
 
                             if gp.Substances[0].ShapeUnit |> isSolutionUnit ||
                                un |> isSolutionUnit || un = su then [||]
@@ -1313,7 +1316,7 @@ module MetaVision =
                                     DefaultUnit = r.Unit
                                     IsUnknownStrength = "FALSE"
                                     StrengthLEFT = r.ComplexMedications[0].Concentration
-                                    StrengthLEFTUnit = r.Unit
+                                    StrengthLEFTUnit = r.ComplexMedications[0].ConcentrationUnit
                                     StrengthRIGHT = "1"
                                     StrengthRIGHTUnit = "mL"
                                     DiluentGroup = Constants.solutionGroup
