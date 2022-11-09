@@ -17,10 +17,10 @@ type GenericProduct = GenericProduct.GenericProduct
 module Constants =
 
 
-    let diluentsGroup = "Oplossen"
+    let solutionGroup = "Oplossen"
 
 
-    let solutionGroup = "Verdunnen"
+    let dilutionGroup = "Verdunnen"
 
 
     let excludeShapes =
@@ -1198,7 +1198,7 @@ module MetaVision =
                     "DefaultUnit", "mL"
                     "OrderingType", "Both"
                     "IsDrugInSolution", false |> mapBool
-                    "Category", Constants.solutionGroup
+                    "Category", Constants.dilutionGroup
                     "IsDispensableAmountAllowed", false |> mapBool
                 |]
                 |> mapForms
@@ -1318,11 +1318,7 @@ module MetaVision =
                 let un =
                     match gp.Shape |> shapeDoseUnit rts gp.Substances[0].ShapeUnit with
                     | Some u when u |> String.isNullOrWhiteSpace |> not -> u
-                    | _ ->
-                        let subst = gp.Substances[0]
-
-                        if subst.SubstanceQuantity >= subst.GenericQuantity then subst.SubstanceUnit
-                        else subst.GenericUnit
+                    | _ -> gp.Substances[0].SubstanceUnit
                     |> mapUnit
 
                 let assort = gp.Id |> getFormulary
@@ -1356,14 +1352,14 @@ module MetaVision =
                         |> Array.filter (String.isNullOrWhiteSpace >> not)
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
-                    DiluentsGroup = // "Verduninngen"
-                        if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.diluentsGroup
+                    DiluentsGroup = // "Oplossen"
+                        if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.solutionGroup
                         else ""
-                    DrugInDiluentGroup = // "Oplossingen"
+                    DrugInDiluentGroup = // "Verdunnen"
                         if gp.Shape |> shapeIsSolution "" un then "[None]"
                         else
                             if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
-                               gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.solutionGroup
+                               gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.dilutionGroup
                             else
                                 "[None]"
                     DrugFamily = "" //g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
@@ -1380,12 +1376,7 @@ module MetaVision =
                             let cms =
                                 gp.Substances
                                 |> Array.map (fun s ->
-                                    let q, u =
-                                        if s.SubstanceQuantity >= s.GenericQuantity then
-                                            s.SubstanceQuantity, s.SubstanceUnit
-                                        else
-                                            s.GenericQuantity, s.GenericUnit
-
+                                    let q, u = s.SubstanceQuantity, s.SubstanceUnit
                                     let u = u |> mapUnit
 
                                     {|
@@ -1474,7 +1465,7 @@ module MetaVision =
                                     StrengthLEFTUnit = r.ComplexMedications[0].ConcentrationUnit
                                     StrengthRIGHT = "1"
                                     StrengthRIGHTUnit = "mL"
-                                    DiluentGroup = Constants.solutionGroup
+                                    DiluentGroup = Constants.dilutionGroup
                                     ProductRequiresReconstitution = "FALSE"
                                     IsVolumeKnown = "FALSE"
                                     Volume = "0"
