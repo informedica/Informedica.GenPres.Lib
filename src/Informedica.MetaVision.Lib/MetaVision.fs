@@ -17,10 +17,10 @@ type GenericProduct = GenericProduct.GenericProduct
 module Constants =
 
 
-    let diluentsGroup = "Oplossingen"
+    let diluentsGroup = "Oplossen"
 
 
-    let solutionGroup = "Verdunningen"
+    let solutionGroup = "Verdunnen"
 
 
     let excludeShapes =
@@ -33,11 +33,11 @@ module Constants =
 
     let solutionMeds =
         [|
-            "water"
-            "NaCl 0,9%"
-            "gluc 5%"
-            "gluc 10%"
-            "emulsie"
+            "water", "oplosvloeistof"
+            "NaCl 0,9%", "oplosvloeistof"
+            "gluc 5%", "oplosvloeistof"
+            "gluc 10%", "oplosvloeistof"
+            "emulsie", "emulsie"
         |]
 
 
@@ -634,6 +634,102 @@ module Constants =
 
 
 
+    let meds =
+        [|
+            [|
+                "MedicationName", "water"
+                "Unit", "mL"
+                "ATCCode", ""
+                "Status", "Active"
+                "Format", "1,234.5 (Include Zero)"
+                "IncrementValue", "0,1"
+                "CodeSnippetName", ""
+                "Frequencies", "[All]"
+                "DoseForms", "oplosvloeistof"
+                "Routes", "[All]"
+                "AdditivesGroup", "[All]"
+                "DiluentsGroup", "[All]"
+                "DrugInDiluentGroup", "[None]"
+                "DrugFamily", "[None]"
+                "DrugSubfamily", "[None]"
+                "HideInAllergyEntry", "FALSE"
+            |]
+            [|
+                "MedicationName", "NaCl 0,9%"
+                "Unit", "mL"
+                "ATCCode", ""
+                "Status", "Active"
+                "Format", "1,234.5 (Include Zero)"
+                "IncrementValue", "0,1"
+                "CodeSnippetName", ""
+                "Frequencies", "[All]"
+                "DoseForms", "oplosvloeistof"
+                "Routes", "[All]"
+                "AdditivesGroup", "[All]"
+                "DiluentsGroup", "[All]"
+                "DrugInDiluentGroup", "[None]"
+                "DrugFamily", "[None]"
+                "DrugSubfamily", "[None]"
+                "HideInAllergyEntry", "FALSE"
+            |]
+            [|
+                "MedicationName", "gluc 5%"
+                "Unit", "mL"
+                "ATCCode", ""
+                "Status", "Active"
+                "Format", "1,234.5 (Include Zero)"
+                "IncrementValue", "0,1"
+                "CodeSnippetName", ""
+                "Frequencies", "[All]"
+                "DoseForms", "oplosvloeistof"
+                "Routes", "[All]"
+                "AdditivesGroup", "[All]"
+                "DiluentsGroup", "[All]"
+                "DrugInDiluentGroup", "[None]"
+                "DrugFamily", "[None]"
+                "DrugSubfamily", "[None]"
+                "HideInAllergyEntry", "FALSE"
+            |]
+            [|
+                "MedicationName", "gluc 10%"
+                "Unit", "mL"
+                "ATCCode", ""
+                "Status", "Active"
+                "Format", "1,234.5 (Include Zero)"
+                "IncrementValue", "0,1"
+                "CodeSnippetName", ""
+                "Frequencies", "[All]"
+                "DoseForms", "oplosvloeistof"
+                "Routes", "[All]"
+                "AdditivesGroup", "[All]"
+                "DiluentsGroup", "[All]"
+                "DrugInDiluentGroup", "[None]"
+                "DrugFamily", "[None]"
+                "DrugSubfamily", "[None]"
+                "HideInAllergyEntry", "FALSE"
+            |]
+            [|
+                "MedicationName", "emulsie"
+                "Unit", "mL"
+                "ATCCode", ""
+                "Status", "Active"
+                "Format", "1,234.5 (Include Zero)"
+                "IncrementValue", "0,1"
+                "CodeSnippetName", ""
+                "Frequencies", "[All]"
+                "DoseForms", "emulsie"
+                "Routes", "[All]"
+                "AdditivesGroup", "[All]"
+                "DiluentsGroup", "[All]"
+                "DrugInDiluentGroup", "[None]"
+                "DrugFamily", "[None]"
+                "DrugSubfamily", "[None]"
+                "HideInAllergyEntry", "FALSE"
+            |]
+        |]
+
+
+
 [<AutoOpen>]
 module Utils =
 
@@ -854,7 +950,7 @@ module Utils =
 
     let isSolutionUnit un =
         let un = un |> String.trim |> String.toLower
-        un = "milliliter" || un = "druppel"
+        un = "milliliter" || un = "druppel" || un = "ml"
 
 
     let removeEmptyUnitSubstances (gp : GenericProduct) =
@@ -991,9 +1087,14 @@ module MetaVision =
         let mapRts = (Array.mapStringHeadings Constants.routeHeadings) >> (String.concat "\t")
         // Get routes and external codes
         // Intra seperated by -
-        Names.getItems Names.Route Names.Fifty
-        |> Array.filter (fun (_, r) -> r.Contains(",") |> not)
-        |> Array.sortBy fst
+        let rts =
+            Names.getItems Names.Route Names.Fifty
+            |> Array.filter (fun (_, r) -> r.Contains(",") |> not)
+            |> Array.sortBy fst
+            |> Array.distinct
+
+        rts
+        |> Array.filter (fun (_, r) -> r |> mapRoute |> String.isNullOrWhiteSpace |> not)
         |> Array.map (fun (id, r) ->
             [|
                 "ExternalCode", $"%i{id}"
@@ -1014,9 +1115,15 @@ module MetaVision =
         )
         |> Array.append [| Constants.routeHeadings |> String.concat "\t" |]
         |> print file name
+        |> ignore
+
+        rts
+        |> Array.map snd
+        |> Array.map mapRoute
+        |> Array.filter (String.isNullOrWhiteSpace >> not)
 
 
-    let createDoseForms file name =
+    let createDoseForms file name routes =
         let mapForms = (Array.mapStringHeadings Constants.doseFormHeadings) >> (String.concat "\t")
 
         // Get doseforms
@@ -1029,7 +1136,7 @@ module MetaVision =
                 |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
                 |> Array.collect (fun gpp -> gpp.Route)
                 |> Array.collect (String.splitAt ',')
-                |> Array.filter ((String.equalsCapInsens "parenteraal") >> not)
+                |> Array.filter (mapRoute >> String.isNullOrWhiteSpace >> not)
                 |> Array.distinct
 
             {|
@@ -1067,6 +1174,7 @@ module MetaVision =
             let rs =
                 r.Routes
                 |> Array.map mapRoute
+                |> Array.filter (String.isNullOrWhiteSpace >> not)
                 |> Array.distinct
                 |> String.concat ";"
             [|
@@ -1081,6 +1189,21 @@ module MetaVision =
             |]
             |> mapForms
         )
+        |> Array.append (
+            [| "oplosvloeistof"; "emulsie" |]
+            |> Array.map (fun s ->
+                [|
+                    "DoseFormName", s
+                    "Routes", routes |> String.concat ";"
+                    "DefaultUnit", "mL"
+                    "OrderingType", "Both"
+                    "IsDrugInSolution", false |> mapBool
+                    "Category", Constants.solutionGroup
+                    "IsDispensableAmountAllowed", false |> mapBool
+                |]
+                |> mapForms
+            )
+        )
         |> Array.append [| Constants.doseFormHeadings |> String.concat "\t" |]
         |> print file name
 
@@ -1091,6 +1214,10 @@ module MetaVision =
         let substs =
             gp
             |> Array.collect (fun gp -> gp.Substances)
+            |> Array.filter (fun s ->
+                s.SubstanceName |> String.equalsCapInsens "water" |> not &&
+                s.GenericName |> String.equalsCapInsens "water" |> not 
+            )
 
         // Ingredients
         substs
@@ -1191,7 +1318,11 @@ module MetaVision =
                 let un =
                     match gp.Shape |> shapeDoseUnit rts gp.Substances[0].ShapeUnit with
                     | Some u when u |> String.isNullOrWhiteSpace |> not -> u
-                    | _ -> gp.Substances[0].GenericUnit
+                    | _ ->
+                        let subst = gp.Substances[0]
+
+                        if subst.SubstanceQuantity >= subst.GenericQuantity then subst.SubstanceUnit
+                        else subst.GenericUnit
                     |> mapUnit
 
                 let assort = gp.Id |> getFormulary
@@ -1222,22 +1353,25 @@ module MetaVision =
                     Routes =
                         rts
                         |> Array.map mapRoute
+                        |> Array.filter (String.isNullOrWhiteSpace >> not)
                         |> String.concat ";"
                     AdditivesGroup = "[None]"
                     DiluentsGroup = // "Verduninngen"
-                        if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then "Verdunningen"
+                        if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.diluentsGroup
                         else ""
                     DrugInDiluentGroup = // "Oplossingen"
                         if gp.Shape |> shapeIsSolution "" un then "[None]"
                         else
                             if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
-                               gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then "Oplossingen"
+                               gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.solutionGroup
                             else
                                 "[None]"
                     DrugFamily = "" //g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
                     DrugSubfamily = "" //g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
                     IsFormulary = assort |> List.isEmpty |> not
-                    IsSolution = gp.Substances[0].ShapeUnit |> isSolutionUnit
+                    CreateProduct =
+                        un <> "keer" &&
+                        gp.Substances[0].ShapeUnit |> isSolutionUnit
 
                     ComplexMedications =
                         if gp.Substances |> Array.length > 4 ||
@@ -1246,25 +1380,46 @@ module MetaVision =
                             let cms =
                                 gp.Substances
                                 |> Array.map (fun s ->
+                                    let q, u =
+                                        if s.SubstanceQuantity >= s.GenericQuantity then
+                                            s.SubstanceQuantity, s.SubstanceUnit
+                                        else
+                                            s.GenericQuantity, s.GenericUnit
+
+                                    let u = u |> mapUnit
+
                                     {|
                                         ComplexMedictionName = name
                                         IngredientName =
                                             s.SubstanceName
                                             |> String.toLower
                                             |> String.trim
-                                        Concentration = s.GenericQuantity
-                                        ConcentrationUnit =
-                                            s.GenericUnit
-                                            |> mapUnit
+                                        Concentration = q
+                                        ConcentrationUnit = u 
                                         In =
-                                            if gp.Shape |> shapeIsSolution "" un  then "1" else ""
+                                            if (gp.Shape |> shapeIsSolution "" un || un = "dosis") &&
+                                               un <> u then "1" else ""
                                         InUnit =
-                                            if gp.Shape |> shapeIsSolution "" un |> not then ""
+                                            if gp.Shape |> shapeIsSolution "" un |> not &&
+                                               un <> "dosis" then ""
                                             else
                                                  if un = "druppel" then "mL" else un
                                     |}
                                 )
-                                |> Array.distinct
+                                |> Array.groupBy (fun cm -> cm.IngredientName)
+                                |> Array.collect (fun (_, cms) ->
+                                    match cms |> Array.tryHead with
+                                    | None -> [||]
+                                    | Some cm ->
+                                        [|
+                                            {| cm with
+                                                Concentration =
+                                                    cms
+                                                    |> Array.sumBy (fun cm -> cm.Concentration)
+                                            |}
+                                        |]
+
+                                )
 
                             if gp.Substances[0].ShapeUnit |> isSolutionUnit ||
                                un |> isSolutionUnit || un = su then [||]
@@ -1297,7 +1452,7 @@ module MetaVision =
             |> Array.map (fun r ->
                 {| r with
                     Products =
-                        if r.IsSolution |> not ||
+                        if r.CreateProduct |> not ||
                            r.Unit = "druppel" || r.Unit = "mL" ||
                            r.ComplexMedications |> Array.isEmpty then [||]
                         else
@@ -1421,6 +1576,7 @@ module MetaVision =
             |]
             |> mapMeds
         )
+        |> Array.append (Constants.meds |> Array.map mapMeds)
         |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
         |> print file medName |> ignore
         meds
@@ -1447,6 +1603,7 @@ module MetaVision =
             gp.Route
             |> Array.collect (fun r -> r |> String.splitAt ',')
             |> Array.map mapRoute
+            |> Array.filter (String.isNullOrWhiteSpace >> not)
             |> Array.filter (fun r -> r = "iv" || r = "im")
             |> Array.collect (fun r ->
                 [| "ICC"; "PICU"; "NICU" |]
@@ -1509,7 +1666,18 @@ module MetaVision =
             ImportFile = Some "data/output/DrugDatabaseForImport.xlsx"
         }
 
+
     let createImport (config : ImportConfig) =
+        printfn "creating routes"
+        let rts =
+            createRoutes config.ImportFile "Routes"
+
+        printfn "creating dose forms"
+        rts
+        |> createDoseForms config.ImportFile "DoseForms"
+        |> ignore
+
+        printfn "creating medications"
         createMedications
             config.ImportFile
             config.Ingredients
