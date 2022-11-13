@@ -51,6 +51,20 @@ let meds =
     |> MetaVision.createImport MetaVision.config
 
 
+type OrderingStyle =
+    | NoInfusedOver
+    | SpecifyInfuseOver
+    | SetDoseAndRate
+
+
+let orderingStyleToString = function
+    | NoInfusedOver -> "Geen looptijd", "No Infuse Over Drug - Calculate Total Volume"
+    | SpecifyInfuseOver -> "Looptijd specificeren", "Specify Infuse Over Drug - Set Infuse Over"
+    | SetDoseAndRate -> "", ""
+
+
+let mapTempl = (Array.mapStringHeadings Constants.orderTemplateHeadings) >> (String.concat "\t")
+
 
 meds
 |> Array.collect (fun m ->
@@ -65,8 +79,14 @@ meds
                 m, p.ProductName, r
             )
     )
+    |> Array.filter (fun (m, _, r) ->
+        m.DoseForms
+        |> shapeIsSolution r ""
+        |> not
+    )
 )
 |> Array.map (fun (m, p, r) ->
+    let ordStyle = NoInfusedOver 
     {|
         OrderTemplateName = m.MedicationName
         MedicationName = m.MedicationName
@@ -75,15 +95,77 @@ meds
         Route = r
         IsPRN = "FALSE"
         PatternMode = "Standard"
+        Frequency =
+            m.Frequencies
+            |> String.splitAt ';'
+            |> Array.tryHead
+            |> Option.defaultValue ""
         ComponentType = "MainComponent"
+        OrderingStyle = ordStyle |> orderingStyleToString |> fst
+        LockerTemplate = ordStyle |> orderingStyleToString |> snd
         ComponentMedicationName =
-            if p |> String.isNullOrWhiteSpace then m.MedicationName
-            else ""
+            if ordStyle = NoInfusedOver then ""
+            else
+                if p |> String.isNullOrWhiteSpace then m.MedicationName
+                else ""
         ComponentProductName =
-            if p |> String.isNullOrWhiteSpace then ""
-            else p
+            if ordStyle = NoInfusedOver then ""
+            else
+                if p |> String.isNullOrWhiteSpace then ""
+                else p
+        ComponentQuantityVolumeValue =
+            match m.ComplexMedications |> Array.tryHead with
+            | Some cm -> cm.Concentration
+            | None -> 0.
+        ComponentQuantityVolumeUnit =
+            match m.ComplexMedications |> Array.tryHead with
+            | Some cm -> cm.ConcentrationUnit
+            | None -> ""
+        ComponentConcentrationMassUnit =
+            match m.ComplexMedications |> Array.tryHead with
+            | Some cm -> cm.ConcentrationUnit
+            | None -> ""
+        ComponentConcentrationVolumeUnit = "mL"
+        TotalVolumeUnit = "mL"
+        StartMethod = "Volgende geplande dosis"
+        EndMethod = "Geen tijdslimiet"
+        WeightType = "ActualWeight"
+        Comment = ""
+        Caption = ""
+        AvailableInRT = "TRUE"
     |}
 )
+|> Array.filter (fun r -> r.ComponentQuantityVolumeValue > 0.)
+|> Array.map (fun r ->
+    [|
+        "OrderTemplateName", r.OrderTemplateName
+        "MedicationName", r.MedicationName
+        "ProductName", r.ProductName
+        "DoseForm", r.DoseForm
+        "Route", r.Route
+        "IsPRN", r.IsPRN
+        "PatternMode",r.PatternMode
+        "Frequency", r.Frequency
+        "ComponentType", r.ComponentType
+        "OrderingStyle", r.OrderingStyle
+        "OrderTemplateName", r.OrderTemplateName
+        "ComponentMedicationName", r.ComponentMedicationName
+        "ComponentProductName", r.ComponentProductName
+        "ComponentQuantityVolumeValue", $"{r.ComponentQuantityVolumeValue |> Double.toStringNumberNLWithoutTrailingZeros}"
+        "ComponentQuantityVolumeUnit", r.ComponentQuantityVolumeUnit
+        "ComponentConcentrationMassUnit", r.ComponentConcentrationMassUnit
+        "ComponentConcentrationVolumeUnit", r.ComponentConcentrationVolumeUnit
+        "TotalVolumeUnit", r.TotalVolumeUnit
+        "StartMethod", r.StartMethod
+        "EndMethod", r.EndMethod
+        "WeightType", r.WeightType
+        "Comment", r.Comment
+        "Caption", r.Caption
+        "AvailableInRT", r.AvailableInRT
+    |]
+    |> mapTempl
+)
+|> print MetaVision.config.ImportFile "OrderTemplates"
 
 
 
