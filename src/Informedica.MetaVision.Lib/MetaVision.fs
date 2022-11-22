@@ -996,11 +996,12 @@ module Utils =
             |> loadDataImport file sheet
         | None -> ()
 
-        xs
-        |> String.concat "\n"
-        |> File.writeTextToFile $"data/output/{sheet}.csv"
+        //xs
+        //|> String.concat "\n"
+        //|> File.writeTextToFile $"data/output/{sheet}.csv"
 
         xs
+
 
 
 module MetaVision =

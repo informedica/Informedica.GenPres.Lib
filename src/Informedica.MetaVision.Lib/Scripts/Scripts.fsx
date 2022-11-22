@@ -49,7 +49,7 @@ let init () =
 
 
 MetaVision.insertAdditionalIngredients()
-
+|> (printfn "%s")
 
 
 let meds =
