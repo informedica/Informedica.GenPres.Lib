@@ -633,99 +633,43 @@ module Constants =
         |]
 
 
-
-    let meds =
+    let parenteral =
         [|
-            [|
-                "MedicationName", "water"
-                "Unit", "mL"
-                "ATCCode", ""
-                "Status", "Active"
-                "Format", "1,234.5 (Include Zero)"
-                "IncrementValue", "0,1"
-                "CodeSnippetName", ""
-                "Frequencies", "[All]"
-                "DoseForms", "oplosvloeistof"
-                "Routes", "[All]"
-                "AdditivesGroup", "[All]"
-                "DiluentsGroup", "[All]"
-                "DrugInDiluentGroup", "[None]"
-                "DrugFamily", "[None]"
-                "DrugSubfamily", "[None]"
-                "HideInAllergyEntry", "FALSE"
-            |]
-            [|
-                "MedicationName", "NaCl 0,9%"
-                "Unit", "mL"
-                "ATCCode", ""
-                "Status", "Active"
-                "Format", "1,234.5 (Include Zero)"
-                "IncrementValue", "0,1"
-                "CodeSnippetName", ""
-                "Frequencies", "[All]"
-                "DoseForms", "oplosvloeistof"
-                "Routes", "[All]"
-                "AdditivesGroup", "[All]"
-                "DiluentsGroup", "[All]"
-                "DrugInDiluentGroup", "[None]"
-                "DrugFamily", "[None]"
-                "DrugSubfamily", "[None]"
-                "HideInAllergyEntry", "FALSE"
-            |]
-            [|
-                "MedicationName", "gluc 5%"
-                "Unit", "mL"
-                "ATCCode", ""
-                "Status", "Active"
-                "Format", "1,234.5 (Include Zero)"
-                "IncrementValue", "0,1"
-                "CodeSnippetName", ""
-                "Frequencies", "[All]"
-                "DoseForms", "oplosvloeistof"
-                "Routes", "[All]"
-                "AdditivesGroup", "[All]"
-                "DiluentsGroup", "[All]"
-                "DrugInDiluentGroup", "[None]"
-                "DrugFamily", "[None]"
-                "DrugSubfamily", "[None]"
-                "HideInAllergyEntry", "FALSE"
-            |]
-            [|
-                "MedicationName", "gluc 10%"
-                "Unit", "mL"
-                "ATCCode", ""
-                "Status", "Active"
-                "Format", "1,234.5 (Include Zero)"
-                "IncrementValue", "0,1"
-                "CodeSnippetName", ""
-                "Frequencies", "[All]"
-                "DoseForms", "oplosvloeistof"
-                "Routes", "[All]"
-                "AdditivesGroup", "[All]"
-                "DiluentsGroup", "[All]"
-                "DrugInDiluentGroup", "[None]"
-                "DrugFamily", "[None]"
-                "DrugSubfamily", "[None]"
-                "HideInAllergyEntry", "FALSE"
-            |]
-            [|
-                "MedicationName", "emulsie"
-                "Unit", "mL"
-                "ATCCode", ""
-                "Status", "Active"
-                "Format", "1,234.5 (Include Zero)"
-                "IncrementValue", "0,1"
-                "CodeSnippetName", ""
-                "Frequencies", "[All]"
-                "DoseForms", "emulsie"
-                "Routes", "[All]"
-                "AdditivesGroup", "[All]"
-                "DiluentsGroup", "[All]"
-                "DrugInDiluentGroup", "[None]"
-                "DrugFamily", "[None]"
-                "DrugSubfamily", "[None]"
-                "HideInAllergyEntry", "FALSE"
-            |]
+            "Unit", "mL"
+            "ATCCode", ""
+            "Status", "Active"
+            "Format", "1,234.5"
+            "IncrementValue", "0,1"
+            "CodeSnippetName", ""
+            "Frequencies", "[All]"
+            "DoseForms", "parenterale vloeistof"
+            "Routes", "[All]"
+            "AdditivesGroup", "[All]"
+            "DiluentsGroup", "[All]"
+            "DrugInDiluentGroup", "[None]"
+            "DrugFamily", "[None]"
+            "DrugSubfamily", "[None]"
+            "HideInAllergyEntry", "TRUE"
+        |]
+
+
+    let enteral un =
+        [|
+            "Unit", un
+            "ATCCode", ""
+            "Status", "Active"
+            "Format", "1,234.5"
+            "IncrementValue", "0,1"
+            "CodeSnippetName", ""
+            "Frequencies", "[All]"
+            "DoseForms", if un = "g" then "poeder voor voeding" else "voeding"
+            "Routes", "[All]"
+            "AdditivesGroup", "[All]"
+            "DiluentsGroup", "[All]"
+            "DrugInDiluentGroup", "[None]"
+            "DrugFamily", "[None]"
+            "DrugSubfamily", "[None]"
+            "HideInAllergyEntry", "TRUE"
         |]
 
 
@@ -768,6 +712,14 @@ module Utils =
 
     let mappingFormulary =
         Web.getDataFromSheet "Formulary"
+
+
+    let mapParentMeds =
+        Web.getDataFromSheet "ParentMeds"
+
+
+    let mapEntFeeding =
+        Web.getDataFromSheet "EntFeeding"
 
 
     type OrderingType = Both | NonInfuse
@@ -1054,6 +1006,28 @@ module Utils =
 module MetaVision =
 
 
+    let entFeeding =
+        mapEntFeeding
+        |> Array.skip 1
+        |> Array.map (fun xs ->
+            [|
+                "MedicationName", xs[0]
+            |]
+            |> Array.append (Constants.enteral xs[1])
+        )
+
+
+    let parentMeds =
+        mapParentMeds
+        |> Array.skip 1
+        |> Array.map (fun xs ->
+            [|
+                "MedicationName", xs[0]
+            |]
+            |> Array.append (Constants.parenteral)
+        )
+
+
     let getDrugFamilies path =
         ATCGroup.get ()
         |> Array.map (fun g ->
@@ -1190,15 +1164,15 @@ module MetaVision =
             |> mapForms
         )
         |> Array.append (
-            [| "oplosvloeistof"; "emulsie" |]
+            [| "parenterale vloeistof"; "voeding"; "poeder voor voeding" |]
             |> Array.map (fun s ->
                 [|
                     "DoseFormName", s
                     "Routes", routes |> String.concat ";"
-                    "DefaultUnit", "mL"
+                    "DefaultUnit", if s = "poeder voor voeding" then "g" else "mL"
                     "OrderingType", "Both"
                     "IsDrugInSolution", false |> mapBool
-                    "Category", Constants.dilutionGroup
+                    "Category", "Overige"
                     "IsDispensableAmountAllowed", false |> mapBool
                 |]
                 |> mapForms
@@ -1248,6 +1222,20 @@ module MetaVision =
             )
             |> Array.distinct
             |> Array.append ingrs
+        |> fun ingrs ->
+                [|1..13|]
+                |> Array.map (fun indx ->
+                    let n, u =
+                        match mapParentMeds[0][indx] |> String.splitAt ' ' with
+                        | [|n;u|] -> n, u
+                        | _ -> "", ""
+                    {|
+                        ExternalCode = ""
+                        IngredientName = n
+                        Unit = u
+                    |}
+                )
+                |> Array.append ingrs
         |> Array.map (fun r ->
             [|
                 "ExternalCode", r.ExternalCode
@@ -1294,6 +1282,7 @@ module MetaVision =
                     |> String.trim
                     |> String.toLower
                     |> String.replace "'" ""
+                    |> String.replace "  " " "
 
                 let grps =
                     ATCGroup.get ()
@@ -1337,8 +1326,11 @@ module MetaVision =
                         |> Array.map (String.replace "'" "")
                         |> Array.append (assort |> List.filter ((<>) UMCU) |> List.map string |> List.toArray)
                         |> String.concat ", "
-                    Status = "Active"
-                    Format = "1,234.5 (Include Zero)"
+                    Status = assort |> List.isEmpty |> not
+                    Format =
+                        if un = "keer" || un = "druppel" || un = "dosis" then "1,234"
+                        else
+                            "1,234.5"
                     IncrementValue = 0.1
                     CodeSnippetName = $"GPK-{gp.Id} {System.Guid.NewGuid().ToString()}"
                     Frequencies =
@@ -1362,8 +1354,8 @@ module MetaVision =
                                gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.dilutionGroup
                             else
                                 "[None]"
-                    DrugFamily = "" //g |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
-                    DrugSubfamily = "" //g |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
+                    DrugFamily = grps |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
+                    DrugSubfamily = grps |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
                     IsFormulary = assort |> List.isEmpty |> not
                     CreateProduct =
                         un <> "keer" &&
@@ -1436,6 +1428,10 @@ module MetaVision =
                         |> Array.filter (String.isNullOrWhiteSpace >> not)
                         |> Array.distinct
 
+                    IsSolution =
+                        gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit ||
+                        gp.Shape |> shapeIsSolution "" un 
+
                 |}
             )
             |> Array.filter (fun r -> r.Routes |> String.isNullOrWhiteSpace |> not)
@@ -1465,7 +1461,7 @@ module MetaVision =
                                     StrengthLEFTUnit = r.ComplexMedications[0].ConcentrationUnit
                                     StrengthRIGHT = "1"
                                     StrengthRIGHTUnit = "mL"
-                                    DiluentGroup = Constants.dilutionGroup
+                                    DiluentGroup = Constants.solutionGroup
                                     ProductRequiresReconstitution = "FALSE"
                                     IsVolumeKnown = "FALSE"
                                     Volume = "0"
@@ -1550,7 +1546,7 @@ module MetaVision =
                 "MedicationName", m.MedicationName
                 "Unit", m.Unit
                 "ATCCode", m.ATC
-                "Status", m.Status
+                "Status", $"{m.Status |> mapBool}"
                 "Format", m.Format
                 "IncrementValue", $"{m.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros}"
                 "CodeSnippetName", m.CodeSnippetName
@@ -1567,7 +1563,14 @@ module MetaVision =
             |]
             |> mapMeds
         )
-        |> Array.append (Constants.meds |> Array.map mapMeds)
+        |> Array.append (
+            parentMeds
+            |> Array.map mapMeds
+        )
+        |> Array.append (
+            entFeeding
+            |> Array.map mapMeds
+        )
         |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
         |> print file medName |> ignore
         meds
@@ -1632,6 +1635,49 @@ module MetaVision =
         )
         |> Array.append [| Constants.solutionHeadings |> String.concat "\t" |]
         |> print file solName
+
+
+    let insertAdditionalIngredients () =
+        let declare = """
+declare @MedId as int
+declare @CompId as int
+declare @ration as decimal(38, 14)
+declare @UnitID as smallint
+declare @SortOrder as smallint
+declare @InRatio as decimal(38, 14)
+declare @InUnitID as smallint
+"""
+
+        let insert = """
+if not exists(select * from dbo.Orders_MedicationNonActiveComponents mc where mc.MedicationID = @MedId and mc.ComponentID = @CompId) 
+insert into dbo.Orders_MedicationNonActiveComponents (MedicationID, ComponentID, Ratio, UnitID, SortOrder, InRatio, InUnitID) values (@MedId, @CompId, @ration, @UnitID, @SortOrder, @InRatio, @InUnitID, 10)
+"""
+
+
+        mapParentMeds
+        |> Array.skip 1
+        |> Array.map (fun xs ->
+            [|1..13|]
+            |> Array.map (fun indx ->
+                let comp, unit =
+                    match mapParentMeds[0][indx] |> String.splitAt ' ' with
+                    | [|n;u|] -> n, u
+                    | _ -> "", ""
+                $"""
+set @MedId = (select p.ParameterId from dbo.Parameters p where p.ParameterName = '{xs[0]}')
+set @CompId = (select p.ParameterId from dbo.Parameters p where p.ParameterName = '{comp}')
+set @ration = {xs[indx] |> Double.stringToFloat32}
+set @UnitID = (select u.UnitID from dbo.Units u where u.UnitName = '{unit}')
+set @SortOrder = {indx - 1}
+set @InRatio = 1
+set @InUnitID = (select u.UnitID from dbo.Units u where u.UnitName = 'mL')
+"""
+                + insert                
+            )
+            |> String.concat "\n"
+        )
+        |> String.concat "\n"
+        |> fun s -> $"{declare}\n{s}"
 
 
     type ImportConfig =

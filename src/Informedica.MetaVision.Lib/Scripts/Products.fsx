@@ -20,5 +20,8 @@ let prods =
 
 
 prods
-|> Array.tryFind (fun gp -> gp.Id = 88749)
+|> Array.tryFind (fun gp ->
+    gp.Shape |> String.equalsCapInsens "gel" &&
+    gp.Route |> Array.exists (String.equalsCapInsens "endotracheopulmonair")
+)
 

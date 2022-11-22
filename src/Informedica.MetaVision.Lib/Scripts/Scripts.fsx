@@ -14,9 +14,6 @@ open Informedica.ZIndex.Lib.ATCGroup
 open Informedica.ZIndex.Lib.GenericProduct
 
 
-"oogdruppels"
-|> shapeDoseUnit [| "oculair" |] "gram"
-
 
 MetaVision.getDrugFamilies "DrugFamilies"
 
@@ -30,24 +27,39 @@ MetaVision.createRoutes (Some "data/output/DrugDatabaseForImport.xlsx") "Routes"
 MetaVision.createDoseForms (Some "data/output/DrugDatabaseForImport.xlsx") "DoseForms"
 
 
+let gpks = 
+    [|
+        //161144 //aardbeiblad/wijnstokblad kauwtablet 40/40mg
+        //165573 //abacavir drank 20mg/ml
+        2194 //paracetamol tablet  500mg
+        30392 // paracetamol drank 24mg/ml
+        143618 //hydrocortison/fusidinezuur zalf 10/20mg/g
+        121967 //paracetamol infvlst 10mg/ml
+        43079 //amoxicilline/clavulaanzuur tablet 500/125mg
+        53856 //amoxicilline/clavulaanzuur injpdr 1000/200mg
+        82708 //ondansetron injvlst 2mg/ml
+        88749 //noradrenaline infopl conc 1mg/ml
+        134546 //morfine infvlst  10mg/ml
+    |]
+
+
+let init () =
+    Array.empty
+    |> MetaVision.createImport MetaVision.config
+
+
+MetaVision.insertAdditionalIngredients()
+
+
+
 let meds =
     GenPresProduct.get true 
-    //|> Array.take 1600
-    //|> Array.filter (fun gpp ->
-        //let n = gpp.Name |> String.toLower |> String.trim
-        //n |> String.contains "fenta" ||
-        //n |> String.contains "genta" ||
-        //n |> String.contains "trime" ||
-        //n |> String.contains "amoxi" ||0
-        //n |> String.contains "parac" ||
-        //n |> String.contains "norad" ||
-        //n |> String.contains "morfi" ||
-        //n |> String.contains "propo" ||
-        //n |> String.contains "predn" ||
-        //n |> String.contains "amfo"  ||
-        //gpp.Shape |> String.toLower |> String.contains "druppel" ||
-        //gpp.Route |> Array.exists (String.toLower >> (String.contains "cutaan"))
-    //)
+    |> Array.filter (fun gpp ->
+        gpp.GenericProducts
+        |> Array.exists (fun gp -> 
+            gpks |> Array.exists ((=) gp.Id) 
+        )
+    )
     |> MetaVision.createImport MetaVision.config
 
 
@@ -66,25 +78,37 @@ let orderingStyleToString = function
 let mapTempl = (Array.mapStringHeadings Constants.orderTemplateHeadings) >> (String.concat "\t")
 
 
-meds
-|> Array.collect (fun m ->
-    m.Routes
-    |> String.splitAt ';'
-    |> Array.collect (fun r ->
-        if m.Products |> Array.isEmpty then
-            [| m, "", r  |]
-        else
-            m.Products
-            |> Array.map (fun p ->
-                m, p.ProductName, r
-            )
+let nonSolutionMeds =
+    meds
+    |> Array.collect (fun m ->
+        m.Routes
+        |> String.splitAt ';'
+        |> Array.collect (fun r ->
+            if m.Products |> Array.isEmpty then
+                [| m, "", r  |]
+            else
+                m.Products
+                |> Array.map (fun p ->
+                    m, p.ProductName, r
+                )
+        )
+        |> Array.filter (fun (m, _, r) ->
+            m.IsSolution
+            |> not
+        )
     )
-    |> Array.filter (fun (m, _, r) ->
-        m.DoseForms
-        |> shapeIsSolution r ""
-        |> not
-    )
+
+
+nonSolutionMeds
+|> Array.map (fun (m, _, r) ->
+    m.MedicationName,
+    r,
+    m.DoseForms
 )
+|> Array.iter (printfn "%A")
+
+
+nonSolutionMeds
 |> Array.map (fun (m, p, r) ->
     let ordStyle = NoInfusedOver 
     {|
@@ -114,17 +138,23 @@ meds
                 if p |> String.isNullOrWhiteSpace then ""
                 else p
         ComponentQuantityVolumeValue =
-            match m.ComplexMedications |> Array.tryHead with
-            | Some cm -> cm.Concentration
-            | None -> 0.
+            if m.Unit = "keer" then 1.
+            else
+                match m.ComplexMedications |> Array.tryHead with
+                | Some cm -> cm.Concentration
+                | None -> 0.
         ComponentQuantityVolumeUnit =
-            match m.ComplexMedications |> Array.tryHead with
-            | Some cm -> cm.ConcentrationUnit
-            | None -> ""
+            if m.Unit = "keer" then "keer"
+            else
+                match m.ComplexMedications |> Array.tryHead with
+                | Some cm -> cm.ConcentrationUnit
+                | None -> ""
         ComponentConcentrationMassUnit =
-            match m.ComplexMedications |> Array.tryHead with
-            | Some cm -> cm.ConcentrationUnit
-            | None -> ""
+            if m.Unit = "keer" then "keer"
+            else
+                match m.ComplexMedications |> Array.tryHead with
+                | Some cm -> cm.ConcentrationUnit
+                | None -> ""
         ComponentConcentrationVolumeUnit = "mL"
         TotalVolumeUnit = "mL"
         StartMethod = "Volgende geplande dosis"
