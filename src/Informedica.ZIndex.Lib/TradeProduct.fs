@@ -1,10 +1,11 @@
-﻿namespace Informedica.ZIndex.Lib
+namespace Informedica.ZIndex.Lib
 
 
 module TradeProduct =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+
 
     type TradeProduct =
         {
@@ -14,11 +15,13 @@ module TradeProduct =
             Brand : string
             Company : string
             Denominator : int
+            UnitWeight : float
             Route : string []
             ConsumerProducts : ConsumerProduct.ConsumerProduct []
         }
 
-    let create id nm lb br cm dn rt ps =
+
+    let create id nm lb br cm dn uw rt ps =
         {
             Id = id
             Name = nm
@@ -26,9 +29,11 @@ module TradeProduct =
             Brand = br
             Company = cm
             Denominator = dn
+            UnitWeight = uw
             Route = rt
             ConsumerProducts = ps
         }
+
 
     let _get id =
         Zindex.BST031T.records ()
@@ -49,7 +54,8 @@ module TradeProduct =
                 |> Array.filter String.notEmpty
                 |> Array.distinct
 
-            create r.HPKODE nm lb r.MSNAAM r.FSNAAM r.HPDEEL rt ps
+            create r.HPKODE nm lb r.MSNAAM r.FSNAAM r.HPDEEL r.HPSGEW rt ps
         )
+
 
     let get : int -> TradeProduct [] = Memoization.memoize _get

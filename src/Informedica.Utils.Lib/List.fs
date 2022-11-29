@@ -2,9 +2,15 @@ namespace Informedica.Utils.Lib
 
 /// Additional utitilty functions
 /// for lists
+[<RequireQualifiedAccess>]
 module List =
 
     open Informedica.Utils.Lib.BCL
+
+
+
+    let prepend xs1 xs2 = xs1 |> List.append xs2
+
 
     /// ToDo: not the best implementation
     let remove pred xs =

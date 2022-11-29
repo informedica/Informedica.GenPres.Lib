@@ -6,6 +6,7 @@ module GenericProduct =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
+
     type GenericProduct =
         {
             Id : int
@@ -21,6 +22,7 @@ module GenericProduct =
     and Substance =
         {
             SubstanceId : int
+            SortOrder : int
             SubstanceName : string
             SubstanceQuantity : float
             SubstanceUnit : string
@@ -31,9 +33,11 @@ module GenericProduct =
             ShapeUnit : string
         }
 
-    let createSubstance si sn sq su gi gn gq gu un =
+
+    let createSubstance si so sn sq su gi gn gq gu un =
         {
             SubstanceId = si
+            SortOrder = so
             SubstanceName = sn
             SubstanceQuantity = sq
             SubstanceUnit = su
@@ -43,6 +47,7 @@ module GenericProduct =
             GenericUnit = gu
             ShapeUnit = un
         }
+
 
     let create id nm lb ac an sh rt ss ps =
         {
@@ -56,6 +61,7 @@ module GenericProduct =
             Substances = ss
             PrescriptionProducts = ps
         }
+
 
     let getRoutes (gp : Zindex.BST711T.BST711T) =
         // try to get the 'enkelvoudige toedieningsweg'
@@ -113,7 +119,7 @@ module GenericProduct =
             match hpks with
             | _ when hpks |> Array.isEmpty ->
                 let un1 = Names.getThes gs.XNMOME Names.GenericUnit Names.Fifty
-                createSubstance gn.GNSTAM stam.GNGNAM gs.GNMOMH un1 gn.GNGNK gn.GNGNAM gs.GNMOMH un1 un
+                createSubstance gn.GNSTAM 1 stam.GNGNAM gs.GNMOMH un1 gn.GNGNK gn.GNGNAM gs.GNMOMH un1 un
                 |> Array.singleton
             | _  ->
                 hpks
@@ -136,11 +142,12 @@ module GenericProduct =
                     |> Array.map (fun ig ->
                         let un1 = Names.getThes ig.XNMINE Names.GenericUnit Names.Fifty
                         let un2 = Names.getThes gs.XNMOME Names.GenericUnit Names.Fifty
-                        createSubstance ig.GNSTAM stam.GNGNAM ig.GNMINH un1 gn.GNGNK gn.GNGNAM gs.GNMOMH un2 un
+                        createSubstance ig.GNSTAM ig.GNVOLG stam.GNGNAM ig.GNMINH un1 gn.GNGNK gn.GNGNAM gs.GNMOMH un2 un
                     )
                 )
         )
         |> Array.distinct
+        |> Array.sortBy (fun s -> s.SortOrder)
 
 
     let private _get log gpks =
@@ -180,6 +187,8 @@ module GenericProduct =
             create gp.GPKODE nm lb gp.ATCODE an sh rt ss ps
         )
 
+
     let get : int list -> GenericProduct [] = Memoization.memoize (_get (fun _ -> ()))
+
 
     let getWithLog = _get

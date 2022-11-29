@@ -1,8 +1,15 @@
 namespace Informedica.Utils.Lib
 
+
+[<RequireQualifiedAccess>]
 module Array =
 
+
     open Informedica.Utils.Lib.BCL
+
+
+    let prepend xs1 xs2 = xs1 |> Array.append xs2
+
 
     let pickArray pl xs =
         match xs with

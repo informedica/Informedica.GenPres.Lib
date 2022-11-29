@@ -2,6 +2,7 @@ namespace Informedica.Utils.Lib.BCL
 
 /// Helper functions for `System.String`
 //open System.Security.Cryptography
+[<RequireQualifiedAccess>]
 module String =
 
     open System

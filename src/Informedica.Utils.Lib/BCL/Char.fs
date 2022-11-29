@@ -2,6 +2,7 @@ namespace Informedica.Utils.Lib.BCL
 
 /// Utility methods to handle a `Char` in a 
 /// functional style
+[<RequireQualifiedAccess>]
 module Char =
 
     open System

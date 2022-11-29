@@ -3,6 +3,7 @@ namespace Informedica.Utils.Lib.BCL
 open System.Globalization
 
 
+[<RequireQualifiedAccess>]
 module Double =
 
     open System

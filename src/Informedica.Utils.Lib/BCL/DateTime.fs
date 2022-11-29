@@ -1,5 +1,6 @@
 namespace Informedica.Utils.Lib.BCL
 
+[<RequireQualifiedAccess>]
 module DateTime =
 
     open System

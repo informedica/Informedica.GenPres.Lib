@@ -1,5 +1,7 @@
 namespace Informedica.Utils.Lib.BCL
 
+
+[<RequireQualifiedAccess>]
 module Int32 =
 
     open System

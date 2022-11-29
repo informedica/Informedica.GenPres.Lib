@@ -14,6 +14,7 @@ File.exists <| FilePath.GStandPath + "BST000T"
 CodeGen.generateZIndex (CodeGen.tabelList)
 |> File.writeTextToFile "Zindex.fs"
 
+
 Parser.getData BST000T.name BST000T.posl BST000T.pickList
 
 Environment.CurrentDirectory
