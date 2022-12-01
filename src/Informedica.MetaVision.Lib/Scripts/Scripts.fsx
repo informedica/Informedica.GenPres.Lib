@@ -15,7 +15,7 @@ open Informedica.MetaVision.Lib
 
 
 GenPresProduct.get true
-|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| ICK |] }
+|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| UMCU; ICC; ICK; NEO |] }
 
 
 

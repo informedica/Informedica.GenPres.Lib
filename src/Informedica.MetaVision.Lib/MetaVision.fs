@@ -388,7 +388,7 @@ module MetaVision =
                 ComponentConcentrationVolumeUnit =
                     if m.Unit = "druppel" || m.Unit = "mL" then ""
                     else "mL"
-                ComponentDrugInDiluentDiluentMedicationName = if p |> String.isNullOrWhiteSpace then "" else "water"
+                ComponentDrugInDiluentDiluentMedicationName = if p |> String.isNullOrWhiteSpace then "" else "ampulvlst"
                 ComponentDrugInDiluentVolumeValue = if p |> String.isNullOrWhiteSpace then None else Some 1.
                 ComponentDrugInDiluentVolumeUnit = if p |> String.isNullOrWhiteSpace then "" else "ml"
                 TotalVolumeUnit = "mL"
