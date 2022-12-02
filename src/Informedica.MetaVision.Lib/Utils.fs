@@ -66,6 +66,11 @@ module Utils =
         Web.getDataFromSheet "EntFeeding"
 
 
+    let mapReconsitution =
+        Web.getDataFromSheet "Reconstitution"
+
+
+
     [<Literal>]
     let NA = "NIET VAN TOEPASSING"
 
@@ -329,6 +334,18 @@ module Utils =
                 if u = dr.Unit then acc
                 else Some ""
         ) None
+
+
+    let getReconsitiution gpk rte dep =
+        mapReconsitution
+        |> Array.tryFind (fun xs ->
+            xs[0] = gpk &&
+            xs[3] = rte &&
+            xs[5] = dep
+        )
+        |> Option.map (fun xs -> xs[8] |> Double.tryParse, xs[9])
+        |> Option.filter (fun (n, _) -> n |> Option.isSome)
+        |> Option.map (fun (n, s) -> n |> Option.get, s)
 
 
     let createDataImport (file : string) (newFile: string) (sheet : string) xs =

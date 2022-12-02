@@ -293,11 +293,17 @@ module MetaVision =
                     |> String.splitAt ';'
                     |> Array.collect (fun r ->
                         if m.Products |> Array.isEmpty then
+                            let dnv =
+                                let gpk = m.ExternalCode |> String.replace "GPK-" ""
+                                getReconsitiution gpk r $"{d}"
+                                
                             [|
                                 {|
                                     Department = d
                                     Medication = m
                                     Product = ""
+                                    DiluentName = dnv |> Option.map snd |> Option.defaultValue ""
+                                    DiluentVolume = dnv |> Option.map fst
                                     Route = r
                                 |}
                             |]
@@ -308,6 +314,8 @@ module MetaVision =
                                     Department = d
                                     Medication = m
                                     Product = p.ProductName
+                                    DiluentName = p.DiluentName
+                                    DiluentVolume = Some 1.
                                     Route = r
                                 |}
                             )
@@ -388,9 +396,9 @@ module MetaVision =
                 ComponentConcentrationVolumeUnit =
                     if m.Unit = "druppel" || m.Unit = "mL" then ""
                     else "mL"
-                ComponentDrugInDiluentDiluentMedicationName = if p |> String.isNullOrWhiteSpace then "" else "ampulvlst"
-                ComponentDrugInDiluentVolumeValue = if p |> String.isNullOrWhiteSpace then None else Some 1.
-                ComponentDrugInDiluentVolumeUnit = if p |> String.isNullOrWhiteSpace then "" else "ml"
+                ComponentDrugInDiluentDiluentMedicationName = t.DiluentName
+                ComponentDrugInDiluentVolumeValue = t.DiluentVolume
+                ComponentDrugInDiluentVolumeUnit = if t.DiluentName |> String.isNullOrWhiteSpace then "" else "ml"
                 TotalVolumeUnit = "mL"
                 StartMethod =
                     match f with
@@ -668,7 +676,7 @@ module MetaVision =
                                     Volume = "0"
                                     DiluentName =
                                         if r.DoseForms |> String.contains "emulsie" then "emulsie"
-                                        else "water"
+                                        else "medvlst"
                                     IsFormulary = r.IsFormulary
                                 }
                             |]
