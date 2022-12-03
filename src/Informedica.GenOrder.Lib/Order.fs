@@ -13,91 +13,103 @@ module Order =
 
     module Logging = Informedica.GenOrder.Lib.Logging
 
-    /// Contains literals used
-    /// to generate `Variable` names
-    module Literals =
-
-        [<Literal>]
-        let adjust = "Order.Adjust"
 
     /// Utitlity functions to
     /// enable mapping of a `Variable`s
     /// to an `Order`
     module Mapping =
 
+        let qty = VariableUnit.Quantity.name
+        let cnc = VariableUnit.Concentration.name
+        let tot = VariableUnit.Total.name
+        let rte = VariableUnit.Rate.name
+        let qtyAdj = VariableUnit.QuantityAdjust.name
+        let totAdj = VariableUnit.TotalAdjust.name
+        let rteAdj = VariableUnit.RateAdjust.name
+        let cnt = VariableUnit.Count.name
+        let frq = VariableUnit.Frequency.name
+        let tme = VariableUnit.Time.name
+        let itm = Orderable.Literals.item
+        let cmp = Orderable.Literals.comp
+        let orb = Orderable.Literals.orderable
+        let dos = Orderable.Literals.dose
+        let prs = "Prescription"
+        let ord = "Order"
+        let adj = "Adjust"
+
         let map = function
-            | PresFreq -> "Pres.Freq"
-            | PresTime -> "Pres.Time"
-            | ItemComponentQty -> "Item.Component.Qty"
-            | ItemOrderableQty -> "Item.Orderable.Qty"
-            | ItemComponentConc -> "Item.Component.Conc"
-            | ItemOrderableConc -> "Item.Orderable.Conc"
-            | ItemDoseQty -> "Item.Dose.Qty"
-            | ItemDoseTotal -> "Item.Dose.Total"
-            | ItemDoseRate -> "Item.Dose.Rate"
-            | ItemDoseAdjustQtyAdjust -> "Item.DoseAdjust.QtyAdjust"
-            | ItemDoseAdjustTotalAdjust -> "Item.DoseAdjust.TotalAdjust"
-            | ItemDoseAdjustRateAdjust -> "Item.DoseAdjust.RateAdjust"
-            | ComponentComponentQty -> "Component.Component.Qty"
-            | ComponentOrderableQty -> "Component.Orderable.Qty"
-            | ComponentOrderableCount -> "Component.Orderable.Count"
-            | ComponentOrderCount -> "Component.Order.Count"
-            | ComponentOrderableConc -> "Component.Orderable.Conc"
-            | ComponentDoseQty -> "Component.Dose.Qty"
-            | ComponentDoseTotal -> "Component.Dose.Total"
-            | ComponentDoseRate -> "Component.Dose.Rate"
-            | ComponentDoseAdjustQtyAdjust -> "Component.DoseAdjust.QtyAdjust"
-            | ComponentDoseAdjustTotalAdjust -> "Component.DoseAdjust.TotalAdjust"
-            | ComponentDoseAdjustRateAdjust -> "Component.DoseAdjust.RateAdjust"
-            | OrderableOrderableQty -> "Orderable.Orderable.Qty"
-            | OrderableOrderQty -> "Orderable.Order.Qty"
-            | OrderableOrderCount -> "Orderable.Order.Count"
-            | OrderableDoseCount -> "Orderable.Dose.Count"
-            | OrderableDoseQty -> "Orderable.Dose.Qty"
-            | OrderableDoseTotal -> "Orderable.Dose.Total"
-            | OrderableDoseRate -> "Orderable.Dose.Rate"
-            | OrderableDoseAdjustQtyAdjust -> "Orderable.DoseAdjust.QtyAdjust"
-            | OrderableDoseAdjustTotalAdjust -> "Orderable.DoseAdjust.TotalAdjust"
-            | OrderableDoseAdjustRateAdjust -> "Orderable.DoseAdjust.RateAdjust"
-            | OrderAdjustQty -> "Order.Adjust.Qty"
+            | ItemComponentQty -> $"{itm}.{cmp}.{qty}"
+            | ItemComponentConc -> $"{itm}.{cmp}.{cnc}"
+            | ItemOrderableQty -> $"{itm}.{orb}.{qty}"
+            | ItemOrderableConc -> $"{itm}.{orb}.{cnc}"
+            | ItemDoseQty -> $"{itm}.{dos}.{qty}"
+            | ItemDoseTotal -> $"{itm}.{dos}.{tot}"
+            | ItemDoseRate -> $"{itm}.{dos}.{rte}"
+            | ItemDoseAdjustQty -> $"{itm}.{dos}.{qtyAdj}"
+            | ItemDoseAdjustTotal -> $"{itm}.{dos}.{totAdj}"
+            | ItemDoseAdjustRate -> $"{itm}.{dos}.{rteAdj}"
+            | ComponentQty -> $"{cmp}.{cmp}.{qty}"
+            | ComponentOrderableQty -> $"{cmp}.{orb}.{qty}"
+            | ComponentOrderableConc -> $"{cmp}.{orb}.{cnc}"
+            | ComponentOrderableCount -> $"{cmp}.{orb}.{cnt}"
+            | ComponentOrderCount -> $"{cmp}.{ord}.{cnt}"
+            | ComponentDoseQty -> $"{cmp}.{dos}.{qty}"
+            | ComponentDoseTotal -> $"{cmp}.{dos}.{tot}"
+            | ComponentDoseRate -> $"{cmp}.{dos}.{rte}"
+            | ComponentDoseAdjustQty -> $"{cmp}.{dos}.{qtyAdj}"
+            | ComponentDoseAdjustTotal -> $"{cmp}.{dos}.{totAdj}"
+            | ComponentDoseAdjustRate -> $"{cmp}.{dos}.{rteAdj}"
+            | OrderableQty -> $"{orb}.{orb}.{qty}"
+            | OrderableDoseCount -> $"{orb}.{dos}.{cnt}"
+            | OrderableDoseQty -> $"{orb}.{dos}.{qty}"
+            | OrderableDoseTotal -> $"{orb}.{dos}.{tot}"
+            | OrderableDoseRate -> $"{orb}.{dos}.{rte}"
+            | OrderableDoseAdjustQty -> $"{orb}.{dos}.{qtyAdj}"
+            | OrderableDoseAdjustTotal -> $"{orb}.{dos}.{totAdj}"
+            | OrderableDoseAdjustRate -> $"{orb}.{dos}.{rteAdj}"
+            | OrderableOrderQty -> $"{orb}.{ord}.{qty}"
+            | OrderableOrderCount -> $"{orb}.{ord}.{cnt}"
+            | OrderPresFreq -> $"{ord}.{prs}.{frq}"
+            | OrderPresTime -> $"{ord}.{prs}.{tme}"
+            | OrderAdjustQty -> $"{ord}.{adj}.{qty}"
 
 
         let fromString s =
             match s with
-            | s when s = "Pres.Freq" -> PresFreq
-            | s when s = "Pres.Time" -> PresTime
-            | s when s = "Item.Component.Qty" -> ItemComponentQty
-            | s when s = "Item.Orderable.Qty" ->  ItemOrderableQty
-            | s when s = "Item.Component.Conc" -> ItemComponentConc
-            | s when s = "Item.Orderable.Conc" ->  ItemOrderableConc
-            | s when s = "Item.Dose.Qty" ->  ItemDoseQty
-            | s when s = "Item.Dose.Total" -> ItemDoseTotal
-            | s when s = "Item.Dose.Rate" ->  ItemDoseRate
-            | s when s = "Item.DoseAdjust.QtyAdjust" -> ItemDoseAdjustQtyAdjust
-            | s when s = "Item.DoseAdjust.TotalAdjust" -> ItemDoseAdjustTotalAdjust
-            | s when s = "Item.DoseAdjust.RateAdjust" ->  ItemDoseAdjustRateAdjust
-            | s when s = "Component.Component.Qty" ->  ComponentComponentQty
-            | s when s = "Component.Orderable.Qty" -> ComponentOrderableQty
-            | s when s = "Component.Orderable.Count" -> ComponentOrderableCount
-            | s when s = "Component.Order.Count" ->  ComponentOrderCount
-            | s when s = "Component.Orderable.Conc" -> ComponentOrderableConc
-            | s when s = "Component.Dose.Qty" ->  ComponentDoseQty
-            | s when s = "Component.Dose.Total" ->  ComponentDoseTotal
-            | s when s = "Component.Dose.Rate" -> ComponentDoseRate
-            | s when s = "Component.DoseAdjust.QtyAdjust" -> ComponentDoseAdjustQtyAdjust
-            | s when s = "Component.DoseAdjust.TotalAdjust" -> ComponentDoseAdjustTotalAdjust
-            | s when s = "Component.DoseAdjust.RateAdjust" -> ComponentDoseAdjustRateAdjust
-            | s when s = "Orderable.Orderable.Qty" -> OrderableOrderableQty
-            | s when s = "Orderable.Order.Qty" -> OrderableOrderQty
-            | s when s = "Orderable.Order.Count" -> OrderableOrderCount
-            | s when s = "Orderable.Dose.Count" -> OrderableDoseCount
-            | s when s = "Orderable.Dose.Qty" -> OrderableDoseQty
-            | s when s = "Orderable.Dose.Total" -> OrderableDoseTotal
-            | s when s = "Orderable.Dose.Rate" -> OrderableDoseRate
-            | s when s = "Orderable.DoseAdjust.QtyAdjust" -> OrderableDoseAdjustQtyAdjust
-            | s when s = "Orderable.DoseAdjust.TotalAdjust" -> OrderableDoseAdjustTotalAdjust
-            | s when s = "Orderable.DoseAdjust.RateAdjust" -> OrderableDoseAdjustRateAdjust
-            | s when s = "Order.Adjust.Qty" -> OrderAdjustQty
+            | _ when s = (ItemComponentQty |> map) -> ItemComponentQty
+            | _ when s = (ItemComponentConc |> map) -> ItemComponentConc
+            | _ when s = (ItemOrderableQty |> map) -> ItemOrderableQty
+            | _ when s = (ItemOrderableConc |> map) -> ItemOrderableConc
+            | _ when s = (ItemDoseQty |> map) -> ItemDoseQty
+            | _ when s = (ItemDoseTotal |> map) -> ItemDoseTotal
+            | _ when s = (ItemDoseRate |> map) -> ItemDoseRate
+            | _ when s = (ItemDoseAdjustQty |> map) -> ItemDoseAdjustQty
+            | _ when s = (ItemDoseAdjustTotal |> map) -> ItemDoseAdjustTotal
+            | _ when s = (ItemDoseAdjustRate |> map) -> ItemDoseAdjustRate
+            | _ when s = (ComponentQty |> map) -> ComponentQty
+            | _ when s = (ComponentOrderableQty |> map) -> ComponentOrderableQty
+            | _ when s = (ComponentOrderableConc |> map) -> ComponentOrderableConc
+            | _ when s = (ComponentOrderableCount |> map) -> ComponentOrderableCount
+            | _ when s = (ComponentDoseQty |> map) ->  ComponentDoseQty
+            | _ when s = (ComponentDoseTotal |> map) ->  ComponentDoseTotal
+            | _ when s = (ComponentDoseRate |> map) -> ComponentDoseRate
+            | _ when s = (ComponentDoseAdjustQty |> map) -> ComponentDoseAdjustQty
+            | _ when s = (ComponentDoseAdjustTotal |> map) -> ComponentDoseAdjustTotal
+            | _ when s = (ComponentDoseAdjustRate |> map) -> ComponentDoseAdjustRate
+            | _ when s = (ComponentOrderCount  |> map) ->  ComponentOrderCount
+            | _ when s = (OrderableQty |> map) -> OrderableQty
+            | _ when s = (OrderableDoseCount |> map) -> OrderableDoseCount
+            | _ when s = (OrderableDoseQty  |> map) -> OrderableDoseQty
+            | _ when s = (OrderableDoseTotal |> map) -> OrderableDoseTotal
+            | _ when s = (OrderableDoseRate |> map) -> OrderableDoseRate
+            | _ when s = (OrderableDoseAdjustQty |> map) -> OrderableDoseAdjustQty
+            | _ when s = (OrderableDoseAdjustTotal |> map) -> OrderableDoseAdjustTotal
+            | _ when s = (OrderableDoseAdjustRate |> map) -> OrderableDoseAdjustRate
+            | _ when s = (OrderableOrderQty |> map) -> OrderableOrderQty
+            | _ when s = (OrderableOrderCount |> map) -> OrderableOrderCount
+            | _ when s = (OrderPresFreq |> map) -> OrderPresFreq
+            | _ when s = (OrderPresTime |> map) -> OrderPresTime
+            | _ when s = (OrderAdjustQty |> map) -> OrderAdjustQty
             | _ -> $"cannot map {s} to an OrderMapping" |> failwith
 
 
@@ -106,7 +118,6 @@ module Order =
     /// model a start and stop date time
     /// of an `Order`
     module StartStop =
-
 
         let toString stst =
             match stst with
@@ -177,8 +188,8 @@ module Order =
     let createNew id n shape str_prs route =
         let orb = Orderable.createNew id n shape
         let nm  = orb |> Orderable.getName
-        let adj = Quantity.quantity [ id |> Id.toString; n |> Name.toString; Literals.adjust ] ValueUnit.NoUnit
-        let prs = [id |> Id.toString; nm |> Name.toString] |> str_prs
+        let adj = Quantity.quantity [ id |> Id.toString; n |> Name.toString; Mapping.ord; Mapping.adj ] ValueUnit.NoUnit
+        let prs = [id |> Id.toString; nm |> Name.toString; Mapping.ord; Mapping.prs] |> str_prs
         let sts = DateTime.Now  |> StartStop.Start
 
         create id adj orb prs route sts
@@ -194,16 +205,11 @@ module Order =
         |> String.concat "."
 
 
-    let mapName n m o =
+    let mapName n m (ord : Order) =
         let dls = "."
 
-        match m with
-        | PresFreq
-        | OrderAdjustQty ->
-            [ (o |> getName) + dls + (m |> Mapping.map)] |> Name.create
-        | _ ->
-            [ (o.Id |> Id.toString) + dls + n + dls + (m |> Mapping.map)]
-            |> Name.create
+        [ (ord.Id |> Id.toString) + dls + n + dls + (m |> Mapping.map)]
+        |> Name.create
 
 
     let getOrderable ord = (ord |> get).Orderable
@@ -239,7 +245,7 @@ module Order =
     /// representing variable name, valuerange
     /// and unit group
     let toString (ord: Order) =
-        [ Literals.adjust; ord.Adjust |> Quantity.toString ]
+        [ OrderAdjustQty |> Mapping.map; ord.Adjust |> Quantity.toString ]
         |> List.append (Orderable.Literals.orderable::(ord.Orderable |> Orderable.toString))
         |> List.append ("Prescription"::(ord.Prescription |> Prescription.toString))
         |> List.append ("Route"::[ord.Route])
@@ -251,7 +257,7 @@ module Order =
 
         let n =
             match m with
-            | PresFreq
+            | OrderPresFreq
             | OrderAdjustQty ->
                 [ (o |> getName) + dls + (m |> Mapping.map) ] |> Name.create
             | _ ->

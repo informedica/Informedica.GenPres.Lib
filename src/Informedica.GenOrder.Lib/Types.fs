@@ -202,40 +202,75 @@ module Types =
 
     /// Mapping of an order to variables
     type OrderMapping =
-        | PresFreq
-        | PresTime
+        // Quantity of an Item in a Component
         | ItemComponentQty
+        // Quantity of an Item in an Orderable
         | ItemOrderableQty
+        // Concentration of an Item in a Component
         | ItemComponentConc
+        // Concentration of an Item in an Orderable
         | ItemOrderableConc
+        // Dose Quantity of an Item
         | ItemDoseQty
+        // Dose Total of an Item
         | ItemDoseTotal
+        // Dose Rate of an Item
         | ItemDoseRate
-        | ItemDoseAdjustQtyAdjust
-        | ItemDoseAdjustTotalAdjust
-        | ItemDoseAdjustRateAdjust
-        | ComponentComponentQty
+        // Adjusted Dose Quantity of an Item
+        | ItemDoseAdjustQty
+        // Adjusted Dose Total of an Item
+        | ItemDoseAdjustTotal
+        // Adjusted Dose Rate of an Item
+        | ItemDoseAdjustRate
+        // Quantity of a Component
+        | ComponentQty
+        // Quantity of a Component in an Orderable
         | ComponentOrderableQty
-        | ComponentOrderableCount
-        | ComponentOrderCount
+        // Concentration of a Component in an Orderable
         | ComponentOrderableConc
+        // Amount of Components in an Orderable
+        | ComponentOrderableCount
+        // Amount of Components in an Order
+        | ComponentOrderCount
+        // Dose Quantity of a Component
         | ComponentDoseQty
+        // Dose Total of a Component
         | ComponentDoseTotal
+        // Dose Rate of a Component
         | ComponentDoseRate
-        | ComponentDoseAdjustQtyAdjust
-        | ComponentDoseAdjustTotalAdjust
-        | ComponentDoseAdjustRateAdjust
-        | OrderableOrderableQty
-        | OrderableOrderQty
-        | OrderableOrderCount
+        // Adjusted Dose Quantity of a Component
+        | ComponentDoseAdjustQty
+        // Adjusted Dose Total of a Component
+        | ComponentDoseAdjustTotal
+        // Adjusted Dose Rate of a Component
+        | ComponentDoseAdjustRate
+        // Quantity of an Orderable
+        | OrderableQty
+        // Amount of Dose Quantity in an Orderable Quantity
         | OrderableDoseCount
+        // Dose Quantity of an Orderable
         | OrderableDoseQty
+        // Dose Total of an Orderable
         | OrderableDoseTotal
+        // Dose Rate of an Orderable
         | OrderableDoseRate
-        | OrderableDoseAdjustQtyAdjust
-        | OrderableDoseAdjustTotalAdjust
-        | OrderableDoseAdjustRateAdjust
+        // Adjusted Dose Quantity of an Orderable
+        | OrderableDoseAdjustQty
+        // Adjusted Dose Total of an Orderable
+        | OrderableDoseAdjustTotal
+        // Adjusted Dose Rate of an Orderable
+        | OrderableDoseAdjustRate
+        // Quantity of an Orderable in an Order
+        | OrderableOrderQty
+        // Amount of Orderables in an Order
+        | OrderableOrderCount
+        // Prescription Frequency
+        | OrderPresFreq
+        // Prescription Time
+        | OrderPresTime
+        // Order Adjust Quantity
         | OrderAdjustQty
+
 
     /// The different possible order types
     type OrderType =
@@ -244,6 +279,7 @@ module Types =
         | ContinuousOrder
         | DiscontinuousOrder
         | TimedOrder
+
 
     /// Relation between shape and route
     type RouteShape =

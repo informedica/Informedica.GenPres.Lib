@@ -21,15 +21,13 @@ module Orderable =
         [<Literal>]
         let item = "Item"
         [<Literal>]
-        let ``component`` = "Component"
+        let comp = "Component"
         [<Literal>]
         let orderable = "Orderable"
         [<Literal>]
         let order = "Order"
         [<Literal>]
         let dose = "Dose"
-        [<Literal>]
-        let doseAdjust = "DoseAdjust"
 
     /// Type and functions that models an
     /// `Order` `Item` that is contained in
@@ -74,12 +72,12 @@ module Orderable =
             let s = [Literals.item] |> List.append [id |> Id.toString; n |> Name.toString]
             let un = ValueUnit.NoUnit
 
-            let cmp_qty = let s = [Literals.``component``] |> List.append s in Quantity.quantity s un
+            let cmp_qty = let s = [Literals.comp] |> List.append s in Quantity.quantity s un
             let orb_qty = let s = [Literals.orderable]     |> List.append s in Quantity.quantity s un
-            let cmp_cnc = let s = [Literals.``component``] |> List.append s in Concentration.conc s un un
+            let cmp_cnc = let s = [Literals.comp] |> List.append s in Concentration.conc s un un
             let orb_cnc = let s = [Literals.orderable]     |> List.append s in Concentration.conc s un un
             let dos     = let s = [Literals.dose]          |> List.append s in Dose.dose s un un un
-            let dos_adj = let s = [Literals.doseAdjust]    |> List.append s in DoseAdjust.doseAdjust s un un un un
+            let dos_adj = let s = [Literals.dose]          |> List.append s in DoseAdjust.doseAdjust s un un un un
 
             create id n cmp_qty orb_qty cmp_cnc orb_cnc dos dos_adj
 
@@ -463,17 +461,17 @@ module Orderable =
         /// * `id`: the id of the component
         /// * `n`: the name of the component
         let createNew id n =
-            let s = [id |> Id.toString; n |> Name.toString; Literals.``component``]
+            let s = [id |> Id.toString; n |> Name.toString; Literals.comp]
             let un = ValueUnit.NoUnit
 
-            let cmp_qty = let s = [Literals.``component``] |> List.append s in Quantity.quantity s un
+            let cmp_qty = let s = [Literals.comp] |> List.append s in Quantity.quantity s un
             let orb_qty = let s = [Literals.orderable]     |> List.append s in Quantity.quantity s un
             let orb_cnt = let s = [Literals.orderable]     |> List.append s in Count.count s
             let ord_qty = let s = [Literals.order]         |> List.append s in Quantity.quantity s un
             let ord_cnt = let s = [Literals.order]         |> List.append s in Count.count s
             let orb_cnc = let s = [Literals.orderable]     |> List.append s in Concentration.conc s un un
             let dos = let s = [Literals.dose]              |> List.append s in Dose.dose s un un un
-            let dos_adj = let s = [Literals.doseAdjust]    |> List.append s in DoseAdjust.doseAdjust s un un un un
+            let dos_adj = let s = [Literals.dose]          |> List.append s in DoseAdjust.doseAdjust s un un un un
 
             create id n cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos dos_adj []
 
@@ -873,7 +871,7 @@ module Orderable =
         let orb_cnt = let s = [Literals.order]        |> List.append s in Count.count s
         let dos_cnt = let s = [Literals.dose]         |> List.append s in Count.count s
         let dos     = let s = [Literals.dose]         |> List.append s in Dose.dose s un un un
-        let dos_ajd = let s = [Literals.doseAdjust]   |> List.append s in DoseAdjust.doseAdjust s un un un un
+        let dos_ajd = let s = [Literals.dose]         |> List.append s in DoseAdjust.doseAdjust s un un un un
 
         create id n shape orb_qty ord_qty orb_cnt dos_cnt dos dos_ajd []
 

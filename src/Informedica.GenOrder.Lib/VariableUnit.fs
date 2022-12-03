@@ -415,7 +415,7 @@ module VariableUnit =
     module Frequency =
 
         /// String representation of the type
-        let name = "Pres.Freq"
+        let name = "Freq"
 
         /// Turn `Frequency` in a `VariableUnit`
         let toVarUnt (Frequency freq) = freq
@@ -468,7 +468,7 @@ module VariableUnit =
     module Time =
 
         /// String representation of the type
-        let name = "Pres.Time"
+        let name = "Time"
 
         /// Turn `Time` in a `VariableUnit`
         let toVarUnt (Time time) = time

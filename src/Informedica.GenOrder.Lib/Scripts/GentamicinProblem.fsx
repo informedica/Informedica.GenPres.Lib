@@ -1,5 +1,5 @@
 
-#load "../Scripts/load.fsx"
+#load "load.fsx"
 
 open MathNet.Numerics
 
@@ -14,6 +14,7 @@ let startLogging = fun () -> OrderLogger.logger.Start path OrderLogger.Level.Inf
 
 
 startLogging ()
+
 
 
 // gentamicin

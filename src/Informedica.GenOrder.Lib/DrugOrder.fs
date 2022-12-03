@@ -474,7 +474,7 @@ module DrugOrder =
             >|> [
                     if d.Quantities |> List.isEmpty |> not then
                         // ALL set possible orderable quantities
-                        cstr OrderableOrderableQty
+                        cstr OrderableQty
                             (d.Quantities |> Props.vals)
                             AnyRouteShape AnyOrder
                     else
@@ -485,7 +485,7 @@ module DrugOrder =
                             |> List.distinct
                             |> Props.incr
 
-                        cstr OrderableOrderableQty
+                        cstr OrderableQty
                              divs
                              AnyRouteShape AnyOrder
 
@@ -500,7 +500,7 @@ module DrugOrder =
                     >|> [
                             // ALL set possible component quantities
                             DrugConstraint.create n
-                                ComponentComponentQty
+                                ComponentQty
                                 (p.Quantities |> Props.vals)
                                 AnyRouteShape AnyOrder
 
@@ -576,21 +576,21 @@ module DrugOrder =
         >|> [
                 if dr.Frequencies |> List.isEmpty |> not then
                     DrugConstraint.create dr.Medication
-                        PresFreq
+                        OrderPresFreq
                         (dr.Frequencies |> Props.vals)
                         AnyRouteShape DiscontinuousOrder
                     DrugConstraint.create dr.Medication
-                        PresFreq
+                        OrderPresFreq
                         (dr.Frequencies |> Props.vals)
                         AnyRouteShape TimedOrder
                 if dr.MinTime.IsSome then
                     DrugConstraint.create dr.Medication
-                        PresTime
+                        OrderPresTime
                         (dr.MinTime.Value |> Props.minIncl)
                         AnyRouteShape TimedOrder
                 if dr.MaxTime.IsSome then
                     DrugConstraint.create dr.Medication
-                        PresTime
+                        OrderPresTime
                         (dr.MaxTime.Value |> Props.maxIncl)
                         AnyRouteShape TimedOrder
         ]
@@ -602,16 +602,16 @@ module DrugOrder =
                 acc
                 |> cr sn ItemDoseQty Props.minIncl l.MinDoseQuantity
                 |> cr sn ItemDoseQty Props.maxIncl l.MaxDoseQuantity
-                |> cr sn ItemDoseAdjustQtyAdjust Props.minIncl l.MinDoseQuantityAdjust
-                |> cr sn ItemDoseAdjustQtyAdjust Props.maxIncl l.MaxDoseQuantityAdjust
+                |> cr sn ItemDoseAdjustQty Props.minIncl l.MinDoseQuantityAdjust
+                |> cr sn ItemDoseAdjustQty Props.maxIncl l.MaxDoseQuantityAdjust
                 |> cr sn ItemDoseTotal Props.minIncl l.MinDoseTotal
                 |> cr sn ItemDoseTotal Props.maxIncl l.MaxDoseTotal
-                |> cr sn ItemDoseAdjustTotalAdjust Props.minIncl l.MinDoseTotalAdjust
-                |> cr sn ItemDoseAdjustTotalAdjust Props.maxIncl l.MaxDoseTotalAdjust
+                |> cr sn ItemDoseAdjustTotal Props.minIncl l.MinDoseTotalAdjust
+                |> cr sn ItemDoseAdjustTotal Props.maxIncl l.MaxDoseTotalAdjust
                 |> cr sn ItemDoseRate Props.minIncl l.MinDoseRate
                 |> cr sn ItemDoseRate Props.maxIncl l.MaxDoseRate
-                |> cr sn ItemDoseAdjustRateAdjust Props.minIncl l.MinDoseRateAdjust
-                |> cr sn ItemDoseAdjustRateAdjust Props.maxIncl l.MaxDoseRateAdjust
+                |> cr sn ItemDoseAdjustRate Props.minIncl l.MinDoseRateAdjust
+                |> cr sn ItemDoseAdjustRate Props.maxIncl l.MaxDoseRateAdjust
 
             ) (cs,o)
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o

@@ -27,6 +27,7 @@
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Api.fsx" />
     <None Include="Scripts\GentamicinProblem.fsx" />
+    <None Include="Scripts\Order.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenForm.Lib\Informedica.GenForm.Lib.fsproj" />

@@ -9,6 +9,7 @@ module OrderLogger =
     open System
     open System.Diagnostics
 
+    open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
     open Informedica.GenOrder.Lib
 
@@ -76,26 +77,31 @@ module OrderLogger =
 
     // To print all messages related to an order
     let printOrderMsg (msgs : ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message> option) msg =
+        let print (o : Order) =
+            let (Id s) = o.Id
+            o
+            |> Order.toString
+            |> List.map (String.replace (s + ".") "")
         match msg with
         | Logging.OrderEvent m ->
             match m with
             | Events.SolverReplaceUnit (n, u) ->
                 $"replaced {n |> Name.toString} unit with {u |> ValueUnit.unitToString}"
 
-            | Events.OrderSolveStarted o -> $"=== Order ({o.Orderable.Name}) Solver Started ==="
+            | Events.OrderSolveStarted o -> $"=== Order ({o.Orderable.Name |> Name.toString}) Solver Started ==="
 
-            | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name}) Solver Finished ==="
+            | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name |> Name.toString}) Solver Finished ==="
 
             | Events.OrderSolveConstraintsStarted (o, cs) ->
                 o
                 |> Order.applyConstraints { Log = ignore } cs
-                |> Order.toString
+                |> print
                 |> String.concat "\n"
                 |> sprintf "=== Order Constraints Solving Started ===\n%s"
 
             | Events.OrderSolveConstraintsFinished (o, _) ->
                 o
-                |> Order.toString
+                |> print
                 |> String.concat "\n"
                 |> sprintf "=== Order Constraints Solving Finished ===\n%s"
 
