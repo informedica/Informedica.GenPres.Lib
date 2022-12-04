@@ -125,49 +125,6 @@ module VariableUnit =
         |> ValueUnit.valueToBase u
 
 
-    let setValue c set v vru =
-        let i =
-            vru
-            |> valueToBase (v |> List.head)
-            |> c
-
-        vru
-        |> getVar
-        |> Variable.getValueRange
-        |> set i
-        |> fun vr ->
-            { vru with
-                Variable =
-                    vr
-                    |> Variable.setValueRange true vru.Variable }
-
-
-    let setMinIncl =
-        setValue (Minimum.create true) (ValueRange.setMin true)
-
-
-    let setMaxIncl =
-        setValue (Maximum.create true) (ValueRange.setMax true)
-
-
-    let setVals vs vru =
-        let vs =
-            vs
-            |> List.map (fun v -> vru |> valueToBase v)
-            |> Set.ofList
-            |> ValueRange.ValueSet.create
-
-        vru
-        |> getVar
-        |> Variable.getValueRange
-        |> ValueRange.setValueSet vs
-        |> fun vr ->
-            { vru with
-                Variable =
-                    vr
-                    |> Variable.setValueRange true vru.Variable }
-
-
     /// Get the string representation of a `VariableUnit` **vru**
     let toString exact vru =
         let ns = vru |> getName |> Variable.Name.toString
@@ -1009,9 +966,6 @@ module VariableUnit =
         module TL = Total
         module RT = Rate
 
-
-        /// Create a `Dose`
-        let create qty tot rte = (qty, tot, rte) |> Dose
 
         let get (Dose(qty, tot, rte)) = qty, tot, rte
 

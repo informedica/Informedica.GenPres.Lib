@@ -22,7 +22,7 @@ module Types =
         {
             /// Stores the values/range
             Variable:  Variable
-            /// Stores the unit group
+            /// Stores the unit
             Unit: Unit
         }
 
@@ -163,19 +163,6 @@ module Types =
         }
 
 
-    /// Type that represents a prescription
-    type Prescription =
-        /// A process
-        | Process
-        /// A continuous infusion
-        | Continuous
-        /// A discontinuous presciption with a frequency
-        | Discontinuous of Frequency
-        /// A discontinuous prescription with both frequency and time
-        | Timed of Frequency * Time
-
-
-
     /// There is always a `Start` or
     /// both a `StartStop`
     type StartStop =
@@ -200,74 +187,92 @@ module Types =
             StartStop: StartStop
         }
 
+    /// Type that represents a prescription
+    and Prescription =
+        /// A process
+        | Process
+        /// A continuous infusion
+        | Continuous
+        /// A discontinuous presciption with a frequency
+        | Discontinuous of Frequency
+        /// A discontinuous prescription with both frequency and time
+        | Timed of Frequency * Time
+
+
     /// Mapping of an order to variables
     type OrderMapping =
         // Quantity of an Item in a Component
-        | ItemComponentQty
-        // Quantity of an Item in an Orderable
-        | ItemOrderableQty
+        | ItemComponentQuantity
         // Concentration of an Item in a Component
-        | ItemComponentConc
+        | ItemComponentConcentration
+        // Quantity of an Item in an Orderable
+        | ItemOrderableQuantity
         // Concentration of an Item in an Orderable
-        | ItemOrderableConc
+        | ItemOrderableConcentration
         // Dose Quantity of an Item
-        | ItemDoseQty
+        | ItemDoseQuantity
         // Dose Total of an Item
         | ItemDoseTotal
         // Dose Rate of an Item
         | ItemDoseRate
+        // Dose Total of an Item in an Order
+        | ItemDoseOrder
         // Adjusted Dose Quantity of an Item
-        | ItemDoseAdjustQty
+        | ItemDoseQuantityAdjust
         // Adjusted Dose Total of an Item
-        | ItemDoseAdjustTotal
+        | ItemDoseTotalAdjust
         // Adjusted Dose Rate of an Item
-        | ItemDoseAdjustRate
+        | ItemDoseRateAdjust
+        // Adjusted Total Dose Rate of an Item in an Order
+        | ItemDoseOrderAdjust
         // Quantity of a Component
-        | ComponentQty
+        | ComponentComponentQuantity
         // Quantity of a Component in an Orderable
-        | ComponentOrderableQty
+        | ComponentOrderableQuantity
         // Concentration of a Component in an Orderable
-        | ComponentOrderableConc
+        | ComponentOrderableConcentration
         // Amount of Components in an Orderable
         | ComponentOrderableCount
+        // Quantity of Component in an Order
+        | ComponentOrderQuantity
         // Amount of Components in an Order
         | ComponentOrderCount
         // Dose Quantity of a Component
-        | ComponentDoseQty
+        | ComponentDoseQuantity
         // Dose Total of a Component
         | ComponentDoseTotal
         // Dose Rate of a Component
         | ComponentDoseRate
         // Adjusted Dose Quantity of a Component
-        | ComponentDoseAdjustQty
+        | ComponentDoseQuantityAdjust
         // Adjusted Dose Total of a Component
-        | ComponentDoseAdjustTotal
+        | ComponentDoseTotalAdjust
         // Adjusted Dose Rate of a Component
-        | ComponentDoseAdjustRate
+        | ComponentDoseRateAdjust
         // Quantity of an Orderable
-        | OrderableQty
+        | OrderableOrderableQuantity
         // Amount of Dose Quantity in an Orderable Quantity
         | OrderableDoseCount
         // Dose Quantity of an Orderable
-        | OrderableDoseQty
+        | OrderableDoseQuantity
         // Dose Total of an Orderable
         | OrderableDoseTotal
         // Dose Rate of an Orderable
         | OrderableDoseRate
         // Adjusted Dose Quantity of an Orderable
-        | OrderableDoseAdjustQty
+        | OrderableDoseQuantityAdjust
         // Adjusted Dose Total of an Orderable
-        | OrderableDoseAdjustTotal
+        | OrderableDoseTotalAdjust
         // Adjusted Dose Rate of an Orderable
         | OrderableDoseAdjustRate
-        // Quantity of an Orderable in an Order
-        | OrderableOrderQty
-        // Amount of Orderables in an Order
-        | OrderableOrderCount
         // Prescription Frequency
         | OrderPresFreq
         // Prescription Time
         | OrderPresTime
+        // Quantity of an Orderable in an Order
+        | OrderableOrderQuantity
+        // Amount of Orderables in an Order
+        | OrderableOrderCount
         // Order Adjust Quantity
         | OrderAdjustQty
 

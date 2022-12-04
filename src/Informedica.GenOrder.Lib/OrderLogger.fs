@@ -55,8 +55,8 @@ module OrderLogger =
         let toEql prod sum =
 
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = o |> Order.toEqs
 

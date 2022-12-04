@@ -213,7 +213,7 @@ module MetaVision =
             |> Array.collect (fun gp -> gp.Substances)
             |> Array.filter (fun s ->
                 s.SubstanceName |> String.equalsCapInsens "water" |> not &&
-                s.GenericName |> String.equalsCapInsens "water" |> not 
+                s.GenericName |> String.equalsCapInsens "water" |> not
             )
 
         // Ingredients
@@ -288,7 +288,7 @@ module MetaVision =
                     m.Assortment
                     |> Array.filter ((<>) UMCU)
                 else m.Assortment
-                |> Array.collect (fun d ->                
+                |> Array.collect (fun d ->
                     m.Routes
                     |> String.splitAt ';'
                     |> Array.collect (fun r ->
@@ -296,7 +296,7 @@ module MetaVision =
                             let dnv =
                                 let gpk = m.ExternalCode |> String.replace "GPK-" ""
                                 getReconsitiution gpk r $"{d}"
-                                
+
                             [|
                                 {|
                                     Department = d
@@ -331,13 +331,13 @@ module MetaVision =
                     else
                         let b =
                             t.Medication.DoseForms
-                            |> shapeIsInfuseOver 
+                            |> shapeIsInfuseOver
                         if b then SpecifyInfuseOver else NoInfusedOver
                 else NoInfusedOver
             let m = t.Medication
             let p = t.Product
             let r = t.Route
-            let f = 
+            let f =
                 m.Frequencies
                 |> String.splitAt ';'
                 |> Array.filter (fun s ->
@@ -350,7 +350,7 @@ module MetaVision =
                 |> Option.defaultValue "01x per dag (00)"
                 |> Frequency.map
             let n = $"A#{t.Department}|R#{r}|D#{f}"
-            
+
             {
                 OrderTemplateName = n
                 MedicationName = m.MedicationName
@@ -508,7 +508,7 @@ module MetaVision =
                     | _ -> gp.Substances[0].SubstanceUnit
                     |> mapUnit
 
-                let assort = gp.Id |> getFormulary 
+                let assort = gp.Id |> getFormulary
 
                 {
                     Medication.ExternalCode = $"GPK-{gp.Id}"
@@ -520,7 +520,7 @@ module MetaVision =
                             |> Array.map (fun s -> s.SubstanceName)
                             |> String.concat "/"
                             |> String.toLower
-                        
+
                     Unit = un
                     ATC =
                         gp
@@ -560,8 +560,14 @@ module MetaVision =
                                gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.solveGroup
                             else
                                 "[None]"
-                    DrugFamily = grps |> Option.map (fun g -> g.AnatomicalGroup |> capitalize) |> Option.defaultValue ""
-                    DrugSubfamily = grps |> Option.map (fun g -> g.TherapeuticSubGroup |> capitalize) |> Option.defaultValue ""
+                    DrugFamily =
+                        grps
+                        |> Option.map (fun g -> $"{g.ATC1} {g.AnatomicalGroup |> capitalize}")
+                        |> Option.defaultValue ""
+                    DrugSubfamily =
+                        grps
+                        |> Option.map (fun g -> $"{g.ATC3} {g.TherapeuticSubGroup |> capitalize}")
+                        |> Option.defaultValue ""
                     Assortment = assort
                     IsFormulary = assort |> Array.isEmpty |> not
                     CreateProduct =
@@ -585,7 +591,7 @@ module MetaVision =
                                             |> String.toLower
                                             |> String.trim
                                         Concentration = q
-                                        ConcentrationUnit = u 
+                                        ConcentrationUnit = u
                                         In =
                                             if (gp.Shape |> shapeIsSolution "" un || un = "dosis") &&
                                                un <> u then "1" else ""
@@ -885,7 +891,7 @@ insert into dbo.DrugFamilies ([Name], IsHiddenInAllergies) values ('{s}', 0)
             ATCGroup.get ()
             |> Array.map (fun g ->
                 g.AnatomicalGroup |> capitalize,
-                g.TherapeuticSubGroup |> capitalize    
+                g.TherapeuticSubGroup |> capitalize
             )
             |> Array.distinct
             |> Array.sort
@@ -913,7 +919,7 @@ declare @ClassOrder as int
 """
 
         let insert = """
-if not exists(select * from dbo.Orders_MedicationNonActiveComponents mc where mc.MedicationID = @MedId and mc.ComponentID = @CompId) 
+if not exists(select * from dbo.Orders_MedicationNonActiveComponents mc where mc.MedicationID = @MedId and mc.ComponentID = @CompId)
 insert into dbo.Orders_MedicationNonActiveComponents (MedicationID, ComponentID, Ratio, UnitID, SortOrder, InRatio, InUnitID, ObjectType) values (@MedId, @CompId, @ratio, @UnitID, @SortOrder, @InRatio, @InUnitID, 10)
 """
 
@@ -940,7 +946,7 @@ set @SortOrder = {indx - 1}
 set @InRatio = 1
 set @InUnitID = (select u.UnitID from dbo.Units u where u.UnitName = 'mL')
 """
-                        + insert                
+                        + insert
                         |> fun s -> [| s |]
 
                 )
@@ -991,7 +997,7 @@ set @SortOrder = {indx - 1}
 set @InRatio = 1
 set @InUnitID = (select u.UnitID from dbo.Units u where u.UnitName = '{xs[1]}')
 """
-                        + insert                
+                        + insert
                         |> fun s -> [| s |]
 
                 )

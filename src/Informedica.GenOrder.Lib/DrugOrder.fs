@@ -474,7 +474,7 @@ module DrugOrder =
             >|> [
                     if d.Quantities |> List.isEmpty |> not then
                         // ALL set possible orderable quantities
-                        cstr OrderableQty
+                        cstr OrderableOrderableQuantity
                             (d.Quantities |> Props.vals)
                             AnyRouteShape AnyOrder
                     else
@@ -485,7 +485,7 @@ module DrugOrder =
                             |> List.distinct
                             |> Props.incr
 
-                        cstr OrderableQty
+                        cstr OrderableOrderableQuantity
                              divs
                              AnyRouteShape AnyOrder
 
@@ -500,13 +500,13 @@ module DrugOrder =
                     >|> [
                             // ALL set possible component quantities
                             DrugConstraint.create n
-                                ComponentQty
+                                ComponentComponentQuantity
                                 (p.Quantities |> Props.vals)
                                 AnyRouteShape AnyOrder
 
                             if not fixedDose then
                                 DrugConstraint.create n
-                                    ComponentOrderableQty
+                                    ComponentOrderableQuantity
                                     (p.Divisible |> Props.singleIncr)
                                     AnyRouteShape AnyOrder
 
@@ -514,7 +514,7 @@ module DrugOrder =
                             // SINGLE COMPONENT
                             if d.Products |> List.length = 1 then
                                 DrugConstraint.create n
-                                    ComponentOrderableConc
+                                    ComponentOrderableConcentration
                                     (1N |> Props.singleVal)
                                     AnyRouteShape AnyOrder
                         ]
@@ -528,17 +528,17 @@ module DrugOrder =
                             // ALL set concentrations and quanties
                             if s.Concentrations |> List.isEmpty |> not then
                                 DrugConstraint.create n
-                                    ItemComponentConc
+                                    ItemComponentConcentration
                                     (s.Concentrations |> Props.vals)
                                     AnyRouteShape AnyOrder
                             if s.OrderableQuantities |> List.isEmpty |> not then
                                 DrugConstraint.create n
-                                    ItemOrderableQty
+                                    ItemOrderableQuantity
                                     (s.OrderableQuantities |> Props.vals)
                                     AnyRouteShape AnyOrder
                             if d.Products |> List.length = 1 && s.Concentrations |> List.isEmpty |> not then
                                 DrugConstraint.create n
-                                    ItemOrderableConc
+                                    ItemOrderableConcentration
                                     (s.Concentrations |> Props.vals)
                                     AnyRouteShape AnyOrder
 
@@ -600,18 +600,18 @@ module DrugOrder =
             |> List.fold (fun acc l ->
                 let sn = l.SubstanceName
                 acc
-                |> cr sn ItemDoseQty Props.minIncl l.MinDoseQuantity
-                |> cr sn ItemDoseQty Props.maxIncl l.MaxDoseQuantity
-                |> cr sn ItemDoseAdjustQty Props.minIncl l.MinDoseQuantityAdjust
-                |> cr sn ItemDoseAdjustQty Props.maxIncl l.MaxDoseQuantityAdjust
+                |> cr sn ItemDoseQuantity Props.minIncl l.MinDoseQuantity
+                |> cr sn ItemDoseQuantity Props.maxIncl l.MaxDoseQuantity
+                |> cr sn ItemDoseQuantityAdjust Props.minIncl l.MinDoseQuantityAdjust
+                |> cr sn ItemDoseQuantityAdjust Props.maxIncl l.MaxDoseQuantityAdjust
                 |> cr sn ItemDoseTotal Props.minIncl l.MinDoseTotal
                 |> cr sn ItemDoseTotal Props.maxIncl l.MaxDoseTotal
-                |> cr sn ItemDoseAdjustTotal Props.minIncl l.MinDoseTotalAdjust
-                |> cr sn ItemDoseAdjustTotal Props.maxIncl l.MaxDoseTotalAdjust
+                |> cr sn ItemDoseTotalAdjust Props.minIncl l.MinDoseTotalAdjust
+                |> cr sn ItemDoseTotalAdjust Props.maxIncl l.MaxDoseTotalAdjust
                 |> cr sn ItemDoseRate Props.minIncl l.MinDoseRate
                 |> cr sn ItemDoseRate Props.maxIncl l.MaxDoseRate
-                |> cr sn ItemDoseAdjustRate Props.minIncl l.MinDoseRateAdjust
-                |> cr sn ItemDoseAdjustRate Props.maxIncl l.MaxDoseRateAdjust
+                |> cr sn ItemDoseRateAdjust Props.minIncl l.MinDoseRateAdjust
+                |> cr sn ItemDoseRateAdjust Props.maxIncl l.MaxDoseRateAdjust
 
             ) (cs,o)
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
@@ -642,8 +642,8 @@ module DrugOrder =
             |> List.fold (fun acc l ->
                 let sn = l.SubstanceName
                 acc
-                |> set sn ItemOrderableConc Props.minIncl l.MinConcentration
-                |> set sn ItemOrderableConc Props.maxIncl l.MaxConcentration
+                |> set sn ItemOrderableConcentration Props.minIncl l.MinConcentration
+                |> set sn ItemOrderableConcentration Props.maxIncl l.MaxConcentration
             ) (cs, o)
             |> fun (cs, o) -> cs |> DrugConstraint.filter o, o
 

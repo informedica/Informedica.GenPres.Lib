@@ -36,26 +36,26 @@ module DateTime =
         (dt |> get).AddDays(ds |> float)
 
 
-    let age (date1:DateTime) (date2: DateTime) = 
+    let age (date1:DateTime) (date2: DateTime) =
 
-        let inv, date1, date2 = 
+        let inv, date1, date2 =
             if date1 > date2 then false, date1, date2 else true, date2, date1
 
         let y, date2 = date1.Year - date2.Year, date2.AddYears(date1.Year - date2.Year)
-        let y, date2 = 
+        let y, date2 =
             if (date1 - date2).Days < 0 then y - 1, date2.AddYears(-1) else y, date2
 
-        let m, date2 = 
-            if date1.Year = date2.Year then 
-                date1.Month - date2.Month, date2.AddMonths(date1.Month - date2.Month) 
-            else 
+        let m, date2 =
+            if date1.Year = date2.Year then
+                date1.Month - date2.Month, date2.AddMonths(date1.Month - date2.Month)
+            else
                 (12 - date2.Month) + date1.Month, date2.AddMonths((12 - date2.Month) + date1.Month)
-        let m, date2 = 
+        let m, date2 =
             if (date1 - date2).Days < 0 then m - 1, date2.AddMonths(-1) else m, date2
 
         let d = (date1 - date2).Days
         let d, w = d % 7, d / 7
-        
+
         if inv then -y, -m, -w, -d
         else y, m, w, d
 
@@ -70,26 +70,28 @@ module DateTime =
     let ageNow = age DateTime.Now
 
     let ageToString  years months weeks days age =
-        let pluralize n s = 
-            match n with 
+        let pluralize n s =
+            match n with
             | 0 -> ""
             | 1 -> n.ToString() + " " + (s |> fst)
             | _ -> n.ToString() + " " + (s |> snd)
         let yr, mo, wk, d = age
         let s =
-            match yr, mo with 
+            match yr, mo with
             | _ when yr > 10 -> pluralize yr years
             | _ when yr > 0  -> pluralize yr years + " " + pluralize mo months
             | _ when mo > 0  -> pluralize mo months + " " + pluralize wk weeks
             | _              -> pluralize wk weeks + " " + pluralize d days
-        s.Trim() 
+        s.Trim()
 
-    let ageToStringDutch = ageToString ("jaar", "jaar") 
-                                       ("maand", "maanden") 
-                                       ("week", "weken") 
+    let ageToStringDutch = ageToString ("jaar", "jaar")
+                                       ("maand", "maanden")
+                                       ("week", "weken")
                                        ("dag", "dagen")
 
     let getAgeFromDate = ageNow >> ageToStringDutch
 
 
+    let formattedString (s: String) (dt : DateTime) =
+        dt.ToString(s)
 

@@ -1,19 +1,6 @@
 namespace Informedica.GenUnits.Lib
 
 
-module List =
-
-    // ToDo move to utils lib
-    let removeFirst pred =
-        List.fold (fun acc x ->
-            let b, xs = acc
-            if b then (true, x::(acc |> snd))
-            else
-                if x |> pred then (true, xs)
-                else (false, x::(acc |> snd))
-        ) (false, [])
-        >> snd
-
 
 module ValueUnit =
 
@@ -200,7 +187,7 @@ module ValueUnit =
         apply f
 
 
-    let getUnitValue u = 
+    let getUnitValue u =
         let rec app u =
             match u with
             | NoUnit -> None
@@ -518,11 +505,11 @@ module ValueUnit =
     let create u v = (v, u) |> ValueUnit
 
 
-    let withUnit u v = 
-        v 
+    let withUnit u v =
+        v
         |> BigRational.fromFloat
         |> function
-        | None -> 
+        | None ->
             sprintf $"{v} cannot be converted to a BigRational!"
             |> failwith
         | Some br -> create u br
@@ -546,10 +533,16 @@ module ValueUnit =
     let isCountUnit = Group.eqsGroup (1N |> Times |> Count)
 
 
-    let toBase (ValueUnit (v, u)) = v |> Multipliers.toBase (u |> Multipliers.getMultiplier)
+    let valueToBase u v = v |> Multipliers.toBase (u |> Multipliers.getMultiplier)
 
 
-    let toUnit (ValueUnit (v, u)) = v |> Multipliers.toUnit (u |> Multipliers.getMultiplier)
+    let toBase (ValueUnit (v, u)) = v |> valueToBase u
+
+
+    let valueToUnit u v = v |> Multipliers.toUnit (u |> Multipliers.getMultiplier)
+
+
+    let toUnit (ValueUnit (v, u)) = v |> valueToUnit u
 
 
     let count = 1N |> Times |> Count
@@ -561,10 +554,10 @@ module ValueUnit =
             match op with
             | OpPer ->
                 match u1, u2 with
-                // this is not enough when u2 is combiunit but 
+                // this is not enough when u2 is combiunit but
                 // contains u1!
                 | _ when u1 |> Group.eqsGroup u2 ->
-                    let v1 = (u1 |> getUnitValue) 
+                    let v1 = (u1 |> getUnitValue)
                     let v2 = (u2 |> getUnitValue)
                     match v1, v2 with
                     | Some x1, Some x2 ->
@@ -729,7 +722,7 @@ module ValueUnit =
                     if ds |> List.exists (Group.eqsGroup h) then
                         build tail (ds |> List.removeFirst (Group.eqsGroup h)) (true, u)
                     else
-                        let b = b || ((u |> Group.eqsGroup count) || (h |> Group.eqsGroup count)) 
+                        let b = b || ((u |> Group.eqsGroup count) || (h |> Group.eqsGroup count))
                         if u = NoUnit then h
                         else u |> times h
                         |> fun u -> build tail ds (b, u)

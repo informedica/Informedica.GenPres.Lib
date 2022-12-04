@@ -38,36 +38,36 @@ module Order =
         let adj = "Adjust"
 
         let map = function
-            | ItemComponentQty -> $"{itm}.{cmp}.{qty}"
-            | ItemComponentConc -> $"{itm}.{cmp}.{cnc}"
-            | ItemOrderableQty -> $"{itm}.{orb}.{qty}"
-            | ItemOrderableConc -> $"{itm}.{orb}.{cnc}"
-            | ItemDoseQty -> $"{itm}.{dos}.{qty}"
+            | ItemComponentQuantity -> $"{itm}.{cmp}.{qty}"
+            | ItemComponentConcentration -> $"{itm}.{cmp}.{cnc}"
+            | ItemOrderableQuantity -> $"{itm}.{orb}.{qty}"
+            | ItemOrderableConcentration -> $"{itm}.{orb}.{cnc}"
+            | ItemDoseQuantity -> $"{itm}.{dos}.{qty}"
             | ItemDoseTotal -> $"{itm}.{dos}.{tot}"
             | ItemDoseRate -> $"{itm}.{dos}.{rte}"
-            | ItemDoseAdjustQty -> $"{itm}.{dos}.{qtyAdj}"
-            | ItemDoseAdjustTotal -> $"{itm}.{dos}.{totAdj}"
-            | ItemDoseAdjustRate -> $"{itm}.{dos}.{rteAdj}"
-            | ComponentQty -> $"{cmp}.{cmp}.{qty}"
-            | ComponentOrderableQty -> $"{cmp}.{orb}.{qty}"
-            | ComponentOrderableConc -> $"{cmp}.{orb}.{cnc}"
+            | ItemDoseQuantityAdjust -> $"{itm}.{dos}.{qtyAdj}"
+            | ItemDoseTotalAdjust -> $"{itm}.{dos}.{totAdj}"
+            | ItemDoseRateAdjust -> $"{itm}.{dos}.{rteAdj}"
+            | ComponentComponentQuantity -> $"{cmp}.{cmp}.{qty}"
+            | ComponentOrderableQuantity -> $"{cmp}.{orb}.{qty}"
+            | ComponentOrderableConcentration -> $"{cmp}.{orb}.{cnc}"
             | ComponentOrderableCount -> $"{cmp}.{orb}.{cnt}"
             | ComponentOrderCount -> $"{cmp}.{ord}.{cnt}"
-            | ComponentDoseQty -> $"{cmp}.{dos}.{qty}"
+            | ComponentDoseQuantity -> $"{cmp}.{dos}.{qty}"
             | ComponentDoseTotal -> $"{cmp}.{dos}.{tot}"
             | ComponentDoseRate -> $"{cmp}.{dos}.{rte}"
-            | ComponentDoseAdjustQty -> $"{cmp}.{dos}.{qtyAdj}"
-            | ComponentDoseAdjustTotal -> $"{cmp}.{dos}.{totAdj}"
-            | ComponentDoseAdjustRate -> $"{cmp}.{dos}.{rteAdj}"
-            | OrderableQty -> $"{orb}.{orb}.{qty}"
+            | ComponentDoseQuantityAdjust -> $"{cmp}.{dos}.{qtyAdj}"
+            | ComponentDoseTotalAdjust -> $"{cmp}.{dos}.{totAdj}"
+            | ComponentDoseRateAdjust -> $"{cmp}.{dos}.{rteAdj}"
+            | OrderableOrderableQuantity -> $"{orb}.{orb}.{qty}"
             | OrderableDoseCount -> $"{orb}.{dos}.{cnt}"
-            | OrderableDoseQty -> $"{orb}.{dos}.{qty}"
+            | OrderableDoseQuantity -> $"{orb}.{dos}.{qty}"
             | OrderableDoseTotal -> $"{orb}.{dos}.{tot}"
             | OrderableDoseRate -> $"{orb}.{dos}.{rte}"
-            | OrderableDoseAdjustQty -> $"{orb}.{dos}.{qtyAdj}"
-            | OrderableDoseAdjustTotal -> $"{orb}.{dos}.{totAdj}"
+            | OrderableDoseQuantityAdjust -> $"{orb}.{dos}.{qtyAdj}"
+            | OrderableDoseTotalAdjust -> $"{orb}.{dos}.{totAdj}"
             | OrderableDoseAdjustRate -> $"{orb}.{dos}.{rteAdj}"
-            | OrderableOrderQty -> $"{orb}.{ord}.{qty}"
+            | OrderableOrderQuantity -> $"{orb}.{ord}.{qty}"
             | OrderableOrderCount -> $"{orb}.{ord}.{cnt}"
             | OrderPresFreq -> $"{ord}.{prs}.{frq}"
             | OrderPresTime -> $"{ord}.{prs}.{tme}"
@@ -76,36 +76,36 @@ module Order =
 
         let fromString s =
             match s with
-            | _ when s = (ItemComponentQty |> map) -> ItemComponentQty
-            | _ when s = (ItemComponentConc |> map) -> ItemComponentConc
-            | _ when s = (ItemOrderableQty |> map) -> ItemOrderableQty
-            | _ when s = (ItemOrderableConc |> map) -> ItemOrderableConc
-            | _ when s = (ItemDoseQty |> map) -> ItemDoseQty
+            | _ when s = (ItemComponentQuantity |> map) -> ItemComponentQuantity
+            | _ when s = (ItemComponentConcentration |> map) -> ItemComponentConcentration
+            | _ when s = (ItemOrderableQuantity |> map) -> ItemOrderableQuantity
+            | _ when s = (ItemOrderableConcentration |> map) -> ItemOrderableConcentration
+            | _ when s = (ItemDoseQuantity |> map) -> ItemDoseQuantity
             | _ when s = (ItemDoseTotal |> map) -> ItemDoseTotal
             | _ when s = (ItemDoseRate |> map) -> ItemDoseRate
-            | _ when s = (ItemDoseAdjustQty |> map) -> ItemDoseAdjustQty
-            | _ when s = (ItemDoseAdjustTotal |> map) -> ItemDoseAdjustTotal
-            | _ when s = (ItemDoseAdjustRate |> map) -> ItemDoseAdjustRate
-            | _ when s = (ComponentQty |> map) -> ComponentQty
-            | _ when s = (ComponentOrderableQty |> map) -> ComponentOrderableQty
-            | _ when s = (ComponentOrderableConc |> map) -> ComponentOrderableConc
+            | _ when s = (ItemDoseQuantityAdjust |> map) -> ItemDoseQuantityAdjust
+            | _ when s = (ItemDoseTotalAdjust |> map) -> ItemDoseTotalAdjust
+            | _ when s = (ItemDoseRateAdjust |> map) -> ItemDoseRateAdjust
+            | _ when s = (ComponentComponentQuantity |> map) -> ComponentComponentQuantity
+            | _ when s = (ComponentOrderableQuantity |> map) -> ComponentOrderableQuantity
+            | _ when s = (ComponentOrderableConcentration |> map) -> ComponentOrderableConcentration
             | _ when s = (ComponentOrderableCount |> map) -> ComponentOrderableCount
-            | _ when s = (ComponentDoseQty |> map) ->  ComponentDoseQty
+            | _ when s = (ComponentDoseQuantity |> map) ->  ComponentDoseQuantity
             | _ when s = (ComponentDoseTotal |> map) ->  ComponentDoseTotal
             | _ when s = (ComponentDoseRate |> map) -> ComponentDoseRate
-            | _ when s = (ComponentDoseAdjustQty |> map) -> ComponentDoseAdjustQty
-            | _ when s = (ComponentDoseAdjustTotal |> map) -> ComponentDoseAdjustTotal
-            | _ when s = (ComponentDoseAdjustRate |> map) -> ComponentDoseAdjustRate
+            | _ when s = (ComponentDoseQuantityAdjust |> map) -> ComponentDoseQuantityAdjust
+            | _ when s = (ComponentDoseTotalAdjust |> map) -> ComponentDoseTotalAdjust
+            | _ when s = (ComponentDoseRateAdjust |> map) -> ComponentDoseRateAdjust
             | _ when s = (ComponentOrderCount  |> map) ->  ComponentOrderCount
-            | _ when s = (OrderableQty |> map) -> OrderableQty
+            | _ when s = (OrderableOrderableQuantity |> map) -> OrderableOrderableQuantity
             | _ when s = (OrderableDoseCount |> map) -> OrderableDoseCount
-            | _ when s = (OrderableDoseQty  |> map) -> OrderableDoseQty
+            | _ when s = (OrderableDoseQuantity  |> map) -> OrderableDoseQuantity
             | _ when s = (OrderableDoseTotal |> map) -> OrderableDoseTotal
             | _ when s = (OrderableDoseRate |> map) -> OrderableDoseRate
-            | _ when s = (OrderableDoseAdjustQty |> map) -> OrderableDoseAdjustQty
-            | _ when s = (OrderableDoseAdjustTotal |> map) -> OrderableDoseAdjustTotal
+            | _ when s = (OrderableDoseQuantityAdjust |> map) -> OrderableDoseQuantityAdjust
+            | _ when s = (OrderableDoseTotalAdjust |> map) -> OrderableDoseTotalAdjust
             | _ when s = (OrderableDoseAdjustRate |> map) -> OrderableDoseAdjustRate
-            | _ when s = (OrderableOrderQty |> map) -> OrderableOrderQty
+            | _ when s = (OrderableOrderQuantity |> map) -> OrderableOrderQuantity
             | _ when s = (OrderableOrderCount |> map) -> OrderableOrderCount
             | _ when s = (OrderPresFreq |> map) -> OrderPresFreq
             | _ when s = (OrderPresTime |> map) -> OrderPresTime
@@ -229,8 +229,8 @@ module Order =
     /// Map a list of `VariableUnit` lists
     /// to an `Order` *ord*
     let fromEqs ord eqs =
-        let orb = ord.Orderable |> Orderable.fromEqs eqs
-        let adj = ord.Adjust    |> Quantity.fromVar eqs
+        let orb = ord.Orderable    |> Orderable.fromEqs eqs
+        let adj = ord.Adjust       |> Quantity.fromVar eqs
         let prs = ord.Prescription |> Prescription.fromEqs eqs
 
         {
@@ -320,13 +320,11 @@ module Order =
     let solveUnits log o =
         // return eqs
         let toEql prod sum =
-
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = o |> toEqs
-
         let eqs = toEql prod sum
 
         eqs
@@ -351,14 +349,11 @@ module Order =
 
         // return eqs
         let toEql prod sum =
-
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
-
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = o |> toEqs
-
         let eqs = toEql prod sum
 
         eqs
@@ -375,13 +370,11 @@ module Order =
     let applyConstraints log cs o =
         // return eqs
         let toEql prod sum =
-
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = o |> toEqs
-
         let eqs = toEql prod sum
 
         eqs
@@ -399,13 +392,11 @@ module Order =
 
         // return eqs
         let toEql prod sum =
-
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = order |> toEqs
-
         let eqs = toEql prod sum
 
         order |> _log Events.OrderSolveConstraintsStarted |> ignore
@@ -422,13 +413,11 @@ module Order =
     let solveAll log o =
         // return eqs
         let toEql prod sum =
-
             prod
-            |> List.map Solver.productEq
-            |> List.append (sum |> List.map Solver.sumEq)
+            |> List.map Solver.orderProdEq
+            |> List.append (sum |> List.map Solver.orderSumEq)
 
         let prod, sum = o |> toEqs
-
         let eqs = toEql prod sum
 
         try
@@ -449,8 +438,8 @@ module Order =
                 |> function
                 | prod, sum ->
                     prod
-                    |> List.map Solver.productEq
-                    |> List.append (sum |> List.map Solver.sumEq)
+                    |> List.map Solver.orderProdEq
+                    |> List.append (sum |> List.map Solver.orderSumEq)
 
                 |> Solver.solve log n (v |> Set.singleton |> Property.createValsProp)
                 |> fromEqs o

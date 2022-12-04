@@ -18,11 +18,11 @@ module Solver =
     module Logging = Informedica.GenOrder.Lib.Logging
 
 
-    let productEq = function
+    let orderProdEq = function
     | h::tail -> (h, tail) |> OrderProductEquation
     | _ -> "not a valid product equation" |> failwith
 
-    let sumEq = function
+    let orderSumEq = function
     | h::tail -> (h, tail) |> OrderSumEquation
     | _ -> "not a valid sum equation" |> failwith
 
