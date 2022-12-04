@@ -682,7 +682,7 @@ module MetaVision =
                                     Volume = "0"
                                     DiluentName =
                                         if r.DoseForms |> String.contains "emulsie" then "emulsie"
-                                        else "medvlst"
+                                        else "."
                                     IsFormulary = r.IsFormulary
                                 }
                             |]
