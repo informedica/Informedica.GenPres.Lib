@@ -562,11 +562,11 @@ module MetaVision =
                                 "[None]"
                     DrugFamily =
                         grps
-                        |> Option.map (fun g -> $"{g.ATC1} {g.AnatomicalGroup |> capitalize}")
+                        |> Option.map (fun g -> drugFamilyName g.ATC1 g.AnatomicalGroup)
                         |> Option.defaultValue ""
                     DrugSubfamily =
                         grps
-                        |> Option.map (fun g -> $"{g.ATC3} {g.TherapeuticSubGroup |> capitalize}")
+                        |> Option.map (fun g -> drugFamilyName g.ATC3 g.TherapeuticSubGroup)
                         |> Option.defaultValue ""
                     Assortment = assort
                     IsFormulary = assort |> Array.isEmpty |> not
@@ -877,7 +877,7 @@ insert into dbo.Orders_ClassificationSystem (ClassificationSystemName, Classific
 
     let insertDrugFamilies () =
         ATCGroup.get ()
-        |> Array.map (fun g -> g.AnatomicalGroup |> capitalize)
+        |> Array.map (fun g -> drugFamilyName g.ATC1 g.AnatomicalGroup)
         |> Array.distinct
         |> Array.sort
         |> Array.map (fun s ->
@@ -890,8 +890,8 @@ insert into dbo.DrugFamilies ([Name], IsHiddenInAllergies) values ('{s}', 0)
         |> fun sql ->
             ATCGroup.get ()
             |> Array.map (fun g ->
-                g.AnatomicalGroup |> capitalize,
-                g.TherapeuticSubGroup |> capitalize
+                drugFamilyName g.ATC1 g.AnatomicalGroup,
+                drugFamilyName g.ATC3 g.TherapeuticSubGroup
             )
             |> Array.distinct
             |> Array.sort

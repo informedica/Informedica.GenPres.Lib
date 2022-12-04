@@ -95,6 +95,9 @@ module Utils =
             |> String.replace "-" ""
 
 
+    let drugFamilyName code name = $"{code}. {name |> capitalize}"
+
+
     let mapRoute s =
         let s = s |> String.toLower |> String.trim
         mappingRoute
