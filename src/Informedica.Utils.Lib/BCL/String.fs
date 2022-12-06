@@ -107,7 +107,7 @@ module String =
 
     /// Split a string `s` at string `dels`
     let split (dels: string) (s: string) =
-        NullCheck.nullOrDef2 (fun (s': string) (dels': string) -> s'.Split(dels'.ToCharArray()) |> Array.toList) [] s dels
+        NullCheck.nullOrDef2 (fun (s': string) (dels': string) -> s'.Split(dels') |> Array.toList) [] s dels
 
     /// Check whether **s1** starts with
     /// **s2** using string comparison **eqs**
