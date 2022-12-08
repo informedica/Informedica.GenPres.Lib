@@ -90,8 +90,8 @@ module List =
     /// in a list of list **xsl**
     /// with a function **get** to
     /// get **n** from an element
-    let tryFindFirst get n xsl =
+    let tryFindFirst get n xs =
         let pred x = x |> get = n
-        match xsl |> List.filter (fun xs -> xs |> List.exists pred) with
+        match xs |> List.filter (fun xs -> xs |> List.exists pred) with
         | [] -> None
         | xs::_ -> xs |> List.find pred |> Some

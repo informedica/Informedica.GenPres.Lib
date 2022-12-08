@@ -98,7 +98,6 @@ module Solver =
 
         let rec loop n que acc =
             let n = n + 1
-
             if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
                 (n, que @ acc)
                 |> Exceptions.SolverTooManyLoops
@@ -173,7 +172,9 @@ module Solver =
             |> Logging.logInfo log
 
             try
-                loop 0 rpl rst
+                match rpl with
+                | [] -> eqs
+                | _  -> loop 0 rpl rst
             with
             | Exceptions.SolverException m  ->
                 m |> Exceptions.raiseExc (Some log)

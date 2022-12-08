@@ -446,6 +446,19 @@ module Variable =
                 | ValsProp vs -> vs |> ValueSet.toString exact
 
 
+        let map fMin fMax fMinMax fIncr fMinIncr fIncrMax fMinIncrMax fValueSet vr =
+            match vr with
+            | Unrestricted -> vr
+            | Min min -> min |> fMin |> Min
+            | Max max -> max |> fMax |> Max
+            | MinMax (min, max) -> (min, max) |> fMinMax |> MinMax
+            | Incr incr -> incr |> fIncr |> Incr
+            | MinIncr (min, incr) -> (min, incr) |> fMinIncr |> MinIncr
+            | IncrMax (incr, max) -> (incr, max) |> fIncrMax |> IncrMax
+            | MinIncrMax (min, incr, max) -> (min, incr, max) |> fMinIncrMax |> MinIncrMax
+            | ValSet vs -> vs |> fValueSet |> ValSet
+
+
         let apply unr fMin fMax fMinMax fIncr fMinIncr fIncrMax fMinIncrMax fValueSet = function
             | Unrestricted -> unr
             | Min min -> min |> fMin
@@ -602,6 +615,7 @@ module Variable =
                 returnFalse
                 returnFalse
                 Boolean.returnTrue
+
 
         /// Checks whether a `BigRational` is between an optional
         /// **min** and an optional **max**
