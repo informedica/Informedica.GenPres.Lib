@@ -7,21 +7,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Types.fs" />
-    <Compile Include="DateTime.fs" />
-    <Compile Include="List.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Logging.fs" />
     <Compile Include="Exceptions.fs" />
     <Compile Include="WrappedString.fs" />
     <Compile Include="ValueUnit.fs" />
-    <Compile Include="ValueRange.fs" />
-    <Compile Include="VariableUnit.fs" />
+    <Compile Include="Variable.fs" />
+    <Compile Include="OrderVariable.fs" />
     <Compile Include="Solver.fs" />
-    <Compile Include="Orderable.fs" />
-    <Compile Include="Prescription.fs" />
     <Compile Include="Order.fs" />
     <Compile Include="DrugOrder.fs" />
-    <Compile Include="Data.fs" />
     <Compile Include="OrderLogger.fs" />
     <Compile Include="Api.fs" />
     <None Include="Scripts\load.fsx" />

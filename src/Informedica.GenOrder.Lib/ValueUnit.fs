@@ -1,5 +1,6 @@
 namespace Informedica.GenOrder.Lib
 
+
 /// Helper functions to
 /// facilitate the use of the
 /// `Informedica.GenUnits.Lib`
@@ -19,7 +20,7 @@ module ValueUnit =
 
 
     let unitToString =
-        Units.toString Units.English Units.Short
+        Units.toString Units.Dutch Units.Short
 
 
     let unitFromString s =
@@ -44,6 +45,7 @@ module ValueUnit =
                 printfn $"could not parse to unit: %s{s}"
                 None
 
+
     let calcUnit op u1 u2 =
 
         match u1, u2 with
@@ -57,6 +59,9 @@ module ValueUnit =
             |> get
             |> snd
 
+
     module Units =
 
         let noUnit = NoUnit
+
+

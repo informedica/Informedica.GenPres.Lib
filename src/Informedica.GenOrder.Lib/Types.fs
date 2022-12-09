@@ -1,12 +1,11 @@
 namespace Informedica.GenOrder.Lib
 
-open System
-open MathNet.Numerics
-
 
 [<AutoOpen>]
 module Types =
 
+    open System
+    open MathNet.Numerics
     open Informedica.GenUnits.Lib
     open Informedica.GenSolver.Lib.Types
 
@@ -18,77 +17,110 @@ module Types =
     /// an `Informedica.GenUnits.Lib.Unit`
     /// The `Variable` stores the base values according
     /// to the `Unit`
-    type VariableUnit =
+    type OrderVariable =
         {
+            Constraints : Constraints
             /// Stores the values/range
             Variable:  Variable
             /// Stores the unit
             Unit: Unit
         }
+    and Constraints =
+        {
+                Min : Minimum option
+                Max : Maximum option
+                Incr : Increment option
+                Values : ValueSet option
+        }
 
-
-    /// Type that represents a frequency
-    type Frequency = Frequency of VariableUnit
-
-
-    /// Type that represents a time
-    type Time = Time of VariableUnit
-
-
-    /// Type that represents a count
-    type Count = Count of VariableUnit
-
-
-    /// Type that represents a quantity
-    type Quantity = Quantity of VariableUnit
-
-
-    /// Type that represents a total
-    type Total = Total of VariableUnit
-
-
-    /// Type that represents a rate
-    type Rate = Rate of VariableUnit
-
-
-    /// Type that represents a concentration
-    type Concentration = Concentration of VariableUnit
-
-
-    /// Type that represents a adjusted quantity
-    type QuantityAdjust = QuantityAdjust of VariableUnit
-
-
-    /// Type that represents a adjusted total
-    type TotalAdjust = TotalAdjust of VariableUnit
-
-
-    /// Type that represents a adjusted rate
-    type RateAdjust = RateAdjust of VariableUnit
-
-
-    /// Type that represents a dose quantity, total and rate
-    type Dose = Dose of Quantity * Total * Rate
-
-
-    /// Type that represents an adjusted dose quantity, total and rate
-    type DoseAdjust = DoseAdjust of QuantityAdjust * TotalAdjust * RateAdjust
 
     /// An order equation is either a product equation or a
     /// sum equation
     type OrderEquation =
-        | OrderProductEquation of VariableUnit * VariableUnit list
-        | OrderSumEquation of VariableUnit * VariableUnit list
+        | OrderProductEquation of OrderVariable * OrderVariable list
+        | OrderSumEquation of OrderVariable * OrderVariable list
+
+
+    /// Time "tme"
+    /// Type that represents a time
+    type Time = Time of OrderVariable
+
+
+    /// Count "cnt"
+    /// Type that represents a count
+    type Count = Count of OrderVariable
+
+
+    /// Count / Time "frq"
+    /// Type that represents a frequency
+    type Frequency = Frequency of OrderVariable
+
+
+    /// Quantity "qty"
+    /// Type that represents a quantity
+    type Quantity = Quantity of OrderVariable
+
+
+    //// Quantity / Time "ptm"
+    /// Type that represents a quantity per time
+    type PerTime = PerTime of OrderVariable
+
+    /// Quantity / Time "rte"
+    /// Type that represents a rate
+    type Rate = Rate of OrderVariable
+
+
+    /// Quantity "tot"
+    /// Type that represents a total
+    type Total = Total of OrderVariable
+
+
+    /// Quantity / Quantity "cnc"
+    /// Type that represents a concentration
+    type Concentration = Concentration of OrderVariable
+
+
+    /// Quantity / Adjust "qty_adj"
+    /// Type that represents a adjusted quantity
+    type QuantityAdjust = QuantityAdjust of OrderVariable
+
+
+    /// Quantity / Adjust / Time "ptm_adj"
+    /// Type that represents a adjusted quantity per time
+    type PerTimeAdjust = PerTimeAdjust of OrderVariable
+
+
+    /// Quantity / Adjust / Time "rte_adj"
+    /// Type that represents a adjusted quantity per time
+    type RateAdjust = RateAdjust of OrderVariable
+
+
+    /// Quantity / Adjust "tot_adj"
+    /// Type that represents a adjusted total
+    type TotalAdjust = TotalAdjust of OrderVariable
+
+
 
     /// An Id is represented by a string
     type Id = Id of string
 
 
+    type Dose =
+        {
+            Quantity : Quantity
+            PerTime : PerTime
+            Rate : Rate
+            Total : Total
+            QuantityAdjust : QuantityAdjust
+            PerTimeAdjust : PerTimeAdjust
+            RateAdjust : RateAdjust
+            TotalAdjust : TotalAdjust
+        }
+
+
     /// Models an `Item` in a `Component`
     type Item =
         {
-            /// The id of the Order
-            OrderId: Id
             /// The name of the item
             Name: Name
             /// The quantity of an `Item` in a `Component`
@@ -99,21 +131,19 @@ module Types =
             ComponentConcentration: Concentration
             /// The  `Item` concentration in an `Orderable`
             OrderableConcentration: Concentration
-            /// The `Item` `Dose`, i.e. quanity, total and rate of `Item` administered
+            /// The `Item` `Dose`, i.e. quantity, total and rate of `Item` administered
             Dose: Dose
-            // The `Item` `DoseAdjust`,  i.e. adjusted quanity, total and rate of `Item` administered
-            DoseAdjust: DoseAdjust
         }
-
 
 
     /// Models in a `Component` in and `Orderable`
     type Component =
         {
-            /// The id of a `Component`
-            OrderId: Id
+            Id : Id
             /// The name of a `Component`
             Name: Name
+            // The shape of an component
+            Shape : string
             /// The quantity of a `Component`
             ComponentQuantity: Quantity
             /// The quantity of a `Component` in an `Orderable`
@@ -127,11 +157,8 @@ module Types =
             /// The concentration of a `Component` in an `Orderable`
             OrderableConcentration: Concentration
             // The `Component` `Dose`,
-            /// i.e. quanity, total and rate of `Component` administered
+            /// i.e. quantity, total and rate of `Component` administered
             Dose: Dose
-            // The `Component` `DoseAdjust`,
-            /// i.e. adjusted quanity, total and rate of `Component` administered
-            DoseAdjust: DoseAdjust
             /// The `Item`s in a `Component`
             Items: Item list
         }
@@ -140,12 +167,8 @@ module Types =
     /// Models an `Orderable`
     type Orderable =
         {
-            /// The order id of
-            OrderId: Id
             /// The name of the orderable
             Name: Name
-            // The shape of an orderable
-            Shape : string
             /// The quantity of an orderable
             OrderableQuantity: Quantity
             /// The quantity of an orderable in an order
@@ -156,8 +179,6 @@ module Types =
             DoseCount: Count
             /// The dose of an orderable
             Dose: Dose
-            /// The adjusted dose of an orderable
-            DoseAdjust: DoseAdjust
             /// The list of components in an orderable
             Components: Component list
         }
@@ -182,99 +203,26 @@ module Types =
             /// How the orderable is prescribed
             Prescription: Prescription
             /// The route of administration of the order
-            Route: string // Route.T
+            Route: string // Route
+            /// The duration of an order
+            Duration: Time
             /// The start stop date of the order
             StartStop: StartStop
         }
 
+
     /// Type that represents a prescription
     and Prescription =
-        /// A process
-        | Process
-        /// A continuous infusion
         | Continuous
-        /// A discontinuous presciption with a frequency
+        /// A discontinuous prescription with a frequency
         | Discontinuous of Frequency
         /// A discontinuous prescription with both frequency and time
         | Timed of Frequency * Time
 
 
-    /// Mapping of an order to variables
-    type OrderMapping =
-        // Quantity of an Item in a Component
-        | ItemComponentQuantity
-        // Concentration of an Item in a Component
-        | ItemComponentConcentration
-        // Quantity of an Item in an Orderable
-        | ItemOrderableQuantity
-        // Concentration of an Item in an Orderable
-        | ItemOrderableConcentration
-        // Dose Quantity of an Item
-        | ItemDoseQuantity
-        // Dose Total of an Item
-        | ItemDoseTotal
-        // Dose Rate of an Item
-        | ItemDoseRate
-        // Dose Total of an Item in an Order
-        | ItemDoseOrder
-        // Adjusted Dose Quantity of an Item
-        | ItemDoseQuantityAdjust
-        // Adjusted Dose Total of an Item
-        | ItemDoseTotalAdjust
-        // Adjusted Dose Rate of an Item
-        | ItemDoseRateAdjust
-        // Adjusted Total Dose Rate of an Item in an Order
-        | ItemDoseOrderAdjust
-        // Quantity of a Component
-        | ComponentComponentQuantity
-        // Quantity of a Component in an Orderable
-        | ComponentOrderableQuantity
-        // Concentration of a Component in an Orderable
-        | ComponentOrderableConcentration
-        // Amount of Components in an Orderable
-        | ComponentOrderableCount
-        // Quantity of Component in an Order
-        | ComponentOrderQuantity
-        // Amount of Components in an Order
-        | ComponentOrderCount
-        // Dose Quantity of a Component
-        | ComponentDoseQuantity
-        // Dose Total of a Component
-        | ComponentDoseTotal
-        // Dose Rate of a Component
-        | ComponentDoseRate
-        // Adjusted Dose Quantity of a Component
-        | ComponentDoseQuantityAdjust
-        // Adjusted Dose Total of a Component
-        | ComponentDoseTotalAdjust
-        // Adjusted Dose Rate of a Component
-        | ComponentDoseRateAdjust
-        // Quantity of an Orderable
-        | OrderableOrderableQuantity
-        // Amount of Dose Quantity in an Orderable Quantity
-        | OrderableDoseCount
-        // Dose Quantity of an Orderable
-        | OrderableDoseQuantity
-        // Dose Total of an Orderable
-        | OrderableDoseTotal
-        // Dose Rate of an Orderable
-        | OrderableDoseRate
-        // Adjusted Dose Quantity of an Orderable
-        | OrderableDoseQuantityAdjust
-        // Adjusted Dose Total of an Orderable
-        | OrderableDoseTotalAdjust
-        // Adjusted Dose Rate of an Orderable
-        | OrderableDoseAdjustRate
-        // Prescription Frequency
-        | OrderPresFreq
-        // Prescription Time
-        | OrderPresTime
-        // Quantity of an Orderable in an Order
-        | OrderableOrderQuantity
-        // Amount of Orderables in an Order
-        | OrderableOrderCount
-        // Order Adjust Quantity
-        | OrderAdjustQty
+    type EquationMapping =
+        | ProductMapping of string list
+        | SumMapping of string list
 
 
     /// The different possible order types
@@ -294,85 +242,6 @@ module Types =
         | OralSolid
         | RectalSolid
 
-    /// Constrained that can be applied to a
-    /// variable in an equation.
-    type DrugConstraint =
-       {
-            Name : string
-            Mapping : OrderMapping
-            Property : Property
-            RouteShape : RouteShape
-            OrderType : OrderType
-        }
-
-    /// The representation of a drug order that
-    /// can be derived by a drug product inventory
-    /// and the related dose rule
-    type DrugOrder =
-        {
-            /// Identifies the specific drug order
-            Id:  string
-            /// The name of the order
-            Name : string
-            /// The list of drug products that can be used for the order
-            Products : ProductComponent list
-            /// The quantities of the drug order
-            Quantities :  BigRational list
-            /// The unit the `DrugOrder` is measured in,
-            /// i.e. of the `Quantities`
-            Unit : string
-            /// The time unit to be used when using a frequency
-            TimeUnit : string
-            /// The time unit to be used when using a rate
-            RateUnit : string
-            /// The shape of the products
-            Shape : string
-            /// The route by which the order is applied
-            Route : string
-            // The type of order
-            OrderType : OrderType
-        }
-    /// The product components that are used by the drug order
-    and ProductComponent =
-        {
-            /// The name of the product
-            Name : string
-            /// The quantities of the product
-            /// Note: measured in the same unit as
-            /// the `DrugOrder` unit
-            Quantities : BigRational list
-            /// The "divisibility" of the products
-            Divisible : BigRational
-            /// The time unit used for frequency
-            TimeUnit : string
-            /// The time unit used for rate
-            RateUnit : string
-            /// The list of substances contained in the product
-            Substances: SubstanceItem list
-        }
-    and SubstanceItem =
-        {
-            /// The name of the substance
-            Name : string
-            /// The possible concentrations of the substance
-            /// in the products
-            Concentrations : BigRational list
-            /// The possible quantities of the substance in the orderable
-            OrderableQuantities : BigRational list
-            /// The unit by which the substance is
-            /// measured.
-            Unit : string
-            /// The unit used for the dose
-            DoseUnit : string
-            /// The time unit used for the frequency
-            TimeUnit : string
-            /// The time unit used for the rate
-            RateUnit : string
-        }
-
-    /// The constraints that can be applied
-    /// and the order
-    type ConstrainedOrder = DrugConstraint list * Order
 
     /// The dose limits that can be applied
     type DoseLimit =
@@ -388,14 +257,14 @@ module Types =
             MinDoseQuantityAdjust : BigRational option
             /// maps to ItemDoseAdjustQtyAdjust
             MaxDoseQuantityAdjust : BigRational option
-            /// maps to ItemDoseTotal
-            MinDoseTotal : BigRational option
-            /// maps to ItemDoseTotal
-            MaxDoseTotal : BigRational option
+            /// maps to ItemDosePerTime
+            MinDosePerTime : BigRational option
+            /// maps to ItemDosePerTime
+            MaxDosePerTime : BigRational option
             /// maps to ItemDoseAdjustTotalAdjust
-            MinDoseTotalAdjust : BigRational option
+            MinDosePerTimeAdjust : BigRational option
             /// maps to ItemDoseAdjustTotalAdjust
-            MaxDoseTotalAdjust : BigRational option
+            MaxDosePerTimeAdjust : BigRational option
             /// maps to ItemDoseRate
             MinDoseRate : BigRational option
             /// maps to ItemDoseRate
@@ -419,11 +288,13 @@ module Types =
             GestAge : BigRational option * BigRational option
             PostAge : BigRational option * BigRational option
             /// maps to OrderTyp
-            OrderType : OrderType
+            OrderType : string
             /// maps to PresFreq
             Frequencies : BigRational list
             /// maps to OrderableDoseRate
             Rates : BigRational list
+            /// maps to OrderableQuantity
+            Quantities : BigRational list
             /// maps to PresTime
             MinTime : BigRational option
             /// maps to PresTime
@@ -460,6 +331,77 @@ module Types =
             /// maps to OrderableDoseCount
             DoseCount : BigRational list
             Limits : SolutionLimit list
+        }
+
+
+    /// The representation of a drug order that
+    /// can be derived by a drug product inventory
+    /// and the related dose rule
+    type DrugOrder =
+        {
+            /// Identifies the specific drug order
+            Id:  string
+            /// The name of the order
+            Name : string
+            /// The list of drug products that can be used for the order
+            Products : ProductComponent list
+            /// The quantities of the drug order
+            Quantities :  BigRational list
+            /// The unit the `DrugOrder` is measured in,
+            /// i.e. of the `Quantities`
+            Unit : string
+            /// The time unit to be used when using a frequency
+            TimeUnit : string
+            /// The time unit to be used when using a rate
+            RateUnit : string
+            /// The route by which the order is applied
+            Route : string
+            // The type of order
+            OrderType : OrderType
+            Frequencies : BigRational list
+            Rates : BigRational list
+            DoseQuantities : BigRational list
+            DoseCount : BigRational option
+        }
+    /// The product components that are used by the drug order
+    and ProductComponent =
+        {
+            /// The name of the product
+            Name : string
+            /// The shape of the product
+            Shape : string
+            /// The quantities of the product
+            /// Note: measured in the same unit as
+            /// the `DrugOrder` unit
+            Quantities : BigRational list
+            /// The "divisibility" of the products
+            Divisible : BigRational
+            /// The time unit used for frequency
+            TimeUnit : string
+            /// The time unit used for rate
+            RateUnit : string
+            /// The list of substances contained in the product
+            Substances: SubstanceItem list
+        }
+    and SubstanceItem =
+        {
+            /// The name of the substance
+            Name : string
+            /// The possible concentrations of the substance
+            /// in the products
+            Concentrations : BigRational list
+            /// The possible quantities of the substance in the orderable
+            OrderableQuantities : BigRational list
+            /// The unit by which the substance is
+            /// measured.
+            Unit : string
+            /// The unit used for the dose
+            DoseUnit : string
+            /// The time unit used for the frequency
+            TimeUnit : string
+            /// The time unit used for the rate
+            RateUnit : string
+            Dose : DoseLimit
         }
 
 
@@ -511,7 +453,7 @@ module Types =
             | OrderSolveConstraintsStarted of Order * Constraint list
             | OrderSolveConstraintsFinished of Order * Constraint list
             | OrderScenario of string
-            | OrderScenerioWithNameValue of Order * Name * BigRational
+            | OrderScenarioWithNameValue of Order * Name * BigRational
 
 
     module Logging =
@@ -522,3 +464,5 @@ module Types =
             | OrderException of Exceptions.Message
             | OrderEvent of Events.Event
             interface IMessage
+
+

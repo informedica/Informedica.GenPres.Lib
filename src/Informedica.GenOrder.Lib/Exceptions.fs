@@ -1,6 +1,8 @@
 namespace Informedica.GenOrder.Lib
 
 
+
+
 module Exceptions =
 
         /// Equation exception
@@ -18,5 +20,4 @@ module Exceptions =
             | None -> ()
 
             (m, o) |> Exceptions.OrderCouldNotBeSolved |> OrderException |> raise
-
 

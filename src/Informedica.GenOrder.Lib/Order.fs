@@ -1,116 +1,1089 @@
 namespace Informedica.GenOrder.Lib
 
+
+
 /// Types and functions that deal with an order.
 /// An `Order` models the `Prescription` of an
 /// `Orderable` with a `StartStop` start date and
 /// stop date.
 module Order =
 
+    open System
     open Informedica.Utils.Lib.BCL
-
-    open Informedica.GenSolver.Lib.Types
-    open Types
-
-    module Logging = Informedica.GenOrder.Lib.Logging
+    open Informedica.GenUnits.Lib
+    open WrappedString
 
 
-    /// Utitlity functions to
+    /// Utility functions to
     /// enable mapping of a `Variable`s
     /// to an `Order`
     module Mapping =
 
-        let qty = VariableUnit.Quantity.name
-        let cnc = VariableUnit.Concentration.name
-        let tot = VariableUnit.Total.name
-        let rte = VariableUnit.Rate.name
-        let qtyAdj = VariableUnit.QuantityAdjust.name
-        let totAdj = VariableUnit.TotalAdjust.name
-        let rteAdj = VariableUnit.RateAdjust.name
-        let cnt = VariableUnit.Count.name
-        let frq = VariableUnit.Frequency.name
-        let tme = VariableUnit.Time.name
-        let itm = Orderable.Literals.item
-        let cmp = Orderable.Literals.comp
-        let orb = Orderable.Literals.orderable
-        let dos = Orderable.Literals.dose
-        let prs = "Prescription"
-        let ord = "Order"
-        let adj = "Adjust"
 
-        let map = function
-            | ItemComponentQuantity -> $"{itm}.{cmp}.{qty}"
-            | ItemComponentConcentration -> $"{itm}.{cmp}.{cnc}"
-            | ItemOrderableQuantity -> $"{itm}.{orb}.{qty}"
-            | ItemOrderableConcentration -> $"{itm}.{orb}.{cnc}"
-            | ItemDoseQuantity -> $"{itm}.{dos}.{qty}"
-            | ItemDoseTotal -> $"{itm}.{dos}.{tot}"
-            | ItemDoseRate -> $"{itm}.{dos}.{rte}"
-            | ItemDoseQuantityAdjust -> $"{itm}.{dos}.{qtyAdj}"
-            | ItemDoseTotalAdjust -> $"{itm}.{dos}.{totAdj}"
-            | ItemDoseRateAdjust -> $"{itm}.{dos}.{rteAdj}"
-            | ComponentComponentQuantity -> $"{cmp}.{cmp}.{qty}"
-            | ComponentOrderableQuantity -> $"{cmp}.{orb}.{qty}"
-            | ComponentOrderableConcentration -> $"{cmp}.{orb}.{cnc}"
-            | ComponentOrderableCount -> $"{cmp}.{orb}.{cnt}"
-            | ComponentOrderCount -> $"{cmp}.{ord}.{cnt}"
-            | ComponentDoseQuantity -> $"{cmp}.{dos}.{qty}"
-            | ComponentDoseTotal -> $"{cmp}.{dos}.{tot}"
-            | ComponentDoseRate -> $"{cmp}.{dos}.{rte}"
-            | ComponentDoseQuantityAdjust -> $"{cmp}.{dos}.{qtyAdj}"
-            | ComponentDoseTotalAdjust -> $"{cmp}.{dos}.{totAdj}"
-            | ComponentDoseRateAdjust -> $"{cmp}.{dos}.{rteAdj}"
-            | OrderableOrderableQuantity -> $"{orb}.{orb}.{qty}"
-            | OrderableDoseCount -> $"{orb}.{dos}.{cnt}"
-            | OrderableDoseQuantity -> $"{orb}.{dos}.{qty}"
-            | OrderableDoseTotal -> $"{orb}.{dos}.{tot}"
-            | OrderableDoseRate -> $"{orb}.{dos}.{rte}"
-            | OrderableDoseQuantityAdjust -> $"{orb}.{dos}.{qtyAdj}"
-            | OrderableDoseTotalAdjust -> $"{orb}.{dos}.{totAdj}"
-            | OrderableDoseAdjustRate -> $"{orb}.{dos}.{rteAdj}"
-            | OrderableOrderQuantity -> $"{orb}.{ord}.{qty}"
-            | OrderableOrderCount -> $"{orb}.{ord}.{cnt}"
-            | OrderPresFreq -> $"{ord}.{prs}.{frq}"
-            | OrderPresTime -> $"{ord}.{prs}.{tme}"
-            | OrderAdjustQty -> $"{ord}.{adj}.{qty}"
+        let [<Literal>] qty = OrderVariable.Quantity.name
+        let [<Literal>] cnc = OrderVariable.Concentration.name
+        let [<Literal>] ptm = OrderVariable.PerTime.name
+        let [<Literal>] rte = OrderVariable.Rate.name
+        let [<Literal>] tot = OrderVariable.Total.name
+        let [<Literal>] qtyAdj = OrderVariable.QuantityAdjust.name
+        let [<Literal>] ptmAdj = OrderVariable.PerTimeAdjust.name
+        let [<Literal>] rteAdj = OrderVariable.RateAdjust.name
+        let [<Literal>] totAdj = OrderVariable.TotalAdjust.name
+        let [<Literal>] cnt = OrderVariable.Count.name
+        let [<Literal>] frq = OrderVariable.Frequency.name
+        let [<Literal>] tme = OrderVariable.Time.name
+        let [<Literal>] itm = "itm" //Orderable.Literals.item
+        let [<Literal>] cmp = "cmp" //Orderable.Literals.comp
+        let [<Literal>] orb = "orb" //Orderable.Literals.orderable
+        let [<Literal>] dos = "dos" //Orderable.Literals.dose
+        let [<Literal>] prs = "prs" //"Prescription"
+        let [<Literal>] ord = "ord" // "Order"
+        let [<Literal>] adj = "adj" // "Adjust"
+
+        let [<Literal>] discontinuous = 3
+        let [<Literal>] continuous = 4
+        let [<Literal>] timed = 5
 
 
-        let fromString s =
-            match s with
-            | _ when s = (ItemComponentQuantity |> map) -> ItemComponentQuantity
-            | _ when s = (ItemComponentConcentration |> map) -> ItemComponentConcentration
-            | _ when s = (ItemOrderableQuantity |> map) -> ItemOrderableQuantity
-            | _ when s = (ItemOrderableConcentration |> map) -> ItemOrderableConcentration
-            | _ when s = (ItemDoseQuantity |> map) -> ItemDoseQuantity
-            | _ when s = (ItemDoseTotal |> map) -> ItemDoseTotal
-            | _ when s = (ItemDoseRate |> map) -> ItemDoseRate
-            | _ when s = (ItemDoseQuantityAdjust |> map) -> ItemDoseQuantityAdjust
-            | _ when s = (ItemDoseTotalAdjust |> map) -> ItemDoseTotalAdjust
-            | _ when s = (ItemDoseRateAdjust |> map) -> ItemDoseRateAdjust
-            | _ when s = (ComponentComponentQuantity |> map) -> ComponentComponentQuantity
-            | _ when s = (ComponentOrderableQuantity |> map) -> ComponentOrderableQuantity
-            | _ when s = (ComponentOrderableConcentration |> map) -> ComponentOrderableConcentration
-            | _ when s = (ComponentOrderableCount |> map) -> ComponentOrderableCount
-            | _ when s = (ComponentDoseQuantity |> map) ->  ComponentDoseQuantity
-            | _ when s = (ComponentDoseTotal |> map) ->  ComponentDoseTotal
-            | _ when s = (ComponentDoseRate |> map) -> ComponentDoseRate
-            | _ when s = (ComponentDoseQuantityAdjust |> map) -> ComponentDoseQuantityAdjust
-            | _ when s = (ComponentDoseTotalAdjust |> map) -> ComponentDoseTotalAdjust
-            | _ when s = (ComponentDoseRateAdjust |> map) -> ComponentDoseRateAdjust
-            | _ when s = (ComponentOrderCount  |> map) ->  ComponentOrderCount
-            | _ when s = (OrderableOrderableQuantity |> map) -> OrderableOrderableQuantity
-            | _ when s = (OrderableDoseCount |> map) -> OrderableDoseCount
-            | _ when s = (OrderableDoseQuantity  |> map) -> OrderableDoseQuantity
-            | _ when s = (OrderableDoseTotal |> map) -> OrderableDoseTotal
-            | _ when s = (OrderableDoseRate |> map) -> OrderableDoseRate
-            | _ when s = (OrderableDoseQuantityAdjust |> map) -> OrderableDoseQuantityAdjust
-            | _ when s = (OrderableDoseTotalAdjust |> map) -> OrderableDoseTotalAdjust
-            | _ when s = (OrderableDoseAdjustRate |> map) -> OrderableDoseAdjustRate
-            | _ when s = (OrderableOrderQuantity |> map) -> OrderableOrderQuantity
-            | _ when s = (OrderableOrderCount |> map) -> OrderableOrderCount
-            | _ when s = (OrderPresFreq |> map) -> OrderPresFreq
-            | _ when s = (OrderPresTime |> map) -> OrderPresTime
-            | _ when s = (OrderAdjustQty |> map) -> OrderAdjustQty
-            | _ -> $"cannot map {s} to an OrderMapping" |> failwith
+        let getEquations indx =
+            Web.getDataFromGenPres "Equations"
+            |> Array.skip 1
+            |> Array.filter (fun xs -> xs[indx] = "x")
+            |> Array.map (Array.item 1)
+            |> Array.toList
+
+
+        let getEqsMapping (ord: Order) (eqs : string list) =
+            let sumEqs =
+                eqs
+                |> List.filter (String.contains "sum")
+
+            let prodEqs =
+                eqs
+                |> List.filter (String.contains "sum" >> not)
+
+            let itmEqs =
+                prodEqs
+                |> List.filter (String.contains "[itm]")
+
+            let cmpEqs =
+                prodEqs
+                |> List.filter (fun e ->
+                    itmEqs
+                    |> List.exists ((=) e)
+                    |> not &&
+                    e.Contains("[cmp]")
+                )
+
+            let orbEqs =
+                prodEqs
+                |> List.filter (fun e ->
+                    itmEqs
+                    |> List.exists ((=) e)
+                    |> not &&
+                    cmpEqs
+                    |> List.exists((=) e)
+                    |> not
+                )
+
+            let idN = [ord.Id |> Id.toString] |> Name.create
+            let orbN = [ord.Id |> Id.toString; ord.Orderable.Name |> Name.toString] |> Name.create
+
+            ord.Orderable.Components
+            |> List.fold (fun acc c ->
+                let cmpN =
+                    [
+                        yield! orbN |> Name.toStringList
+                        c.Name |> Name.toString
+                    ]
+                    |> Name.create
+
+                let itms =
+                    c.Items
+                    |> List.collect (fun i ->
+                        itmEqs
+                        |> List.map (fun s ->
+                            let itmN =
+                                [
+                                    yield! cmpN |> Name.toStringList
+                                    i.Name |> Name.toString
+                                ]
+                                |> Name.create
+                            s
+                            |> String.replace "[cmp]" $"{cmpN |> Name.toString}"
+                            |> String.replace "[itm]" $"{itmN |> Name.toString}"
+                        )
+                    )
+
+                let cmps =
+                    cmpEqs
+                    |> List.map (String.replace "[cmp]" $"{cmpN |> Name.toString}")
+
+                acc
+                |> List.append cmps
+                |> List.append itms
+            ) []
+            |> fun es ->
+                let sumEqs =
+                    sumEqs
+                    |> List.map (fun e ->
+                        match e
+                              |> String.replace "sum(" ""
+                              |> String.replace ")" ""
+                              |> String.split " = " with
+                        | [lv; rv] ->
+                            ord.Orderable.Components
+                            |> List.map(fun c ->
+                                let cmpN =
+                                    [
+                                        yield! orbN |> Name.toStringList
+                                        c.Name |> Name.toString
+                                    ]
+                                    |> Name.create
+
+                                rv
+                                |> String.replace "[cmp]" $"{cmpN |> Name.toString}"
+                            )
+                            |> String.concat " + "
+                            |> fun s -> $"{lv} = {s}"
+                        | _ ->
+                            printfn $"could not match {e}"
+                            ""
+                    )
+                    |> List.filter (String.isNullOrWhiteSpace >> not)
+                    |> List.map (String.replace "[orb]" $"{orbN |> Name.toString}")
+                    |> SumMapping
+                let prodEqs =
+                    es
+                    |> List.append orbEqs
+                    |> List.append es
+                    |> List.map (String.replace "[orb]" $"{orbN |> Name.toString}")
+                    |> List.map (String.replace "[ord]" $"{idN |> Name.toString}")
+                    |> ProductMapping
+
+                sumEqs, prodEqs
+
+
+
+    /// Types and functions to deal
+    /// with an `Orderable`, i.e. something
+    /// that can be ordered.
+    module Orderable =
+
+        open Informedica.GenSolver.Lib
+        open Types
+
+        type Name = Types.Name
+
+        /// Contains string constants
+        /// to create `Variable` names
+        module Literals =
+
+            [<Literal>]
+            let item = Mapping.itm
+            [<Literal>]
+            let comp = Mapping.cmp
+            [<Literal>]
+            let orderable = Mapping.orb
+            [<Literal>]
+            let order = Mapping.ord
+            [<Literal>]
+            let dose = Mapping.dos
+
+
+
+        module Dose =
+
+            module Quantity = OrderVariable.Quantity
+            module PerTime = OrderVariable.PerTime
+            module Rate = OrderVariable.Rate
+            module Total = OrderVariable.Total
+            module QuantityAdjust = OrderVariable.QuantityAdjust
+            module PerTimeAdjust = OrderVariable.PerTimeAdjust
+            module RateAdjust = OrderVariable.RateAdjust
+            module TotalAdjust = OrderVariable.TotalAdjust
+
+
+            let create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj =
+                {
+                    Quantity = qty
+                    PerTime = ptm
+                    Rate = rte
+                    Total = tot
+                    QuantityAdjust = qty_adj
+                    PerTimeAdjust = ptm_adj
+                    RateAdjust = rte_adj
+                    TotalAdjust = tot_adj
+                }
+
+            let createNew n =
+                let un = ValueUnit.NoUnit
+                let n = n |> Name.add Literals.dose
+
+                let qty = Quantity.create n un
+                let ptm = PerTime.create n un un
+                let rte = Rate.create n un un
+                let tot = Total.create n un
+                let qty_adj = QuantityAdjust.create n un un
+                let rte_adj = RateAdjust.create n un un un
+                let ptm_adj = PerTimeAdjust.create n un un un
+                let tot_adj = TotalAdjust.create n un un
+
+                create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
+
+
+            /// Turn an `Item` to `VariableUnit`s
+            let toOrdVars (dos : Dose) =
+                let qty = dos.Quantity |> Quantity.toOrdVar
+                let ptm = dos.PerTime |> PerTime.toOrdVar
+                let rte = dos.Rate |> Rate.toOrdVar
+                let tot = dos.Total |> Total.toOrdVar
+                let qty_adj = dos.QuantityAdjust |> QuantityAdjust.toOrdVar
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.toOrdVar
+                let rte_adj = dos.RateAdjust |> RateAdjust.toOrdVar
+                let tot_adj = dos.TotalAdjust |> TotalAdjust.toOrdVar
+
+                [
+                    qty
+                    ptm
+                    rte
+                    tot
+                    qty_adj
+                    ptm_adj
+                    rte_adj
+                    tot_adj
+                ]
+
+            let fromOrdVars ovars (dos: Dose) =
+                let qty = dos.Quantity |> Quantity.fromOrdVar ovars
+                let ptm = dos.PerTime |> PerTime.fromOrdVar ovars
+                let rte = dos.Rate |> Rate.fromOrdVar ovars
+                let tot = dos.Total |> Total.fromOrdVar ovars
+                let qty_adj = dos.QuantityAdjust |> QuantityAdjust.fromOrdVar ovars
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.fromOrdVar ovars
+                let rte_adj = dos.RateAdjust |> RateAdjust.fromOrdVar ovars
+                let tot_adj = dos.TotalAdjust |> TotalAdjust.fromOrdVar ovars
+
+                create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
+
+
+            let applyConstraints (dos: Dose) =
+                let qty = dos.Quantity |> Quantity.applyConstraints
+                let ptm = dos.PerTime |> PerTime.applyConstraints
+                let rte = dos.Rate |> Rate.applyConstraints
+                let tot = dos.Total |> Total.applyConstraints
+                let qty_adj = dos.QuantityAdjust |> QuantityAdjust.applyConstraints
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.applyConstraints
+                let rte_adj = dos.RateAdjust |> RateAdjust.applyConstraints
+                let tot_adj = dos.TotalAdjust |> TotalAdjust.applyConstraints
+
+                create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
+
+
+
+            /// Turn an `Item` to a list of `string`s,
+            /// each string containing the variable
+            /// `Name`, `ValueRange` and `Unit`
+            let toString = toOrdVars >> List.map (OrderVariable.toString false)
+
+
+            module Dto =
+
+
+                module Units = ValueUnit.Units
+                module Quantity = OrderVariable.Quantity
+                module QuantityPerTime = OrderVariable.PerTime
+                module Rate = OrderVariable.Rate
+                module Total = OrderVariable.Total
+                module QuantityAdjust = OrderVariable.QuantityAdjust
+                module QuantityPerTimeAdjust = OrderVariable.PerTimeAdjust
+                module RateAdjust = OrderVariable.RateAdjust
+                module TotalAdjust = OrderVariable.TotalAdjust
+
+
+                type Dto () =
+                    member val Quantity = OrderVariable.Dto.dto () with get, set
+                    member val PerTime = OrderVariable.Dto.dto () with get, set
+                    member val Rate = OrderVariable.Dto.dto () with get, set
+                    member val Total = OrderVariable.Dto.dto () with get, set
+                    member val QuantityAdjust = OrderVariable.Dto.dto () with get, set
+                    member val PerTimeAdjust = OrderVariable.Dto.dto () with get, set
+                    member val RateAdjust = OrderVariable.Dto.dto () with get, set
+                    member val TotalAdjust = OrderVariable.Dto.dto () with get, set
+
+
+                let fromDto (dto: Dto) =
+
+                    let qty = dto.Quantity |> Quantity.fromDto
+                    let ptm = dto.PerTime |> PerTime.fromDto
+                    let rte = dto.Rate |> Rate.fromDto
+                    let tot = dto.Total |> Total.fromDto
+                    let qty_adj = dto.QuantityAdjust |> QuantityAdjust.fromDto
+                    let ptm_adj = dto.PerTimeAdjust |> PerTimeAdjust.fromDto
+                    let rte_adj = dto.RateAdjust |> RateAdjust.fromDto
+                    let tot_adj = dto.TotalAdjust |> TotalAdjust.fromDto
+
+                    create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
+
+                let toDto (dos : Dose) =
+                    let dto = Dto ()
+
+                    dto.Quantity <-
+                        dos.Quantity
+                        |> Quantity.toDto
+                    dto.PerTime <-
+                        dos.PerTime
+                        |> PerTime.toDto
+                    dto.Rate <-
+                        dos.Rate
+                        |> Rate.toDto
+                    dto.Total <-
+                        dos.Total
+                        |> Total.toDto
+                    dto.QuantityAdjust <-
+                        dos.QuantityAdjust
+                        |> QuantityAdjust.toDto
+                    dto.PerTimeAdjust <-
+                        dos.PerTimeAdjust
+                        |> PerTimeAdjust.toDto
+                    dto.RateAdjust <-
+                        dos.RateAdjust
+                        |> RateAdjust.toDto
+                    dto.TotalAdjust <-
+                        dos.TotalAdjust
+                        |> TotalAdjust.toDto
+
+                    dto
+
+
+                let dto () = Dto ()
+
+
+
+        /// Type and functions that models an
+        /// `Order` `Item` that is contained in
+        /// a `Component`
+        module Item =
+
+            module Quantity = OrderVariable.Quantity
+            module Concentration = OrderVariable.Concentration
+            module Total = OrderVariable.Total
+            module Rate = OrderVariable.Rate
+
+
+            /// Create an item with
+            ///
+            /// * **id**: the order id
+            /// * **n**: the name of the item
+            /// * **cmp_qty**: the quantity of the item in a component
+            /// * **orb_qty**: the quantity of the item in an orderable
+            /// * **cmp_cnc**: the item concentration in a component
+            /// * **orb_cnc**: the item concentration in an orderable
+            /// * **dos**: the item dose
+            let create n cmp_qty orb_qty cmp_cnc orb_cnc dos =
+                {
+                    Name = n
+                    ComponentQuantity = cmp_qty
+                    OrderableQuantity = orb_qty
+                    ComponentConcentration = cmp_cnc
+                    OrderableConcentration = orb_cnc
+                    Dose = dos
+                }
+
+
+            /// Create a new item with
+            ///
+            /// **id**: the order id
+            /// **n**: the string name of the item
+            let createNew id orbN cmpN itmN =
+                let un = ValueUnit.NoUnit
+                let n =
+                    [ id; orbN; cmpN; itmN ]
+                    |> Name.create
+
+                let cmp_qty = let n = n |> Name.add Literals.comp in Quantity.create n un
+                let orb_qty = let n = n |> Name.add Literals.orderable in Quantity.create n un
+                let cmp_cnc = let n = n |> Name.add Literals.comp in Concentration.create n un un
+                let orb_cnc = let n = n |> Name.add Literals.orderable in Concentration.create n un un
+                let dos     = Dose.createNew n
+
+                create (itmN |> Name.fromString) cmp_qty orb_qty cmp_cnc orb_cnc dos
+
+
+            /// Apply **f** to an `item`
+            let apply f (itm: Item) = itm |> f
+
+
+            /// Utility method to facitilitate type inference
+            let get = apply id
+
+
+            /// Get the `Name` of an `Item`
+            let getName itm = (itm |> get).Name
+
+
+            /// Get the `Item` dose
+            let getDose itm = (itm |> get).Dose
+
+
+            /// Turn an `Item` to `VariableUnit`s
+            let toOrdVars itm =
+                let itm_cmp_qty = (itm |> get).ComponentQuantity |> Quantity.toOrdVar
+                let itm_orb_qty = itm.OrderableQuantity          |> Quantity.toOrdVar
+                let itm_cmp_cnc = itm.ComponentConcentration     |> Concentration.toOrdVar
+                let itm_orb_cnc = itm.OrderableConcentration     |> Concentration.toOrdVar
+
+                [
+                    itm_cmp_qty
+                    itm_orb_qty
+                    itm_cmp_cnc
+                    itm_orb_cnc
+                    yield! itm.Dose |> Dose.toOrdVars
+                ]
+
+
+            let fromOrdVars ovars itm =
+                let cmp_qty = (itm |> get).ComponentQuantity |> Quantity.fromOrdVar ovars
+                let orb_qty = itm.OrderableQuantity          |> Quantity.fromOrdVar ovars
+                let cmp_cnc = itm.ComponentConcentration     |> Concentration.fromOrdVar ovars
+                let orb_cnc = itm.OrderableConcentration     |> Concentration.fromOrdVar ovars
+                let dos = itm.Dose |> Dose.fromOrdVars ovars
+
+                create itm.Name cmp_qty orb_qty cmp_cnc orb_cnc dos
+
+
+            let applyConstraints itm =
+                let cmp_qty = (itm |> get).ComponentQuantity |> Quantity.applyConstraints
+                let orb_qty = itm.OrderableQuantity          |> Quantity.applyConstraints
+                let cmp_cnc = itm.ComponentConcentration     |> Concentration.applyConstraints
+                let orb_cnc = itm.OrderableConcentration     |> Concentration.applyConstraints
+                let dos = itm.Dose |> Dose.applyConstraints
+
+                create itm.Name cmp_qty orb_qty cmp_cnc orb_cnc dos
+
+
+            /// Turn an `Item` to a list of `string`s,
+            /// each string containing the variable
+            /// `Name`, `ValueRange` and `Unit`
+            let toString = toOrdVars >> List.map (OrderVariable.toString false)
+
+
+
+            module Dto =
+
+                module Units = ValueUnit.Units
+                module Id = WrappedString.Id
+                module Name = WrappedString.Name
+                module Quantity = OrderVariable.Quantity
+                module Concentration = OrderVariable.Concentration
+
+
+                type Dto () =
+                    member val Name = "" with get, set
+                    member val ComponentQuantity = OrderVariable.Dto.dto () with get, set
+                    member val OrderableQuantity = OrderVariable.Dto.dto () with get, set
+                    member val ComponentConcentration = OrderVariable.Dto.dto () with get, set
+                    member val OrderableConcentration = OrderVariable.Dto.dto () with get, set
+                    member val Dose = Dose.Dto.dto () with get, set
+
+
+                let fromDto (dto: Dto) =
+                    let n = dto.Name |> Name.fromString
+                    let cmp_qty = dto.ComponentQuantity |> Quantity.fromDto
+                    let orb_qty = dto.OrderableQuantity |> Quantity.fromDto
+                    let cmp_cnc = dto.ComponentConcentration |> Concentration.fromDto
+                    let orb_cnc = dto.OrderableConcentration |> Concentration.fromDto
+                    let dos = dto.Dose |> Dose.Dto.fromDto
+
+                    create n cmp_qty orb_qty cmp_cnc orb_cnc dos
+
+
+                let toDto (itm : Item) =
+                    let dto = Dto ()
+
+                    dto.Name <- itm.Name |> Name.toString
+                    dto.ComponentQuantity <-
+                        itm.ComponentQuantity
+                        |> Quantity.toDto
+                    dto.OrderableQuantity <-
+                        itm.OrderableQuantity
+                        |> Quantity.toDto
+                    dto.ComponentConcentration <-
+                        itm.ComponentConcentration
+                        |> Concentration.toDto
+                    dto.OrderableConcentration <-
+                        itm.OrderableConcentration
+                        |> Concentration.toDto
+                    dto.Dose <-
+                        itm.Dose |> Dose.Dto.toDto
+
+                    dto
+
+
+                let dto id orbN cmpN itmN =
+                    createNew id orbN cmpN itmN
+                    |> toDto
+
+
+
+        /// Types and functions to model a
+        /// `Component` in an `Orderable`.
+        /// A `Component` contains a list
+        /// of `Item`s
+        module Component =
+
+            module Name = Name
+            module Quantity = OrderVariable.Quantity
+            module Concentration = OrderVariable.Concentration
+            module Count = OrderVariable.Count
+
+
+            /// Create a component with
+            ///
+            /// * `id`: the order id
+            /// * `n`: the name of the component
+            /// * `cmp_qty`: quantity of component
+            /// * `orb_qty`: quantity of component in orderable
+            /// * `orb_cnt`: count of component in orderable
+            /// * `ord_qty`: quantity of component in order
+            /// * `ord_cnt`: count of component in order
+            /// * `orb_cnc`: concentration of component in orderable
+            /// * `dos`: component dose
+            /// * `dos_adj`: adjusted dose of component
+            /// * `ii`: list of `Item`s in a component
+            let create id nm sh cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos ii =
+                {
+                    Id = id
+                    Name = nm
+                    Shape = sh
+                    ComponentQuantity = cmp_qty
+                    OrderableQuantity = orb_qty
+                    OrderableCount = orb_cnt
+                    OrderQuantity = ord_qty
+                    OrderCount = ord_cnt
+                    OrderableConcentration = orb_cnc
+                    Dose = dos
+                    Items = ii
+                }
+
+            /// Create a new component with
+            /// * `id`: the id of the component
+            /// * `n`: the name of the component
+            let createNew id orbN cmpN sh =
+                let un = ValueUnit.NoUnit
+                let nm = [ id; orbN; cmpN ] |> Name.create
+                let id = Id.create id
+
+                let cmp_qty = let n = nm |> Name.add Literals.comp in Quantity.create n un
+                let orb_qty = let n = nm |> Name.add Literals.orderable in Quantity.create n un
+                let orb_cnt = let n = nm |> Name.add Literals.orderable in Count.create n
+                let ord_qty = let n = nm |> Name.add Literals.order in Quantity.create n un
+                let ord_cnt = let n = nm |> Name.add Literals.order in Count.create n
+                let orb_cnc = let n = nm |> Name.add Literals.orderable in Concentration.create n un un
+                let dos     = Dose.createNew nm
+
+                create id (cmpN |> Name.fromString) sh cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos []
+
+
+            /// Apply **f** to a `Component` **comp**
+            let apply f (comp: Component) = comp |> f
+
+
+            /// Utility to facilitate type inference
+            let get = apply id
+
+
+            /// Get the name of a `Component`
+            let getName cmp = (cmp |> get).Name
+
+
+            /// Get the `Item`s in an `Component`
+            let getItems cmp = (cmp |> get).Items
+
+
+            /// Map a `Component` **cmp**
+            /// to `VariableUnit`s
+            let toOrdVars cmp =
+                let cmp_qty = (cmp |> get).ComponentQuantity |> Quantity.toOrdVar
+                let orb_qty = cmp.OrderableQuantity          |> Quantity.toOrdVar
+                let orb_cnt = cmp.OrderableCount             |> Count.toOrdVar
+                let orb_cnc = cmp.OrderableConcentration     |> Concentration.toOrdVar
+                let ord_qty = cmp.OrderQuantity              |> Quantity.toOrdVar
+                let ord_cnt = cmp.OrderCount                 |> Count.toOrdVar
+
+                [
+                    cmp_qty
+                    orb_qty
+                    orb_cnt
+                    orb_cnc
+                    ord_qty
+                    ord_cnt
+                    yield! cmp.Dose |> Dose.toOrdVars
+                    yield! cmp.Items |> List.collect Item.toOrdVars
+                ]
+
+
+            /// Map a `Component` **cmp**
+            /// to `VariableUnit`s
+            let fromOrdVars ovars cmp =
+                let cmp_qty = (cmp |> get).ComponentQuantity |> Quantity.fromOrdVar ovars
+                let orb_qty = cmp.OrderableQuantity          |> Quantity.fromOrdVar ovars
+                let orb_cnt = cmp.OrderableCount             |> Count.fromOrdVar ovars
+                let orb_cnc = cmp.OrderableConcentration     |> Concentration.fromOrdVar ovars
+                let ord_qty = cmp.OrderQuantity              |> Quantity.fromOrdVar ovars
+                let ord_cnt = cmp.OrderCount                 |> Count.fromOrdVar ovars
+                let dos = cmp.Dose |> Dose.fromOrdVars ovars
+
+                cmp.Items
+                |> List.map (Item.fromOrdVars ovars)
+                |> create cmp.Id cmp.Name cmp.Shape cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos
+
+
+            /// Map a `Component` **cmp**
+            /// to `VariableUnit`s
+            let applyConstraints cmp =
+                let cmp_qty = (cmp |> get).ComponentQuantity |> Quantity.applyConstraints
+                let orb_qty = cmp.OrderableQuantity          |> Quantity.applyConstraints
+                let orb_cnt = cmp.OrderableCount             |> Count.applyConstraints
+                let orb_cnc = cmp.OrderableConcentration     |> Concentration.applyConstraints
+                let ord_qty = cmp.OrderQuantity              |> Quantity.applyConstraints
+                let ord_cnt = cmp.OrderCount                 |> Count.applyConstraints
+                let dos = cmp.Dose |> Dose.applyConstraints
+
+                cmp.Items
+                |> List.map Item.applyConstraints
+                |> create cmp.Id cmp.Name cmp.Shape cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos
+
+
+            /// Create a string list from a
+            /// component where each string is
+            /// a variable name with the value range
+            /// and the Unit
+            let toString = toOrdVars >> List.map (OrderVariable.toString false)
+
+
+
+            module Dto =
+
+                module Units = ValueUnit.Units
+                module Id = WrappedString.Id
+                module Name = WrappedString.Name
+                module Quantity = OrderVariable.Quantity
+                module Concentration = OrderVariable.Concentration
+                module CT = OrderVariable.Count
+
+
+                type Dto () =
+                    member val Id = "" with get, set
+                    member val Name = "" with get, set
+                    member val Shape = "" with get, set
+                    member val ComponentQuantity = OrderVariable.Dto.dto () with get, set
+                    member val OrderableQuantity = OrderVariable.Dto.dto () with get, set
+                    member val OrderableCount = OrderVariable.Dto.dto () with get, set
+                    member val OrderQuantity = OrderVariable.Dto.dto () with get, set
+                    member val OrderCount = OrderVariable.Dto.dto () with get, set
+                    member val OrderableConcentration = OrderVariable.Dto.dto () with get, set
+                    member val Dose = Dose.Dto.dto () with get, set
+                    member val Items : Item.Dto.Dto list = [] with get, set
+
+
+                let fromDto (dto: Dto) =
+
+                    let id = dto.Id |> Id.create
+                    let n = dto.Name |> Name.fromString
+                    let s = dto.Shape
+                    let cmp_qty = dto.ComponentQuantity |> Quantity.fromDto
+                    let orb_qty = dto.OrderableQuantity |> Quantity.fromDto
+                    let orb_cnt = dto.OrderableCount    |> Count.fromDto
+                    let orb_cnc = dto.OrderableConcentration |> Concentration.fromDto
+                    let ord_qty = dto.OrderQuantity |> Quantity.fromDto
+                    let ord_cnt = dto.OrderCount    |> Count.fromDto
+                    let ii =
+                        dto.Items
+                        |> List.map Item.Dto.fromDto
+
+                    let dos = dto.Dose |> Dose.Dto.fromDto
+
+                    create id n s cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos ii
+
+
+                let toDto (cmp : Component) =
+                    let dto = Dto ()
+
+                    dto.Name <- cmp.Name |> Name.toString
+                    dto.ComponentQuantity <-
+                        cmp.ComponentQuantity
+                        |> Quantity.toDto
+                    dto.OrderableQuantity <-
+                        cmp.OrderableQuantity
+                        |> Quantity.toDto
+                    dto.OrderableCount <-
+                        cmp.OrderableCount
+                        |> Count.toDto
+                    dto.OrderQuantity <-
+                        cmp.OrderQuantity
+                        |> Quantity.toDto
+                    dto.OrderCount <-
+                        cmp.OrderCount
+                        |> Count.toDto
+                    dto.OrderableConcentration <-
+                        cmp.OrderableConcentration
+                        |> Concentration.toDto
+                    dto.Dose <-
+                        cmp.Dose
+                        |> Dose.Dto.toDto
+                    dto.Items <-
+                        cmp.Items
+                        |> List.map Item.Dto.toDto
+
+                    dto
+
+                let dto id orbN cmpN shape =
+                    createNew id orbN cmpN shape
+                    |> toDto
+
+
+
+        module Quantity = OrderVariable.Quantity
+        module Concentration = OrderVariable.Concentration
+        module Count = OrderVariable.Count
+
+
+        /// Create an `Orderable` with
+        ///
+        /// * nm: the name of the orderable
+        /// * orb\_qty: quantity of the orderable
+        /// * ord\_qty: quantity of orderable in the order
+        /// * orb\_cnt: the count of orderable in the order
+        /// * dos: the orderable dose
+        /// * dos\_adj: the adjusted orderable dose
+        let create n orb_qty ord_qty ord_cnt dos_cnt dos cc =
+            {
+                Name = n
+                OrderableQuantity = orb_qty
+                OrderQuantity = ord_qty
+                OrderCount = ord_cnt
+                DoseCount = dos_cnt
+                Dose = dos
+                Components = cc
+            }
+
+        /// Create a new `Orderable` with a `Component` list
+        /// `cl`, and
+        /// * `Orderable`unit `un` and
+        /// * component unit `cu`
+        /// * time unit `tu`
+        /// * adjust unit `adj`
+        let createNew id orbN =
+            let un = ValueUnit.NoUnit
+            let n = [id; orbN] |> Name.create
+
+            let orb_qty = let n = n |> Name.add Literals.orderable in Quantity.create n un
+            let ord_qty = let n = n |> Name.add Literals.order in Quantity.create n un
+            let ord_cnt = let n = n |> Name.add Literals.order in Count.create n
+            let dos_cnt = let n = n |> Name.add Literals.dose in Count.create n
+            let dos     = Dose.createNew n
+
+            create (orbN |> Name.fromString) orb_qty ord_qty ord_cnt dos_cnt dos []
+
+
+        /// Apply **f** to `Orderable` `ord`
+        let apply f (orb: Orderable) = orb |> f
+
+
+        /// Utility function to facilitate type inference
+        let get = apply id
+
+
+        /// Get the name of the `Orderable`
+        let getName orb = (orb |> get).Name
+
+
+        /// Get the `Component`s in an `Orderable`
+        let getComponents orb = (orb |> get).Components
+
+
+        /// Get the `Orderable` dose
+        let getDose orb = (orb |> get).Dose
+
+
+        // Get the base `Unit` of an `Orderable`
+        let getUnit orb =
+            (orb |> get).OrderableQuantity
+            |> Quantity.toOrdVar
+            |> OrderVariable.getUnit
+
+
+        /// Map an `Orderable` **orb** to
+        /// `VariableUnit`s
+        let toOrdVars orb =
+            let ord_qty = (orb |> get).OrderQuantity |> Quantity.toOrdVar
+            let orb_qty = orb.OrderableQuantity      |> Quantity.toOrdVar
+            let ord_cnt = orb.OrderCount             |> Count.toOrdVar
+            let dos_cnt = orb.DoseCount              |> Count.toOrdVar
+
+            [
+                ord_qty
+                orb_qty
+                ord_cnt
+                dos_cnt
+                yield! orb.Dose |> Dose.toOrdVars
+                yield! orb.Components |> List.collect Component.toOrdVars
+            ]
+
+
+        /// Map an `Orderable` **orb** to
+        /// `VariableUnit`s
+        let fromOrdVars ovars orb =
+            let ord_qty = (orb |> get).OrderQuantity |> Quantity.fromOrdVar ovars
+            let orb_qty = orb.OrderableQuantity      |> Quantity.fromOrdVar ovars
+            let ord_cnt = orb.OrderCount             |> Count.fromOrdVar ovars
+            let dos_cnt = orb.DoseCount              |> Count.fromOrdVar ovars
+            let dos = orb.Dose |> Dose.fromOrdVars ovars
+
+            orb.Components
+            |> List.map (Component.fromOrdVars ovars)
+            |> create orb.Name orb_qty ord_qty ord_cnt dos_cnt dos
+
+
+        /// Map an `Orderable` **orb** to
+        /// `VariableUnit`s
+        let applyConstraints orb =
+            let ord_qty = (orb |> get).OrderQuantity |> Quantity.applyConstraints
+            let orb_qty = orb.OrderableQuantity      |> Quantity.applyConstraints
+            let ord_cnt = orb.OrderCount             |> Count.applyConstraints
+            let dos_cnt = orb.DoseCount              |> Count.applyConstraints
+            let dos = orb.Dose |> Dose.applyConstraints
+
+            orb.Components
+            |> List.map Component.applyConstraints
+            |> create orb.Name orb_qty ord_qty ord_cnt dos_cnt dos
+
+
+        /// Turn an `Orderable` `ord` into
+        /// a list of strings.
+        let toString = toOrdVars >> List.map (OrderVariable.toString false)
+
+
+
+        module Dto =
+
+            module Units = ValueUnit.Units
+            module Id = WrappedString.Id
+            module Name = WrappedString.Name
+            module Quantity = OrderVariable.Quantity
+            module Concentration = OrderVariable.Concentration
+            module CT = OrderVariable.Count
+
+            type Dto () =
+                member val Name = "" with get, set
+                member val OrderableQuantity = OrderVariable.Dto.dto () with get, set
+                member val OrderQuantity = OrderVariable.Dto.dto () with get, set
+                member val OrderCount = OrderVariable.Dto.dto () with get, set
+                member val DoseCount = OrderVariable.Dto.dto () with get, set
+                member val Dose = Dose.Dto.dto () with get, set
+                member val Components : Component.Dto.Dto list = [] with get, set
+
+
+            let fromDto (dto: Dto) =
+                let n = dto.Name |> Name.fromString
+
+                let orb_qty = dto.OrderableQuantity |> Quantity.fromDto
+                let ord_qty = dto.OrderQuantity     |> Quantity.fromDto
+                let ord_cnt = dto.OrderCount        |> Count.fromDto
+                let dos_cnt = dto.DoseCount         |> Count.fromDto
+
+                let cc =
+                    dto.Components
+                    |> List.map Component.Dto.fromDto
+
+                let dos = dto.Dose |> Dose.Dto.fromDto
+
+                create n orb_qty ord_qty ord_cnt dos_cnt dos cc
+
+            let toDto (orb : Orderable) =
+                let dto = Dto ()
+
+                dto.Name <- orb.Name |> Name.toString
+                dto.OrderableQuantity <-
+                    orb.OrderableQuantity
+                    |> Quantity.toDto
+                dto.OrderQuantity <-
+                    orb.OrderQuantity
+                    |> Quantity.toDto
+                dto.OrderCount <-
+                    orb.OrderCount
+                    |> Count.toDto
+                dto.DoseCount <-
+                    orb.DoseCount
+                    |> Count.toDto
+                dto.Dose <-
+                    orb.Dose
+                    |> Dose.Dto.toDto
+                dto.Components <-
+                    orb.Components
+                    |> List.map Component.Dto.toDto
+
+                dto
+
+
+            let dto id orbN =
+                createNew id orbN
+                |> toDto
+
+
+
+    module Prescription =
+
+        open Types
+
+        module Frequency = OrderVariable.Frequency
+        module Time = OrderVariable.Time
+
+
+        /// Create `Frequency` and `Time` with name generated by string list **n**
+        let freqTime tu1 tu2 n =  (Frequency.create n tu1, Time.create n tu2)
+
+
+        /// Create a continuous `Prescription` with name generated by string list **n**
+        let continuous tu1 tu2 n =
+            let _, _ = n |> freqTime tu1 tu2 in Continuous
+
+
+        /// Create a discontinuous `Prescription` with name generated by string list **n**
+        let discontinuous tu1 tu2 n =
+            let frq, _ = n |> freqTime tu1 tu2 in frq |> Discontinuous
+
+
+        /// Create a timed `Prescription` with name generated by string list **n**
+        let timed tu1 tu2 n =
+            let frq, tme = n |> freqTime tu1 tu2 in (frq, tme) |> Timed
+
+
+        /// Check whether a `Prescription` is continuous
+        let isContinuous = function | Continuous -> true | _ -> false
+
+
+        /// Check whether a `Prescription` is discontinuous with a time
+        let isTimed = function | Timed _ -> true | _ -> false
+
+
+        /// Turn `Prescription` **prs** into `VariableUnit`s to
+        /// be used in equations
+        let toOrdVars prs =
+            match prs with
+            | Continuous -> None, None
+            | Discontinuous frq ->
+                frq |> Frequency.toOrdVar |> Some, None
+            | Timed(frq, tme)     ->
+                frq |> Frequency.toOrdVar |> Some, tme |> Time.toOrdVar |> Some
+
+
+        let fromOrdVars ovars prs =
+            match prs with
+            | Continuous -> prs
+            | Discontinuous frq ->
+                frq |> Frequency.fromOrdVar ovars |> Discontinuous
+            | Timed(frq, tme)     ->
+                (frq |> Frequency.fromOrdVar ovars,
+                tme |> Time.fromOrdVar ovars)
+                |> Timed
+
+
+        let applyConstraints prs =
+            match prs with
+            | Continuous -> prs
+            | Discontinuous frq ->
+                frq |> Frequency.applyConstraints |> Discontinuous
+            | Timed(frq, tme)     ->
+                (frq |> Frequency.applyConstraints,
+                tme |> Time.applyConstraints)
+                |> Timed
+
+
+
+        /// Turn a `Prescription` **prs** into
+        /// a string list
+        let toString (prs: Prescription) =
+                match prs with
+                | Continuous -> ["Continuous"]
+                | Discontinuous frq -> [frq |> Frequency.toString]
+                | Timed(frq, tme)     -> [frq |> Frequency.toString; tme |> Time.toString]
+
+
+        module Dto =
+
+            module Units = ValueUnit.Units
+            module Id = WrappedString.Id
+            module NM = Name
+
+            type Dto () =
+                member val IsContinuous = false with get, set
+                member val IsDiscontinuous = false with get, set
+                member val IsTimed = false with get, set
+                member val Frequency = OrderVariable.Dto.dto () with get, set
+                member val Time = OrderVariable.Dto.dto () with get, set
+
+            let fromDto (dto : Dto) =
+                match dto.IsContinuous,
+                      dto.IsDiscontinuous,
+                      dto.IsTimed with
+                | true,  false, false -> Continuous
+                | false, true,  false ->
+                    dto.Frequency
+                    |> Frequency.fromDto
+                    |> Discontinuous
+                | false, false, true  ->
+                    (dto.Frequency |> Frequency.fromDto, dto.Time |> Time.fromDto)
+                    |> Timed
+                | _ -> exn "dto is neither or both process, continuous, discontinuous or timed"
+                       |> raise
+
+            let toDto pres =
+                let dto = Dto ()
+
+                match pres with
+                | Continuous -> dto.IsContinuous <- true
+                | Discontinuous freq ->
+                    dto.IsDiscontinuous <- true
+                    dto.Frequency <- freq |> Frequency.toDto
+                | Timed (freq, time) ->
+                    dto.IsTimed <- true
+                    dto.Frequency <- freq |> Frequency.toDto
+                    dto.Time      <- time |> Time.toDto
+
+                dto
+
+            let dto n =
+                let dto  = Dto ()
+                let f, t =
+                    n
+                    |> Name.fromString
+                    |> freqTime ValueUnit.NoUnit ValueUnit.NoUnit
+
+                dto.Frequency <- f |> Frequency.toDto
+                dto.Time <- t |> Time.toDto
+                dto.IsDiscontinuous <- true
+
+                dto
+
+            let setToContinuous (dto : Dto) =
+                dto.IsContinuous <- true
+                dto.IsDiscontinuous <- false
+                dto.IsTimed <- false
+                dto
+
+            let setToDiscontinuous (dto : Dto) =
+                dto.IsContinuous <- false
+                dto.IsDiscontinuous <- true
+                dto.IsTimed <- false
+                dto
+
+            let setToTimed (dto : Dto) =
+                dto.IsContinuous <- false
+                dto.IsDiscontinuous <- false
+                dto.IsTimed <- true
+                dto
 
 
 
@@ -119,8 +1092,8 @@ module Order =
     /// of an `Order`
     module StartStop =
 
-        let toString stst =
-            match stst with
+        let toString startStop =
+            match startStop with
             | Start dt ->
                 dt
                 |> DateTime.formattedString "dd-MM-yy"
@@ -130,32 +1103,53 @@ module Order =
                 |> DateTime.formattedString "dd-MM-yy"
                 |> sprintf "%s - %s" (start |> DateTime.formattedString "dd-MM-yy")
 
-    open System
 
-    open Informedica.GenUnits.Lib
-    open WrappedString
+
+    module OrderType =
+
+        let toString = function
+            | AnyOrder -> $"{AnyOrder}"
+            | ProcessOrder -> $"{ProcessOrder}"
+            | ContinuousOrder -> $"{ContinuousOrder}"
+            | DiscontinuousOrder -> $"{DiscontinuousOrder}"
+            | TimedOrder -> $"{TimedOrder}"
+
+
+        let map s = 
+            match s with
+            | _ when s = "discontinu" -> DiscontinuousOrder
+            | _ when s = "continu" -> ContinuousOrder
+            | _ when s = "inlooptijd" -> TimedOrder
+            | _ -> DiscontinuousOrder
+
+
 
     module ValueRange = Informedica.GenSolver.Lib.Variable.ValueRange
     module Equation = Informedica.GenSolver.Lib.Equation
     module Property = ValueRange.Property
-    module Quantity = VariableUnit.Quantity
-    module Frequency = VariableUnit.Frequency
-    module Concentration = VariableUnit.Concentration
-    module Rate = VariableUnit.Rate
-    module Dose = VariableUnit.Dose
-    module DoseAdjust = VariableUnit.DoseAdjust
-    module Time = VariableUnit.Time
+    module Quantity = OrderVariable.Quantity
+    module Frequency = OrderVariable.Frequency
+    module PerTimeAdjust = OrderVariable.PerTimeAdjust
+    module Concentration = OrderVariable.Concentration
+    module Rate = OrderVariable.Rate
+    module RateAdjust = OrderVariable.RateAdjust
+    module Time = OrderVariable.Time
     module Units = ValueUnit.Units
+
+    type Equation = Informedica.GenSolver.Lib.Types.Equation
 
 
     /// Apply `f` to `Order` `ord`
     let apply f (ord: Order) = ord |> f
 
-    /// Utilty function to facilitate type inference
+
+    /// Utility function to facilitate type inference
     let get = apply id
+
 
     /// Get the order id
     let getId ord = (ord |> get).Id
+
 
     /// Create an `Order` with
     ///
@@ -164,555 +1158,352 @@ module Order =
     /// * orb: the `Orderable`
     /// * prs: `Prescription`, how the orderable is prescribed
     /// * rte: the route of administration of the orderable
-    let create id adj_qty orb prs rte sts =
+    let create id adj_qty orb prs rte tme sts =
         {
             Id = id
             Adjust = adj_qty
             Orderable = orb
             Prescription = prs
             Route = rte
+            Duration = tme
             StartStop = sts
         }
 
-    /// Create a new orderable using:
-    ///
-    /// * id: the unique id in an `OrderSet` of an `Order`
-    /// * nm: the name of the `Orderable`
-    /// * cil: the names for the `Component`s, each with a list of name, string tuples for `Item`s
-    /// * orb_un: the unit name for the `Orderable` and its `Component`s
-    /// * cmp_un: the unit for the `Component`
-    /// * adj_un: the unit used to adjust doses
-    /// * tme_un: the unit for time
-    /// * str_prs: a function that takes in a list of strings that will generate the names and returns a `Prescription`
-    /// * route: the route of administration
-    let createNew id n shape str_prs route =
-        let orb = Orderable.createNew id n shape
-        let nm  = orb |> Orderable.getName
-        let adj = Quantity.quantity [ id |> Id.toString; n |> Name.toString; Mapping.ord; Mapping.adj ] ValueUnit.NoUnit
-        let prs = [id |> Id.toString; nm |> Name.toString; Mapping.ord; Mapping.prs] |> str_prs
+
+    let createNew id orbN str_prs route =
+        let orb = Orderable.createNew id orbN
+        let n = [id] |> Name.create
+
+        let adj =
+            Quantity.create (n |> Name.add Mapping.adj) ValueUnit.NoUnit
+
+        let tme =
+            Time.create (n |> Name.add Mapping.ord) ValueUnit.NoUnit
+
+        let prs =
+            n
+            |> Name.add Mapping.prs
+            |> str_prs
         let sts = DateTime.Now  |> StartStop.Start
 
-        create id adj orb prs route sts
+        create (id |> Id.create) adj orb prs route tme sts
+
 
     let getAdjust ord = (ord |> get).Adjust
 
-    let getName ord =
-        ord
-        |> (getAdjust >> Quantity.toVarUnt >> VariableUnit.getName)
-        |> Name.toString
-        |> String.split "."
-        |> List.take 2
-        |> String.concat "."
-
-
-    let mapName n m (ord : Order) =
-        let dls = "."
-
-        [ (ord.Id |> Id.toString) + dls + n + dls + (m |> Mapping.map)]
-        |> Name.create
-
 
     let getOrderable ord = (ord |> get).Orderable
-
-    /// Map an `Order` *ord* to
-    /// a list of `VariableUnit` lists
-    let toEqs (ord: Order) =
-        let orb = ord.Orderable
-        let adj = ord.Adjust |> Quantity.toVarUnt
-        let frq, tme = ord.Prescription |> Prescription.toEqs
-        let hasRate =
-            ord.Prescription |> Prescription.isContinuous ||
-            ord.Prescription |> Prescription.isTimed
-
-        orb |> Orderable.toEqs hasRate adj frq tme
-
-    /// Map a list of `VariableUnit` lists
-    /// to an `Order` *ord*
-    let fromEqs ord eqs =
-        let orb = ord.Orderable    |> Orderable.fromEqs eqs
-        let adj = ord.Adjust       |> Quantity.fromVar eqs
-        let prs = ord.Prescription |> Prescription.fromEqs eqs
-
-        {
-            ord with
-                Adjust = adj
-                Orderable = orb
-                Prescription = prs
-        }
 
 
     /// Turn an order into a list of string
     /// representing variable name, valuerange
     /// and unit group
     let toString (ord: Order) =
-        [ OrderAdjustQty |> Mapping.map; ord.Adjust |> Quantity.toString ]
+        [ ord.Adjust |> Quantity.toString ]
         |> List.append (Orderable.Literals.orderable::(ord.Orderable |> Orderable.toString))
         |> List.append ("Prescription"::(ord.Prescription |> Prescription.toString))
         |> List.append ("Route"::[ord.Route])
         |> List.filter (String.isNullOrWhiteSpace >> not)
 
 
-    let getVariableUnit n m o =
-        let dls = "."
+    /// Map an `Orderable` **orb** to
+    /// `VariableUnit`s
+    let toOrdVars (ord : Order) =
+        let adj_qty = ord.Adjust |> Quantity.toOrdVar
+        let ord_tme = ord.Duration |> Time.toOrdVar
 
-        let n =
-            match m with
-            | OrderPresFreq
-            | OrderAdjustQty ->
-                [ (o |> getName) + dls + (m |> Mapping.map) ] |> Name.create
-            | _ ->
-                [ (o.Id |> Id.toString) + dls + n + dls + (m |> Mapping.map) ]
-                |> Name.create
-
-        let prod, sum = o |> toEqs
-
-        sum @ prod
-        |> List.collect id
-        |> List.tryFind (VariableUnit.getName >> ((=) n))
-
-
-    let setVariableUnit o vru =
-
-        let prod, sum = o |> toEqs
-
-        sum @ prod
-        |> List.collect id
-        |> List.map (fun x ->
-            if vru |> VariableUnit.getName = x.Variable.Name  then vru else x
-        )
-        |> List.singleton
-        |> fromEqs o
+        let prs_vars =
+            ord.Prescription
+            |> Prescription.toOrdVars
+            |> fun  (f, t) ->
+                [f; t]
+                |> List.choose id
+        [
+            adj_qty
+            ord_tme
+            yield! prs_vars
+            yield! ord.Orderable |> Orderable.toOrdVars
+        ]
 
 
-    let hasUnitValue n m v o =
-        getVariableUnit n m o
-        |> function
-        | Some vru ->
-            vru
-            |> VariableUnit.containsUnitValue v
-        | None -> false
-
-    let contains n v o =
-        o
-        |> toEqs
-        |> fun (prod, sum) ->
-            let find =
-                List.tryFind (fun vru ->
-                    vru
-                    |> VariableUnit.getName
-                    |> ((=) n)
-                )
-
-            match prod @ sum |> List.collect id |> find with
-            | Some vru -> vru |> VariableUnit.containsUnitValue v
-            | None -> false
+    let fromOrdVars ovars (ord : Order) =
+        { ord with
+            Adjust = ord.Adjust |> Quantity.fromOrdVar ovars
+            Duration = ord.Duration |> Time.fromOrdVar ovars
+            Prescription = ord.Prescription |> Prescription.fromOrdVars ovars
+            Orderable = ord.Orderable |> Orderable.fromOrdVars ovars
+        }
 
 
-    //let isEmpty n m o =
-    //    getVariableUnit n m o
-    //    |> function
-    //    | Some vru ->
-    //        vru.Variable.Values
-    //        |> ValueRange.isEmpty
-    //    | None -> false
+    let applyConstraints (ord : Order) =
+        { ord with
+            Adjust = ord.Adjust |> Quantity.applyConstraints
+            Duration = ord.Duration |> Time.applyConstraints
+            Prescription = ord.Prescription |> Prescription.applyConstraints
+            Orderable = ord.Orderable |> Orderable.applyConstraints
+        }
 
 
-    let solveUnits log o =
-        // return eqs
-        let toEql prod sum =
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
+    let mapToEquations eqs (ord: Order)  =
+        let ovars = ord |> toOrdVars
 
-        let prod, sum = o |> toEqs
-        let eqs = toEql prod sum
-
-        eqs
-        |> Solver.solveUnits log
-        |> List.map (fun e ->
-            match e with
-            | OrderProductEquation (vru, vrus)
-            | OrderSumEquation     (vru, vrus) -> vru::vrus
-        )
-        |> fromEqs o
-
-
-    /// Solve an `Order` *ord* with
-    ///
-    /// * n: the name of the variable to be set
-    /// * m: the mapping for the field of the order
-    /// * p: the property of the variable to be set
-    /// * vs: the values to be set
-    let solve log n m p o =
-        let n =
-            mapName n m o
-
-        // return eqs
-        let toEql prod sum =
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
-
-        let prod, sum = o |> toEqs
-        let eqs = toEql prod sum
-
-        eqs
-        |> Solver.solve log n p
-        |> fromEqs o
-        |> fun o ->
-            o
-            |> Events.OrderSolveFinished
-            |> Logging.logInfo log
-
-            o
-
-
-    let applyConstraints log cs o =
-        // return eqs
-        let toEql prod sum =
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
-
-        let prod, sum = o |> toEqs
-        let eqs = toEql prod sum
-
-        eqs
-        |> Solver.applyConstraints log cs
-        |> fromEqs o
-
-
-    let solveConstraints log cs order =
-        let _log msg o =
-            (o, cs)
-            |> msg
-            |> Logging.logInfo log
-
-            o
-
-        // return eqs
-        let toEql prod sum =
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
-
-        let prod, sum = order |> toEqs
-        let eqs = toEql prod sum
-
-        order |> _log Events.OrderSolveConstraintsStarted |> ignore
-
-        try
+        let map repl eqs =
+            let eqs, c =
+                match eqs with
+                | SumMapping eqs -> eqs, OrderSumEquation
+                | ProductMapping eqs -> eqs, OrderProductEquation
             eqs
-            |> Solver.solveConstraints log cs
-            |> fromEqs order
-            |> _log Events.OrderSolveConstraintsFinished
-        with
-        | e ->
-            Exceptions.raiseExc (Some log) (e.ToString()) order
+            |> List.map (String.replace "=" repl)
+            |> List.map (String.split repl >> List.map String.trim)
+            |> List.map (fun xs ->
+                match xs with
+                | h::rest ->
+                    let h =
+                        try
+                            ovars |> List.find (fun v -> v.Variable.Name |> Name.toString = h)
+                        with
+                        | _ -> failwith $"cannot find {h} in {ovars}"
+                    let rest =
+                        rest
+                        |> List.map (fun s ->
+                            try
+                                ovars |> List.find (fun v -> v.Variable.Name |> Name.toString = s)
+                            with
+                            | _ -> failwith $"cannot find {s} in {ovars}"
+                        )
+                    (h, rest) |> c
+                | _ -> failwith $"cannot map {eqs}"
+            )
 
-    let solveAll log o =
-        // return eqs
-        let toEql prod sum =
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
+        let sumEqs, prodEqs = eqs
 
-        let prod, sum = o |> toEqs
-        let eqs = toEql prod sum
+        sumEqs |> map "+"
+        |> List.append (prodEqs |> map "*")
 
-        try
+
+    let mapFromEquations (ord: Order) eqs =
+        let ovars =
             eqs
-            |> Solver.solveAll log
-            |> fromEqs o
-        with
-        | e ->
-            Exceptions.raiseExc (Some log) (e.ToString()) o
+            |> List.collect (fun e ->
+                match e with
+                | OrderProductEquation (y, xs)
+                | OrderSumEquation (y, xs) -> y::xs
+            )
+            |> List.distinct
+
+        ord |> fromOrdVars ovars
 
 
-    let calcScenarios log (order : Order) =
+    let solveMinMax logger (ord: Order) =
+        let ord = ord |> applyConstraints
 
-        let solve n v o =
-            try
-                o
-                |> toEqs
-                |> function
-                | prod, sum ->
-                    prod
-                    |> List.map Solver.orderProdEq
-                    |> List.append (sum |> List.map Solver.orderSumEq)
+        let mapping =
+            match ord.Prescription with
+            | Continuous -> Mapping.continuous
+            | Discontinuous _ -> Mapping.discontinuous
+            | Timed _ -> Mapping.timed
+            |> Mapping.getEquations
+            |> Mapping.getEqsMapping ord
 
-                |> Solver.solve log n (v |> Set.singleton |> Property.createValsProp)
-                |> fromEqs o
-                |> Some
-            with
-            | e ->
-                (e.ToString(), o)
-                |> Exceptions.OrderCouldNotBeSolved
-                |> Logging.logError log
+        let oEqs =
+            ord
+            |> mapToEquations mapping
+            |> Solver.solveUnits logger
+            |> Solver.orderEqsToBase
 
-                None
+        oEqs
+        |> Solver.mapToSolverEqs
+        |> Solver.solveMinMax logger
+        |> Solver.mapToOrderEqs oEqs
+        |> Solver.orderEqsToUnit
+        |> mapFromEquations ord
 
-        let smallest o =
-            o
-            |> toEqs
-            |> function
-            | vrus1, vrus2 ->
-                vrus1
-                |> List.append vrus2
-                |> List.collect id
-                |> List.filter (fun vru ->
-                    vru
-                    |> VariableUnit.getBaseValues
-                    |> Seq.length > 1
+
+    module Print =
+
+        let printItemConcentration (c : Component) =
+            c.Items
+            |> Seq.collect (fun i ->
+                i.ComponentConcentration
+                |> Concentration.toValueUnitStringList (Some 1)
+                |> Seq.map (fun (_, s) ->
+                    $"{s} {i.Name |> Name.toString}"
                 )
-            |> List.map (fun vru ->
-                vru.Variable.Name, vru |> VariableUnit.getUnitValues
             )
-            |> function
-            | [] -> None
-            | xs ->
-                xs
-                |> List.sortBy (fun (_, vs) -> vs |> Seq.length)
-                |> List.tryHead
+            |> String.concat " + "
 
-        let rec calc os sc =
-            match sc with
-            | None         ->
-                os
-            | Some (n, vs) ->
-                (vs |> Seq.map BigRational.toString |> String.concat ",")
-                |> sprintf "scenario: %A, with %A" n
-                |> Events.OrderScenario
-                |> Logging.logInfo log
 
-                [
-                    for v in vs do
-                        for o in os do
-                            if o |> contains n v then
-                                (o, n, v)
-                                |> Events.OrderScenerioWithNameValue
-                                |> Logging.logInfo log
-
-                                let o =
-                                    o
-                                    |> solve n v
-
-                                if o |> Option.isSome then
-                                    o
-                                    |> Option.get
-
-                ]
-                |> List.map (fun o ->
-                    o
-                    |> smallest
-                    |> calc [o]
+        let printComponentQuantity o =
+            o.Orderable.Components
+            |> Seq.map (fun c ->
+                c.OrderableQuantity
+                |> Quantity.toValueUnitStringList (Some 1)
+                |> Seq.map (fun (_, q) ->
+                    let s =
+                        c
+                        |> printItemConcentration
+                        |> String.trim
+                        |> fun s ->
+                            if s |> String.isNullOrWhiteSpace then ""
+                            else
+                                $" ({s})"
+                    $"{q} {c.Name |> Name.toString}{s}"
                 )
-                |> List.collect id
-                |> List.distinct
-
-        let o = order |> solveAll log
-
-        o
-        |> smallest
-        |> calc [ o ]
+                |> String.concat ""
+            ) |> String.concat " + "
 
 
-    let printItemConcentration (c : Component) =
-        c.Items
-        |> Seq.collect (fun i ->
-            i.ComponentConcentration
-            |> Concentration.toValueUnitStringList (Some 1)
-            |> Seq.map (fun (_, s) ->
-                $"{s} {i.Name |> Name.toString}"
-            )
-        )
-        |> String.concat " + "
-
-
-    let printComponentQuantity o =
-        o.Orderable.Components
-        |> Seq.map (fun c ->
-            c.OrderableQuantity
-            |> Quantity.toValueUnitStringList (Some 1)
-            |> Seq.map (fun (_, q) ->
-                let s =
-                    c
-                    |> printItemConcentration
-                    |> String.trim
-                    |> fun s ->
-                        if s |> String.isNullOrWhiteSpace then ""
-                        else
-                            $" ({s})"
-                $"{q} {c.Name |> Name.toString}{s}"
-            )
-            |> String.concat ""
-        ) |> String.concat " + "
-
-
-    let printOrderableDoseQuantity o =
-        o.Orderable.Dose
-        |> Dose.get
-        |> fun (qt, _, _) ->
-            qt
+        let printOrderableDoseQuantity o =
+            o.Orderable.Dose.Quantity
             |> Quantity.toValueUnitStringList (Some 2)
             |> Seq.map snd
             |> String.concat ""
 
 
-    let printPrescription sn (o : Order) =
-        let on = o.Orderable.Name |> Name.toString
+        let printPrescription sn (o : Order) =
+            let on = o.Orderable.Name |> Name.toString
 
-        let printItem get unt o =
-            o.Orderable.Components
-            |> Seq.collect (fun c ->
-                c.Items
-                |> Seq.collect (fun i ->
-                    let n = i.Name |> Name.toString
-                    if sn |> Seq.exists ((=) n) then
-                        i
-                        |> get
-                        |> unt
-                        |> Seq.map snd
-                        |> fun xs ->
-                            if on |> String.startsWith n then
-                                xs
-                                |>Seq.map (sprintf "%s")
-                            else
-                                xs
-                                |> Seq.map (sprintf "%s %s" n)
+            let printItem get unt o =
+                o.Orderable.Components
+                |> Seq.collect (fun c ->
+                    c.Items
+                    |> Seq.collect (fun i ->
+                        let n = i.Name |> Name.toString
+                        if sn |> Seq.exists ((=) n) then
+                            i
+                            |> get
+                            |> unt
+                            |> Seq.map snd
+                            |> fun xs ->
+                                if on |> String.startsWith n then
+                                    xs
+                                    |>Seq.map (sprintf "%s")
+                                else
+                                    xs
+                                    |> Seq.map (sprintf "%s %s" n)
 
-                    else Seq.empty
+                        else Seq.empty
+                    )
                 )
-            )
-            |> String.concat " + "
+                |> String.concat " + "
 
-        match o.Prescription with
-        | Prescription.Discontinuous fr ->
-            // frequencies
-            let fr =
-                fr
-                |> Frequency.toValueUnitStringList None
-                |> Seq.map snd
-                |> String.concat ";"
+            match o.Prescription with
+            | Prescription.Discontinuous fr ->
+                // frequencies
+                let fr =
+                    fr
+                    |> Frequency.toValueUnitStringList None
+                    |> Seq.map snd
+                    |> String.concat ";"
 
-            let dq =
-                o
-                |> printItem
-                    (fun i -> i.Dose |> Dose.get |> (fun (dq, _, _) -> dq))
-                    (VariableUnit.Quantity.toValueUnitStringList (Some 3))
+                let dq =
+                    o
+                    |> printItem
+                        (fun i -> i.Dose.Quantity)
+                        (Quantity.toValueUnitStringList (Some 3))
 
-            let dt =
-                o
-                |> printItem
-                    (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
-                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 2))
+                let dt =
+                    o
+                    |> printItem
+                        (fun i -> i.Dose.PerTimeAdjust)
+                        (PerTimeAdjust.toValueUnitStringList (Some 2))
 
-            let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
-            let prep = $"{o |> printComponentQuantity}"
-            let adm = $"{fr} {o |> printOrderableDoseQuantity}"
+                let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
+                let prep = $"{o |> printComponentQuantity}"
+                let adm = $"{fr} {o |> printOrderableDoseQuantity}"
 
-            pres, prep, adm
+                pres, prep, adm
 
-        | Prescription.Continuous ->
-            // infusion rate
-            let rt =
-                o.Orderable.Dose
-                |> Dose.get
-                |> fun (_, _, dr) ->
-                    dr
+            | Prescription.Continuous ->
+                // infusion rate
+                let rt =
+                    o.Orderable.Dose.Rate
                     |> Rate.toValueUnitStringList (Some 1)
                     |> Seq.map snd
                     |> String.concat ""
 
-            let oq =
-                o.Orderable.OrderableQuantity
-                |> Quantity.toValueUnitStringList (Some 2)
-                |> Seq.map snd
-                |> String.concat ""
+                let oq =
+                    o.Orderable.OrderableQuantity
+                    |> Quantity.toValueUnitStringList (Some 2)
+                    |> Seq.map snd
+                    |> String.concat ""
 
-            let it =
-                o
-                |> printItem
-                    (fun i -> i.OrderableQuantity)
-                    (Quantity.toValueUnitStringList (Some 2))
+                let it =
+                    o
+                    |> printItem
+                        (fun i -> i.OrderableQuantity)
+                        (Quantity.toValueUnitStringList (Some 2))
 
-            let dr =
-                o
-                |> printItem
-                    (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, _, dr) -> dr))
-                    (VariableUnit.RateAdjust.toValueUnitStringList (Some 2))
+                let dr =
+                    o
+                    |> printItem
+                        (fun i -> i.Dose.RateAdjust)
+                        (RateAdjust.toValueUnitStringList (Some 2))
 
-            let pres = $"""{sn |> String.concat " + "} {dr}"""
-            let prep = o |> printComponentQuantity
-            let adm = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
+                let pres = $"""{sn |> String.concat " + "} {dr}"""
+                let prep = o |> printComponentQuantity
+                let adm = $"""{sn |> String.concat " + "} {it} in {oq}, {rt}"""
 
-            pres, prep, adm
+                pres, prep, adm
 
-        | Prescription.Timed (fr, tme) ->
+            | Prescription.Timed (fr, tme) ->
 
-            // frequencies
-            let fr =
-                fr
-                |> Frequency.toValueUnitStringList None
-                |> Seq.map snd
-                |> String.concat ";"
+                // frequencies
+                let fr =
+                    fr
+                    |> Frequency.toValueUnitStringList None
+                    |> Seq.map snd
+                    |> String.concat ";"
 
-            let tme =
-                tme
-                |> Time.toValueUnitStringList (Some 2)
-                |> Seq.map snd
-                |> String.concat ""
-            // infusion rate
-            let rt =
-                o.Orderable.Dose
-                |> Dose.get
-                |> fun (_, _, dr) ->
-                    dr
+                let tme =
+                    tme
+                    |> Time.toValueUnitStringList (Some 2)
+                    |> Seq.map snd
+                    |> String.concat ""
+                // infusion rate
+                let rt =
+                    o.Orderable.Dose.Rate
                     |> Rate.toValueUnitStringList (Some 1)
                     |> Seq.map snd
                     |> String.concat ""
 
-            let dq =
-                o
-                |> printItem
-                    (fun i -> i.Dose |> Dose.get |> (fun (dq, _, _) -> dq))
-                    (VariableUnit.Quantity.toValueUnitStringList (Some 3))
+                let dq =
+                    o
+                    |> printItem
+                        (fun i -> i.Dose.Quantity)
+                        (Quantity.toValueUnitStringList (Some 3))
 
-            let dt =
-                o
-                |> printItem
-                    (fun i -> i.DoseAdjust |> DoseAdjust.get |> (fun (_, dt, _) -> dt))
-                    (VariableUnit.TotalAdjust.toValueUnitStringList (Some 1))
+                let dt =
+                    o
+                    |> printItem
+                        (fun i -> i.Dose.PerTimeAdjust)
+                        (PerTimeAdjust.toValueUnitStringList (Some 1))
 
-            let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"
-            let prep = o |> printComponentQuantity
-            let adm = $"{fr} {o |> printOrderableDoseQuantity} in {tme}, {rt}"
+                let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"
+                let prep = o |> printComponentQuantity
+                let adm = $"{fr} {o |> printOrderableDoseQuantity} in {tme}, {rt}"
 
-            pres, prep, adm
+                pres, prep, adm
 
-
-        | Prescription.Process ->
-            let p =
-                o.Orderable.Name
-                |> Name.toString
-                |> sprintf "%s"
-            p, "", ""
 
 
     module Dto =
 
-        type Dto (id , n, shape) =
+        type Dto (id , n) =
             member val Id = id with get, set
-            member val Adjust = VariableUnit.Dto.dto () with get, set
-            member val Orderable = Orderable.Dto.dto id n shape with get, set
+            member val Adjust = OrderVariable.Dto.dto () with get, set
+            member val Orderable = Orderable.Dto.dto id n with get, set
             member val Prescription = Prescription.Dto.dto n with get, set
             member val Route = "" with get, set
+            member val Duration = OrderVariable.Dto.dto () with get, set
             member val Start = DateTime.now () with get, set
             member val Stop : DateTime option = None with get, set
+
 
         let fromDto (dto : Dto) =
             let id = dto.Id |> Id.create
             let adj_qty = dto.Adjust |> Quantity.fromDto
+            let ord_tme = dto.Duration |> Time.fromDto
             let orb = dto.Orderable |> Orderable.Dto.fromDto
             let prs = dto.Prescription |> Prescription.Dto.fromDto
             let sts =
@@ -720,15 +1511,16 @@ module Order =
                 | Some dt -> (dto.Start, dt) |> StartStop.StartStop
                 | None -> dto.Start |> StartStop.Start
 
-            create id adj_qty orb prs dto.Route sts
+            create id adj_qty orb prs dto.Route ord_tme sts
 
 
         let toDto (ord : Order) =
             let id = ord.Id |> Id.toString
             let n = ord.Orderable.Name |> Name.toString
-            let dto = Dto (id, n, ord.Orderable.Shape)
+            let dto = Dto (id, n)
 
             dto.Adjust <- ord.Adjust |> Quantity.toDto
+            dto.Duration <- ord.Duration |> Time.toDto
             dto.Orderable <- ord.Orderable |> Orderable.Dto.toDto
             dto.Prescription <- ord.Prescription |> Prescription.Dto.toDto
             dto.Route <- ord.Route
@@ -741,47 +1533,39 @@ module Order =
 
             dto
 
-        let ``process`` id n shape rte =
-            let id = id |> Id.create
-            let n = [ n ] |> Name.create
-            let str_prs =
-                fun _ -> Prescription.``process``
 
-            createNew id n shape str_prs rte
-            |> toDto
+        let dto id orbN rte cmps str_prs =
+            let dto =
+                createNew id orbN str_prs rte
+                |> toDto
 
-        let continuous id n shape rte =
-            let id = id |> Id.create
-            let n = [ n ] |> Name.create
-            let str_prs =
-                Prescription.continuous ValueUnit.NoUnit ValueUnit.NoUnit
+            dto.Orderable.Components <-
+                [
+                    for cmpN, shape, itms in cmps do
+                        let c = Orderable.Component.Dto.dto id orbN cmpN shape
+                        c.Items <-
+                            itms
+                            |> List.map (Orderable.Item.Dto.dto id orbN cmpN)
+                        c
+                ]
 
-            createNew id n shape str_prs rte
-            |> toDto
-
-        let discontinuous id n shape rte =
-            let id = id |> Id.create
-            let n = [ n ] |> Name.create
-            let str_prs =
-                Prescription.discontinuous ValueUnit.NoUnit ValueUnit.NoUnit
-
-            createNew id n shape str_prs rte
-            |> toDto
-
-        let timed id n shape rte =
-            let id = id |> Id.create
-            let n = [ n ] |> Name.create
-            let str_prs =
-                Prescription.timed ValueUnit.NoUnit ValueUnit.NoUnit
-
-            createNew id n shape str_prs rte
-            |> toDto
-
-        let setToProcess (dto : Dto) =
-            dto.Prescription <-
-                dto.Prescription
-                |> Prescription.Dto.setToProcess
             dto
+
+
+        let continuous id orbN rte cmps  =
+            Prescription.continuous ValueUnit.NoUnit ValueUnit.NoUnit
+            |> dto id orbN rte cmps
+
+
+        let discontinuous id orbN rte cmps =
+            Prescription.discontinuous ValueUnit.NoUnit ValueUnit.NoUnit
+            |> dto  id orbN rte cmps
+
+
+        let timed  id orbN rte cmps=
+            Prescription.timed ValueUnit.NoUnit ValueUnit.NoUnit
+            |> dto id orbN rte cmps
+
 
         let setToContinuous (dto : Dto) =
             dto.Prescription <-
@@ -800,3 +1584,4 @@ module Order =
                 dto.Prescription
                 |> Prescription.Dto.setToTimed
             dto
+

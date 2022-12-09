@@ -15,8 +15,7 @@ module OrderLogger =
 
 
     module Units = ValueUnit.Units
-    module DrugConstraint = DrugOrder.DrugConstraint
-    module Quantity = VariableUnit.Quantity
+    module Quantity = OrderVariable.Quantity
 
     module SolverLogging = SolverLogging
 
@@ -41,9 +40,9 @@ module OrderLogger =
                 | h::tail ->
                     let s =
                         tail
-                        |> List.map (VariableUnit.toString false)
+                        |> List.map (OrderVariable.toString false)
                         |> String.concat op
-                    $"{h |> VariableUnit.toString false} = {s}"
+                    $"{h |> OrderVariable.toString false} = {s}"
                 | _ -> ""
             )
             |> String.concat "\n"
@@ -51,25 +50,26 @@ module OrderLogger =
         let (Id s) = o.Id
         let s = s + "."
 
-                // return eqs
-        let toEql prod sum =
+        let mapping =
+            match o.Prescription with
+            | Continuous -> Order.Mapping.continuous
+            | Discontinuous _ -> Order.Mapping.discontinuous
+            | Timed _ -> Order.Mapping.timed
+            |> Order.Mapping.getEquations
+            |> Order.Mapping.getEqsMapping o
 
-            prod
-            |> List.map Solver.orderProdEq
-            |> List.append (sum |> List.map Solver.orderSumEq)
-
-        let prod, sum = o |> Order.toEqs
-
-        let oEqs = toEql prod sum
         try
             eqs
-            |> Solver.mapFromSolverEqs oEqs
-            |> Order.fromEqs o
-            |> Order.toEqs
-            |> fun (vs1, vs2) -> $"""
-        {(vs1 |> toEqString " * ").Replace(s, "")}
-        {(vs2 |> toEqString " + ").Replace(s, "")}
-        """
+            |> Solver.mapToOrderEqs (o |> Order.mapToEquations mapping)
+            |> List.map (fun e ->
+                match e with
+                | OrderProductEquation (ovar, ovars)
+                | OrderSumEquation (ovar, ovars) -> ovar::ovars
+            )
+            |> fun xs -> $"""
+{(xs |> toEqString " * ").Replace(s, "")}
+{(xs |> toEqString " + ").Replace(s, "")}
+"""
         with
         | e ->
             printfn $"error printing: {e.ToString()}"
@@ -92,21 +92,7 @@ module OrderLogger =
 
             | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name |> Name.toString}) Solver Finished ==="
 
-            | Events.OrderSolveConstraintsStarted (o, cs) ->
-                o
-                |> Order.applyConstraints { Log = ignore } cs
-                |> print
-                |> String.concat "\n"
-                |> sprintf "=== Order Constraints Solving Started ===\n%s"
-
-            | Events.OrderSolveConstraintsFinished (o, _) ->
-                o
-                |> print
-                |> String.concat "\n"
-                |> sprintf "=== Order Constraints Solving Finished ===\n%s"
-
             | Events.OrderScenario _ -> ""
-            | Events.OrderScenerioWithNameValue _ -> ""
 
         | Logging.OrderException (Exceptions.OrderCouldNotBeSolved(s, o)) ->
             printfn $"printing error for order {o.Orderable.Name}"
@@ -297,7 +283,7 @@ module OrderLogger =
         sc
         |> List.iteri (fun i o ->
             o
-            |> Order.printPrescription n
+            |> Order.Print.printPrescription n
             |> fun (p, a, d) ->
                 printfn $"%i{i + 1}\tprescription:\t%s{p}"
                 printfn $"  \tdispensing:\t%s{a}"

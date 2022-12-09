@@ -1,11 +1,9 @@
 ﻿namespace Informedica.GenOrder.Lib
 
-open System
 
 module Logging =
 
-    open Types
-//    open Informedica.GenSolver.Lib.Types.Logging
+    open System
 
     module SolverLogging = Informedica.GenSolver.Lib.Logging
     module LoggingType = Informedica.GenSolver.Lib.Types.Logging
@@ -36,4 +34,5 @@ module Logging =
         msg
         |> Logging.OrderException
         |> log LoggingType.Error logger
+
 
