@@ -313,7 +313,7 @@ module Variable =
                     if exact then BigRational.toString
                     else
                         (BigRational.fixPrecision 3) >> string
-                $"""{incr |> Set.map toStr |> String.concat ", "}"""
+                $"""{incr |> Set.toList |> List.sort |> List.map toStr |> String.concat ", "}"""
 
 
         module ValueSet =

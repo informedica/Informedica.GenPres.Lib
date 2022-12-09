@@ -8,6 +8,8 @@
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 #r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"
 
+#time
+
 
 fsi.AddPrinter<System.DateTime> (fun dt -> dt.ToShortDateString())
 
@@ -30,13 +32,18 @@ module Types =
     /// to the `Unit`
     type OrderVariable =
         {
-            Min : Minimum option
-            Max : Maximum option
-            Incr : Increment option
+            Constraints : Constraints
             /// Stores the values/range
             Variable:  Variable
             /// Stores the unit
             Unit: Unit
+        }
+    and Constraints =
+        {
+                Min : Minimum option
+                Max : Maximum option
+                Incr : Increment option
+                Values : ValueSet option
         }
 
 
@@ -69,7 +76,7 @@ module Types =
 
     //// Quantity / Time "ptm"
     /// Type that represents a quantity per time
-    type QuantityPerTime = QuantityPerTime of OrderVariable
+    type PerTime = PerTime of OrderVariable
 
     /// Quantity / Time "rte"
     /// Type that represents a rate
@@ -93,7 +100,7 @@ module Types =
 
     /// Quantity / Adjust / Time "ptm_adj"
     /// Type that represents a adjusted quantity per time
-    type QuantityPerTimeAdjust = QuantityPerTimeAdjust of OrderVariable
+    type PerTimeAdjust = PerTimeAdjust of OrderVariable
 
 
     /// Quantity / Adjust / Time "rte_adj"
@@ -114,11 +121,11 @@ module Types =
     type Dose =
         {
             Quantity : Quantity
-            PerTime : QuantityPerTime
+            PerTime : PerTime
             Rate : Rate
             Total : Total
             QuantityAdjust : QuantityAdjust
-            PerTimeAdjust : QuantityPerTimeAdjust
+            PerTimeAdjust : PerTimeAdjust
             RateAdjust : RateAdjust
             TotalAdjust : TotalAdjust
         }
@@ -231,96 +238,6 @@ module Types =
         | SumMapping of string list
 
 
-    /// Mapping of an order to variables
-    type OrderMapping =
-        // Quantity of an Item in a Component
-        | ItemComponentQuantity
-        // Concentration of an Item in a Component
-        | ItemComponentConcentration
-        // Quantity of an Item in an Orderable
-        | ItemOrderableQuantity
-        // Concentration of an Item in an Orderable
-        | ItemOrderableConcentration
-        // Quantity of an Item in an Order
-        | ItemOrderQuantity
-        // Dose Quantity of an Item
-        | ItemDoseQuantity
-        // Dose Quantity of an Item per time
-        | ItemDosePerTime
-        // Dose Rate of an Item
-        | ItemDoseRate
-        // Dose Total of an Item in an Order
-        | ItemDoseTotal
-        // Adjusted Dose Quantity of an Item
-        | ItemDoseQuantityAdjust
-        // Adjusted Dose Total of an Item
-        | ItemDosePerTimeAdjust
-        // Adjusted Dose Rate of an Item
-        | ItemDoseRateAdjust
-        // Adjusted Total Dose of an Item in an Order
-        | ItemDoseTotalAdjust
-        // Quantity of a Component
-        | ComponentComponentQuantity
-        // Quantity of a Component in an Orderable
-        | ComponentOrderableQuantity
-        // Concentration of a Component in an Orderable
-        | ComponentOrderableConcentration
-        // Amount of Components in an Orderable
-        | ComponentOrderableCount
-        // Quantity of Component in an Order
-        | ComponentOrderQuantity
-        // Amount of Components in an Order
-        | ComponentOrderCount
-        // Dose Quantity of a Component
-        | ComponentDoseQuantity
-        // Dose Total of a Component
-        | ComponentDosePerTime
-        // Dose Rate of a Component
-        | ComponentDoseRate
-        // Dose Total of a Component in Order
-        | ComponentDoseTotal
-        // Adjusted Dose Quantity of a Component
-        | ComponentDoseQuantityAdjust
-        // Adjusted Dose Total of a Component
-        | ComponentDosePerTimeAdjust
-        // Adjusted Dose Rate of a Component
-        | ComponentDoseRateAdjust
-        // Adjusted Dose Total of a Component in an Order
-        | ComponentDoseTotalAdjust
-        // Quantity of an Orderable
-        | OrderableOrderableQuantity
-        // Amount of Dose Quantity in an Orderable Quantity
-        | OrderableDoseCount
-        // Dose Quantity of an Orderable
-        | OrderableDoseQuantity
-        // Dose Total of an Orderable
-        | OrderableDosePerTime
-        // Dose Rate of an Orderable
-        | OrderableDoseRate
-        // Dose Total of an Orderable in an Order
-        | OrderableDoseTotal
-        // Adjusted Dose Quantity of an Orderable
-        | OrderableDoseQuantityAdjust
-        // Adjusted Dose Total of an Orderable
-        | OrderableDosePerTimeAdjust
-        // Adjusted Dose Rate of an Orderable
-        | OrderableDoseRateAdjust
-        // Adjusted Dose Total of an Orderable in an Order
-        | OrderableDoseTotalAdjust
-        // Prescription Frequency
-        | OrderPrescriptionFrequency
-        // Prescription Time
-        | OrderPrescriptionTime
-        // Quantity of an Orderable in an Order
-        | OrderableOrderQuantity
-        // Amount of Orderables in an Order
-        | OrderableOrderCount
-        // Order Adjust Quantity
-        | OrderAdjustQuantity
-        // The duration of the order
-        | OrderOrderTime
-
-
     /// The different possible order types
     type OrderType =
         | AnyOrder
@@ -338,86 +255,6 @@ module Types =
         | OralSolid
         | RectalSolid
 
-    /// Constrained that can be applied to a
-    /// variable in an equation.
-    type DrugConstraint =
-       {
-            Name : string
-            Mapping : OrderMapping
-            Property : Property
-            RouteShape : RouteShape
-            OrderType : OrderType
-        }
-
-    /// The representation of a drug order that
-    /// can be derived by a drug product inventory
-    /// and the related dose rule
-    type DrugOrder =
-        {
-            /// Identifies the specific drug order
-            Id:  string
-            /// The name of the order
-            Name : string
-            /// The list of drug products that can be used for the order
-            Products : ProductComponent list
-            /// The quantities of the drug order
-            Quantities :  BigRational list
-            /// The unit the `DrugOrder` is measured in,
-            /// i.e. of the `Quantities`
-            Unit : string
-            /// The time unit to be used when using a frequency
-            TimeUnit : string
-            /// The time unit to be used when using a rate
-            RateUnit : string
-            /// The shape of the products
-            Shape : string
-            /// The route by which the order is applied
-            Route : string
-            // The type of order
-            OrderType : OrderType
-        }
-    /// The product components that are used by the drug order
-    and ProductComponent =
-        {
-            /// The name of the product
-            Name : string
-            /// The quantities of the product
-            /// Note: measured in the same unit as
-            /// the `DrugOrder` unit
-            Quantities : BigRational list
-            /// The "divisibility" of the products
-            Divisible : BigRational
-            /// The time unit used for frequency
-            TimeUnit : string
-            /// The time unit used for rate
-            RateUnit : string
-            /// The list of substances contained in the product
-            Substances: SubstanceItem list
-        }
-    and SubstanceItem =
-        {
-            /// The name of the substance
-            Name : string
-            /// The possible concentrations of the substance
-            /// in the products
-            Concentrations : BigRational list
-            /// The possible quantities of the substance in the orderable
-            OrderableQuantities : BigRational list
-            /// The unit by which the substance is
-            /// measured.
-            Unit : string
-            /// The unit used for the dose
-            DoseUnit : string
-            /// The time unit used for the frequency
-            TimeUnit : string
-            /// The time unit used for the rate
-            RateUnit : string
-        }
-
-
-    /// The constraints that can be applied
-    /// and the order
-    type ConstrainedOrder = DrugConstraint list * Order
 
 
     /// The dose limits that can be applied
@@ -509,24 +346,75 @@ module Types =
         }
 
 
-    type Substance =
+    /// The representation of a drug order that
+    /// can be derived by a drug product inventory
+    /// and the related dose rule
+    type DrugOrder =
         {
+            /// Identifies the specific drug order
+            Id:  string
+            /// The name of the order
             Name : string
+            /// The list of drug products that can be used for the order
+            Products : ProductComponent list
+            /// The quantities of the drug order
+            Quantities :  BigRational list
+            /// The unit the `DrugOrder` is measured in,
+            /// i.e. of the `Quantities`
             Unit : string
-            Quantities : BigRational list
-            Concentrations : BigRational list
+            /// The time unit to be used when using a frequency
+            TimeUnit : string
+            /// The time unit to be used when using a rate
+            RateUnit : string
+            /// The route by which the order is applied
+            Route : string
+            // The type of order
+            OrderType : OrderType
+            Frequencies : BigRational list
+            Rates : BigRational list
         }
-
-
-    type Product =
+    /// The product components that are used by the drug order
+    and ProductComponent =
         {
+            /// The name of the product
             Name : string
+            /// The shape of the product
             Shape : string
-            Unit : string
-            Divisible : BigRational option
+            /// The quantities of the product
+            /// Note: measured in the same unit as
+            /// the `DrugOrder` unit
             Quantities : BigRational list
-            Substances : Substance list
+            /// The "divisibility" of the products
+            Divisible : BigRational
+            /// The time unit used for frequency
+            TimeUnit : string
+            /// The time unit used for rate
+            RateUnit : string
+            /// The list of substances contained in the product
+            Substances: SubstanceItem list
         }
+    and SubstanceItem =
+        {
+            /// The name of the substance
+            Name : string
+            /// The possible concentrations of the substance
+            /// in the products
+            Concentrations : BigRational list
+            /// The possible quantities of the substance in the orderable
+            OrderableQuantities : BigRational list
+            /// The unit by which the substance is
+            /// measured.
+            Unit : string
+            /// The unit used for the dose
+            DoseUnit : string
+            /// The time unit used for the frequency
+            TimeUnit : string
+            /// The time unit used for the rate
+            RateUnit : string
+            Dose : DoseLimit
+            Solution : SolutionLimit option
+        }
+
 
 
     type Scenario =
@@ -908,8 +796,30 @@ module Variable =
             vr |> map mapMin mapMax fMinMax fIncr fMinIncr fIncrMax fMinIncrMax fVs
 
 
+        let inline setOpt m set vr =
+            match m with
+            | Some m -> vr |> set true m
+            | None   -> vr
+
+
+        let setOptMin min vr = vr |> setOpt min setMin
+
+
+        let setOptMax max vr = vr |> setOpt max setMax
+
+
+        let setOptIncr incr vr = vr |> setOpt incr setIncr
+
+
+        let setOptVs vs vr =
+            match vs with
+            | Some vs -> vr |> setValueSet vs
+            | None    -> vr
+
+
     let scale n (var : Variable) =
         { var with Values = var.Values |> ValueRange.scale n }
+
 
 
 /// Functions that deal with the `VariableUnit` type
@@ -919,7 +829,6 @@ module OrderVariable =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-
     open Informedica.GenSolver.Lib.Types
 
     module Variable   = Informedica.GenSolver.Lib.Variable
@@ -938,15 +847,22 @@ module OrderVariable =
     type Unit = ValueUnit.Unit
 
 
-    /// Create a `VariableUnit` with preset values
-    let create n min incr max vs un =
+    let createConstraints min incr max vs =
+        {
+            Min = min
+            Max = max
+            Incr = incr
+            Values = vs
+        }
+
+
+    /// Create a `OrderVariable` with preset values
+    let create n min incr max vs un cs =
         ValueRange.create true min incr max vs
         |> fun vlr ->
             let var = Variable.create id n vlr
             {
-                Min = min
-                Max = max
-                Incr = incr
+                Constraints = cs
                 Variable = var
                 Unit = un
             }
@@ -954,7 +870,10 @@ module OrderVariable =
 
     /// Create a new `VariableUnit` with
     /// `Name` **nm** and `Unit` **un**
-    let createNew n un = create n None None None None un
+    let createNew n un =
+        let min = Minimum.create false 0N |> Some
+        createConstraints min None None None
+        |> create n min None None None un
 
 
     /// Apply **f** to `VariableUnit` **vru**
@@ -966,12 +885,12 @@ module OrderVariable =
 
 
     /// Get all record fields from a `VariableUnit`
-    let getMembers { Variable = var; Unit = un } =
+    let getVariableUnit { Variable = var; Unit = un } =
         var, un
 
 
     /// Get the `Variable` from a `VariableUnit`
-    let getVar = getMembers >> fst
+    let getVar = getVariableUnit >> fst
 
 
     /// Get the `Variable.Name` from a `VariableUnit` **vru**
@@ -983,7 +902,7 @@ module OrderVariable =
 
 
     /// Get the `Unit` from a `VariableUnit`
-    let getUnit = getMembers >> snd
+    let getUnit = getVariableUnit >> snd
 
 
     let hasUnit = getUnit >> ((<>) ValueUnit.NoUnit)
@@ -992,9 +911,13 @@ module OrderVariable =
     let scale n ovar =
         let calc = (*) n
         { ovar with
-            Min = ovar.Min |> Option.map (Minimum.map calc calc)
-            Max = ovar.Max |> Option.map (Maximum.map calc calc)
-            Incr = ovar.Incr |> Option.map (Increment.map calc)
+            Constraints =
+                { ovar.Constraints with
+                    Min = ovar.Constraints.Min |> Option.map (Minimum.map calc calc)
+                    Max = ovar.Constraints.Max |> Option.map (Maximum.map calc calc)
+                    Incr = ovar.Constraints.Incr |> Option.map (Increment.map calc)
+                    Values = ovar.Constraints.Values |> Option.map (ValueSet.map calc)
+                }
             Variable =
                 ovar.Variable |> Variable.scale n
         }
@@ -1012,6 +935,17 @@ module OrderVariable =
         ovar |> scale n
 
 
+    let applyConstraints (ovar : OrderVariable) =
+        { ovar with
+            Variable =
+                ovar.Variable.Values
+                |> ValueRange.setOptMin ovar.Constraints.Min
+                |> ValueRange.setOptMax ovar.Constraints.Max
+                |> ValueRange.setOptIncr ovar.Constraints.Incr
+                |> ValueRange.setOptVs ovar.Constraints.Values
+                |> Variable.setValueRange true ovar.Variable
+        }
+
 
     let fromOrdVar toOvar c ovars a =
         ovars
@@ -1025,6 +959,7 @@ module OrderVariable =
         { ovar with
             Variable = ovar.Variable |> Variable.setName nm
         }
+
 
     let setUnit u ovar : OrderVariable =
         { ovar with Unit = u }
@@ -1043,51 +978,6 @@ module OrderVariable =
             |> ValueRange.toString exact) + " " + us
 
 
-    (*
-    let valueToBase v ovar =
-        v |> ValueUnit.valueToBase (ovar |> getUnit)
-
-
-    let valueToUnit v ovar =
-        v |> ValueUnit.valueToUnit (ovar |> getUnit)
-
-
-    let getBaseValues =
-        getVar
-        >> Variable.getValueRange
-        >> Variable.ValueRange.getValSet
-        >> Option.map Variable.ValueRange.ValueSet.toSet
-        >> Option.defaultValue Set.empty
-
-
-    let getUnitValues ovar =
-        ovar
-        |> getBaseValues
-        |> Seq.map (fun vs ->
-            vs, ovar |> getUnit
-        )
-        |> Seq.map (fun (v, u) ->
-            v
-            |> ValueUnit.valueToUnit u
-        )
-
-
-    let containsBaseValue ovar =
-        getVar
-        >> Variable.getValueRange
-        >> ValueRange.contains ovar
-
-
-    let containsUnitValue v ovar =
-        let u = ovar |> getUnit
-
-        ovar
-        |> getVar
-        |> Variable.getValueRange
-        |> ValueRange.contains (v |> ValueUnit.valueToBase u)
-        *)
-
-
     let toValueUnitStringList get n x =
         x
         |> get
@@ -1095,7 +985,7 @@ module OrderVariable =
         |> Variable.getValueRange
         |> Variable.ValueRange.getValSet
         |> function
-        | Some (ValueSet vs) ->
+        | Some (ValueSet.ValueSet vs) ->
             vs
             |> Seq.map (fun vs ->
                 vs, x |> get |> getUnit
@@ -1167,9 +1057,7 @@ module OrderVariable =
 
         module ValueRange = Variable.ValueRange
 
-        type Dto () =
-            member val Name = "" with get, set
-            member val Unit = "" with get, set
+        type VarDto () =
             member val Min : BigRational option = None with get, set
             member val MinIncl = false with get, set
             member val Incr : BigRational list = [] with get, set
@@ -1177,7 +1065,16 @@ module OrderVariable =
             member val MaxIncl = false with get, set
             member val Vals : BigRational list = [] with get, set
 
+
+        type Dto () =
+            member val Name = "" with get, set
+            member val Unit = "" with get, set
+            member val Constraints = VarDto ()
+            member val Variable = VarDto ()
+
+
         let dto () = Dto ()
+
 
         let fromDto (dto: Dto) =
             let un =
@@ -1187,80 +1084,106 @@ module OrderVariable =
                     |> ValueUnit.unitFromString
                     |> Option.defaultValue ValueUnit.NoUnit
 
-            let toBase =
-                ValueUnit.create un
-                >> ValueUnit.toBase
+            let cs =
+                let vs =
+                    dto.Constraints.Vals
+                    |> function
+                    | [] -> None
+                    | xs -> xs |> Set.ofList |> ValueSet.create |> Some
 
-            let n    = dto.Name |> Name.fromString
+                let incr =
+                    dto.Constraints.Incr
+                    |> function
+                    | [] -> None
+                    | xs -> xs |> Set.ofList |> Increment.create |> Some
+
+                let min  = dto.Constraints.Min  |> Option.map  (Minimum.create  dto.Constraints.MinIncl)
+                let max  = dto.Constraints.Max  |> Option.map  (Maximum.create  dto.Constraints.MaxIncl)
+                createConstraints min incr max vs
+
+            let n = dto.Name |> Name.fromString
             let vals =
-                dto.Vals
-                |> List.map toBase
+                dto.Variable.Vals
                 |> function
                 | [] -> None
                 | xs -> xs |> Set.ofList |> ValueSet.create |> Some
 
             let incr =
-                dto.Incr
-                |> List.map toBase
+                dto.Variable.Incr
                 |> function
                 | [] -> None
                 | xs -> xs |> Set.ofList |> Increment.create |> Some
 
+            let min  = dto.Variable.Min  |> Option.map  (Minimum.create  dto.Variable.MinIncl)
+            let max  = dto.Variable.Max  |> Option.map  (Maximum.create  dto.Variable.MaxIncl)
 
-            let min  = dto.Min  |> Option.map  (toBase >> Minimum.create  dto.MinIncl)
-            let max  = dto.Max  |> Option.map  (toBase >> Maximum.create  dto.MaxIncl)
+            create n min incr max vals un cs
 
-            create n min incr max vals un
 
-        let toDto (vu : OrderVariable) =
+        let toDto (ovar : OrderVariable) =
             let dto = dto ()
             let vr =
-                vu
+                ovar
                 |> getVar
                 |> Variable.getValueRange
-            let min, inclMin =
-                vr
-                |> ValueRange.getMin
-                |> function
-                | Some m ->
-                    m
-                    |> Minimum.toBigRational
-                    |> ValueUnit.valueToUnit vu.Unit
-                    |> Some, m |> Minimum.isIncl
-                | None -> None, false
-            let max, inclMax =
-                vr
-                |> ValueRange.getMax
-                |> function
-                | Some m ->
-                    m
-                    |> Maximum.toBigRational
-                    |> ValueUnit.valueToUnit vu.Unit
-                    |> Some,
-                    m |> Maximum.isIncl
-                | None -> None, false
 
             dto.Name <-
-                vu |> getName |> Name.toString
+                ovar |> getName |> Name.toString
             dto.Unit <-
-                vu |> getUnit |> ValueUnit.unitToString
-            dto.Vals <-
+                ovar |> getUnit |> ValueUnit.unitToString
+
+            dto.Variable.Vals <-
                 vr
                 |> ValueRange.getValSet
                 |> Option.map (ValueSet.toSet >> Set.toList)
-                |> Option.map (List.map (ValueUnit.valueToUnit vu.Unit))
                 |> Option.defaultValue []
-            dto.Incr <-
+            dto.Variable.Incr <-
                 vr
                 |> ValueRange.getIncr
                 |> Option.map Increment.toList
-                |> Option.map (List.map (ValueUnit.valueToUnit vu.Unit))
+                |> Option.defaultValue []
+            dto.Variable.Min <-
+                vr
+                |> ValueRange.getMin
+                |> Option.map Minimum.toBigRational
+            dto.Variable.MinIncl <-
+                vr
+                |> ValueRange.getMin
+                |> Option.map Minimum.isIncl
+                |> Option.defaultValue false
+            dto.Variable.Max <-
+                vr
+                |> ValueRange.getMax
+                |> Option.map Maximum.toBigRational
+            dto.Variable.MaxIncl <-
+                vr
+                |> ValueRange.getMax
+                |> Option.map Maximum.isIncl
+                |> Option.defaultValue false
+
+            dto.Constraints.Vals <-
+                ovar.Constraints.Values
+                |> Option.map (ValueSet.toSet >> Set.toList)
+                |> Option.defaultValue []
+            dto.Constraints.Incr <-
+                ovar.Constraints.Incr
+                |> Option.map Increment.toList
                 |> Option.defaultValue []
 
-            dto.Min <- min
-            dto.MinIncl <- inclMin
-            dto.Max <- max
-            dto.MaxIncl <- inclMax
+            dto.Constraints.Min <-
+                ovar.Constraints.Min
+                |> Option.map Minimum.toBigRational
+            dto.Constraints.MinIncl <-
+                ovar.Constraints.Min
+                |> Option.map Minimum.isIncl
+                |> Option.defaultValue false
+            dto.Constraints.Max <-
+                ovar.Constraints.Max
+                |> Option.map Maximum.toBigRational
+            dto.Constraints.MaxIncl <-
+                ovar.Constraints.Max
+                |> Option.map Maximum.isIncl
+                |> Option.defaultValue false
 
             dto
 
@@ -1318,6 +1241,10 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> Count
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> Count
+
+
+
 
     /// Type and functions that represent a time
     module Time =
@@ -1370,6 +1297,9 @@ module OrderVariable =
 
 
         let toUnit = toOrdVar >> toUnit >> Time
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> Time
 
 
 
@@ -1428,6 +1358,9 @@ module OrderVariable =
 
 
         let toUnit = toOrdVar >> toUnit >> Frequency
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> Frequency
 
 
 
@@ -1492,6 +1425,9 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> Concentration
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> Concentration
+
+
 
     /// Type and functions that represent a quantity
     module Quantity =
@@ -1548,16 +1484,19 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> Quantity
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> Quantity
+
+
 
     /// Type and functions that represent a quantity per time
-    module QuantityPerTime =
+    module PerTime =
 
 
         let [<Literal>] name = "ptm"
 
 
         /// Turn `PerTime` in a `VariableUnit`
-        let toOrdVar (QuantityPerTime ptm) = ptm
+        let toOrdVar (PerTime ptm) = ptm
 
 
         let unitToString =
@@ -1573,12 +1512,12 @@ module OrderVariable =
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> QuantityPerTime
+        let fromDto dto = dto |> Dto.fromDto |> PerTime
 
 
         /// Set a `PerTime` with a `Variable`
         /// in a list fromVariable` lists
-        let fromOrdVar = fromOrdVar toOrdVar QuantityPerTime
+        let fromOrdVar = fromOrdVar toOrdVar PerTime
 
 
         /// Create a `PerTime` with name **n**
@@ -1590,7 +1529,7 @@ module OrderVariable =
                 un
                 |> ValueUnit.per tu
             |> createNew (n |> Name.add name)
-            |> QuantityPerTime
+            |> PerTime
 
 
         /// Turn a `PerTime` to a string
@@ -1601,10 +1540,13 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> QuantityPerTime
+        let toBase = toOrdVar >> toBase >> PerTime
 
 
-        let toUnit = toOrdVar >> toUnit >> QuantityPerTime
+        let toUnit = toOrdVar >> toUnit >> PerTime
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> PerTime
 
 
 
@@ -1665,6 +1607,9 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> Rate
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> Rate
+
+
 
     /// Type and functions that represent a total
     module Total =
@@ -1719,6 +1664,9 @@ module OrderVariable =
 
 
         let toUnit = toOrdVar >> toUnit >> Total
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> Total
 
 
 
@@ -1779,17 +1727,20 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> QuantityAdjust
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> QuantityAdjust
+
+
 
     /// Type and functions that represent a adjusted total,
     /// and a adjusted total is a quantity per time
-    module QuantityPerTimeAdjust =
+    module PerTimeAdjust =
 
 
         let [<Literal>] name = "ptm_adj"
 
 
         /// Turn `TotalAdjust` in a `VariableUnit`
-        let toOrdVar (QuantityPerTimeAdjust ptm_adj) = ptm_adj
+        let toOrdVar (PerTimeAdjust ptm_adj) = ptm_adj
 
 
         let unitToString =
@@ -1806,12 +1757,12 @@ module OrderVariable =
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> QuantityPerTimeAdjust
+        let fromDto dto = dto |> Dto.fromDto |> PerTimeAdjust
 
 
         /// Set a `TotalAdjust` with a `Variable`
         /// in a list fromVariable` lists
-        let fromOrdVar = fromOrdVar toOrdVar QuantityPerTimeAdjust
+        let fromOrdVar = fromOrdVar toOrdVar PerTimeAdjust
 
 
         /// Create a `TotalAdjust` with name **n**
@@ -1826,7 +1777,7 @@ module OrderVariable =
                 |> ValueUnit.per adj
                 |> ValueUnit.per tu
             |> createNew (n |> Name.add name)
-            |> QuantityPerTimeAdjust
+            |> PerTimeAdjust
 
 
         /// Turn a `TotalAdjust` to a string
@@ -1837,10 +1788,13 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> QuantityPerTimeAdjust
+        let toBase = toOrdVar >> toBase >> PerTimeAdjust
 
 
-        let toUnit = toOrdVar >> toUnit >> QuantityPerTimeAdjust
+        let toUnit = toOrdVar >> toUnit >> PerTimeAdjust
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> PerTimeAdjust
 
 
 
@@ -1907,6 +1861,9 @@ module OrderVariable =
         let toUnit = toOrdVar >> toUnit >> RateAdjust
 
 
+        let applyConstraints = toOrdVar >> applyConstraints >> RateAdjust
+
+
 
     /// Type and functions that represent a adjusted quantity,
     /// and a adjusted quantity is a quantity per time
@@ -1963,6 +1920,9 @@ module OrderVariable =
 
 
         let toUnit = toOrdVar >> toUnit >> TotalAdjust
+
+
+        let applyConstraints = toOrdVar >> applyConstraints >> TotalAdjust
 
 
 
@@ -2198,11 +2158,11 @@ module Order =
 
         let [<Literal>] qty = OrderVariable.Quantity.name
         let [<Literal>] cnc = OrderVariable.Concentration.name
-        let [<Literal>] ptm = OrderVariable.QuantityPerTime.name
+        let [<Literal>] ptm = OrderVariable.PerTime.name
         let [<Literal>] rte = OrderVariable.Rate.name
         let [<Literal>] tot = OrderVariable.Total.name
         let [<Literal>] qtyAdj = OrderVariable.QuantityAdjust.name
-        let [<Literal>] ptmAdj = OrderVariable.QuantityPerTimeAdjust.name
+        let [<Literal>] ptmAdj = OrderVariable.PerTimeAdjust.name
         let [<Literal>] rteAdj = OrderVariable.RateAdjust.name
         let [<Literal>] totAdj = OrderVariable.TotalAdjust.name
         let [<Literal>] cnt = OrderVariable.Count.name
@@ -2371,11 +2331,11 @@ module Order =
         module Dose =
 
             module Quantity = OrderVariable.Quantity
-            module QuantityPerTime = OrderVariable.QuantityPerTime
+            module PerTime = OrderVariable.PerTime
             module Rate = OrderVariable.Rate
             module Total = OrderVariable.Total
             module QuantityAdjust = OrderVariable.QuantityAdjust
-            module QuantityPerTimeAdjust = OrderVariable.QuantityPerTimeAdjust
+            module PerTimeAdjust = OrderVariable.PerTimeAdjust
             module RateAdjust = OrderVariable.RateAdjust
             module TotalAdjust = OrderVariable.TotalAdjust
 
@@ -2397,12 +2357,12 @@ module Order =
                 let n = n |> Name.add Literals.dose
 
                 let qty = Quantity.create n un
-                let ptm = QuantityPerTime.create n un un
+                let ptm = PerTime.create n un un
                 let rte = Rate.create n un un
                 let tot = Total.create n un
                 let qty_adj = QuantityAdjust.create n un un
                 let rte_adj = RateAdjust.create n un un un
-                let ptm_adj = QuantityPerTimeAdjust.create n un un un
+                let ptm_adj = PerTimeAdjust.create n un un un
                 let tot_adj = TotalAdjust.create n un un
 
                 create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
@@ -2411,11 +2371,11 @@ module Order =
             /// Turn an `Item` to `VariableUnit`s
             let toOrdVars (dos : Dose) =
                 let qty = dos.Quantity |> Quantity.toOrdVar
-                let ptm = dos.PerTime |> QuantityPerTime.toOrdVar
+                let ptm = dos.PerTime |> PerTime.toOrdVar
                 let rte = dos.Rate |> Rate.toOrdVar
                 let tot = dos.Total |> Total.toOrdVar
                 let qty_adj = dos.QuantityAdjust |> QuantityAdjust.toOrdVar
-                let ptm_adj = dos.PerTimeAdjust |> QuantityPerTimeAdjust.toOrdVar
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.toOrdVar
                 let rte_adj = dos.RateAdjust |> RateAdjust.toOrdVar
                 let tot_adj = dos.TotalAdjust |> TotalAdjust.toOrdVar
 
@@ -2432,13 +2392,26 @@ module Order =
 
             let fromOrdVars ovars (dos: Dose) =
                 let qty = dos.Quantity |> Quantity.fromOrdVar ovars
-                let ptm = dos.PerTime |> QuantityPerTime.fromOrdVar ovars
+                let ptm = dos.PerTime |> PerTime.fromOrdVar ovars
                 let rte = dos.Rate |> Rate.fromOrdVar ovars
                 let tot = dos.Total |> Total.fromOrdVar ovars
                 let qty_adj = dos.QuantityAdjust |> QuantityAdjust.fromOrdVar ovars
-                let ptm_adj = dos.PerTimeAdjust |> QuantityPerTimeAdjust.fromOrdVar ovars
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.fromOrdVar ovars
                 let rte_adj = dos.RateAdjust |> RateAdjust.fromOrdVar ovars
                 let tot_adj = dos.TotalAdjust |> TotalAdjust.fromOrdVar ovars
+
+                create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
+
+
+            let applyConstraints (dos: Dose) =
+                let qty = dos.Quantity |> Quantity.applyConstraints
+                let ptm = dos.PerTime |> PerTime.applyConstraints
+                let rte = dos.Rate |> Rate.applyConstraints
+                let tot = dos.Total |> Total.applyConstraints
+                let qty_adj = dos.QuantityAdjust |> QuantityAdjust.applyConstraints
+                let ptm_adj = dos.PerTimeAdjust |> PerTimeAdjust.applyConstraints
+                let rte_adj = dos.RateAdjust |> RateAdjust.applyConstraints
+                let tot_adj = dos.TotalAdjust |> TotalAdjust.applyConstraints
 
                 create qty ptm rte tot qty_adj ptm_adj rte_adj tot_adj
 
@@ -2455,11 +2428,11 @@ module Order =
 
                 module Units = ValueUnit.Units
                 module Quantity = OrderVariable.Quantity
-                module QuantityPerTime = OrderVariable.QuantityPerTime
+                module QuantityPerTime = OrderVariable.PerTime
                 module Rate = OrderVariable.Rate
                 module Total = OrderVariable.Total
                 module QuantityAdjust = OrderVariable.QuantityAdjust
-                module QuantityPerTimeAdjust = OrderVariable.QuantityPerTimeAdjust
+                module QuantityPerTimeAdjust = OrderVariable.PerTimeAdjust
                 module RateAdjust = OrderVariable.RateAdjust
                 module TotalAdjust = OrderVariable.TotalAdjust
 
@@ -2478,11 +2451,11 @@ module Order =
                 let fromDto (dto: Dto) =
 
                     let qty = dto.Quantity |> Quantity.fromDto
-                    let ptm = dto.PerTime |> QuantityPerTime.fromDto
+                    let ptm = dto.PerTime |> PerTime.fromDto
                     let rte = dto.Rate |> Rate.fromDto
                     let tot = dto.Total |> Total.fromDto
                     let qty_adj = dto.QuantityAdjust |> QuantityAdjust.fromDto
-                    let ptm_adj = dto.PerTimeAdjust |> QuantityPerTimeAdjust.fromDto
+                    let ptm_adj = dto.PerTimeAdjust |> PerTimeAdjust.fromDto
                     let rte_adj = dto.RateAdjust |> RateAdjust.fromDto
                     let tot_adj = dto.TotalAdjust |> TotalAdjust.fromDto
 
@@ -2496,7 +2469,7 @@ module Order =
                         |> Quantity.toDto
                     dto.PerTime <-
                         dos.PerTime
-                        |> QuantityPerTime.toDto
+                        |> PerTime.toDto
                     dto.Rate <-
                         dos.Rate
                         |> Rate.toDto
@@ -2508,7 +2481,7 @@ module Order =
                         |> QuantityAdjust.toDto
                     dto.PerTimeAdjust <-
                         dos.PerTimeAdjust
-                        |> QuantityPerTimeAdjust.toDto
+                        |> PerTimeAdjust.toDto
                     dto.RateAdjust <-
                         dos.RateAdjust
                         |> RateAdjust.toDto
@@ -2614,6 +2587,15 @@ module Order =
 
                 create itm.Name cmp_qty orb_qty cmp_cnc orb_cnc dos
 
+
+            let applyConstraints itm =
+                let cmp_qty = (itm |> get).ComponentQuantity |> Quantity.applyConstraints
+                let orb_qty = itm.OrderableQuantity          |> Quantity.applyConstraints
+                let cmp_cnc = itm.ComponentConcentration     |> Concentration.applyConstraints
+                let orb_cnc = itm.OrderableConcentration     |> Concentration.applyConstraints
+                let dos = itm.Dose |> Dose.applyConstraints
+
+                create itm.Name cmp_qty orb_qty cmp_cnc orb_cnc dos
 
 
             /// Turn an `Item` to a list of `string`s,
@@ -2793,17 +2775,27 @@ module Order =
                 |> create cmp.Id cmp.Name cmp.Shape cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos
 
 
+            /// Map a `Component` **cmp**
+            /// to `VariableUnit`s
+            let applyConstraints cmp =
+                let cmp_qty = (cmp |> get).ComponentQuantity |> Quantity.applyConstraints
+                let orb_qty = cmp.OrderableQuantity          |> Quantity.applyConstraints
+                let orb_cnt = cmp.OrderableCount             |> Count.applyConstraints
+                let orb_cnc = cmp.OrderableConcentration     |> Concentration.applyConstraints
+                let ord_qty = cmp.OrderQuantity              |> Quantity.applyConstraints
+                let ord_cnt = cmp.OrderCount                 |> Count.applyConstraints
+                let dos = cmp.Dose |> Dose.applyConstraints
+
+                cmp.Items
+                |> List.map Item.applyConstraints
+                |> create cmp.Id cmp.Name cmp.Shape cmp_qty orb_qty orb_cnt ord_qty ord_cnt orb_cnc dos
+
+
             /// Create a string list from a
             /// component where each string is
             /// a variable name with the value range
             /// and the Unit
-            let toString cmp =
-                let ii = cmp.Items
-
-                cmp
-                |> toOrdVars
-                |> List.map (OrderVariable.toString false)
-                |> List.append (ii |> List.collect Item.toString )
+            let toString = toOrdVars >> List.map (OrderVariable.toString false)
 
 
 
@@ -2990,16 +2982,23 @@ module Order =
             |> create orb.Name orb_qty ord_qty ord_cnt dos_cnt dos
 
 
+        /// Map an `Orderable` **orb** to
+        /// `VariableUnit`s
+        let applyConstraints orb =
+            let ord_qty = (orb |> get).OrderQuantity |> Quantity.applyConstraints
+            let orb_qty = orb.OrderableQuantity      |> Quantity.applyConstraints
+            let ord_cnt = orb.OrderCount             |> Count.applyConstraints
+            let dos_cnt = orb.DoseCount              |> Count.applyConstraints
+            let dos = orb.Dose |> Dose.applyConstraints
+
+            orb.Components
+            |> List.map Component.applyConstraints
+            |> create orb.Name orb_qty ord_qty ord_cnt dos_cnt dos
+
+
         /// Turn an `Orderable` `ord` into
         /// a list of strings.
-        let toString orb =
-            let cc = orb.Components
-
-            orb
-            |> toOrdVars
-            |> List.map (OrderVariable.toString false)
-            |> List.append (cc |> List.collect Component.toString )
-            |> List.sort
+        let toString = toOrdVars >> List.map (OrderVariable.toString false)
 
 
 
@@ -3127,6 +3126,17 @@ module Order =
                 |> Timed
 
 
+        let applyConstraints prs =
+            match prs with
+            | Continuous -> prs
+            | Discontinuous frq ->
+                frq |> Frequency.applyConstraints |> Discontinuous
+            | Timed(frq, tme)     ->
+                (frq |> Frequency.applyConstraints,
+                tme |> Time.applyConstraints)
+                |> Timed
+
+
 
         /// Turn a `Prescription` **prs** into
         /// a string list
@@ -3236,7 +3246,7 @@ module Order =
     module Property = ValueRange.Property
     module Quantity = OrderVariable.Quantity
     module Frequency = OrderVariable.Frequency
-    module QuantityPerTimeAdjust = OrderVariable.QuantityPerTimeAdjust
+    module PerTimeAdjust = OrderVariable.PerTimeAdjust
     module Concentration = OrderVariable.Concentration
     module Rate = OrderVariable.Rate
     module RateAdjust = OrderVariable.RateAdjust
@@ -3342,6 +3352,15 @@ module Order =
         }
 
 
+    let applyConstraints (ord : Order) =
+        { ord with
+            Adjust = ord.Adjust |> Quantity.applyConstraints
+            Duration = ord.Duration |> Time.applyConstraints
+            Prescription = ord.Prescription |> Prescription.applyConstraints
+            Orderable = ord.Orderable |> Orderable.applyConstraints
+        }
+
+
     let mapToEquations eqs (ord: Order)  =
         let ovars = ord |> toOrdVars
 
@@ -3393,8 +3412,14 @@ module Order =
 
 
     let solveMinMax logger (ord: Order) =
+        let ord = ord |> applyConstraints
+
         let mapping =
-            Mapping.getEquations 5
+            match ord.Prescription with
+            | Continuous -> Mapping.continuous
+            | Discontinuous _ -> Mapping.discontinuous
+            | Timed _ -> Mapping.timed
+            |> Mapping.getEquations
             |> Mapping.getEqsMapping ord
 
         let oEqs =
@@ -3498,7 +3523,7 @@ module Order =
                     o
                     |> printItem
                         (fun i -> i.Dose.PerTimeAdjust)
-                        (QuantityPerTimeAdjust.toValueUnitStringList (Some 2))
+                        (PerTimeAdjust.toValueUnitStringList (Some 2))
 
                 let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
                 let prep = $"{o |> printComponentQuantity}"
@@ -3569,7 +3594,7 @@ module Order =
                     o
                     |> printItem
                         (fun i -> i.Dose.PerTimeAdjust)
-                        (QuantityPerTimeAdjust.toValueUnitStringList (Some 1))
+                        (PerTimeAdjust.toValueUnitStringList (Some 1))
 
                 let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"
                 let prep = o |> printComponentQuantity
@@ -3679,26 +3704,440 @@ module Order =
 
 
 
-[ "paracetamol", "tablet", ["paracetamol"] ]
-|> Order.Dto.discontinuous "2" "paracetamol" "or"
+module DrugOrder =
+
+    open MathNet.Numerics
+    open Informedica.Utils.Lib
+    open Informedica.GenUnits.Lib
+
+
+    module DoseRule =
+
+        let limit =
+            {
+                SubstanceName = ""
+                MinDoseQuantity = None
+                MaxDoseQuantity = None
+                MinDoseQuantityAdjust = None
+                MaxDoseQuantityAdjust = None
+                MinDosePerTime = None
+                MaxDosePerTime = None
+                MinDosePerTimeAdjust = None
+                MaxDosePerTimeAdjust = None
+                MinDoseRate = None
+                MaxDoseRate = None
+                MinDoseRateAdjust = None
+                MaxDoseRateAdjust = None
+            }
+
+
+
+    let drugOrder =
+        {
+            Id = ""
+            Name = ""
+            Products = []
+            Quantities = []
+            Unit = ""
+            TimeUnit = ""
+            RateUnit = ""
+            Route = ""
+            OrderType = AnyOrder
+            Frequencies = []
+            Rates = []
+        }
+
+
+    let productComponent =
+        {
+            Name = ""
+            Shape = ""
+            Quantities = []
+            TimeUnit = ""
+            RateUnit = ""
+            Divisible = 1N
+            Substances = []
+        }
+
+
+    let substanceItem =
+        {
+            Name = ""
+            Concentrations = []
+            OrderableQuantities = []
+            Unit = ""
+            DoseUnit = ""
+            TimeUnit = ""
+            RateUnit = ""
+            Dose = DoseRule.limit
+            Solution = None
+        }
+
+
+    let unitGroup u =
+        ValueUnit.Units.units
+        |> List.filter (fun ud ->
+            ud.Group <> ValueUnit.Group.WeightGroup
+        )
+        |> List.tryFind (fun ud ->
+            [
+                ud.Abbreviation.Dut
+                ud.Abbreviation.Eng
+                ud.Name.Dut
+                ud.Name.Eng
+            ]
+            |> List.append ud.Synonyms
+            |> List.exists((=) u)
+        )
+        |> function
+        | Some ud ->
+            ud.Group
+            |> ValueUnit.Group.toString
+        | None -> "General"
+        |> sprintf "%s[%s]" u
+
+
+    let toOrder (d : DrugOrder) =
+        let ou = d.Unit |> unitGroup
+        let orbDto = Order.Orderable.Dto.dto d.Id d.Name
+
+        orbDto.OrderableQuantity.Constraints.Vals <- d.Quantities
+        orbDto.OrderableQuantity.Unit <- ou
+        orbDto.OrderQuantity.Unit <- ou
+
+        match d.OrderType with
+        | AnyOrder
+        | ProcessOrder -> ()
+
+        | ContinuousOrder ->
+            orbDto.Dose.Rate.Constraints.Vals <-
+                [1N/10N..1N/10N..1000N]
+            orbDto.Dose.Rate.Unit <-
+                d.RateUnit
+                |> unitGroup
+                |> sprintf "%s/%s" ou
+            orbDto.Dose.RateAdjust.Unit <-
+                d.RateUnit
+                |> unitGroup
+                |> sprintf "%s/kg[Weight]/%s" ou
+
+        | DiscontinuousOrder ->
+            orbDto.Dose.Quantity.Unit <- ou
+            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/kg[Weight]"
+            orbDto.Dose.PerTime.Unit <-
+                d.TimeUnit
+                |> unitGroup
+                |> sprintf "%s/%s" ou
+
+        | TimedOrder ->
+            orbDto.Dose.Rate.Constraints.Vals <-
+                [1N/10N..1N/10N..1000N]
+            orbDto.Dose.Quantity.Unit <- ou
+            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/kg[Weight]"
+            orbDto.Dose.PerTime.Unit <-
+                d.TimeUnit
+                |> unitGroup
+                |> sprintf "%s/%s" ou
+            orbDto.Dose.Rate.Unit <-
+                d.RateUnit
+                |> unitGroup
+                |> sprintf "%s/%s" ou
+            orbDto.Dose.RateAdjust.Unit <-
+                d.RateUnit
+                |> unitGroup
+                |> sprintf "%s/kg[Weight]/%s" ou
+
+        orbDto.Components <-
+            [
+                for p in d.Products do
+                    let cdto = Order.Orderable.Component.Dto.dto d.Id d.Name p.Name p.Shape
+
+                    cdto.ComponentQuantity.Constraints.Vals <- p.Quantities
+                    cdto.OrderableConcentration.Unit <- "x[Count]"
+                    cdto.Dose.Quantity.Constraints.Incr <- [ 1N / p.Divisible ]
+
+                    cdto.Items <- [
+                        for s in p.Substances do
+                            let su = s.Unit |> unitGroup
+                            let du = s.DoseUnit |> unitGroup
+
+                            let itmDto =
+                                Order.Orderable.Item.Dto.dto d.Id d.Name p.Name s.Name
+
+                            itmDto.ComponentConcentration.Constraints.Vals <- s.Concentrations
+                            itmDto.ComponentConcentration.Unit <- $"{su}/{ou}"
+                            itmDto.OrderableQuantity.Constraints.Vals <- s.OrderableQuantities
+                            itmDto.OrderableQuantity.Unit <- su
+                            itmDto.ComponentQuantity.Unit <- su
+
+                            match d.OrderType with
+                            | AnyOrder -> ()
+                            | ProcessOrder -> ()
+                            | ContinuousOrder ->
+                                itmDto.Dose.RateAdjust.Unit <-
+                                    s.RateUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
+
+                                itmDto.Dose.Rate.Constraints.MinIncl <- s.Dose.MinDoseRate.IsSome
+                                itmDto.Dose.Rate.Constraints.Min <- s.Dose.MinDoseRate
+                                itmDto.Dose.RateAdjust.Constraints.MinIncl <- s.Dose.MinDoseRateAdjust.IsSome
+                                itmDto.Dose.RateAdjust.Constraints.Min <- s.Dose.MinDoseRateAdjust
+
+                                itmDto.Dose.Rate.Constraints.MaxIncl <- s.Dose.MaxDoseRate.IsSome
+                                itmDto.Dose.Rate.Constraints.Max <- s.Dose.MaxDoseRate
+                                itmDto.Dose.RateAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseRateAdjust.IsSome
+                                itmDto.Dose.RateAdjust.Constraints.Max <- s.Dose.MaxDoseRateAdjust
+
+                            | DiscontinuousOrder ->
+                                itmDto.Dose.Quantity.Unit <- du
+
+                                itmDto.Dose.Quantity.Constraints.MinIncl <- s.Dose.MinDoseQuantity.IsSome
+                                itmDto.Dose.Quantity.Constraints.Min <- s.Dose.MinDoseQuantity
+                                itmDto.Dose.QuantityAdjust.Constraints.MinIncl <- s.Dose.MinDoseQuantityAdjust.IsSome
+                                itmDto.Dose.QuantityAdjust.Constraints.Min <- s.Dose.MinDoseQuantityAdjust
+
+                                itmDto.Dose.Quantity.Constraints.MaxIncl <- s.Dose.MaxDoseQuantity.IsSome
+                                itmDto.Dose.Quantity.Constraints.Max <- s.Dose.MaxDoseQuantity
+                                itmDto.Dose.QuantityAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseQuantityAdjust.IsSome
+                                itmDto.Dose.QuantityAdjust.Constraints.Max <- s.Dose.MaxDoseQuantityAdjust
+
+                                itmDto.Dose.PerTimeAdjust.Unit <-
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
+
+                                itmDto.Dose.PerTime.Constraints.MinIncl <- s.Dose.MinDosePerTime.IsSome
+                                itmDto.Dose.PerTime.Constraints.Min <- s.Dose.MinDosePerTime
+                                itmDto.Dose.PerTimeAdjust.Constraints.MinIncl <- s.Dose.MinDosePerTimeAdjust.IsSome
+                                itmDto.Dose.PerTimeAdjust.Constraints.Min <- s.Dose.MinDosePerTimeAdjust
+
+                                itmDto.Dose.PerTime.Constraints.MaxIncl <- s.Dose.MaxDosePerTime.IsSome
+                                itmDto.Dose.PerTime.Constraints.Max <- s.Dose.MaxDosePerTime
+                                itmDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- s.Dose.MaxDosePerTimeAdjust.IsSome
+                                itmDto.Dose.PerTimeAdjust.Constraints.Max <- s.Dose.MaxDosePerTimeAdjust
+
+                            | TimedOrder ->
+                                itmDto.Dose.Quantity.Unit <- du
+
+                                itmDto.Dose.Quantity.Constraints.MinIncl <- s.Dose.MinDoseQuantity.IsSome
+                                itmDto.Dose.Quantity.Constraints.Min <- s.Dose.MinDoseQuantity
+                                itmDto.Dose.QuantityAdjust.Constraints.MinIncl <- s.Dose.MinDoseQuantityAdjust.IsSome
+                                itmDto.Dose.QuantityAdjust.Constraints.Min <- s.Dose.MinDoseQuantityAdjust
+
+                                itmDto.Dose.Quantity.Constraints.MaxIncl <- s.Dose.MaxDoseQuantity.IsSome
+                                itmDto.Dose.Quantity.Constraints.Max <- s.Dose.MaxDoseQuantity
+                                itmDto.Dose.QuantityAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseQuantityAdjust.IsSome
+                                itmDto.Dose.QuantityAdjust.Constraints.Max <- s.Dose.MaxDoseQuantityAdjust
+
+                                itmDto.Dose.PerTimeAdjust.Unit <-
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
+
+                                itmDto.Dose.PerTime.Constraints.MinIncl <- s.Dose.MinDosePerTime.IsSome
+                                itmDto.Dose.PerTime.Constraints.Min <- s.Dose.MinDosePerTime
+                                itmDto.Dose.PerTimeAdjust.Constraints.MinIncl <- s.Dose.MinDosePerTimeAdjust.IsSome
+                                itmDto.Dose.PerTimeAdjust.Constraints.Min <- s.Dose.MinDosePerTimeAdjust
+
+                                itmDto.Dose.PerTime.Constraints.MaxIncl <- s.Dose.MaxDosePerTime.IsSome
+                                itmDto.Dose.PerTime.Constraints.Max <- s.Dose.MaxDosePerTime
+                                itmDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- s.Dose.MaxDosePerTimeAdjust.IsSome
+                                itmDto.Dose.PerTimeAdjust.Constraints.Max <- s.Dose.MaxDosePerTimeAdjust
+
+                                itmDto.Dose.RateAdjust.Unit <-
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/kg[Weight]/%s" du
+
+                            itmDto
+                    ]
+
+                    cdto
+            ]
+
+        let dto =
+            match d.OrderType with
+            | AnyOrder ->
+                "the order type cannot by 'Any'"
+                |> failwith
+            | ProcessOrder ->
+                "the order type cannot by 'Any'"
+                |> failwith
+            | ContinuousOrder ->
+                Order.Dto.continuous d.Id d.Name d.Route []
+            | DiscontinuousOrder ->
+                Order.Dto.discontinuous d.Id d.Name d.Route []
+            | TimedOrder ->
+                Order.Dto.timed d.Id d.Name d.Route []
+
+        dto.Orderable <- orbDto
+
+        dto.Prescription.Frequency.Unit <-
+            $"x[Count]/{(d.TimeUnit |> unitGroup)}"
+        dto.Prescription.Frequency.Constraints.Vals <- d.Frequencies
+
+        dto.Adjust.Constraints.Vals <-
+            [ 200N/1000N .. 1N/50N .. 2N ] @
+            [ 2N + 1N/10N .. 1N/10N .. 5N ] @
+            [ 5N + 1N/2N .. 1N/2N .. 10N ] @
+            [ 11N .. 1N .. 150N ]
+        dto.Adjust.Unit <- "kg[Weight]"
+
+        dto
+
+
+
+open MathNet.Numerics
+
+
+let gentaDto =
+    // gentamicin
+    {
+        DrugOrder.drugOrder with
+            Id = "1"
+            Name = "gentamicin"
+            Quantities = [ ]
+            Unit = "ml"
+            TimeUnit = "day"
+            Route = "iv"
+
+            Products =
+                [
+                    {
+                        DrugOrder.productComponent with
+                            Name = "gentamicin"
+                            Shape = "infusion fluid"
+                            Quantities = [ 2N; 10N ]
+                            Divisible = 1N
+                            TimeUnit = "day"
+                            Substances =
+                                [
+                                    {
+                                        DrugOrder.substanceItem with
+                                            Name = "gentamicin"
+                                            Concentrations = [ 10N; 40N ]
+                                            Unit = "mg"
+                                            DoseUnit = "mg"
+                                            TimeUnit = "day"
+                                    }
+                                ]
+
+                    }
+                    {
+                        DrugOrder.productComponent with
+                            Name = "saline"
+                            Shape = "infusion fluid"
+                            Quantities = [ 5000N ]
+                            Divisible = 1N
+                            TimeUnit = "day"
+                            Substances =
+                                [
+                                    {
+                                        DrugOrder.substanceItem with
+                                            Name = "sodium"
+                                            Concentrations = [ 155N / 1000N ]
+                                            Unit = "mmol"
+                                            DoseUnit = "mmol"
+                                            TimeUnit = "day"
+                                    }
+                                    {
+                                        DrugOrder.substanceItem with
+                                            Name = "chloride"
+                                            Concentrations = [ 155N / 1000N ]
+                                            Unit = "mmol"
+                                            DoseUnit = "mmol"
+                                            TimeUnit = "day"
+                                    }
+                                ]
+
+                    }
+
+                ]
+            OrderType = TimedOrder
+        }
+    |> DrugOrder.toOrder
+
+
+
+
+gentaDto
 |> Order.Dto.fromDto
-|> Order.toOrdVars
-|> List.map (fun ovar -> ovar.Variable.Name |> Name.toString)
+|> Order.solveMinMax { Log = ignore }
+
+
+
+let pcmDto =
+    // gentamicin
+    {
+        DrugOrder.drugOrder with
+            Id = "1"
+            Name = "paracetamol"
+            Quantities = [ 1N ]
+            Unit = "piece"
+            TimeUnit = "day"
+            Route = "rect"
+            Frequencies = [1N; 2N; 3N ; 4N; 6N]
+            Products =
+                [
+                    {
+                        DrugOrder.productComponent with
+                            Name = "paracetamol"
+                            Shape = "supp"
+                            Quantities = [ 1N ]
+                            Divisible = 1N
+                            TimeUnit = "day"
+                            Substances =
+                                [
+                                    {
+                                        DrugOrder.substanceItem with
+                                            Name = "paracetamol"
+                                            Concentrations = [ 60N; 120N; 240N; 500N; 1000N ]
+                                            Unit = "mg"
+                                            DoseUnit = "mg"
+                                            TimeUnit = "day"
+                                            Dose =
+                                                { DrugOrder.DoseRule.limit  with
+                                                    MaxDoseQuantity = Some 1000N
+                                                    MaxDosePerTime = Some 4000N
+                                                    MaxDosePerTimeAdjust = Some 90N
+                                                    MinDosePerTimeAdjust = Some 20N
+                                                }
+                                    }
+                                ]
+
+                    }
+
+                ]
+            OrderType = DiscontinuousOrder
+        }
+    |> DrugOrder.toOrder
+
+
+pcmDto
+|> Order.Dto.fromDto
+|> Order.toString
+|> List.length
+
+
+pcmDto
+|> Order.Dto.fromDto
+|> Order.applyConstraints
+|> Order.toString
 |> List.iteri (printfn "%i. %s")
 
 
-let ord =
-    [
-        "gentamicin", "infusion fluid", ["gentamicin"]
-    ]
-    |> Order.Dto.timed "1" "gentamicin" "iv"
-    |> Order.Dto.fromDto
-
-
-ord
+pcmDto
+|> Order.Dto.fromDto
+|> Order.solveMinMax { Log = ignore }
+|> Order.Dto.toDto
+|> fun dto ->
+    dto.Adjust.Constraints.Vals <-
+        [ dto.Adjust.Constraints.Vals[150] ]
+    dto
+|> Order.Dto.fromDto
+|> Order.applyConstraints
 |> Order.solveMinMax { Log = ignore }
 |> Order.toString
-
-
-
+|> List.iteri (printfn "%i. %s")
 
