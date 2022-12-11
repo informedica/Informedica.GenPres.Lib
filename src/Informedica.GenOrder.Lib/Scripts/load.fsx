@@ -6,6 +6,7 @@
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 #r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"
+#r "../../Informedica.GenForm.Lib/bin/Debug/net6.0/Informedica.GenForm.Lib.dll"
 
 // These can be loaded all at once.
 
@@ -24,3 +25,4 @@
 #load "../Api.fs"
 
 
+fsi.AddPrinter<System.DateTime> (fun dt -> dt.ToShortDateString())

@@ -80,6 +80,9 @@ module Utils =
         [<Literal>]
         let dataUrlId = "1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g"
 
+        //https://docs.google.com/spreadsheets/d/1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ/edit?usp=sharing
+        let [<Literal>] dataUrlId2 = "1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ"
+
         let client = new HttpClient()
 
         let download url =
@@ -91,8 +94,8 @@ module Utils =
             }
 
 
-        let getDataFromSheet sheet =
-            createUrl sheet dataUrlId
+        let getDataFromSheet urlId sheet =
+            createUrl sheet urlId
             |> download
             |> Async.RunSynchronously
             |> Csv.parseCSV

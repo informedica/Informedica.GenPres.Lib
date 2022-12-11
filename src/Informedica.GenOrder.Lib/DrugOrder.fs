@@ -8,6 +8,21 @@ module DrugOrder =
     open Informedica.GenUnits.Lib
 
 
+    module MinMax =
+
+        let none = { Minimum = None; Maximum = None }
+
+
+        let setConstraints (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
+            dto.MinIncl <- minMax.Minimum.IsSome
+            dto.Min <-minMax.Minimum
+            dto.MaxIncl <- minMax.Maximum.IsSome
+            dto.Max <- minMax.Maximum
+
+            dto
+
+
+
     module SolutionRule =
 
         let limit =
@@ -25,19 +40,19 @@ module DrugOrder =
 
         let limit =
             {
-                SubstanceName = ""
-                MinDoseQuantity = None
-                MaxDoseQuantity = None
-                MinDoseQuantityAdjust = None
-                MaxDoseQuantityAdjust = None
-                MinDosePerTime = None
-                MaxDosePerTime = None
-                MinDosePerTimeAdjust = None
-                MaxDosePerTimeAdjust = None
-                MinDoseRate = None
-                MaxDoseRate = None
-                MinDoseRateAdjust = None
-                MaxDoseRateAdjust = None
+                Substance = ""
+                NormQuantity = None
+                Quantity = MinMax.none
+                NormQuantityAdjust = None
+                QuantityAdjust = MinMax.none
+                NormPerTime = None
+                PerTime = MinMax.none
+                NormPerTimeAdjust = None
+                PerTimeAdjust = MinMax.none
+                NormRate = None
+                Rate = MinMax.none
+                NormRateAdjust = None
+                RateAdjust = MinMax.none
             }
 
 
@@ -197,71 +212,61 @@ module DrugOrder =
                                     |> unitGroup
                                     |> sprintf "%s/kg[Weight]/%s" du
 
-                                itmDto.Dose.Rate.Constraints.MinIncl <- s.Dose.MinDoseRate.IsSome
-                                itmDto.Dose.Rate.Constraints.Min <- s.Dose.MinDoseRate
-                                itmDto.Dose.RateAdjust.Constraints.MinIncl <- s.Dose.MinDoseRateAdjust.IsSome
-                                itmDto.Dose.RateAdjust.Constraints.Min <- s.Dose.MinDoseRateAdjust
+                                itmDto.Dose.Rate.Constraints <-
+                                    itmDto.Dose.Rate.Constraints
+                                    |> MinMax.setConstraints s.Dose.Rate
 
-                                itmDto.Dose.Rate.Constraints.MaxIncl <- s.Dose.MaxDoseRate.IsSome
-                                itmDto.Dose.Rate.Constraints.Max <- s.Dose.MaxDoseRate
-                                itmDto.Dose.RateAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseRateAdjust.IsSome
-                                itmDto.Dose.RateAdjust.Constraints.Max <- s.Dose.MaxDoseRateAdjust
+                                itmDto.Dose.RateAdjust.Constraints <-
+                                    itmDto.Dose.RateAdjust.Constraints
+                                    |> MinMax.setConstraints s.Dose.RateAdjust
 
                             | DiscontinuousOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
 
-                                itmDto.Dose.Quantity.Constraints.MinIncl <- s.Dose.MinDoseQuantity.IsSome
-                                itmDto.Dose.Quantity.Constraints.Min <- s.Dose.MinDoseQuantity
-                                itmDto.Dose.QuantityAdjust.Constraints.MinIncl <- s.Dose.MinDoseQuantityAdjust.IsSome
-                                itmDto.Dose.QuantityAdjust.Constraints.Min <- s.Dose.MinDoseQuantityAdjust
+                                itmDto.Dose.Quantity.Constraints <-
+                                    itmDto.Dose.Quantity.Constraints
+                                    |> MinMax.setConstraints s.Dose.Quantity
 
-                                itmDto.Dose.Quantity.Constraints.MaxIncl <- s.Dose.MaxDoseQuantity.IsSome
-                                itmDto.Dose.Quantity.Constraints.Max <- s.Dose.MaxDoseQuantity
-                                itmDto.Dose.QuantityAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseQuantityAdjust.IsSome
-                                itmDto.Dose.QuantityAdjust.Constraints.Max <- s.Dose.MaxDoseQuantityAdjust
+                                itmDto.Dose.QuantityAdjust.Constraints <-
+                                    itmDto.Dose.QuantityAdjust.Constraints
+                                    |> MinMax.setConstraints s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
                                     |> unitGroup
                                     |> sprintf "%s/kg[Weight]/%s" du
 
-                                itmDto.Dose.PerTime.Constraints.MinIncl <- s.Dose.MinDosePerTime.IsSome
-                                itmDto.Dose.PerTime.Constraints.Min <- s.Dose.MinDosePerTime
-                                itmDto.Dose.PerTimeAdjust.Constraints.MinIncl <- s.Dose.MinDosePerTimeAdjust.IsSome
-                                itmDto.Dose.PerTimeAdjust.Constraints.Min <- s.Dose.MinDosePerTimeAdjust
+                                itmDto.Dose.PerTime.Constraints <-
+                                    itmDto.Dose.PerTime.Constraints
+                                    |> MinMax.setConstraints s.Dose.PerTime
 
-                                itmDto.Dose.PerTime.Constraints.MaxIncl <- s.Dose.MaxDosePerTime.IsSome
-                                itmDto.Dose.PerTime.Constraints.Max <- s.Dose.MaxDosePerTime
-                                itmDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- s.Dose.MaxDosePerTimeAdjust.IsSome
-                                itmDto.Dose.PerTimeAdjust.Constraints.Max <- s.Dose.MaxDosePerTimeAdjust
+                                itmDto.Dose.PerTimeAdjust.Constraints <-
+                                    itmDto.Dose.PerTimeAdjust.Constraints
+                                    |> MinMax.setConstraints s.Dose.PerTimeAdjust
 
                             | TimedOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
 
-                                itmDto.Dose.Quantity.Constraints.MinIncl <- s.Dose.MinDoseQuantity.IsSome
-                                itmDto.Dose.Quantity.Constraints.Min <- s.Dose.MinDoseQuantity
-                                itmDto.Dose.QuantityAdjust.Constraints.MinIncl <- s.Dose.MinDoseQuantityAdjust.IsSome
-                                itmDto.Dose.QuantityAdjust.Constraints.Min <- s.Dose.MinDoseQuantityAdjust
+                                itmDto.Dose.Quantity.Constraints <-
+                                    itmDto.Dose.Quantity.Constraints
+                                    |> MinMax.setConstraints s.Dose.Quantity
 
-                                itmDto.Dose.Quantity.Constraints.MaxIncl <- s.Dose.MaxDoseQuantity.IsSome
-                                itmDto.Dose.Quantity.Constraints.Max <- s.Dose.MaxDoseQuantity
-                                itmDto.Dose.QuantityAdjust.Constraints.MaxIncl <- s.Dose.MaxDoseQuantityAdjust.IsSome
-                                itmDto.Dose.QuantityAdjust.Constraints.Max <- s.Dose.MaxDoseQuantityAdjust
+                                itmDto.Dose.QuantityAdjust.Constraints <-
+                                    itmDto.Dose.QuantityAdjust.Constraints
+                                    |> MinMax.setConstraints s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
                                     |> unitGroup
                                     |> sprintf "%s/kg[Weight]/%s" du
 
-                                itmDto.Dose.PerTime.Constraints.MinIncl <- s.Dose.MinDosePerTime.IsSome
-                                itmDto.Dose.PerTime.Constraints.Min <- s.Dose.MinDosePerTime
-                                itmDto.Dose.PerTimeAdjust.Constraints.MinIncl <- s.Dose.MinDosePerTimeAdjust.IsSome
-                                itmDto.Dose.PerTimeAdjust.Constraints.Min <- s.Dose.MinDosePerTimeAdjust
+                                itmDto.Dose.PerTime.Constraints <-
+                                    itmDto.Dose.PerTime.Constraints
+                                    |> MinMax.setConstraints s.Dose.PerTime
 
-                                itmDto.Dose.PerTime.Constraints.MaxIncl <- s.Dose.MaxDosePerTime.IsSome
-                                itmDto.Dose.PerTime.Constraints.Max <- s.Dose.MaxDosePerTime
-                                itmDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- s.Dose.MaxDosePerTimeAdjust.IsSome
-                                itmDto.Dose.PerTimeAdjust.Constraints.Max <- s.Dose.MaxDosePerTimeAdjust
+                                itmDto.Dose.PerTimeAdjust.Constraints <-
+                                    itmDto.Dose.PerTimeAdjust.Constraints
+                                    |> MinMax.setConstraints s.Dose.PerTimeAdjust
 
                                 itmDto.Dose.RateAdjust.Unit <-
                                     s.TimeUnit

@@ -117,6 +117,11 @@ module Utils =
         open Informedica.GenOrder.Lib
 
 
+        module MinMax =
+
+            let create min max = { Minimum = min; Maximum = max }
+
+
         let toBrs s =
             s
             |> String.splitAt ';'
@@ -245,7 +250,7 @@ module Utils =
                 |> Array.groupBy (fun r ->
                     {
                         Indication = r.Indication
-                        Medication = r.Medication
+                        Generic = r.Medication
                         Shape = r.Shape
                         Route = r.Route
                         Age = r.MinAge, r.MaxAge
@@ -271,19 +276,19 @@ module Utils =
                             rs
                             |> Array.map (fun r ->
                                 {
-                                    SubstanceName = r.Substance
-                                    MinDoseQuantity = r.MinDoseQty
-                                    MaxDoseQuantity = r.MaxDoseQty
-                                    MinDoseQuantityAdjust = r.MinDoseQtyAdj
-                                    MaxDoseQuantityAdjust = r.MaxDoseQtyAdj
-                                    MinDosePerTime = r.MinDoseTot
-                                    MaxDosePerTime = r.MaxDoseTot
-                                    MinDosePerTimeAdjust = r.MinDoseTotAdj
-                                    MaxDosePerTimeAdjust = r.MaxDoseTotAdj
-                                    MinDoseRate = r.MinDoseRate
-                                    MaxDoseRate = r.MaxDoseRate
-                                    MinDoseRateAdjust = r.MinDoseRateAdj
-                                    MaxDoseRateAdjust = r.MaxDoseRateAdj
+                                    Substance = r.Substance
+                                    NormQuantity = None
+                                    Quantity = MinMax.create r.MinDoseQty r.MaxDoseQty
+                                    NormQuantityAdjust = None
+                                    QuantityAdjust = MinMax.create r.MinDoseQtyAdj r.MaxDoseQtyAdj
+                                    NormPerTime = None
+                                    PerTime = MinMax.create r.MinDoseTot r.MaxDoseTot
+                                    NormPerTimeAdjust = None
+                                    PerTimeAdjust = MinMax.create r.MinDoseTotAdj r.MaxDoseTotAdj
+                                    NormRate = None
+                                    Rate = MinMax.create r.MinDoseRate r.MaxDoseRate
+                                    NormRateAdjust = None
+                                    RateAdjust = MinMax.create r.MinDoseRateAdj r.MaxDoseRateAdj
                                 }
                             )
                             |> Array.toList
@@ -307,6 +312,7 @@ module Utils =
                     let toBrOpt = toBrs >> toBrOpt
 
                     {|
+                        Id = get "GPK"
                         Name = get "Name"
                         Shape = get "Shape"
                         Divisible = "Divisible" |> toBrOpt
@@ -319,6 +325,7 @@ module Utils =
                 )
                 |> Array.groupBy (fun r ->
                     {
+                        Id = r.Id
                         Name = r.Name
                         Shape = r.Shape
                         Unit = r.Unit

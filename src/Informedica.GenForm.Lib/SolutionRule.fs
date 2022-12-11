@@ -1,5 +1,6 @@
 namespace Informedica.GenForm.Lib
 
+
 module SolutionRule =
 
     open MathNet.Numerics
@@ -28,7 +29,7 @@ module SolutionRule =
 
 
     let getRules () =
-        Web.getDataFromSheet "SolutionRules2"
+        Web.getDataFromSheet Web.dataUrlId2 "SolutionRules"
         |> fun data ->
             let prods = Product.products ()
 
@@ -334,14 +335,14 @@ module SolutionRule =
                                         if d |> String.isNullOrWhiteSpace ||
                                            u |> String.isNullOrWhiteSpace then ""
                                         else
-                                            $"{d} {u}" 
+                                            $"{d} {u}"
 
                                     let dt =
                                         let s = sel.DoseType |> DoseType.toString
                                         if s |> String.isNullOrWhiteSpace then ""
                                         else
                                             $"{s}"
-                                        
+
 
                                     {| acc with
                                         rules = rs

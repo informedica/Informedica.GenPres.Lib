@@ -64,10 +64,10 @@ module Types =
             DoseQuantity : MinMax
             NormDoseQuantityAdjust : BigRational option
             DoseQuantityAdjust : MinMax
-            NormDoseTotal : BigRational option
-            DoseTotal : MinMax
-            NormDoseTotalAdjust : BigRational option
-            DoseTotalAdjust : MinMax
+            NormDosePerTime : BigRational option
+            DosePerTime : MinMax
+            NormDosePerTimeAdjust : BigRational option
+            DosePerTimeAdjust : MinMax
             NormDoseRate : BigRational option
             DoseRate : MinMax
             NormDoseRateAdjust : BigRational option

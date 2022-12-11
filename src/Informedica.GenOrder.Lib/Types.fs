@@ -243,36 +243,42 @@ module Types =
         | RectalSolid
 
 
+    type Gender = Male | Female | AnyGender
+
+
+    type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
+
+
+
+    type Patient =
+        {
+            Diagnosis : string
+            Gender : Gender
+            Age : MinMax
+            Weight : MinMax
+            BSA : MinMax
+            GestAge : MinMax
+            PMAge : MinMax
+        }
+
+
+
     /// The dose limits that can be applied
     type DoseLimit =
         {
-            /// The substance name to which the dose limits
-            /// are applied
-            SubstanceName : string
-            /// maps to ItemDoseQty
-            MinDoseQuantity : BigRational option
-            /// maps to ItemDoseQty
-            MaxDoseQuantity : BigRational option
-            /// maps to ItemDoseAdjustQtyAdjust
-            MinDoseQuantityAdjust : BigRational option
-            /// maps to ItemDoseAdjustQtyAdjust
-            MaxDoseQuantityAdjust : BigRational option
-            /// maps to ItemDosePerTime
-            MinDosePerTime : BigRational option
-            /// maps to ItemDosePerTime
-            MaxDosePerTime : BigRational option
-            /// maps to ItemDoseAdjustTotalAdjust
-            MinDosePerTimeAdjust : BigRational option
-            /// maps to ItemDoseAdjustTotalAdjust
-            MaxDosePerTimeAdjust : BigRational option
-            /// maps to ItemDoseRate
-            MinDoseRate : BigRational option
-            /// maps to ItemDoseRate
-            MaxDoseRate : BigRational option
-            /// maps to ItemDoseAdjustRateAdjust
-            MinDoseRateAdjust : BigRational option
-            /// maps to ItemDoseAdjustRateAdjust
-            MaxDoseRateAdjust : BigRational option
+            Substance : string
+            NormQuantity : BigRational option
+            Quantity : MinMax
+            NormQuantityAdjust : BigRational option
+            QuantityAdjust : MinMax
+            NormPerTime : BigRational option
+            PerTime : MinMax
+            NormPerTimeAdjust : BigRational option
+            PerTimeAdjust : MinMax
+            NormRate : BigRational option
+            Rate : MinMax
+            NormRateAdjust : BigRational option
+            RateAdjust : MinMax
         }
 
 
@@ -280,13 +286,11 @@ module Types =
         {
             // selector properties
             Indication : string
-            Medication : string
+            Generic : string
             Shape : string
             Route : string
-            Age : BigRational option * BigRational option
-            Weight : BigRational option * BigRational option
-            GestAge : BigRational option * BigRational option
-            PostAge : BigRational option * BigRational option
+            Department : string
+            Patient : Patient
             /// maps to OrderTyp
             OrderType : string
             /// maps to PresFreq
@@ -295,10 +299,7 @@ module Types =
             Rates : BigRational list
             /// maps to OrderableQuantity
             Quantities : BigRational list
-            /// maps to PresTime
-            MinTime : BigRational option
-            /// maps to PresTime
-            MaxTime : BigRational option
+            Time : MinMax
             DoseUnit : string
             AdjUnit : string
             TimeUnit : string
@@ -313,9 +314,7 @@ module Types =
             /// maps to ItemOrderableQty
             Quantities : BigRational list
             /// maps to ItemOrderableConc
-            MinConcentration : BigRational option
-            /// maps to ItemOrderableConc
-            MaxConcentration : BigRational option
+            Concentration : MinMax
         }
 
 
@@ -416,6 +415,7 @@ module Types =
 
     type Product =
         {
+            Id : string
             Name : string
             Shape : string
             Unit : string

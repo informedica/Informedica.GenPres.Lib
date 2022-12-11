@@ -21,15 +21,14 @@
     <Compile Include="Api.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Api.fsx" />
-    <None Include="Scripts\GentamicinProblem.fsx" />
-    <None Include="Scripts\Order.fsx" />
-    <None Include="Scripts\GenOrder.fsx" />
-    <None Include="Scripts\TempMapping.fsx" />
+    <None Include="Scripts\Api2.fsx" />
+    <None Include="Scripts\Products.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenForm.Lib\Informedica.GenForm.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.GenUnits.Lib\Informedica.GenUnits.Lib.fsproj" />
+    <ProjectReference Include="..\Informedica.MetaVision.Lib\Informedica.MetaVision.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

@@ -249,8 +249,8 @@ module OrderVariable =
         type Dto () =
             member val Name = "" with get, set
             member val Unit = "" with get, set
-            member val Constraints = VarDto ()
-            member val Variable = VarDto ()
+            member val Constraints = VarDto () with get, set
+            member val Variable = VarDto () with get, set
 
 
         let dto () = Dto ()

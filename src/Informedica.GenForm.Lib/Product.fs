@@ -31,7 +31,7 @@ module Product =
 
 
     let products () =
-        Web.getDataFromSheet "Products2"
+        Web.getDataFromSheet Web.dataUrlId2 "Products"
         |> fun data ->
             let getColumn =
                 data

@@ -167,11 +167,11 @@ module DoseRule =
                 $"{dl.NormDoseRateAdjust |> printNormDose doseRateAdjUnit} " +
                 $"{dl.DoseRateAdjust |> printMinMaxDose doseRateAdjUnit}"
 
-                $"{dl.NormDoseTotalAdjust |> printNormDose doseTotAdjUnit} " +
-                $"{dl.DoseTotalAdjust |> printMinMaxDose doseTotAdjUnit}"
+                $"{dl.NormDosePerTimeAdjust |> printNormDose doseTotAdjUnit} " +
+                $"{dl.DosePerTimeAdjust |> printMinMaxDose doseTotAdjUnit}"
 
-                $"{dl.NormDoseTotal |> printNormDose doseTotUnit} " +
-                $"{dl.DoseTotal |> printMinMaxDose doseTotUnit}"
+                $"{dl.NormDosePerTime |> printNormDose doseTotUnit} " +
+                $"{dl.DosePerTime |> printMinMaxDose doseTotUnit}"
 
                 $"{dl.NormDoseQuantityAdjust |> printNormDose doseQtyAdjUnit} " +
                 $"{dl.DoseQuantityAdjust |> printMinMaxDose doseQtyAdjUnit}"
@@ -227,7 +227,7 @@ module DoseRule =
     let doseRules () =
         let prods = Product.products ()
 
-        Web.getDataFromSheet "DoseRules2"
+        Web.getDataFromSheet Web.dataUrlId2 "DoseRules"
         |> fun data ->
             let getColumn =
                 data
@@ -343,10 +343,10 @@ module DoseRule =
                                 DoseQuantity = (r.MinDoseQty, r.MaxDoseQty) |> MinMax.fromTuple
                                 NormDoseQuantityAdjust = r.NormDoseQtyAdj
                                 DoseQuantityAdjust = (r.MinDoseQtyAdj, r.MaxDoseQtyAdj) |> MinMax.fromTuple
-                                NormDoseTotal = r.NormDoseTot
-                                DoseTotal = (r.MinDoseTot, r.MaxDoseTot) |> MinMax.fromTuple
-                                NormDoseTotalAdjust = r.NormDoseTotAdj
-                                DoseTotalAdjust = (r.MinDoseTotAdj, r.MaxDoseTotAdj) |> MinMax.fromTuple
+                                NormDosePerTime = r.NormDoseTot
+                                DosePerTime = (r.MinDoseTot, r.MaxDoseTot) |> MinMax.fromTuple
+                                NormDosePerTimeAdjust = r.NormDoseTotAdj
+                                DosePerTimeAdjust = (r.MinDoseTotAdj, r.MaxDoseTotAdj) |> MinMax.fromTuple
                                 NormDoseRate = r.NormDoseRate
                                 DoseRate = (r.MinDoseRate, r.MaxDoseRate) |> MinMax.fromTuple
                                 NormDoseRateAdjust = r.NormDoseRateAdj

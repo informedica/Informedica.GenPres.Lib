@@ -1,4 +1,11 @@
-namespace Informedica.GenOrder.Lib
+
+#load "load.fsx"
+
+
+open Informedica.GenOrder.Lib
+
+module Product = Informedica.GenForm.Lib.Product
+
 
 
 
@@ -44,6 +51,7 @@ module Api =
         |> List.map (fun d -> d.Generic)
         |> List.distinct
 
+
     let filterShapes a w ind med route =
         filter a w ind med None route
         |> List.map (fun d -> d.Route)
@@ -57,3 +65,37 @@ module Api =
 
 
     let tryHead m = (List.map m) >> List.tryHead >> (Option.defaultValue "")
+
+
+Product.products ()
+|> Array.groupBy (fun p -> p.Generic)
+|> Array.map (fun (g, ps) ->
+    {
+        Id = ps[0].GPK
+        Name = g
+        Shape = ps[0].Shape
+        Unit = ps[0].ShapeUnit
+        Divisible = ps[0].Divisible
+        Quantities =
+            ps
+            |> Array.choose (fun p -> p.ShapeQuantity)
+            |> Array.toList
+        Substances =
+            ps
+            |> Array.collect (fun p -> p.Substances)
+            |> Array.groupBy (fun s -> s.Name, s.Unit)
+            |> Array.map (fun (s, xs) ->
+                {
+                    Name = s |> fst
+                    Unit = s |> snd
+                    Quantities =
+                        xs
+                        |> Array.choose (fun x -> x.Quantity)
+                        |> Array.toList
+                    Concentrations = []
+                }
+            )
+            |> Array.toList
+    }
+)
+
