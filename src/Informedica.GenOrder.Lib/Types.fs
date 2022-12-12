@@ -9,6 +9,7 @@ module Types =
     open Informedica.GenUnits.Lib
     open Informedica.GenSolver.Lib.Types
 
+
     type Unit = ValueUnit.Unit
 
 
@@ -234,103 +235,8 @@ module Types =
         | TimedOrder
 
 
-    /// Relation between shape and route
-    type RouteShape =
-        | AnyRouteShape
-        | IntravenousFluid
-        | OralFluid
-        | OralSolid
-        | RectalSolid
-
-
-    type Gender = Male | Female | AnyGender
-
-
-    type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
-
-
-
-    type Patient =
-        {
-            Diagnosis : string
-            Gender : Gender
-            Age : MinMax
-            Weight : MinMax
-            BSA : MinMax
-            GestAge : MinMax
-            PMAge : MinMax
-        }
-
-
-
-    /// The dose limits that can be applied
-    type DoseLimit =
-        {
-            Substance : string
-            NormQuantity : BigRational option
-            Quantity : MinMax
-            NormQuantityAdjust : BigRational option
-            QuantityAdjust : MinMax
-            NormPerTime : BigRational option
-            PerTime : MinMax
-            NormPerTimeAdjust : BigRational option
-            PerTimeAdjust : MinMax
-            NormRate : BigRational option
-            Rate : MinMax
-            NormRateAdjust : BigRational option
-            RateAdjust : MinMax
-        }
-
-
-    type DoseRule =
-        {
-            // selector properties
-            Indication : string
-            Generic : string
-            Shape : string
-            Route : string
-            Department : string
-            Patient : Patient
-            /// maps to OrderTyp
-            OrderType : string
-            /// maps to PresFreq
-            Frequencies : BigRational list
-            /// maps to OrderableDoseRate
-            Rates : BigRational list
-            /// maps to OrderableQuantity
-            Quantities : BigRational list
-            Time : MinMax
-            DoseUnit : string
-            AdjUnit : string
-            TimeUnit : string
-            RateUnit : string
-            Limits : DoseLimit list
-        }
-
-
-    type SolutionLimit =
-        {
-            SubstanceName : string
-            /// maps to ItemOrderableQty
-            Quantities : BigRational list
-            /// maps to ItemOrderableConc
-            Concentration : MinMax
-        }
-
-
-    type SolutionRule =
-        {
-            Medication : string
-            Age : BigRational option * BigRational option
-            Weight : BigRational option * BigRational option
-            Solutions : string list
-            /// maps to OrderableOrderableQty
-            Quantities : BigRational list
-            RateUnit : string
-            /// maps to OrderableDoseCount
-            DoseCount : BigRational list
-            Limits : SolutionLimit list
-        }
+    type DoseLimit = Informedica.GenForm.Lib.Types.DoseLimit
+    type SolutionLimit = Informedica.GenForm.Lib.Types.SolutionLimit
 
 
     /// The representation of a drug order that
@@ -401,27 +307,7 @@ module Types =
             /// The time unit used for the rate
             RateUnit : string
             Dose : DoseLimit
-        }
-
-
-    type Substance =
-        {
-            Name : string
-            Unit : string
-            Quantities : BigRational list
-            Concentrations : BigRational list
-        }
-
-
-    type Product =
-        {
-            Id : string
-            Name : string
-            Shape : string
-            Unit : string
-            Divisible : BigRational option
-            Quantities : BigRational list
-            Substances : Substance list
+            Solution : SolutionLimit option
         }
 
 

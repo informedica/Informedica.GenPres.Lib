@@ -7,53 +7,30 @@ module DrugOrder =
     open Informedica.Utils.Lib
     open Informedica.GenUnits.Lib
 
+    type MinMax = Informedica.GenForm.Lib.Types.MinMax
+
+
+    module DoseRule = Informedica.GenForm.Lib.DoseRule
+    module DoseLimit = DoseRule.DoseLimit
+
+
 
     module MinMax =
 
-        let none = { Minimum = None; Maximum = None }
+        let setConstraints (br : BigRational option) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
+            let min = minMax.Minimum
 
+            let max =
+                match minMax.Maximum, br with
+                | Some max, _ -> Some max
+                | None, _     -> br |> Option.map (fun br -> br + br / 10N)
 
-        let setConstraints (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
-            dto.MinIncl <- minMax.Minimum.IsSome
-            dto.Min <-minMax.Minimum
-            dto.MaxIncl <- minMax.Maximum.IsSome
-            dto.Max <- minMax.Maximum
+            dto.MinIncl <- min.IsSome
+            dto.Min <- min
+            dto.MaxIncl <- max.IsSome
+            dto.Max <- max
 
             dto
-
-
-
-    module SolutionRule =
-
-        let limit =
-            {
-                SubstanceName = ""
-                Quantities = []
-                MinConcentration = None
-                MaxConcentration = None
-            }
-
-
-
-    module DoseRule =
-
-
-        let limit =
-            {
-                Substance = ""
-                NormQuantity = None
-                Quantity = MinMax.none
-                NormQuantityAdjust = None
-                QuantityAdjust = MinMax.none
-                NormPerTime = None
-                PerTime = MinMax.none
-                NormPerTimeAdjust = None
-                PerTimeAdjust = MinMax.none
-                NormRate = None
-                Rate = MinMax.none
-                NormRateAdjust = None
-                RateAdjust = MinMax.none
-            }
 
 
 
@@ -96,7 +73,8 @@ module DrugOrder =
             DoseUnit = ""
             TimeUnit = ""
             RateUnit = ""
-            Dose = DoseRule.limit
+            Dose = DoseLimit.limit
+            Solution = None
         }
 
 
@@ -214,22 +192,22 @@ module DrugOrder =
 
                                 itmDto.Dose.Rate.Constraints <-
                                     itmDto.Dose.Rate.Constraints
-                                    |> MinMax.setConstraints s.Dose.Rate
+                                    |> MinMax.setConstraints s.Dose.NormRate s.Dose.Rate
 
                                 itmDto.Dose.RateAdjust.Constraints <-
                                     itmDto.Dose.RateAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.RateAdjust
+                                    |> MinMax.setConstraints s.Dose.NormRateAdjust s.Dose.RateAdjust
 
                             | DiscontinuousOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
 
                                 itmDto.Dose.Quantity.Constraints <-
                                     itmDto.Dose.Quantity.Constraints
-                                    |> MinMax.setConstraints s.Dose.Quantity
+                                    |> MinMax.setConstraints s.Dose.NormQuantity s.Dose.Quantity
 
                                 itmDto.Dose.QuantityAdjust.Constraints <-
                                     itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.QuantityAdjust
+                                    |> MinMax.setConstraints s.Dose.NormQuantityAdjust s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
@@ -238,22 +216,22 @@ module DrugOrder =
 
                                 itmDto.Dose.PerTime.Constraints <-
                                     itmDto.Dose.PerTime.Constraints
-                                    |> MinMax.setConstraints s.Dose.PerTime
+                                    |> MinMax.setConstraints s.Dose.NormPerTime s.Dose.PerTime
 
                                 itmDto.Dose.PerTimeAdjust.Constraints <-
                                     itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.PerTimeAdjust
+                                    |> MinMax.setConstraints s.Dose.NormPerTimeAdjust s.Dose.PerTimeAdjust
 
                             | TimedOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
 
                                 itmDto.Dose.Quantity.Constraints <-
                                     itmDto.Dose.Quantity.Constraints
-                                    |> MinMax.setConstraints s.Dose.Quantity
+                                    |> MinMax.setConstraints s.Dose.NormQuantity s.Dose.Quantity
 
                                 itmDto.Dose.QuantityAdjust.Constraints <-
                                     itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.QuantityAdjust
+                                    |> MinMax.setConstraints s.Dose.NormQuantityAdjust s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
@@ -262,11 +240,11 @@ module DrugOrder =
 
                                 itmDto.Dose.PerTime.Constraints <-
                                     itmDto.Dose.PerTime.Constraints
-                                    |> MinMax.setConstraints s.Dose.PerTime
+                                    |> MinMax.setConstraints s.Dose.NormPerTime s.Dose.PerTime
 
                                 itmDto.Dose.PerTimeAdjust.Constraints <-
                                     itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.PerTimeAdjust
+                                    |> MinMax.setConstraints s.Dose.NormPerTimeAdjust s.Dose.PerTimeAdjust
 
                                 itmDto.Dose.RateAdjust.Unit <-
                                     s.TimeUnit

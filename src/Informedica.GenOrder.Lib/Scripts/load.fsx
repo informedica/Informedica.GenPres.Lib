@@ -1,6 +1,10 @@
 
 #r "nuget: MathNet.Numerics.FSharp"
 #r "nuget: FParsec"
+#r "nuget: Newtonsoft.Json"
+#r "nuget: Aether"
+#r "nuget: Markdig"
+#r "nuget: ClosedXML"
 
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
@@ -26,3 +30,13 @@
 
 
 fsi.AddPrinter<System.DateTime> (fun dt -> dt.ToShortDateString())
+
+
+open System
+open Informedica.Utils.Lib
+
+
+let zindexPath = __SOURCE_DIRECTORY__ |> Path.combineWith "../../../"
+Environment.CurrentDirectory <- zindexPath
+
+

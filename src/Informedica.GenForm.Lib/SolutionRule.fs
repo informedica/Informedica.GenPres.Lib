@@ -7,6 +7,22 @@ module SolutionRule =
     open Informedica.Utils.Lib.BCL
 
 
+    module DoseType = DoseRule.DoseType
+
+
+    module SolutionLimit =
+
+        let limit =
+            {
+                Substance = ""
+                Unit = ""
+                Quantity = MinMax.none
+                Quantities = [||]
+                Concentration = MinMax.none
+            }
+
+
+
     let toBrs = BigRational.toBrs
 
 
@@ -25,7 +41,7 @@ module SolutionRule =
 
 
 
-    let generics = get (fun sr -> sr.Selector.Generic)
+    let ids = get (fun sr -> sr.Selector.Id)
 
 
     let getRules () =
@@ -45,7 +61,8 @@ module SolutionRule =
                 let toBrOpt = toBrs >> toBrOpt
 
                 {|
-                    Generic = get "Generic"
+                    Id = get "GPK"
+                    Medication = get "Medication"
                     Shape = get "Shape"
                     Department = get "Dep"
                     CVL = get "CVL"
@@ -80,7 +97,8 @@ module SolutionRule =
                 {
                     Selector =
                         {
-                            Generic = r.Generic
+                            Id = r.Id
+                            Medication = r.Medication
                             Shape = r.Shape
                             Department = r.Department
                             Location =
@@ -101,7 +119,9 @@ module SolutionRule =
                     Time = (r.MinTime, r.MaxTime) |> MinMax.fromTuple
                     MaxRate = r.MaxRate
                     RateUnit = r.RateUnit
-                    Products = prods |> Product.filter r.Generic r.Shape
+                    Products =
+                        prods
+                        |> Array.filter (fun p -> p.GPK = r.Id)
                     SolutionLimits = [||]
                 }
             )
@@ -244,7 +264,7 @@ module SolutionRule =
 """
 
 
-        ({| md = ""; rules = [||] |}, rules |> Array.groupBy (fun d -> d.Selector.Generic))
+        ({| md = ""; rules = [||] |}, rules |> Array.groupBy (fun d -> d.Selector.Medication))
         ||> Array.fold (fun acc (generic, rs) ->
             let prods =
                 rs
@@ -253,15 +273,15 @@ module SolutionRule =
                     p.Substances
                     |> Array.sumBy (fun s -> s.Quantity |> Option.defaultValue 0N)
                 )
-                |> Array.map (fun p ->
-                    let sol =
-                        p.ShapeVolume
-                        |> Option.map BigRational.toStringNl
-                        |> Option.defaultValue ""
-                    if sol |> String.isNullOrWhiteSpace then product_md p.Label
+                |> Array.collect (fun p ->
+                    if p.Reconstitution |> Array.isEmpty then
+                        [| product_md p.Label |]
                     else
-                        $"{p.Label} oplossen in {sol} ml"
-                        |> product_md
+                        p.Reconstitution
+                        |> Array.map (fun r ->
+                            $"{p.Label} oplossen in {r.Volume} ml voor {r.Route}"
+                            |> product_md
+                        )
                 )
                 |> Array.distinct
                 |> String.concat "\n"
@@ -364,11 +384,11 @@ module SolutionRule =
 
     let printGenerics (rules: SolutionRule []) =
         rules
-        |> generics
-        |> Array.sort
-        |> Array.map (fun g ->
+        |> ids
+        |> Array.map (fun id ->
             rules
-            |> Array.filter (fun sr -> sr.Selector.Generic = g)
+            |> Array.filter (fun sr -> sr.Selector.Id = id)
+            |> Array.sortBy (fun sr -> sr.Selector.Medication)
             |> toMarkdown
         )
 

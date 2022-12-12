@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
+    <Compile Include="Mapping.fs" />
     <Compile Include="MinMax.fs" />
     <Compile Include="Patient.fs" />
     <Compile Include="Product.fs" />

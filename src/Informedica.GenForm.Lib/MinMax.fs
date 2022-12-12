@@ -5,6 +5,8 @@ namespace Informedica.GenForm.Lib
 module MinMax =
 
 
+
+
     let fromTuple (min, max) =
         {
             Minimum = min
@@ -12,12 +14,14 @@ module MinMax =
         }
 
 
+    let none = (None, None) |> fromTuple
+
+
     let map fMin fMax (minMax : MinMax) =
         { minMax with
             Minimum = minMax.Minimum |> Option.map fMin
             Maximum = minMax.Maximum |> Option.map fMax
         }
-        
 
 
     let isNone (minMax : MinMax) =

@@ -1,8 +1,6 @@
 namespace Informedica.GenOrder.Lib
 
 
-
-
 module Exceptions =
 
         /// Equation exception
@@ -19,5 +17,16 @@ module Exceptions =
 
             | None -> ()
 
-            (m, o) |> Exceptions.OrderCouldNotBeSolved |> OrderException |> raise
+            (m, o)
+            |> Exceptions.OrderCouldNotBeSolved
+            |> OrderException
+            |> raise
 
+
+        let toString (exn : exn) =
+            match exn with
+            | :? OrderException as m ->
+                match m.Data0 with
+                | Exceptions.OrderCouldNotBeSolved(m, o) ->
+                    $"{o} could not be resolved because: {m}"
+            | _ -> $"cannot turn {exn} to string"

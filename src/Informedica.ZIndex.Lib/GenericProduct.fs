@@ -184,7 +184,7 @@ module GenericProduct =
                 )
                 |> getSubstances log un gp
             printfn $"creating: {nm}"
-            create gp.GPKODE nm lb gp.ATCODE an sh rt ss ps
+            create gp.GPKODE nm lb (gp.ATCODE.Trim()) an sh rt ss ps
         )
 
 

@@ -6,6 +6,7 @@ module Types =
 
     open MathNet.Numerics
 
+
     type Substance =
         {
             Name : string
@@ -30,9 +31,15 @@ module Types =
             Shape : string
             ShapeQuantity : BigRational option
             ShapeUnit : string
-            ShapeVolume : BigRational option
+            Reconstitution : Reconstitution []
             Divisible : BigRational option
             Substances : Substance array
+        }
+    and Reconstitution =
+        {
+            Route : string
+            Volume : BigRational
+            Diluents : string []
         }
 
 
@@ -60,18 +67,18 @@ module Types =
     type DoseLimit =
         {
             Substance : string
-            NormDoseQuantity : BigRational option
-            DoseQuantity : MinMax
-            NormDoseQuantityAdjust : BigRational option
-            DoseQuantityAdjust : MinMax
-            NormDosePerTime : BigRational option
-            DosePerTime : MinMax
-            NormDosePerTimeAdjust : BigRational option
-            DosePerTimeAdjust : MinMax
-            NormDoseRate : BigRational option
-            DoseRate : MinMax
-            NormDoseRateAdjust : BigRational option
-            DoseRateAdjust : MinMax
+            NormQuantity : BigRational option
+            Quantity : MinMax
+            NormQuantityAdjust : BigRational option
+            QuantityAdjust : MinMax
+            NormPerTime : BigRational option
+            PerTime : MinMax
+            NormPerTimeAdjust : BigRational option
+            PerTimeAdjust : MinMax
+            NormRate : BigRational option
+            Rate : MinMax
+            NormRateAdjust : BigRational option
+            RateAdjust : MinMax
         }
 
 
@@ -148,7 +155,8 @@ module Types =
 
     type Selector =
         {
-            Generic : string
+            Id : string
+            Medication : string
             Shape : string
             Department : string
             Location : Location

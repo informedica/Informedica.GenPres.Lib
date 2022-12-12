@@ -2,80 +2,100 @@ namespace Informedica.GenForm.Lib
 
 
 
-module DoseType =
-
-    open Informedica.Utils.Lib.BCL
-
-
-    let sortBy = function
-        | Start -> 0
-        | Once -> 1
-        | PRN -> 2
-        | Maintenance -> 3
-        | Continuous -> 4
-        | StepUp n -> 50 + n
-        | StepDown n -> 100 + n
-        | AnyDoseType -> 200
-        | Contraindicated -> -1
-
-
-    let fromString s =
-        let s = s |> String.toLower |> String.trim
-
-        match s with
-        | "start" -> Start
-        | "eenmalig" -> Once
-        | "prn" -> PRN
-        | "onderhoud" -> Maintenance
-        | "continu" -> Continuous
-        | "contra" -> Contraindicated
-
-        | _ when s |> String.startsWith "afbouw" ->
-            match s |> String.split(" ") with
-            | [_;i] ->
-                match i |> Int32.tryParse with
-                | Some i -> StepDown i
-                | None ->
-                    printfn $"couldn't match {s}"
-                    AnyDoseType
-            | _ ->
-                printfn $"couldn't match {s}"
-                AnyDoseType
-        | _ when s |> String.startsWith "opbouw" ->
-            match s |> String.split(" ") with
-            | [_;i] ->
-                match i |> Int32.tryParse with
-                | Some i -> StepUp i
-                | None ->
-                    printfn $"couldn't match {s}"
-                    AnyDoseType
-            | _ ->
-                printfn $"couldn't match {s}"
-                AnyDoseType
-
-        | _ ->
-            printfn $"couldn't match {s}"
-            AnyDoseType
-
-
-    let toString = function
-        | Start -> "start"
-        | Once -> "eenmalig"
-        | PRN -> "prn"
-        | Maintenance -> "onderhoud"
-        | Continuous -> "continu"
-        | StepDown i -> $"afbouw {i}"
-        | StepUp i -> $"opbouw {i}"
-        | Contraindicated -> "contra"
-        | AnyDoseType -> ""
-
-
-
 module DoseRule =
 
     open System
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
+
+
+
+    module DoseType =
+
+
+        let sortBy = function
+            | Start -> 0
+            | Once -> 1
+            | PRN -> 2
+            | Maintenance -> 3
+            | Continuous -> 4
+            | StepUp n -> 50 + n
+            | StepDown n -> 100 + n
+            | AnyDoseType -> 200
+            | Contraindicated -> -1
+
+
+        let fromString s =
+            let s = s |> String.toLower |> String.trim
+
+            match s with
+            | "start" -> Start
+            | "eenmalig" -> Once
+            | "prn" -> PRN
+            | "onderhoud" -> Maintenance
+            | "continu" -> Continuous
+            | "contra" -> Contraindicated
+
+            | _ when s |> String.startsWith "afbouw" ->
+                match s |> String.split(" ") with
+                | [_;i] ->
+                    match i |> Int32.tryParse with
+                    | Some i -> StepDown i
+                    | None ->
+                        printfn $"couldn't match {s}"
+                        AnyDoseType
+                | _ ->
+                    printfn $"couldn't match {s}"
+                    AnyDoseType
+            | _ when s |> String.startsWith "opbouw" ->
+                match s |> String.split(" ") with
+                | [_;i] ->
+                    match i |> Int32.tryParse with
+                    | Some i -> StepUp i
+                    | None ->
+                        printfn $"couldn't match {s}"
+                        AnyDoseType
+                | _ ->
+                    printfn $"couldn't match {s}"
+                    AnyDoseType
+
+            | _ ->
+                printfn $"couldn't match {s}"
+                AnyDoseType
+
+
+        let toString = function
+            | Start -> "start"
+            | Once -> "eenmalig"
+            | PRN -> "prn"
+            | Maintenance -> "onderhoud"
+            | Continuous -> "continu"
+            | StepDown i -> $"afbouw {i}"
+            | StepUp i -> $"opbouw {i}"
+            | Contraindicated -> "contra"
+            | AnyDoseType -> ""
+
+
+
+    module DoseLimit =
+
+
+        let limit =
+            {
+                Substance = ""
+                NormQuantity = None
+                Quantity = MinMax.none
+                NormQuantityAdjust = None
+                QuantityAdjust = MinMax.none
+                NormPerTime = None
+                PerTime = MinMax.none
+                NormPerTimeAdjust = None
+                PerTimeAdjust = MinMax.none
+                NormRate = None
+                Rate = MinMax.none
+                NormRateAdjust = None
+                RateAdjust = MinMax.none
+            }
 
 
     let toBrs = BigRational.toBrs
@@ -161,23 +181,23 @@ module DoseRule =
             let doseRateUnit = $"{dr.DoseUnit}/{dr.RateUnit}"
             let doseRateAdjUnit = $"{dr.DoseUnit}/{dr.AdjustUnit}/{dr.RateUnit}"
             [
-                $"{dl.NormDoseRate |> printNormDose doseRateUnit} " +
-                $"{dl.DoseRate |> printMinMaxDose doseRateUnit}"
+                $"{dl.NormRate |> printNormDose doseRateUnit} " +
+                $"{dl.Rate |> printMinMaxDose doseRateUnit}"
 
-                $"{dl.NormDoseRateAdjust |> printNormDose doseRateAdjUnit} " +
-                $"{dl.DoseRateAdjust |> printMinMaxDose doseRateAdjUnit}"
+                $"{dl.NormRateAdjust |> printNormDose doseRateAdjUnit} " +
+                $"{dl.RateAdjust |> printMinMaxDose doseRateAdjUnit}"
 
-                $"{dl.NormDosePerTimeAdjust |> printNormDose doseTotAdjUnit} " +
-                $"{dl.DosePerTimeAdjust |> printMinMaxDose doseTotAdjUnit}"
+                $"{dl.NormPerTimeAdjust |> printNormDose doseTotAdjUnit} " +
+                $"{dl.PerTimeAdjust |> printMinMaxDose doseTotAdjUnit}"
 
-                $"{dl.NormDosePerTime |> printNormDose doseTotUnit} " +
-                $"{dl.DosePerTime |> printMinMaxDose doseTotUnit}"
+                $"{dl.NormPerTime |> printNormDose doseTotUnit} " +
+                $"{dl.PerTime |> printMinMaxDose doseTotUnit}"
 
-                $"{dl.NormDoseQuantityAdjust |> printNormDose doseQtyAdjUnit} " +
-                $"{dl.DoseQuantityAdjust |> printMinMaxDose doseQtyAdjUnit}"
+                $"{dl.NormQuantityAdjust |> printNormDose doseQtyAdjUnit} " +
+                $"{dl.QuantityAdjust |> printMinMaxDose doseQtyAdjUnit}"
 
-                $"{dl.NormDoseQuantity |> printNormDose doseQtyUnit} " +
-                $"{dl.DoseQuantity |> printMinMaxDose doseQtyUnit}"
+                $"{dl.NormQuantity |> printNormDose doseQtyUnit} " +
+                $"{dl.Quantity |> printMinMaxDose doseQtyUnit}"
             ]
             |> List.map String.trim
             |> List.filter (String.IsNullOrEmpty >> not)
@@ -244,7 +264,7 @@ module DoseRule =
                     Indication = get "Indication"
                     Generic = get "Generic"
                     Shape = get "Shape"
-                    Route = get "Route"
+                    Route = get "RouteMV"
                     Department = get "Dep"
                     Diagn = get "Diagn"
                     Gender = get "Gender" |> Gender.fromString
@@ -339,18 +359,18 @@ module DoseRule =
                         |> Array.map (fun r ->
                             {
                                 Substance = r.Substance
-                                NormDoseQuantity = r.NormDoseQty
-                                DoseQuantity = (r.MinDoseQty, r.MaxDoseQty) |> MinMax.fromTuple
-                                NormDoseQuantityAdjust = r.NormDoseQtyAdj
-                                DoseQuantityAdjust = (r.MinDoseQtyAdj, r.MaxDoseQtyAdj) |> MinMax.fromTuple
-                                NormDosePerTime = r.NormDoseTot
-                                DosePerTime = (r.MinDoseTot, r.MaxDoseTot) |> MinMax.fromTuple
-                                NormDosePerTimeAdjust = r.NormDoseTotAdj
-                                DosePerTimeAdjust = (r.MinDoseTotAdj, r.MaxDoseTotAdj) |> MinMax.fromTuple
-                                NormDoseRate = r.NormDoseRate
-                                DoseRate = (r.MinDoseRate, r.MaxDoseRate) |> MinMax.fromTuple
-                                NormDoseRateAdjust = r.NormDoseRateAdj
-                                DoseRateAdjust = (r.MinDoseRateAdj, r.MaxDoseRateAdj) |> MinMax.fromTuple
+                                NormQuantity = r.NormDoseQty
+                                Quantity = (r.MinDoseQty, r.MaxDoseQty) |> MinMax.fromTuple
+                                NormQuantityAdjust = r.NormDoseQtyAdj
+                                QuantityAdjust = (r.MinDoseQtyAdj, r.MaxDoseQtyAdj) |> MinMax.fromTuple
+                                NormPerTime = r.NormDoseTot
+                                PerTime = (r.MinDoseTot, r.MaxDoseTot) |> MinMax.fromTuple
+                                NormPerTimeAdjust = r.NormDoseTotAdj
+                                PerTimeAdjust = (r.MinDoseTotAdj, r.MaxDoseTotAdj) |> MinMax.fromTuple
+                                NormRate = r.NormDoseRate
+                                Rate = (r.MinDoseRate, r.MaxDoseRate) |> MinMax.fromTuple
+                                NormRateAdjust = r.NormDoseRateAdj
+                                RateAdjust = (r.MinDoseRateAdj, r.MaxDoseRateAdj) |> MinMax.fromTuple
                             }
                         )
                 }
@@ -596,3 +616,5 @@ module DoseRule =
                     }
             |> toMarkdown
         )
+
+

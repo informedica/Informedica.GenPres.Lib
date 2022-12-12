@@ -1,9 +1,12 @@
 namespace Informedica.GenForm.Lib
 
 
+
 module Product =
 
+    open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
+    open Informedica.ZIndex.Lib
 
 
     let toBrs s =
@@ -22,17 +25,32 @@ module Product =
 
 
     let filter generic shape (prods : Product array) =
+        let repl s =
+            s
+            |> String.replace "/" ""
+            |> String.replace "+" ""
         let eqs s1 s2 =
-            let s1 = s1 |> String.trim |> String.toLower
-            let s2 = s2 |> String.trim |> String.toLower
-            s1 = s2
+            let s1 = s1 |> repl
+            let s2 = s2 |> repl
+            s1 |> String.equalsCapInsens s2
         prods
         |> Array.filter (fun p -> p.Generic |> eqs generic && p.Shape |> eqs shape)
 
 
-    let products () =
-        Web.getDataFromSheet Web.dataUrlId2 "Products"
+    // GPK
+    // Generic
+    // Shape
+    // Route
+    // DoseType
+    // Dep
+    // CVL
+    // PVL
+    // DiluentVol
+    // Diluent
+    let getReconstitution () =
+        Web.getDataFromSheet Web.dataUrlId2 "Reconstitution"
         |> fun data ->
+
             let getColumn =
                 data
                 |> Array.head
@@ -45,61 +63,129 @@ module Product =
                 let toBrOpt = toBrs >> toBrOpt
 
                 {|
-                    GPK =  get "GPK"
-                    ATC = get "ATC"
-                    MainGroup = get "MainGroup"
-                    SubGroup = get "SubGroup"
-                    Generic = get "Generic"
-                    TallMan = get "TallMan"
-                    Synonyms = get "Synonyms" |> String.split "||" |> List.toArray
-                    Product = get "Product"
-                    Label = get "Label"
-                    Shape = get "Shape"
-                    ShapeQuantity = get "ShapeQuantity" |> toBrOpt
-                    ShapeUnit = get "ShapeUnit"
-                    ShapeVolume = get "ShapeVol" |> toBrOpt
-                    Substance = get "Substance"
-                    SubstanceQuantity = get "SubstanceQuantity" |> toBrOpt
-                    SubstanceUnit = get "SubstanceUnit"
-                    MultipleQuantity = get "MultipleQuantity" |> toBrOpt
-                    MultipleUnit = get "MultipleUnit"
-                    Divisible = get "Divisible" |> toBrOpt
+                    GPK = get "GPK"
+                    Route = get "Route"
+                    DoseType = get "DoseType"
+                    Dep = get "Dep"
+                    DilentVol = get "DiluentVol" |> toBrOpt
+                    Diluent = get "Diluent"
                 |}
             )
-            |> Array.groupBy (fun r ->
-                {
-                    GPK =  r.GPK
-                    ATC = r.ATC
-                    MainGroup = r.MainGroup
-                    SubGroup = r.SubGroup
-                    Generic = r.Generic
-                    TallMan = r.TallMan
-                    Synonyms = r.Synonyms
-                    Product = r.Product
-                    Label = r.Label
-                    Shape = r.Shape
-                    ShapeQuantity = r.ShapeQuantity
-                    ShapeUnit = r.ShapeUnit
-                    ShapeVolume = r.ShapeVolume
-                    Divisible = r.Divisible
-                    Substances = [||]
-                }
+
+
+    let products () =
+        let reconst = getReconstitution ()
+
+        Web.getDataFromSheet Web.dataUrlId2 "Formulary"
+        |> fun data ->
+            let getColumn =
+                data
+                |> Array.head
+                |> Csv.getStringColumn
+
+            data
+            |> Array.tail
+            |> Array.map (fun r ->
+                let get = getColumn r
+
+                {|
+                    GPKODE = get "GPKODE" |> Int32.parse
+                    Apotheek = get "Apotheek"
+                    ICC = get "ICC"
+                    NICU = get "NICU"
+                    PICU = get "PICU"
+                    Leeuw = get "Leeuw"                
+                |}
             )
-            |> Array.map (fun (prod, rs) ->
-                { prod with
-                    Substances =
-                        rs
+            |> Array.collect (fun r ->
+                r.GPKODE
+                |> GenPresProduct.findByGPK
+            )
+            |> Array.collect (fun gpp ->
+                gpp.GenericProducts
+                |> Array.map (fun gp -> gpp, gp)
+            )
+            |> Array.map (fun (gpp, gp) ->
+                let atc =
+                    gp.ATC
+                    |> ATCGroup.findByATC5 ()
+                {
+                    GPK =  $"{gp.Id}"
+                    ATC = gp.ATC |> String.trim
+                    MainGroup =
+                        atc
+                        |> Array.map (fun g -> g.AnatomicalGroup)
+                        |> Array.tryHead
+                        |> Option.defaultValue ""
+                    SubGroup =
+                        atc
+                        |> Array.map (fun g -> g.TherapeuticSubGroup)
+                        |> Array.tryHead
+                        |> Option.defaultValue ""
+                    Generic = gpp.Name |> String.toLower
+                    TallMan = "" //r.TallMan
+                    Synonyms =
+                        gpp.GenericProducts
+                        |> Array.collect (fun gp ->
+                            gp.PrescriptionProducts
+                            |> Array.collect (fun pp ->
+                                pp.TradeProducts
+                                |> Array.map (fun tp -> tp.Brand)
+                            )
+                        )
+                    Product =
+                        gp.PrescriptionProducts
+                        |> Array.collect (fun pp ->
+                            pp.TradeProducts
+                            |> Array.map (fun tp -> tp.Label)
+                        )
+                        |> Array.distinct
+                        |> function
+                        | [| p |] -> p
+                        | _ -> ""
+                    Label = gp.Label
+                    Shape = gp.Shape |> String.toLower
+                    ShapeQuantity = Some 1N
+                    ShapeUnit =
+                        gp.Substances[0].ShapeUnit
+                        |> Mapping.mapUnit
+                        |> Option.defaultValue ""
+                    Reconstitution =
+                        reconst
+                        |> Array.filter (fun r ->
+                            r.GPK = $"{gp.Id}" &&
+                            r.DilentVol |> Option.isSome
+                        )
                         |> Array.map (fun r ->
                             {
-                                Name = r.Substance
-                                Quantity = r.SubstanceQuantity
-                                Unit = r.SubstanceUnit
-                                MultipleQuantity = r.MultipleQuantity
-                                MultipleUnit = r.MultipleUnit
+                                Route = r.Route
+                                Volume = r.DilentVol.Value
+                                Diluents = [| r.Diluent |]
+                            }
+                        )
+                        
+                    Divisible = None
+                    Substances =
+                        gp.Substances
+                        |> Array.map (fun s ->
+                            {
+                                Name =
+                                    s.SubstanceName
+                                    |> String.toLower
+                                Quantity =
+                                    s.SubstanceQuantity
+                                    |> BigRational.fromFloat
+                                Unit =
+                                    s.SubstanceUnit
+                                    |> Mapping.mapUnit
+                                    |> Option.defaultValue ""
+                                MultipleQuantity = None
+                                MultipleUnit = ""
                             }
                         )
                 }
             )
+
 
     let generics (products : Product array) =
         products
@@ -122,4 +208,5 @@ module Product =
         products
         |> Array.map (fun p -> p.Shape)
         |> Array.distinct
+
 

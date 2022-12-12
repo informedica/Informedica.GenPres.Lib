@@ -1,4 +1,5 @@
 
+
 #time
 
 #load "load.fsx"
@@ -6,6 +7,7 @@
 
 #load "../Types.fs"
 #load "../Utils.fs"
+#load "../Mapping.fs"
 #load "../MinMax.fs"
 #load "../Patient.fs"
 #load "../Product.fs"
@@ -23,16 +25,10 @@ open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 
-Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
+
+DoseRule.doseRules ()
 
 
-let noProdsFilt (sr : SolutionRule) = sr.Products |> Array.isEmpty
-
-
-SolutionRule.getRules ()
-|> Array.filter noProdsFilt
+SolutionRule.getRules()
 |> SolutionRule.printGenerics
-|> fun s -> File.WriteAllText("solutions.md", s |> String.concat "\n")
-
-
 

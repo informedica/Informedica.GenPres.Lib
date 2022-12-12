@@ -8,6 +8,7 @@ module Logging =
     module SolverLogging = Informedica.GenSolver.Lib.Logging
     module LoggingType = Informedica.GenSolver.Lib.Types.Logging
 
+
     let private log level (logger : LoggingType.Logger) msg =
         msg
         |> fun m ->

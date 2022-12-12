@@ -19,6 +19,7 @@ module Utils =
             | FloatData
             | FloatOptionData
 
+
         let tryCast dt (x: string) =
             match dt with
             | StringData -> box (x.Trim())
@@ -73,17 +74,20 @@ module Utils =
 
     module Web =
 
+
         let createUrl sheet id =
             $"https://docs.google.com/spreadsheets/d/{id}/gviz/tq?tqx=out:csv&sheet={sheet}"
 
+
         //https://docs.google.com/spreadsheets/d/1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g/edit?usp=sharing
-        [<Literal>]
-        let dataUrlId = "1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g"
+        let [<Literal>] dataUrlId = "1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g"
 
         //https://docs.google.com/spreadsheets/d/1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ/edit?usp=sharing
         let [<Literal>] dataUrlId2 = "1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ"
 
+
         let client = new HttpClient()
+
 
         let download url =
             async {
@@ -99,6 +103,7 @@ module Utils =
             |> download
             |> Async.RunSynchronously
             |> Csv.parseCSV
+
 
 
     module BigRational =
