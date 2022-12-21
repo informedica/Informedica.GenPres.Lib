@@ -48,8 +48,10 @@ module Solver =
     let orderEqsToUnit = scaleOrderEqs OrderVariable.toUnit
 
 
-    let mapToSolverEqs =
-        List.map (fun eq ->
+    let mapToSolverEqs eqs =
+        eqs
+        |> filterEqsWithUnits
+        |> List.map (fun eq ->
             match eq with
             | OrderProductEquation (y, xs) -> (y.Variable, xs |> List.map (fun v -> v.Variable)) |> ProductEquation
             | OrderSumEquation     (y, xs) -> (y.Variable, xs |> List.map (fun v -> v.Variable)) |> SumEquation

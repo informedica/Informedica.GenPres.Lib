@@ -10,6 +10,7 @@
     <Compile Include="Mapping.fs" />
     <Compile Include="MinMax.fs" />
     <Compile Include="Patient.fs" />
+    <Compile Include="DoseType.fs" />
     <Compile Include="Product.fs" />
     <Compile Include="DoseRule.fs" />
     <Compile Include="SolutionRule.fs" />

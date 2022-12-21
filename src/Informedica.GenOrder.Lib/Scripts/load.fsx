@@ -26,6 +26,7 @@
 #load "../Order.fs"
 #load "../OrderLogger.fs"
 #load "../DrugOrder.fs"
+#load "../Patient.fs"
 #load "../Api.fs"
 
 
@@ -38,5 +39,4 @@ open Informedica.Utils.Lib
 
 let zindexPath = __SOURCE_DIRECTORY__ |> Path.combineWith "../../../"
 Environment.CurrentDirectory <- zindexPath
-
 

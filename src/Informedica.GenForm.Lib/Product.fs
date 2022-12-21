@@ -4,9 +4,28 @@ namespace Informedica.GenForm.Lib
 
 module Product =
 
+
     open MathNet.Numerics
+    open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.ZIndex.Lib
+
+
+    module Location =
+
+
+        let toString = function
+            | PVL -> "PVL"
+            | CVL -> "CVL"
+            | AnyLocation -> ""
+
+
+        let fromString s =
+            match s with
+            | _ when s |> String.equalsCapInsens "PVL" -> PVL
+            | _ when s |> String.equalsCapInsens "CVL" -> CVL
+            | _ -> AnyLocation
+
 
 
     let toBrs s =
@@ -38,15 +57,14 @@ module Product =
 
 
     // GPK
-    // Generic
-    // Shape
     // Route
     // DoseType
     // Dep
     // CVL
     // PVL
     // DiluentVol
-    // Diluent
+    // ExpansionVol
+    // Diluents
     let getReconstitution () =
         Web.getDataFromSheet Web.dataUrlId2 "Reconstitution"
         |> fun data ->
@@ -65,12 +83,94 @@ module Product =
                 {|
                     GPK = get "GPK"
                     Route = get "Route"
-                    DoseType = get "DoseType"
+                    Location =
+                        match get "CVL", get "PVL" with
+                        | s1, _ when s1 |> String.isNullOrWhiteSpace |> not -> CVL
+                        | _, s2 when s2 |> String.isNullOrWhiteSpace |> not -> PVL
+                        | _ -> AnyLocation
+                    DoseType = get "DoseType" |> DoseType.fromString
                     Dep = get "Dep"
-                    DilentVol = get "DiluentVol" |> toBrOpt
-                    Diluent = get "Diluent"
+                    DiluentVol = get "DiluentVol" |> toBrOpt
+                    ExpansionVol = get "ExpansionVol" |> toBrOpt
+                    Diluents = get "Diluents"
                 |}
             )
+
+
+    let parenteral () =
+        Web.getDataFromSheet Web.dataUrlId2 "ParentMeds"
+        |> fun data ->
+            let getColumn =
+                data
+                |> Array.head
+                |> Csv.getStringColumn
+
+            data
+            |> Array.tail
+            |> Array.map (fun r ->
+                let get = getColumn r
+                let toBrOpt = toBrs >> toBrOpt
+
+                {|
+                    Name = get "Name"
+                    Substances =
+                        [|
+                            "volume mL", get "volume mL" |> toBrOpt
+                            "energie kCal", get "energie kCal" |> toBrOpt
+                            "eiwit g", get "eiwit g" |> toBrOpt
+                            "KH g", get "KH g" |> toBrOpt
+                            "vet g", get "vet g" |> toBrOpt
+                            "Na mmol", get "Na mmol" |> toBrOpt
+                            "K mmol", get "K mmol" |> toBrOpt
+                            "Ca mmol", get "Ca mmol" |> toBrOpt
+                            "P mmol", get "P mmol" |> toBrOpt
+                            "Mg mmol", get "Mg mmol" |> toBrOpt
+                            "Fe mmol", get "Fe mmol" |> toBrOpt
+                            "VitD IE", get "VitD IE" |> toBrOpt
+                            "Cl mmol", get "Cl mmol" |> toBrOpt
+
+                        |]
+                    Oplosmiddel = get "volume mL" 
+                    Verdunner = get "volume mL" 
+                |}
+            )
+            |> Array.map (fun r ->
+                {
+                    GPK =  r.Name
+                    ATC = ""
+                    MainGroup = ""
+                    SubGroup = ""
+                    Generic = r.Name
+                    TallMan = "" //r.TallMan
+                    Synonyms = [||]
+                    Product = r.Name
+                    Label = r.Name
+                    Shape = ""
+                    ShapeQuantity = Some 1N
+                    ShapeUnit = "mL"
+                    Reconstitution = [||]
+                    Divisible = 10N |> Some
+                    Substances =
+                        r.Substances
+                        |> Array.map (fun (s, q) ->
+                            let n, u =
+                                match s |> String.split " " with
+                                | [n; u] -> n |> String.trim, u |> String.trim
+                                | _ -> failwith $"cannot parse substance {s}"
+                            {
+                                Name = n
+                                Quantity = q
+                                Unit = u
+                                MultipleQuantity = None
+                                MultipleUnit = ""
+                            }
+                        )
+                }
+            )
+
+
+    let getParenteral : unit -> Product [] =
+        Memoization.memoize parenteral
 
 
     let products () =
@@ -90,11 +190,11 @@ module Product =
 
                 {|
                     GPKODE = get "GPKODE" |> Int32.parse
-                    Apotheek = get "Apotheek"
+                    Apotheek = get "UMCU"
                     ICC = get "ICC"
-                    NICU = get "NICU"
-                    PICU = get "PICU"
-                    Leeuw = get "Leeuw"                
+                    NEO = get "NEO"
+                    ICK = get "ICK"
+                    HCK = get "HCK"                
                 |}
             )
             |> Array.collect (fun r ->
@@ -154,13 +254,20 @@ module Product =
                         reconst
                         |> Array.filter (fun r ->
                             r.GPK = $"{gp.Id}" &&
-                            r.DilentVol |> Option.isSome
+                            r.DiluentVol |> Option.isSome
                         )
                         |> Array.map (fun r ->
                             {
                                 Route = r.Route
-                                Volume = r.DilentVol.Value
-                                Diluents = [| r.Diluent |]
+                                DoseType = r.DoseType
+                                Department = r.Dep
+                                Location = r.Location
+                                DiluentVolume = r.DiluentVol.Value
+                                ExpansionVolume = r.ExpansionVol
+                                Diluents =
+                                    r.Diluents
+                                    |> String.splitAt ';'
+                                    |> Array.map String.trim
                             }
                         )
                         
@@ -185,6 +292,10 @@ module Product =
                         )
                 }
             )
+
+
+    let getProducts : unit -> Product [] =
+        Memoization.memoize products
 
 
     let generics (products : Product array) =

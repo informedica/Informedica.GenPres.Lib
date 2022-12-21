@@ -4,10 +4,8 @@ namespace Informedica.GenForm.Lib
 module SolutionRule =
 
     open MathNet.Numerics
+    open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-
-
-    module DoseType = DoseRule.DoseType
 
 
     module SolutionLimit =
@@ -41,10 +39,10 @@ module SolutionRule =
 
 
 
-    let ids = get (fun sr -> sr.Selector.Id)
+    let generics = get (fun sr -> sr.Selector.Generic)
 
 
-    let getRules () =
+    let solutionRules () =
         Web.getDataFromSheet Web.dataUrlId2 "SolutionRules"
         |> fun data ->
             let prods = Product.products ()
@@ -61,9 +59,9 @@ module SolutionRule =
                 let toBrOpt = toBrs >> toBrOpt
 
                 {|
-                    Id = get "GPK"
-                    Medication = get "Medication"
+                    Generic = get "Generic"
                     Shape = get "Shape"
+                    Route = get "Route"
                     Department = get "Dep"
                     CVL = get "CVL"
                     PVL = get "PVL"
@@ -80,10 +78,6 @@ module SolutionRule =
                     MaxVol = get "MaxVol" |> toBrOpt
                     MinPerc = get "MinPerc" |> toBrOpt
                     MaxPerc = get "MaxPerc" |> toBrOpt
-                    MinTime = get "MinTime" |> toBrOpt
-                    MaxTime = get "MaxTime" |> toBrOpt
-                    MaxRate = get "MaxRate" |> toBrOpt
-                    RateUnit = get "RateUnit"
                     Substance = get "Substance"
                     Unit = get "Unit"
                     Quantities = get "Quantities" |> toBrs
@@ -97,9 +91,9 @@ module SolutionRule =
                 {
                     Selector =
                         {
-                            Id = r.Id
-                            Medication = r.Medication
+                            Generic = r.Generic
                             Shape = r.Shape
+                            Route = r.Route
                             Department = r.Department
                             Location =
                                 if r.CVL = "x" then CVL
@@ -116,12 +110,9 @@ module SolutionRule =
                     Volumes = r.Volumes
                     Volume = (r.MinVol, r.MaxVol) |> MinMax.fromTuple
                     DosePerc = (r.MinPerc, r.MaxPerc) |> MinMax.fromTuple
-                    Time = (r.MinTime, r.MaxTime) |> MinMax.fromTuple
-                    MaxRate = r.MaxRate
-                    RateUnit = r.RateUnit
                     Products =
                         prods
-                        |> Array.filter (fun p -> p.GPK = r.Id)
+                        |> Array.filter (fun p -> p.Generic = r.Generic)
                     SolutionLimits = [||]
                 }
             )
@@ -140,6 +131,10 @@ module SolutionRule =
                         )
                 }
             )
+
+
+    let getSolutionRules : unit -> SolutionRule [] =
+        Memoization.memoize solutionRules
 
 
     let printSolutionLimit (sr: SolutionRule) (limit: SolutionLimit) =
@@ -210,23 +205,10 @@ module SolutionRule =
             else
                 $"* geef {p}%% van de bereiding"
 
-        let time =
-            if sr.Time |> MinMax.toString |> String.isNullOrWhiteSpace then ""
-            else
-                $"* inlooptijd: {sr.Time |> MinMax.toString} min"
-
-        let rate =
-            match sr.MaxRate with
-            | Some r when sr.RateUnit |> String.isNullOrWhiteSpace |> not &&
-                          limit.Unit |> String.isNullOrWhiteSpace |> not ->
-                $"* max inloop snelheid: {r |> BigRational.toStringNl} {limit.Unit}/{sr.RateUnit}"
-            | _ -> ""
-
         $"""
 {loc}{limit.Substance}: {q}{qs}{vol}
 {conc}
 {dosePerc}
-{time}{rate}
 """
 
 
@@ -264,7 +246,7 @@ module SolutionRule =
 """
 
 
-        ({| md = ""; rules = [||] |}, rules |> Array.groupBy (fun d -> d.Selector.Medication))
+        ({| md = ""; rules = [||] |}, rules |> Array.groupBy (fun d -> d.Selector.Generic))
         ||> Array.fold (fun acc (generic, rs) ->
             let prods =
                 rs
@@ -279,7 +261,7 @@ module SolutionRule =
                     else
                         p.Reconstitution
                         |> Array.map (fun r ->
-                            $"{p.Label} oplossen in {r.Volume} ml voor {r.Route}"
+                            $"{p.Label} oplossen in {r.DiluentVolume} ml voor {r.Route}"
                             |> product_md
                         )
                 )
@@ -384,11 +366,11 @@ module SolutionRule =
 
     let printGenerics (rules: SolutionRule []) =
         rules
-        |> ids
-        |> Array.map (fun id ->
+        |> generics
+        |> Array.map (fun generic ->
             rules
-            |> Array.filter (fun sr -> sr.Selector.Id = id)
-            |> Array.sortBy (fun sr -> sr.Selector.Medication)
+            |> Array.filter (fun sr -> sr.Selector.Generic = generic)
+            |> Array.sortBy (fun sr -> sr.Selector.Generic)
             |> toMarkdown
         )
 

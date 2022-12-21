@@ -66,10 +66,12 @@ module OrderLogger =
                 | OrderProductEquation (ovar, ovars)
                 | OrderSumEquation (ovar, ovars) -> ovar::ovars
             )
-            |> fun xs -> $"""
-{(xs |> toEqString " * ").Replace(s, "")}
-{(xs |> toEqString " + ").Replace(s, "")}
-"""
+            |> fun xs ->
+        $"""
+        {(xs |> toEqString " * ").Replace(s, "")}
+        {(xs |> toEqString " + ").Replace(s, "")}
+        """
+
         with
         | e ->
             printfn $"error printing: {e.ToString()}"
@@ -93,6 +95,8 @@ module OrderLogger =
             | Events.OrderSolveFinished o -> $"=== Order ({o.Orderable.Name |> Name.toString}) Solver Finished ==="
 
             | Events.OrderScenario _ -> ""
+
+            | _ -> ""
 
         | Logging.OrderException (Exceptions.OrderCouldNotBeSolved(s, o)) ->
             printfn $"printing error for order {o.Orderable.Name}"
@@ -127,6 +131,7 @@ module OrderLogger =
                 let s = $"Terminated with {s}"
                 printfn $"%s{s}"
                 s
+
 
 
     // Catches a message and will dispatch this to the appropiate

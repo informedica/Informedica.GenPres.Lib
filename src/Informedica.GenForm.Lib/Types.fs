@@ -7,6 +7,33 @@ module Types =
     open MathNet.Numerics
 
 
+    type Location =
+        | PVL
+        | CVL
+        | AnyLocation
+
+
+    type Gender = Male | Female | AnyGender
+
+
+    type DoseType =
+        | Start
+        | Once
+        | PRN
+        | Maintenance
+        | Continuous
+        | StepDown of int
+        | StepUp of int
+        | Contraindicated
+        | AnyDoseType
+
+
+    type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
+
+
+    type Frequency = { Count : BigRational; TimeUnit : string }
+
+
     type Substance =
         {
             Name : string
@@ -38,35 +65,21 @@ module Types =
     and Reconstitution =
         {
             Route : string
-            Volume : BigRational
+            DoseType: DoseType
+            Department : string
+            Location : Location
+            DiluentVolume : BigRational
+            ExpansionVolume : BigRational option
             Diluents : string []
         }
 
-
-    type Gender = Male | Female | AnyGender
-
-
-    type MinMax = { Minimum : BigRational option; Maximum : BigRational option }
-
-
-    type DoseType =
-        | Start
-        | Once
-        | PRN
-        | Maintenance
-        | Continuous
-        | StepDown of int
-        | StepUp of int
-        | Contraindicated
-        | AnyDoseType
-
-
-    type Frequency = { Count : BigRational; TimeUnit : string }
 
 
     type DoseLimit =
         {
             Substance : string
+            DoseUnit : string
+            RateUnit : string
             NormQuantity : BigRational option
             Quantity : MinMax
             NormQuantityAdjust : BigRational option
@@ -102,12 +115,10 @@ module Types =
             Route : string
             Department : string
             Patient : Patient
+            AdjustUnit : string
             DoseType : DoseType
             Frequencies : BigRational array
-            DoseUnit : string
-            AdjustUnit : string
             FreqUnit : string
-            RateUnit : string
             Time : MinMax
             TimeUnit : string
             Interval : MinMax
@@ -136,13 +147,13 @@ module Types =
         }
 
 
-
-    type Location =
-        | PVL
-        | CVL
-        | AnyLocation
-
-
+    // Substance
+    // Unit
+    // Quantities
+    // MinQty
+    // MaxQty
+    // MinConc
+    // MaxConc
     type SolutionLimit =
         {
             Substance : string
@@ -152,21 +163,39 @@ module Types =
             Concentration : MinMax
         }
 
-
+    // Id
+    // Medication
+    // Shape
+    // Route
+    // DoseType
+    // Dep
+    // CVL
+    // PVL
+    // MinAge
+    // MaxAge
+    // MinWeight
+    // MaxWeight
+    // MinDose
+    // MaxDose
     type Selector =
         {
-            Id : string
-            Medication : string
+            Generic : string
             Shape : string
+            Route : string
+            DoseType : DoseType
             Department : string
             Location : Location
             Age : MinMax
             Weight : MinMax
             Dose : MinMax
-            DoseType : DoseType
         }
 
-
+    // Solutions
+    // Volumes
+    // MinVol
+    // MaxVol
+    // MinPerc
+    // MaxPerc
     type SolutionRule =
         {
             Selector : Selector
@@ -174,9 +203,6 @@ module Types =
             Volumes : BigRational []
             Volume : MinMax
             DosePerc : MinMax
-            Time : MinMax
-            MaxRate : BigRational option
-            RateUnit : string
             Products : Product []
             SolutionLimits : SolutionLimit []
         }

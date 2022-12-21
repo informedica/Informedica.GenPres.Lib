@@ -26,6 +26,9 @@ open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 
 
+Product.parenteral ()
+
+
 DoseRule.doseRules ()
 
 

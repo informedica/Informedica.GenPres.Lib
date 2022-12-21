@@ -32,6 +32,7 @@ module Patient =
     open Informedica.Utils.Lib.BCL
 
 
+
     let sortBy (pat : Patient) =
         let toInt = function
             | Some x -> x |> BigRational.ToInt32
