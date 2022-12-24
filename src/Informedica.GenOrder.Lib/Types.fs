@@ -259,7 +259,7 @@ module Types =
             Unit : string
             /// The time unit to be used when using a frequency
             FreqUnit : string
-
+            /// The time unit for infusion time (duration)
             TimeUnit : string
             /// The time unit to be used when using a rate
             RateUnit : string
@@ -269,7 +269,7 @@ module Types =
             OrderType : OrderType
             Frequencies : BigRational list
             Rates : BigRational list
-            DoseQuantities : BigRational list
+            Dose : DoseLimit option
             DoseCount : BigRational option
             Adjust : BigRational option
             AdjustUnit : string

@@ -93,15 +93,15 @@ module Types =
             Substance : string
             DoseUnit : string
             RateUnit : string
-            NormQuantity : BigRational option
+            NormQuantity : BigRational []
             Quantity : MinMax
             NormQuantityAdjust : BigRational option
             QuantityAdjust : MinMax
-            NormPerTime : BigRational option
+            NormPerTime : BigRational []
             PerTime : MinMax
             NormPerTimeAdjust : BigRational option
             PerTimeAdjust : MinMax
-            NormRate : BigRational option
+            NormRate : BigRational []
             Rate : MinMax
             NormRateAdjust : BigRational option
             RateAdjust : MinMax

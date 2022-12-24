@@ -85,12 +85,24 @@ module Api =
             if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
             else pr.DoseRule.AdjustUnit
 
+        let dose =
+            pr.DoseRule.DoseLimits
+            |> Array.filter (fun dl -> dl.Substance |> String.isNullOrWhiteSpace)
+            |> function
+            | [|dl|] -> dl |> Some
+            | _ -> None
+
+        let noSubst =
+            dose
+            |> Option.map (fun d -> d.DoseUnit = "keer")
+            |> Option.defaultValue false
+
         { DrugOrder.drugOrder with
             Id = Guid.NewGuid().ToString()
             Name = pr.DoseRule.Generic
             Products =
                 pr.DoseRule.Products
-                |> createProductComponent false pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+                |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
                 |> List.singleton
             Quantities = []
             Frequencies = pr.DoseRule.Frequencies |> Array.toList
@@ -102,13 +114,14 @@ module Api =
             RateUnit = "uur"
             Route = pr.DoseRule.Route
             DoseCount =
-                if pr.DoseRule.Products |> Array.length = 1 then Some 1N
+                if pr.SolutionRule.IsNone then Some 1N
                 else None
             OrderType =
                 match pr.DoseRule.DoseType with
                 | Informedica.GenForm.Lib.Types.Continuous -> ContinuousOrder
                 | _ when pr.DoseRule.TimeUnit |> String.isNullOrWhiteSpace -> DiscontinuousOrder
                 | _ -> TimedOrder
+            Dose = dose
             Adjust =
                 if au = "kg" then
                     pr.Patient.Weight
@@ -166,10 +179,12 @@ module Api =
 
 
 
-let test n =
+let test a w n =
+    let a = a * 365m |> BigRational.FromDecimal |> Some
+    let w = w * 1000m |> BigRational.FromDecimal |> Some
     Patient.patient
-    |> Patient.Optics.setAge (10N * 365N |> Some)
-    |> Patient.Optics.setWeight (30N * 1000N |> Some)
+    |> Patient.Optics.setAge a
+    |> Patient.Optics.setWeight w
     |> Patient.Optics.setBSA (1N |> Some)
     |> PrescriptionRule.get
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
@@ -187,9 +202,16 @@ let test n =
 
 
 
+test 3m 15m 17
 
-test 40
 
+Patient.patient
+|> Patient.Optics.setAge (10N * 365N |> Some)
+|> Patient.Optics.setWeight (30N * 1000N |> Some)
+|> Patient.Optics.setBSA (1N |> Some)
+|> PrescriptionRule.get
+|> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+|> Array.item 17
 
 
 

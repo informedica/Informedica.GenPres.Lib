@@ -18,16 +18,16 @@ module DrugOrder =
 
     module MinMax =
 
-        let setConstraints (br : BigRational option) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
+        let setConstraints (brs : BigRational []) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
             let min =
-                match minMax.Minimum, br with
-                | Some min, _ -> Some min
-                | None, _     -> br |> Option.map (fun br -> br - br / 10N)
+                match minMax.Minimum, brs with
+                | None, [|br|] -> br - br / 10N |> Some
+                | _  -> minMax.Minimum
 
             let max =
-                match minMax.Maximum, br with
-                | Some max, _ -> Some max
-                | None, _     -> br |> Option.map (fun br -> br + br / 10N)
+                match minMax.Maximum, brs with
+                | None, [|br|] -> br + br / 10N |> Some
+                | _  -> minMax.Maximum
 
             dto.MinIncl <- min.IsSome
             dto.Min <- min
@@ -51,7 +51,7 @@ module DrugOrder =
             OrderType = AnyOrder
             Frequencies = []
             Rates = []
-            DoseQuantities = []
+            Dose = None
             DoseCount = None
             Adjust = None
             AdjustUnit = ""
@@ -108,6 +108,8 @@ module DrugOrder =
 
 
     let toOrder (d : DrugOrder) =
+        let toArr = Option.map Array.singleton >> Option.defaultValue [||]
+
         let setDoseRate (orbDto : Order.Orderable.Dto.Dto) =
             orbDto.Dose.Rate.Constraints.Incr <- [ 1N/10N ]
             orbDto.Dose.Rate.Constraints.MinIncl <- true
@@ -128,8 +130,6 @@ module DrugOrder =
         orbDto.OrderableQuantity.Unit <- ou
         orbDto.OrderQuantity.Unit <- ou
 
-        orbDto.Dose.Quantity.Constraints.Vals <-
-            d.DoseQuantities
         orbDto.DoseCount.Constraints.Vals <-
             d.DoseCount
             |> Option.map List.singleton
@@ -150,6 +150,23 @@ module DrugOrder =
                 |> unitGroup
                 |> sprintf "%s/%s/%s" ou au
 
+            match d.Dose with
+            | Some dl ->
+                orbDto.Dose.Rate.Unit <- $"{dl.DoseUnit}/{d.RateUnit}"
+
+                orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum
+                orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Maximum.IsSome
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Maximum
+
+                orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Minimum.IsSome
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum
+                orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Maximum.IsSome
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Maximum
+
+            | None -> ()
+
+
         | DiscontinuousOrder ->
             orbDto.Dose.Quantity.Unit <- ou
             orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/{au}"
@@ -157,6 +174,35 @@ module DrugOrder =
                 d.FreqUnit
                 |> unitGroup
                 |> sprintf "%s/%s" ou
+
+            match d.Dose with
+            | Some dl ->
+                orbDto.Dose.Quantity.Unit <- dl.DoseUnit
+                orbDto.Dose.PerTime.Unit <- $"{dl.DoseUnit}/{d.FreqUnit |> unitGroup}"
+
+                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> Array.toList
+
+                orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Minimum.IsSome
+                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum
+                orbDto.Dose.Quantity.Constraints.MaxIncl <- dl.Quantity.Maximum.IsSome
+                orbDto.Dose.Quantity.Constraints.Max <- dl.Quantity.Maximum
+
+                orbDto.Dose.QuantityAdjust.Constraints.MinIncl <- dl.QuantityAdjust.Minimum.IsSome
+                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum
+                orbDto.Dose.QuantityAdjust.Constraints.MaxIncl <- dl.QuantityAdjust.Maximum.IsSome
+                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum
+
+                orbDto.Dose.PerTime.Constraints.MinIncl <- dl.PerTime.Minimum.IsSome
+                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum
+                orbDto.Dose.PerTime.Constraints.MaxIncl <- dl.PerTime.Maximum.IsSome
+                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum
+
+                orbDto.Dose.PerTimeAdjust.Constraints.MinIncl <- dl.PerTimeAdjust.Minimum.IsSome
+                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum
+                orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
+                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum
+
+            | None -> ()
 
         | TimedOrder ->
             orbDto |> setDoseRate
@@ -176,6 +222,46 @@ module DrugOrder =
                 |> unitGroup
                 |> sprintf "%s/%s" ou
 
+            match d.Dose with
+            | Some dl ->
+                orbDto.Dose.Quantity.Unit <- dl.DoseUnit
+                orbDto.Dose.PerTime.Unit <- $"{dl.DoseUnit}/{d.FreqUnit |> unitGroup}"
+                orbDto.Dose.Rate.Unit <- $"{dl.DoseUnit}/{d.RateUnit}"
+
+                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> Array.toList
+
+                orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Minimum.IsSome
+                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum
+                orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Maximum.IsSome
+                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Maximum
+
+                orbDto.Dose.QuantityAdjust.Constraints.MinIncl <- dl.QuantityAdjust.Minimum.IsSome
+                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum
+                orbDto.Dose.QuantityAdjust.Constraints.MaxIncl <- dl.QuantityAdjust.Maximum.IsSome
+                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum
+
+                orbDto.Dose.PerTime.Constraints.MinIncl <- dl.PerTime.Minimum.IsSome
+                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum
+                orbDto.Dose.PerTime.Constraints.MaxIncl <- dl.PerTime.Maximum.IsSome
+                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum
+
+                orbDto.Dose.PerTimeAdjust.Constraints.MinIncl <- dl.PerTimeAdjust.Minimum.IsSome
+                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum
+                orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
+                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum
+
+                orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum
+                orbDto.Dose.Rate.Constraints.MaxIncl <- dl.Rate.Maximum.IsSome
+                orbDto.Dose.Rate.Constraints.Max <- dl.Rate.Maximum
+
+                orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Minimum.IsSome
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum
+                orbDto.Dose.RateAdjust.Constraints.MaxIncl <- dl.RateAdjust.Maximum.IsSome
+                orbDto.Dose.RateAdjust.Constraints.Max <- dl.RateAdjust.Maximum
+
+            | None -> ()
+
         orbDto.Components <-
             [
                 for p in d.Products do
@@ -194,7 +280,10 @@ module DrugOrder =
                     cdto.Items <- [
                         for s in p.Substances do
                             let su = s.Unit |> unitGroup
-                            let du = s.Dose.DoseUnit |> unitGroup
+                            let du =
+                                if s.Dose.DoseUnit |> String.isNullOrWhiteSpace then su
+                                else
+                                    s.Dose.DoseUnit |> unitGroup
 
                             let itmDto =
                                 Order.Orderable.Item.Dto.dto d.Id d.Name p.Name s.Name
@@ -220,7 +309,7 @@ module DrugOrder =
 
                                 itmDto.Dose.RateAdjust.Constraints <-
                                     itmDto.Dose.RateAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormRateAdjust s.Dose.RateAdjust
+                                    |> MinMax.setConstraints (s.Dose.NormRateAdjust |> toArr) s.Dose.RateAdjust
 
                             | DiscontinuousOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
@@ -231,7 +320,7 @@ module DrugOrder =
 
                                 itmDto.Dose.QuantityAdjust.Constraints <-
                                     itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormQuantityAdjust s.Dose.QuantityAdjust
+                                    |> MinMax.setConstraints (s.Dose.NormQuantityAdjust |> toArr) s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTime.Unit <-
                                     s.TimeUnit
@@ -249,7 +338,7 @@ module DrugOrder =
 
                                 itmDto.Dose.PerTimeAdjust.Constraints <-
                                     itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormPerTimeAdjust s.Dose.PerTimeAdjust
+                                    |> MinMax.setConstraints (s.Dose.NormPerTimeAdjust |> toArr) s.Dose.PerTimeAdjust
 
                             | TimedOrder ->
                                 itmDto.Dose.Quantity.Unit <- du
@@ -260,7 +349,7 @@ module DrugOrder =
 
                                 itmDto.Dose.QuantityAdjust.Constraints <-
                                     itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormQuantityAdjust s.Dose.QuantityAdjust
+                                    |> MinMax.setConstraints (s.Dose.NormQuantityAdjust |> toArr) s.Dose.QuantityAdjust
 
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
@@ -278,7 +367,7 @@ module DrugOrder =
 
                                 itmDto.Dose.PerTimeAdjust.Constraints <-
                                     itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormPerTimeAdjust s.Dose.PerTimeAdjust
+                                    |> MinMax.setConstraints (s.Dose.NormPerTimeAdjust |> toArr) s.Dose.PerTimeAdjust
 
                                 itmDto.Dose.RateAdjust.Unit <-
                                     s.TimeUnit
