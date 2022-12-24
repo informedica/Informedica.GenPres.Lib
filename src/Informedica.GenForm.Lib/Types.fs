@@ -4,6 +4,7 @@ namespace Informedica.GenForm.Lib
 [<AutoOpen>]
 module Types =
 
+    open Informedica.Utils.Lib.BCL
     open MathNet.Numerics
 
 
@@ -34,6 +35,18 @@ module Types =
     type Frequency = { Count : BigRational; TimeUnit : string }
 
 
+    type ShapeRoute =
+        {
+            Shape : string
+            Route : string
+            Unit  : string
+            DoseUnit : string
+            Timed : bool
+            Reconstitute : bool
+            IsSolution : bool
+        }
+
+
     type Substance =
         {
             Name : string
@@ -56,7 +69,7 @@ module Types =
             Product : string
             Label : string
             Shape : string
-            ShapeQuantity : BigRational option
+            ShapeQuantities : BigRational []
             ShapeUnit : string
             Reconstitution : Reconstitution []
             Divisible : BigRational option
@@ -95,15 +108,31 @@ module Types =
         }
 
 
-    type Patient =
+    type PatientCategory =
         {
-            Diagnosis : string
+            Department : string option
+            Diagnoses : string []
             Gender : Gender
             Age : MinMax
             Weight : MinMax
             BSA : MinMax
             GestAge : MinMax
             PMAge : MinMax
+            Location : Location
+        }
+
+
+    type Patient =
+        {
+            Department : string
+            Diagnoses : string []
+            Gender : Gender
+            Age : BigRational option
+            Weight : BigRational option
+            BSA : BigRational option
+            GestAge : BigRational option
+            PMAge : BigRational option
+            Location : Location
         }
 
 
@@ -113,8 +142,7 @@ module Types =
             Generic : string
             Shape : string
             Route : string
-            Department : string
-            Patient : Patient
+            Patient : PatientCategory
             AdjustUnit : string
             DoseType : DoseType
             Frequencies : BigRational array
@@ -129,31 +157,7 @@ module Types =
             Products : Product array
         }
 
-    type Filter =
-        {
-            Indication : string option
-            Generic : string option
-            Shape : string option
-            Route : string option
-            Department : string option
-            Diagnosis : string option
-            Gender : Gender
-            Age : BigRational option
-            Weight : BigRational option
-            BSA : BigRational option
-            GestAge : BigRational option
-            PMAge : BigRational option
-            DoseType : DoseType
-        }
 
-
-    // Substance
-    // Unit
-    // Quantities
-    // MinQty
-    // MaxQty
-    // MinConc
-    // MaxConc
     type SolutionLimit =
         {
             Substance : string
@@ -163,21 +167,8 @@ module Types =
             Concentration : MinMax
         }
 
-    // Id
-    // Medication
-    // Shape
-    // Route
-    // DoseType
-    // Dep
-    // CVL
-    // PVL
-    // MinAge
-    // MaxAge
-    // MinWeight
-    // MaxWeight
-    // MinDose
-    // MaxDose
-    type Selector =
+
+    type SolutionRule =
         {
             Generic : string
             Shape : string
@@ -188,17 +179,6 @@ module Types =
             Age : MinMax
             Weight : MinMax
             Dose : MinMax
-        }
-
-    // Solutions
-    // Volumes
-    // MinVol
-    // MaxVol
-    // MinPerc
-    // MaxPerc
-    type SolutionRule =
-        {
-            Selector : Selector
             Solutions : string []
             Volumes : BigRational []
             Volume : MinMax
@@ -207,3 +187,30 @@ module Types =
             SolutionLimits : SolutionLimit []
         }
 
+
+    type Filter =
+        {
+            Indication : string option
+            Generic : string option
+            Shape : string option
+            Route : string option
+            Department : string option
+            Diagnoses : string []
+            Gender : Gender
+            Age : BigRational option
+            Weight : BigRational option
+            BSA : BigRational option
+            GestAge : BigRational option
+            PMAge : BigRational option
+            DoseType : DoseType
+            Dose : BigRational option
+            Location : Location
+        }
+
+
+    type PrescriptionRule =
+        {
+            Patient : Patient
+            DoseRule : DoseRule
+            SolutionRule : SolutionRule option
+        }

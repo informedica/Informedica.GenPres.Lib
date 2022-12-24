@@ -71,7 +71,10 @@ module GenPresProduct =
                 |> Array.collect (fun gp ->
                     Zindex.BST801T.records ()
                     |> Array.filter (fun atc ->
-                        atc.ATCODE.Trim() = gp.ATC.Substring(0, 5))
+                        atc.ATCODE
+                        |> String.trim
+                        |> String.equalsCapInsens (gp.ATC |> String.subString 0 5)
+                    )
                     |> Array.map (fun atc -> atc.ATOMS))
                 |> Array.distinct
 

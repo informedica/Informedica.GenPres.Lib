@@ -86,12 +86,23 @@ module Equation =
         let f y xs = y::xs
         apply f f
 
+
     let count eq =
-        eq
-        |> toVars
-        |> List.fold (fun (acc : int) v ->
-            (+) (v |> Variable.count) acc
-        ) 0
+        let vars = eq |> toVars
+        let b =
+            let n =
+                vars
+                |> List.filter (Variable.isSolved)
+                |> List.length
+            (vars |> List.length) - n = 1
+        if b then -100
+        else
+            eq
+            |> toVars
+            |> List.fold (fun (acc : int) v ->
+                (+) (v |> Variable.count) acc
+            ) 0
+
 
     let countProduct eq =
         //match eq with

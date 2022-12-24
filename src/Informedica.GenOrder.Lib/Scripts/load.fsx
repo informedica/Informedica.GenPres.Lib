@@ -11,6 +11,7 @@
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 #r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"
 #r "../../Informedica.GenForm.Lib/bin/Debug/net6.0/Informedica.GenForm.Lib.dll"
+#r "../../Informedica.ZIndex.Lib/bin/Debug/net6.0/Informedica.ZIndex.Lib.dll"
 
 // These can be loaded all at once.
 
@@ -27,7 +28,7 @@
 #load "../OrderLogger.fs"
 #load "../DrugOrder.fs"
 #load "../Patient.fs"
-#load "../Api.fs"
+//#load "../Api.fs"
 
 
 fsi.AddPrinter<System.DateTime> (fun dt -> dt.ToShortDateString())

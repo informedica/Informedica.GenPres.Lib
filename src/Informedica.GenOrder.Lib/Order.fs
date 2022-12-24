@@ -1115,7 +1115,7 @@ module Order =
             | TimedOrder -> $"{TimedOrder}"
 
 
-        let map s = 
+        let map s =
             match s with
             | _ when s = "discontinu" -> DiscontinuousOrder
             | _ when s = "continu" -> ContinuousOrder
@@ -1311,12 +1311,22 @@ module Order =
             |> Solver.solveUnits logger
             |> Solver.orderEqsToBase
 
-        oEqs
-        |> Solver.mapToSolverEqs
-        |> Solver.solveMinMax logger
-        |> Solver.mapToOrderEqs oEqs
-        |> Solver.orderEqsToUnit
-        |> mapFromEquations ord
+        try
+            oEqs
+            |> Solver.mapToSolverEqs
+            |> Solver.solveMinMax logger
+            |> Solver.mapToOrderEqs oEqs
+            |> Solver.orderEqsToUnit
+            |> mapFromEquations ord
+        with
+        | _ ->
+            oEqs
+            |> Solver.orderEqsToUnit
+            |> mapFromEquations ord
+            |> toString
+            |> List.iteri (printfn "%i. %s")
+
+            reraise()
 
 
     module Print =

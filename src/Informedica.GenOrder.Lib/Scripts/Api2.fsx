@@ -17,45 +17,6 @@ open Informedica.GenOrder.Lib
 open Api
 
 
-let evaluate weight (doseRule : DoseRule) =
-    let solRule =
-        SolutionRule.getSolutionRules ()
-        |> Array.tryFind (fun s ->
-            s.Selector.Generic = doseRule.Generic
-        )
-
-    let sns =
-        doseRule.DoseLimits
-        |> Array.map (fun l -> l.Substance)
-        |> Array.toList
-
-    doseRule
-    |> createDrugOrders solRule
-    |> List.map (Api.setAdjust weight)
-    |> List.map DrugOrder.toOrder
-    |> List.map Order.Dto.fromDto
-    |> List.map (Order.solveMinMax { Log = ignore })
-//    |> toScenarios doseRule.Indication sns
-
-
-
-let applConstrs weight (doseRule : DoseRule) =
-    let solRule =
-        SolutionRule.getSolutionRules ()
-        |> Array.tryFind (fun s ->
-            s.Selector.Generic = doseRule.Generic
-        )
-
-    doseRule
-    |> createDrugOrders solRule
-    |> List.map (Api.setAdjust weight)
-    |> List.map DrugOrder.toOrder
-    |> List.map Order.Dto.fromDto
-    |> List.map Order.applyConstraints
-
-//    |> List.map (Order.solveMinMax { Log = ignore })
-//    |> toScenarios doseRule.Indication sns
-
 
 let path = Some $"{__SOURCE_DIRECTORY__}/log.txt"
 let startLogger () =
@@ -63,117 +24,214 @@ let startLogger () =
     OrderLogger.logger.Start path Logging.Level.Informative
 
 
-startLogger()
+module Api =
+
+    open System
+    open MathNet.Numerics
+    open Informedica.Utils.Lib.BCL
+    open Informedica.GenForm.Lib
+    open Informedica.GenOrder.Lib
 
 
-Api.filter None None None (Some "gentamicine") None None
-|> Array.item 4
-//|> applConstrs 50.
-|> evaluate 2.
-|> List.iter (fun o ->
-    o
-    |> Order.toString
-    |> List.iter (printfn "%s")
-)
+    let tryHead m = (Array.map m) >> Array.tryHead >> (Option.defaultValue "")
 
 
-startLogger()
-Api.filter
-    None None None
-    (Some "noradrenaline")
-    (Some "infusievloeistof") None
-|> Array.item 0
+    let createProductComponent noSubst freqUnit (doseLimits : DoseLimit []) (ps : Product []) =
+        { DrugOrder.productComponent with
+            Name = ps |> tryHead (fun p -> p.Shape)
+            Quantities =
+                ps
+                |> Array.collect (fun p -> p.ShapeQuantities)
+                |> Array.distinct
+                |> Array.toList
+            TimeUnit = freqUnit
+            RateUnit = "uur" //doseRule.RateUnit
+            Divisible =
+                ps
+                |> Array.choose (fun p -> p.Divisible)
+                |> Array.tryHead
+                |> Option.defaultValue 1N
+            Substances =
+                if noSubst then []
+                else
+                    ps
+                    |> Array.collect (fun p -> p.Substances)
+                    |> Array.groupBy (fun s -> s.Name)
+                    |> Array.map (fun (n, xs) ->
+                        {
+                            Name = n
+                            Concentrations =
+                                xs
+                                |> Array.choose (fun s -> s.Quantity)
+                                |> Array.distinct
+                                |> Array.toList
+                            OrderableQuantities = []
+                            Unit = xs |> tryHead (fun x -> x.Unit)
+                            TimeUnit = freqUnit
+                            Dose =
+                                doseLimits
+                                |> Array.tryFind (fun l -> l.Substance = n)
+                                |> Option.defaultValue DoseRule.DoseLimit.limit
+                            Solution = None
+                        }
+                    )
+                    |> Array.toList
+        }
 
 
-// report output to the fsi
-OrderLogger.logger.Report ()
+    let createDrugOrder (pr : PrescriptionRule) =
+        let parenteral = Product.Parenteral.get ()
+        let au =
+            if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
+            else pr.DoseRule.AdjustUnit
+
+        { DrugOrder.drugOrder with
+            Id = Guid.NewGuid().ToString()
+            Name = pr.DoseRule.Generic
+            Products =
+                pr.DoseRule.Products
+                |> createProductComponent false pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+                |> List.singleton
+            Quantities = []
+            Frequencies = pr.DoseRule.Frequencies |> Array.toList
+            FreqUnit = pr.DoseRule.FreqUnit
+            Unit =
+                pr.DoseRule.Products
+                |> tryHead (fun p -> p.ShapeUnit)
+            TimeUnit = pr.DoseRule.TimeUnit
+            RateUnit = "uur"
+            Route = pr.DoseRule.Route
+            DoseCount =
+                if pr.DoseRule.Products |> Array.length = 1 then Some 1N
+                else None
+            OrderType =
+                match pr.DoseRule.DoseType with
+                | Informedica.GenForm.Lib.Types.Continuous -> ContinuousOrder
+                | _ when pr.DoseRule.TimeUnit |> String.isNullOrWhiteSpace -> DiscontinuousOrder
+                | _ -> TimedOrder
+            Adjust =
+                if au = "kg" then
+                    pr.Patient.Weight
+                    |> Option.map (fun v -> v / 1000N)
+                else pr.Patient.BSA
+            AdjustUnit = au
+        }
+        |> fun dr ->
+                match pr.SolutionRule with
+                | None -> dr
+                | Some sr ->
+                    { dr with
+                        Quantities = sr.Volumes |> Array.toList
+                        DoseCount = sr.DosePerc.Maximum
+                        Products =
+                            match sr.Solutions with
+                            | [|s|] ->
+                                parenteral
+                                |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
+                                |> function
+                                | Some p ->
+                                    [|p|]
+                                    |> createProductComponent true pr.DoseRule.FreqUnit [||]
+                                    |> List.singleton
+                                    |> List.append dr.Products
+                                | None -> dr.Products
+                            | _ -> dr.Products
+                    }
+
+    let evaluate (dr : DrugOrder) =
+        dr
+        |> DrugOrder.toOrder
+        |> Order.Dto.fromDto
+        |> Order.solveMinMax { Log = ignore }
 
 
-SolutionRule.getSolutionRules ()
+    // print an order list
+    let toScenarios ind sn (sc : Order list) =
+        sc
+        |> List.mapi (fun i o ->
+            o
+            |> Order.Print.printPrescription sn
+            |> fun (pres, prep, adm) ->
+                {
+                    No = i
+                    Indication = ind
+                    Name = o.Orderable.Name |> Informedica.GenSolver.Lib.Variable.Name.toString
+                    Shape = o.Orderable.Components[0].Shape
+                    Route = o.Route
+                    Prescription = pres
+                    Preparation = prep
+                    Administration = adm
+                }
+        )
 
-"mL"
-|> DrugOrder.unitGroup
-
-661111N/21999996000000000000000N
-|> BigRational.ToDouble
-
-
-4074073333N/14666664000000N
-|> BigRational.ToDouble
-|> fun x -> x * 3600.
-
-1111111111N/4320000000000000000000N
-|> BigRational.ToDouble
-|> fun x -> x * 3600. * 1000.
-
-SolutionRule.getSolutionRules ()
-|> Array.tryFind (fun s ->
-    s.Selector.Generic = "gentamicine"
-)
-
-
-DoseRule.getDoseRules ()
-|> DoseRule.filter
-    { DoseRule.allFilter with
-        Age = 365N |> Some
-//        Generic = "paracetamol" |> Some
-//        Route = "iv" |> Some
-        Weight = 10N * 1000N |> Some
-    }
-|> DoseRule.patients
-|> Array.iteri (printfn "%i. %s")
-
-
-{
-    Diagnosis = ""
-    Gender = AnyGender
-    Age = { MinMax.none with Maximum = 19N * 365N |> Some }
-    Weight = { MinMax.none with Maximum = 6N |> Some }
-    BSA = MinMax.none
-    GestAge = MinMax.none
-    PMAge = MinMax.none
-}
-|> Patient.filter 
-    { DoseRule.allFilter with
-//        Age = 301N |> Some
-        Weight = 30N |> Some
-    }
 
 
 let test n =
-    DoseRule.getDoseRules ()
-    |> Array.skip n
-    |> Array.take 1
-    |> fun xs ->
-        xs
-        |> DoseRule.patients
-        |> Array.iteri (printfn "%i. %s")
-        printfn "---"
-        xs
-
-    |> DoseRule.filter
-        { DoseRule.allFilter with
-    //        Age = 10N * 365N |> Some
-    //        Generic = "paracetamol" |> Some
-    //        Route = "iv" |> Some
-            Weight = 30N |> Some
-        }
-    |> DoseRule.patients
-    |> Array.iteri (printfn "%i. %s")
-
-
-for i in [1..50] do
-    printfn $"{i}"
-    test i
+    Patient.patient
+    |> Patient.Optics.setAge (10N * 365N |> Some)
+    |> Patient.Optics.setWeight (30N * 1000N |> Some)
+    |> Patient.Optics.setBSA (1N |> Some)
+    |> PrescriptionRule.get
+    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+    |> Array.item n
+    |> fun pr ->
+        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
+        pr
+    |> Api.createDrugOrder
+    |> DrugOrder.toOrder
+    |> Order.Dto.fromDto
+    |> Order.solveMinMax { Log = ignore }
+    |> Order.toString
+    |> String.concat "\n"
+    |> printfn "# Berekening:\n\n%s"
 
 
 
-test 24
+
+test 40
 
 
 
-let dr =
-    DoseRule.getDoseRules()
-    |> Array.skip 24
-    |> Array.take 1
+
+
+DoseRule.get ()
+|> Array.filter (fun dr -> dr.Products |> Array.isEmpty)
+|> Array.map (fun dr -> dr.Generic, dr.Shape, dr.Route)
+|> Array.map (fun (g, s, r) ->
+    let ps =
+        Product.get ()
+        |> Array.filter (fun p -> p.Generic = g)
+        |> Array.map (fun p -> p.Shape)
+        |> Array.distinct
+        |> String.concat ";"
+    $"{g}, {s}, {r}: {ps}"
+)
+|> Array.distinct
+|> Array.map (fun x -> printfn "%s" x; x)
+|> Array.length
+
+
+
+open Informedica.ZIndex.Lib
+
+
+GenPresProduct.get true
+|> Array.filter (fun gpp ->
+    gpp.GenericProducts
+    |> Array.exists (fun gp -> gp.Id = 165638)
+)
+|> Array.map (fun gpp -> gpp.Name.ToLower())
+
+
+
+
+
+
+
+
+
+
+
+
+
 

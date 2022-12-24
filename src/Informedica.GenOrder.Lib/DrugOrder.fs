@@ -19,7 +19,7 @@ module DrugOrder =
     module MinMax =
 
         let setConstraints (br : BigRational option) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
-            let min = 
+            let min =
                 match minMax.Minimum, br with
                 | Some min, _ -> Some min
                 | None, _     -> br |> Option.map (fun br -> br - br / 10N)
@@ -54,6 +54,7 @@ module DrugOrder =
             DoseQuantities = []
             DoseCount = None
             Adjust = None
+            AdjustUnit = ""
         }
 
 
@@ -82,26 +83,28 @@ module DrugOrder =
 
 
     let unitGroup u =
-        ValueUnit.Units.units
-        |> List.filter (fun ud ->
-            ud.Group <> ValueUnit.Group.WeightGroup
-        )
-        |> List.tryFind (fun ud ->
-            [
-                ud.Abbreviation.Dut
-                ud.Abbreviation.Eng
-                ud.Name.Dut
-                ud.Name.Eng
-            ]
-            |> List.append ud.Synonyms
-            |> List.exists(String.equalsCapInsens u)
-        )
-        |> function
-        | Some ud ->
-            ud.Group
-            |> ValueUnit.Group.toString
-        | None -> "General"
-        |> sprintf "%s[%s]" u
+        if u = "kg" then "kg[Weight]"
+        else
+            ValueUnit.Units.units
+            |> List.filter (fun ud ->
+                ud.Group <> ValueUnit.Group.WeightGroup
+            )
+            |> List.tryFind (fun ud ->
+                [
+                    ud.Abbreviation.Dut
+                    ud.Abbreviation.Eng
+                    ud.Name.Dut
+                    ud.Name.Eng
+                ]
+                |> List.append ud.Synonyms
+                |> List.exists(String.equalsCapInsens u)
+            )
+            |> function
+            | Some ud ->
+                ud.Group
+                |> ValueUnit.Group.toString
+            | None -> "General"
+            |> sprintf "%s[%s]" u
 
 
     let toOrder (d : DrugOrder) =
@@ -111,8 +114,9 @@ module DrugOrder =
             orbDto.Dose.Rate.Constraints.Min <- 1N/10N |> Some
             orbDto.Dose.Rate.Constraints.MaxIncl <- true
             orbDto.Dose.Rate.Constraints.Max <- 1000N |> Some
-    
+
         let ou = d.Unit |> unitGroup
+        let au = d.AdjustUnit |> unitGroup
         let orbDto = Order.Orderable.Dto.dto d.Id d.Name
 
         orbDto.DoseCount.Constraints.Vals <-
@@ -144,11 +148,11 @@ module DrugOrder =
             orbDto.Dose.RateAdjust.Unit <-
                 d.RateUnit
                 |> unitGroup
-                |> sprintf "%s/kg[Weight]/%s" ou
+                |> sprintf "%s/%s/%s" ou au
 
         | DiscontinuousOrder ->
             orbDto.Dose.Quantity.Unit <- ou
-            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/kg[Weight]"
+            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/{au}"
             orbDto.Dose.PerTime.Unit <-
                 d.FreqUnit
                 |> unitGroup
@@ -163,10 +167,10 @@ module DrugOrder =
             orbDto.Dose.RateAdjust.Unit <-
                 d.RateUnit
                 |> unitGroup
-                |> sprintf "%s/kg[Weight]/%s" ou
+                |> sprintf "%s/%s/%s" ou au
 
             orbDto.Dose.Quantity.Unit <- ou
-            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/kg[Weight]"
+            orbDto.Dose.QuantityAdjust.Unit <- $"{ou}/{au}"
             orbDto.Dose.PerTime.Unit <-
                 d.FreqUnit
                 |> unitGroup
@@ -179,7 +183,7 @@ module DrugOrder =
 
                     cdto.ComponentQuantity.Constraints.Vals <- p.Quantities
                     cdto.ComponentQuantity.Unit <- ou
-                        
+
                     cdto.OrderableConcentration.Unit <- "x[Count]"
                     cdto.OrderableQuantity.Constraints.Incr <- [ 1N / p.Divisible ]
                     cdto.OrderableQuantity.Unit <- ou
@@ -208,7 +212,7 @@ module DrugOrder =
                                 itmDto.Dose.RateAdjust.Unit <-
                                     s.Dose.RateUnit
                                     |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du
+                                    |> sprintf "%s/%s/%s" du au
 
                                 itmDto.Dose.Rate.Constraints <-
                                     itmDto.Dose.Rate.Constraints
@@ -229,14 +233,19 @@ module DrugOrder =
                                     itmDto.Dose.QuantityAdjust.Constraints
                                     |> MinMax.setConstraints s.Dose.NormQuantityAdjust s.Dose.QuantityAdjust
 
-                                itmDto.Dose.PerTimeAdjust.Unit <-
+                                itmDto.Dose.PerTime.Unit <-
                                     s.TimeUnit
                                     |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du
+                                    |> sprintf "%s/%s" du
 
                                 itmDto.Dose.PerTime.Constraints <-
                                     itmDto.Dose.PerTime.Constraints
                                     |> MinMax.setConstraints s.Dose.NormPerTime s.Dose.PerTime
+
+                                itmDto.Dose.PerTimeAdjust.Unit <-
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/%s/%s" du au
 
                                 itmDto.Dose.PerTimeAdjust.Constraints <-
                                     itmDto.Dose.PerTimeAdjust.Constraints
@@ -256,7 +265,12 @@ module DrugOrder =
                                 itmDto.Dose.PerTimeAdjust.Unit <-
                                     s.TimeUnit
                                     |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du
+                                    |> sprintf "%s/%s/%s" du au
+
+                                itmDto.Dose.PerTime.Unit <-
+                                    s.TimeUnit
+                                    |> unitGroup
+                                    |> sprintf "%s/%s" du
 
                                 itmDto.Dose.PerTime.Constraints <-
                                     itmDto.Dose.PerTime.Constraints
@@ -269,7 +283,7 @@ module DrugOrder =
                                 itmDto.Dose.RateAdjust.Unit <-
                                     s.TimeUnit
                                     |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du
+                                    |> sprintf "%s/%s/%s" du au
 
                             itmDto
                     ]
@@ -304,7 +318,7 @@ module DrugOrder =
             d.Adjust
             |> Option.map List.singleton
             |> Option.defaultValue []
-        dto.Adjust.Unit <- "kg[Weight]"
+        dto.Adjust.Unit <- au
 
         dto
 

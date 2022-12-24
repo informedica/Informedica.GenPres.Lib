@@ -10,9 +10,12 @@
 #load "../Mapping.fs"
 #load "../MinMax.fs"
 #load "../Patient.fs"
+#load "../DoseType.fs"
 #load "../Product.fs"
+#load "../Filter.fs"
 #load "../DoseRule.fs"
 #load "../SolutionRule.fs"
+#load "../PrescriptionRule.fs"
 
 
 open System
@@ -26,12 +29,5 @@ open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 
 
-Product.parenteral ()
 
-
-DoseRule.doseRules ()
-
-
-SolutionRule.getRules()
-|> SolutionRule.printGenerics
 

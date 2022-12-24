@@ -12,6 +12,7 @@ module Types =
 
     type Unit = ValueUnit.Unit
     type Gender = Informedica.GenForm.Lib.Types.Gender
+    type Patient = Informedica.GenForm.Lib.Types.Patient
 
 
     /// A `VariableUnit` is the combination of
@@ -271,6 +272,7 @@ module Types =
             DoseQuantities : BigRational list
             DoseCount : BigRational option
             Adjust : BigRational option
+            AdjustUnit : string
         }
     /// The product components that are used by the drug order
     and ProductComponent =
@@ -308,17 +310,6 @@ module Types =
             TimeUnit : string
             Dose : DoseLimit
             Solution : SolutionLimit option
-        }
-
-
-    type Patient =
-        {
-            Gender : Gender
-            Age : BigRational option
-            Weight : BigRational option
-            BSA : BigRational option
-            GestAge : BigRational option
-            PMAge : BigRational option
         }
 
 

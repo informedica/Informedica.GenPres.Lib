@@ -26,14 +26,14 @@ module Gender =
 
 
 
-module Patient =
+module PatientCategory =
 
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
 
 
 
-    let sortBy (pat : Patient) =
+    let sortBy (pat : PatientCategory) =
         let toInt = function
             | Some x -> x |> BigRational.ToInt32
             | None -> 0
@@ -44,26 +44,46 @@ module Patient =
         (pat.Weight.Minimum |> Option.map (fun w -> w / 1000N) |> toInt)
 
 
-    let filter (filter : Filter) (pat : Patient) =
+    let filter (filter : Filter) (pat : PatientCategory) =
+        let eqs a b =
+            match a, b with
+            | None, _
+            | _, None -> true
+            | Some a, Some b -> a = b
+
         ([| pat |]
         |> Array.filter (fun p ->
-            match filter.Diagnosis with
-            | None -> true
-            | Some d -> p.Diagnosis = d
+            if filter.Diagnoses |> Array.isEmpty then true
+            else
+                p.Diagnoses
+                |> Array.exists (fun d ->
+                    filter.Diagnoses |> Array.exists (String.equalsCapInsens d)
+                )
         ),
         [|
-            fun (p: Patient) -> filter.Age |> MinMax.isBetween p.Age
-            fun (p: Patient) -> filter.Weight |> MinMax.isBetween p.Weight
-            fun (p: Patient) -> filter.BSA |> MinMax.isBetween p.BSA
-            fun (p: Patient) -> filter.GestAge |> MinMax.isBetween p.GestAge
-            fun (p: Patient) -> filter.PMAge |> MinMax.isBetween p.PMAge
-            fun (p: Patient) -> filter.Gender |> Gender.filter p.Gender
+            fun (p: PatientCategory) -> filter.Department |> eqs p.Department
+            fun (p: PatientCategory) -> filter.Age |> MinMax.isBetween p.Age
+            fun (p: PatientCategory) -> filter.Weight |> MinMax.isBetween p.Weight
+            fun (p: PatientCategory) -> filter.BSA |> MinMax.isBetween p.BSA
+            fun (p: PatientCategory) -> filter.GestAge |> MinMax.isBetween p.GestAge
+            fun (p: PatientCategory) -> filter.PMAge |> MinMax.isBetween p.PMAge
+            fun (p: PatientCategory) -> filter.Gender |> Gender.filter p.Gender
+            fun (p: PatientCategory) ->
+                match p.Location, filter.Location with
+                | AnyLocation, _
+                | _, AnyLocation -> true
+                | _ -> p.Location = filter.Location
         |])
         ||> Array.fold(fun acc pred ->
             acc
             |> Array.filter pred
         )
         |> fun xs -> xs |> Array.length > 0
+
+
+    let isAgeWeight a w aMinMax wMinMax =
+        a |> MinMax.isBetween aMinMax &&
+        w |> MinMax.isBetween wMinMax
 
 
     let printAge a =
@@ -107,7 +127,7 @@ module Patient =
 
 
 
-    let toString (pat : Patient) =
+    let toString (pat : PatientCategory) =
 
         let gender = pat.Gender |> Gender.toString
 
@@ -160,10 +180,86 @@ module Patient =
             | None,     None     -> ""
 
         [
+            pat.Department |> Option.defaultValue ""
             gender
             neonate
             age
             weight
         ]
+        |> List.filter String.notEmpty
         |> List.filter (String.isNullOrWhiteSpace >> not)
         |> String.concat ", "
+
+
+
+module Patient =
+
+    open MathNet.Numerics
+    open Informedica.Utils.Lib.BCL
+
+
+    let patient =
+        {
+            Department = ""
+            Diagnoses = [||]
+            Gender = AnyGender
+            Age = None
+            Weight = None
+            BSA = None
+            GestAge = None
+            PMAge = None
+            Location = AnyLocation
+        }
+
+
+    let toString (pat: Patient) =
+
+        let gender = pat.Gender |> Gender.toString
+
+        let age =
+            pat.Age
+            |> Option.map PatientCategory.printAge
+            |> Option.defaultValue ""
+
+
+        let neonate =
+            let printDaysToWeeks = PatientCategory.printDaysToWeeks
+
+            let s =
+                if pat.GestAge.IsSome && pat.GestAge.Value < 259N then "prematuren"
+                else "neonaten"
+
+            match pat.GestAge, pat.PMAge with
+            | _, Some a ->
+                let a = a |> printDaysToWeeks
+                $"{s} postconceptie leeftijd %s{a}"
+            | Some a, _ ->
+                let a = a |> printDaysToWeeks
+                $"{s} zwangerschapsduur %s{a}"
+            | _ -> ""
+
+        let weight =
+            let toStr (v : BigRational) =
+                let v = v / 1000N
+                if v.Denominator = 1I then v |> BigRational.ToInt32 |> sprintf "%i"
+                else
+                    v
+                    |> BigRational.ToDouble
+                    |> sprintf "%A"
+
+            pat.Weight
+            |> Option.map (fun w -> $"gewicht %s{w |> toStr} kg")
+            |> Option.defaultValue ""
+
+
+        [
+            pat.Department
+            gender
+            neonate
+            age
+            weight
+        ]
+        |> List.filter String.notEmpty
+        |> List.filter (String.isNullOrWhiteSpace >> not)
+        |> String.concat ", "
+

@@ -1416,7 +1416,13 @@ module Variable =
         let applyExpr onlyMinIncrMax y expr =
             let set get set vr =
                 match expr |> get with
-                | Some m -> vr |> set m
+                | Some m ->
+                    try
+                        vr |> set m
+                    with
+                    | _ ->
+                        printfn $"cannot set {vr} with {m}"
+                        reraise ()
                 | None   -> vr
 
             match expr with

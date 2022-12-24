@@ -79,11 +79,6 @@ module OrderLogger =
 
     // To print all messages related to an order
     let printOrderMsg (msgs : ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message> option) msg =
-        let print (o : Order) =
-            let (Id s) = o.Id
-            o
-            |> Order.toString
-            |> List.map (String.replace (s + ".") "")
         match msg with
         | Logging.OrderEvent m ->
             match m with
