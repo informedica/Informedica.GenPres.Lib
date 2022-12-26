@@ -18,15 +18,15 @@ module Gender =
         | Female -> "vrouw"
         | AnyGender -> ""
 
-    let filter g1 g2 =
-        match g1, g2 with
-        | AnyGender, _
-        | _, AnyGender -> true
-        | _ -> g1 = g2
+    let filter pat (filter : Filter) =
+        match filter.Gender, pat with
+        | AnyGender, _ -> true
+        | _ -> filter.Gender = pat
 
 
 
 module PatientCategory =
+
 
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
@@ -65,9 +65,19 @@ module PatientCategory =
             fun (p: PatientCategory) -> filter.Age |> MinMax.isBetween p.Age
             fun (p: PatientCategory) -> filter.Weight |> MinMax.isBetween p.Weight
             fun (p: PatientCategory) -> filter.BSA |> MinMax.isBetween p.BSA
-            fun (p: PatientCategory) -> filter.GestAge |> MinMax.isBetween p.GestAge
-            fun (p: PatientCategory) -> filter.PMAge |> MinMax.isBetween p.PMAge
-            fun (p: PatientCategory) -> filter.Gender |> Gender.filter p.Gender
+            fun (p: PatientCategory) ->
+                // defaults to normal gestation
+                filter.GestAge
+                |> Option.defaultValue 259N
+                |> Some
+                |> MinMax.isBetween p.GestAge
+            fun (p: PatientCategory) ->
+                // defaults to normal postmenstrual age
+                filter.PMAge
+                |> Option.defaultValue 259N
+                |> Some
+                |> MinMax.isBetween p.PMAge
+            fun (p: PatientCategory) -> filter |> Gender.filter p.Gender
             fun (p: PatientCategory) ->
                 match p.Location, filter.Location with
                 | AnyLocation, _
@@ -205,24 +215,31 @@ module Patient =
             Gender = AnyGender
             Age = None
             Weight = None
-            BSA = None
+            Height = None
             GestAge = None
             PMAge = None
             Location = AnyLocation
         }
 
 
-    let toString (pat: Patient) =
+    let calcBSA (pat: Patient) =
+        match pat.Weight, pat.Height with
+        | Some w, Some h ->
+            let w =(w |> BigRational.toDouble) / 1000.
+            let h = h |> BigRational.toDouble
+            sqrt (w * h / 3600.)
+            |> BigRational.fromFloat
+        | _ -> None
 
-        let gender = pat.Gender |> Gender.toString
 
-        let age =
+    let rec toString (pat: Patient) =
+        [
+            pat.Department
+            pat.Gender |> Gender.toString
             pat.Age
             |> Option.map PatientCategory.printAge
             |> Option.defaultValue ""
 
-
-        let neonate =
             let printDaysToWeeks = PatientCategory.printDaysToWeeks
 
             let s =
@@ -238,26 +255,31 @@ module Patient =
                 $"{s} zwangerschapsduur %s{a}"
             | _ -> ""
 
-        let weight =
             let toStr (v : BigRational) =
                 let v = v / 1000N
                 if v.Denominator = 1I then v |> BigRational.ToInt32 |> sprintf "%i"
                 else
                     v
-                    |> BigRational.ToDouble
-                    |> sprintf "%A"
+                    |> BigRational.toStringNl
 
             pat.Weight
             |> Option.map (fun w -> $"gewicht %s{w |> toStr} kg")
             |> Option.defaultValue ""
 
+            pat.Height
+            |> Option.map (fun h -> $"lengte {h |> BigRational.toStringNl} cm")
+            |> Option.defaultValue ""
 
-        [
-            pat.Department
-            gender
-            neonate
-            age
-            weight
+            pat
+            |> calcBSA
+            |> Option.map (fun bsa ->
+                let bsa =
+                    bsa
+                    |> BigRational.toDouble
+                    |> Double.fixPrecision 2
+                $"BSA {bsa} m2"
+            )
+            |> Option.defaultValue ""
         ]
         |> List.filter String.notEmpty
         |> List.filter (String.isNullOrWhiteSpace >> not)

@@ -240,6 +240,7 @@ module Product =
             Memoization.memoize get_
 
 
+
     let private get_ () =
         let isSol = ShapeRoute.isSolution (ShapeRoute.get ())
 
@@ -376,6 +377,28 @@ module Product =
 
     let get : unit -> Product [] =
         Memoization.memoize get_
+
+
+    let manual (p : Product) =
+        if p.Substances |> Array.isEmpty then None
+        else
+            match p.Substances[0].Quantity with
+            | Some sq when sq > 0N ->
+                { p with
+                    GPK = $"{90000000 + (p.GPK |> Int32.parse)}"
+                    Product = p.Product  + " EIGEN BEREIDING" |> String.trim
+                    Label = p.Label + " EIGEN BEREIDING" |> String.trim
+                    ShapeQuantities = [| 1N |]
+                    Substances =
+                        p.Substances
+                        |> Array.map (fun s ->
+                            { s with
+                                Quantity = s.Quantity |> Option.map (fun v -> v / sq)
+                            }
+                        )
+                }
+                |> Some
+            | _ -> None
 
 
     let filter (filter : Filter) (prods : Product []) =

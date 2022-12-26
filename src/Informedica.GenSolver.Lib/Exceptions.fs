@@ -17,6 +17,8 @@ module Exceptions =
                 m |> Logging.logError log
             | None -> ()
 
+            //if isReraise then ()
+            //else
             m |> SolverException |> raise
 
 

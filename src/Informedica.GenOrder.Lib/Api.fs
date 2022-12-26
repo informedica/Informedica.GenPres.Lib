@@ -91,7 +91,7 @@ module Api =
                 if au = "kg" then
                     pr.Patient.Weight
                     |> Option.map (fun v -> v / 1000N)
-                else pr.Patient.BSA
+                else pr.Patient |> Patient.calcBSA
             AdjustUnit = au
         }
         |> fun dr ->

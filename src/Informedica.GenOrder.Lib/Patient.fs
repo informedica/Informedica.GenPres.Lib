@@ -5,6 +5,7 @@ module Patient =
 
     open DocumentFormat.OpenXml.Bibliography
 
+    open DocumentFormat.OpenXml.Drawing.Charts
     open Informedica.GenForm.Lib
 
     let patient : Patient =
@@ -14,7 +15,7 @@ module Patient =
             Gender = Gender.AnyGender
             Age = None
             Weight = None
-            BSA = None
+            Height = None
             GestAge = None
             PMAge = None
             Location = AnyLocation
@@ -32,8 +33,8 @@ module Patient =
         static member Weight_ =
             (fun (p : Patient) -> p.Weight), (fun w (p : Patient) -> { p with Weight = w})
 
-        static member BSA_ =
-            (fun (p : Patient) -> p.BSA), (fun b (p : Patient) -> { p with BSA = b})
+        static member Height_ =
+            (fun (p : Patient) -> p.Height), (fun b (p : Patient) -> { p with Height = b})
 
         static member GestAge_ =
             (fun (p : Patient) -> p.GestAge), (fun a (p : Patient) -> { p with GestAge = a})
@@ -41,6 +42,8 @@ module Patient =
         static member PMAge_ =
             (fun (p : Patient) -> p.PMAge), (fun a (p : Patient) -> { p with PMAge = a})
 
+        static member Department_ =
+            (fun (p : Patient) -> p.Department), (fun d (p : Patient) -> { p with Department = d})
 
 
     module Optics =
@@ -63,10 +66,10 @@ module Patient =
 
         let setWeight = Optic.set Patient.Weight_
 
-        let getBSA = Optic.get Patient.BSA_
+        let getHeight = Optic.get Patient.Height_
 
 
-        let setBSA = Optic.set Patient.BSA_
+        let setHeight = Optic.set Patient.Height_
 
         let getGestAge = Optic.get Patient.GestAge_
 
@@ -76,5 +79,9 @@ module Patient =
         let getPMAge = Optic.get Patient.PMAge_
 
         let setPMAGE = Optic.set Patient.PMAge_
+
+        let getDepartment = Optic.get Patient.Department_
+
+        let setDepartment = Optic.set Patient.Department_
 
 

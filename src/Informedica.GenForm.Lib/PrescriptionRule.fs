@@ -75,6 +75,28 @@ module PrescriptionRule =
                 )
         )
 
+    let filterProducts shapeQuantities (substs : (string * BigRational option) array)  (pr : PrescriptionRule) =
+        { pr with
+            DoseRule =
+                { pr.DoseRule with
+                    Products =
+                        pr.DoseRule.Products
+                        |> Array.filter (fun p ->
+                            p.ShapeQuantities
+                            |> Array.exists (fun sq ->
+                                shapeQuantities
+                                |> Array.exists ((=) sq)
+                            ) &&
+                            p.Substances
+                            |> Array.map (fun s -> s.Name.ToLower(), s.Quantity)
+                            |> Array.exists (fun sq ->
+                                substs
+                                |> Array.exists((=) sq)
+                            )
+                        )
+                }
+        }
+
 
     let toMarkdown (prs : PrescriptionRule []) =
             [

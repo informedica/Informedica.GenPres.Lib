@@ -38,7 +38,12 @@ module Api =
 
     let createProductComponent noSubst freqUnit (doseLimits : DoseLimit []) (ps : Product []) =
         { DrugOrder.productComponent with
-            Name = ps |> tryHead (fun p -> p.Shape)
+            Name =
+                ps
+                |> tryHead (fun p -> p.Shape)
+                |> fun s ->
+                    if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
+                    else s
             Quantities =
                 ps
                 |> Array.collect (fun p -> p.ShapeQuantities)
@@ -126,29 +131,35 @@ module Api =
                 if au = "kg" then
                     pr.Patient.Weight
                     |> Option.map (fun v -> v / 1000N)
-                else pr.Patient.BSA
+                else pr.Patient |> Patient.calcBSA
             AdjustUnit = au
         }
         |> fun dr ->
                 match pr.SolutionRule with
                 | None -> dr
                 | Some sr ->
+                    printfn "found solutionrule"
                     { dr with
                         Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
                         Products =
-                            match sr.Solutions with
-                            | [|s|] ->
-                                parenteral
-                                |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
-                                |> function
-                                | Some p ->
-                                    [|p|]
-                                    |> createProductComponent true pr.DoseRule.FreqUnit [||]
-                                    |> List.singleton
-                                    |> List.append dr.Products
-                                | None -> dr.Products
-                            | _ -> dr.Products
+                            let s =
+                                // ugly hack to get default solution
+                                sr.Solutions
+                                |> Array.tryHead
+                                |> Option.defaultValue "x"
+                            parenteral
+                            |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
+                            |> function
+                            | Some p ->
+                                printfn $"adding solution {p.Generic}"
+                                [|p|]
+                                |> createProductComponent true pr.DoseRule.FreqUnit [||]
+                                |> List.singleton
+                                |> List.append dr.Products
+                            | None ->
+                                printfn $"couldn't find {s} in parenterals"
+                                dr.Products
                     }
 
     let evaluate (dr : DrugOrder) =
@@ -179,41 +190,167 @@ module Api =
 
 
 
-let test a w n =
+let test a w h d n =
     let a = a * 365m |> BigRational.FromDecimal |> Some
     let w = w * 1000m |> BigRational.FromDecimal |> Some
-    Patient.patient
-    |> Patient.Optics.setAge a
-    |> Patient.Optics.setWeight w
-    |> Patient.Optics.setBSA (1N |> Some)
-    |> PrescriptionRule.get
-    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-    |> Array.item n
-    |> fun pr ->
+    let h = h |> BigRational.FromDecimal |> Some
+
+    let pat =
+        Patient.patient
+        |> Patient.Optics.setAge a
+        |> Patient.Optics.setWeight w
+        |> Patient.Optics.setHeight h
+        |> Patient.Optics.setDepartment d
+
+    let pr =
+        pat
+        |> PrescriptionRule.get
+        |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+        |> Array.item n
+
+    [| pr |]
+    |> PrescriptionRule.toMarkdown
+    |> printfn "Found rule:\n%s"
+
+    try
+        let ord =
+            pr
+            |> Api.createDrugOrder
+            |> DrugOrder.toOrder
+            |> Order.Dto.fromDto
+            |> Order.solveMinMax { Log = ignore }
+
+        let dto = ord |> Order.Dto.toDto
+
+        let shps =
+            dto.Orderable.Components
+            |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
+            |> List.toArray
+
+        let sbsts =
+            dto.Orderable.Components
+            |> List.toArray
+            |> Array.collect (fun cDto ->
+                cDto.Items
+                |> List.toArray
+                |> Array.collect (fun iDto ->
+                    iDto.ComponentConcentration.Variable.Vals
+                    |> List.toArray
+                    |> Array.map (fun v -> iDto.Name, v |> Some)
+                )
+            )
+            |> Array.distinct
+
+        let pr =
+            pr
+            |> PrescriptionRule.filterProducts
+                shps
+                sbsts
+
         printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
-        pr
-    |> Api.createDrugOrder
-    |> DrugOrder.toOrder
-    |> Order.Dto.fromDto
-    |> Order.solveMinMax { Log = ignore }
-    |> Order.toString
-    |> String.concat "\n"
-    |> printfn "# Berekening:\n\n%s"
+
+        ord
+        |> Order.toString
+        |> String.concat "\n"
+        |> printfn "# Berekening:\n\n%s"
+    with
+    | _ ->
+        printfn "bereken met handmatige bereiding"
+        let pr =
+            { pr with
+                DoseRule =
+                    { pr.DoseRule with
+                        Products =
+                            pr.DoseRule.Products
+                            |> Array.choose Product.manual
+                    }
+            }
+
+        let ord =
+            pr
+            |> Api.createDrugOrder
+            |> DrugOrder.toOrder
+            |> Order.Dto.fromDto
+            |> Order.solveMinMax { Log = ignore }
+
+        let dto = ord |> Order.Dto.toDto
+
+        let shps =
+            dto.Orderable.Components
+            |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
+            |> List.toArray
+
+        let sbsts =
+            dto.Orderable.Components
+            |> List.toArray
+            |> Array.collect (fun cDto ->
+                cDto.Items
+                |> List.toArray
+                |> Array.collect (fun iDto ->
+                    iDto.ComponentConcentration.Variable.Vals
+                    |> List.toArray
+                    |> Array.map (fun v -> iDto.Name, v |> Some)
+                )
+            )
+            |> Array.distinct
+
+        let pr =
+            pr
+            |> PrescriptionRule.filterProducts
+                shps
+                sbsts
+
+        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
+
+        ord
+        |> Order.toString
+        |> String.concat "\n"
+        |> printfn "# Berekening:\n\n%s"
 
 
 
-test 3m 15m 17
+20
+|> test 15m 70m 170m "ICK"
 
 
 Patient.patient
-|> Patient.Optics.setAge (10N * 365N |> Some)
-|> Patient.Optics.setWeight (30N * 1000N |> Some)
-|> Patient.Optics.setBSA (1N |> Some)
+|> Patient.Optics.setAge (3N * 365N |> Some)
+|> Patient.Optics.setWeight (15N * 1000N |> Some)
+|> Patient.Optics.setHeight (170N |> Some)
+|> Patient.Optics.setDepartment "ICK"
 |> PrescriptionRule.get
 |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-|> Array.item 17
+|> Array.item 16
+|> Api.createDrugOrder
+|> DrugOrder.toOrder
+|> Order.Dto.fromDto
+|> Order.applyConstraints
+|> Order.toString
 
 
+Patient.patient
+|> Patient.Optics.setAge (3N * 365N |> Some)
+|> Patient.Optics.setWeight (15N * 1000N |> Some)
+|> Patient.Optics.setHeight (170N |> Some)
+|> Patient.Optics.setDepartment "ICK"
+|> PrescriptionRule.get
+|> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+|> Array.filter (fun pr -> pr.SolutionRule.IsSome)
+|> Array.item 2
+
+
+Patient.patient
+|> Patient.Optics.setAge (3N * 365N |> Some)
+|> Patient.Optics.setWeight (15N * 1000N |> Some)
+|> Patient.Optics.setHeight (170N |> Some)
+|> Patient.Optics.setDepartment "ICK"
+|> PrescriptionRule.get
+|> Array.filter (fun pr ->
+    pr.DoseRule.Patient |> PatientCategory.toString = "neonaten" //&& pr.DoseRule.Indication = "diurese"
+)
+|> PrescriptionRule.indications
+|> Array.sort
+|> Array.iteri (printfn "%i. %s")
 
 
 DoseRule.get ()
@@ -233,6 +370,34 @@ DoseRule.get ()
 |> Array.length
 
 
+open Informedica.Utils.Lib.BCL
+
+let manual (p : Product) =
+    if p.Substances |> Array.isEmpty then None
+    else
+        match p.Substances[0].Quantity with
+        | Some sq ->
+            { p with
+                GPK = $"{90000000 + (p.GPK |> Int32.parse)}"
+                Product = p.Product  + " EIGEN BEREIDING" |> String.trim
+                Label = p.Label + " EIGEN BEREIDING" |> String.trim
+                ShapeQuantities = [| 1N |]
+                Substances =
+                    p.Substances
+                    |> Array.map (fun s ->
+                        { s with
+                            Quantity = s.Quantity |> Option.map (fun v -> v / sq)
+                        }
+                    )
+            }
+            |> Some
+        | None -> None
+
+
+Product.get ()
+|> Array.take 100
+|> Array.map manual
+
 
 open Informedica.ZIndex.Lib
 
@@ -243,12 +408,6 @@ GenPresProduct.get true
     |> Array.exists (fun gp -> gp.Id = 165638)
 )
 |> Array.map (fun gpp -> gpp.Name.ToLower())
-
-
-
-
-
-
 
 
 

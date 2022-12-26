@@ -10,6 +10,7 @@ module Variable =
 
     let raiseExc m = m |> Exceptions.raiseExc None
 
+
     module Name =
 
         open Informedica.Utils.Lib.BCL
@@ -1527,6 +1528,8 @@ module Variable =
 
         with
         | _ ->
+            printfn $"{v.Name |> Name.toString} cannot be set with {vr}"
+
             (v, vr)
             |> Exceptions.VariableCannotSetValueRange
             |> raiseExc
@@ -1573,8 +1576,13 @@ module Variable =
     /// Apply the operator **op** to **v1** and **v2**
     /// return an intermediate *result* `Variable`.
     let calc op (v1, v2) =
-        (v1 |> getValueRange) |> op <| (v2 |> getValueRange)
-        |> createRes
+        try
+            (v1 |> getValueRange) |> op <| (v2 |> getValueRange)
+            |> createRes
+        with
+        | _ ->
+            printfn $"couldn't calc {v1.Name |> Name.toString}, {v2.Name |> Name.toString}"
+            reraise ()
 
 
     module Operators =
@@ -1588,7 +1596,12 @@ module Variable =
         let inline (^-) vr1 vr2 = calc (^-) (vr1, vr2)
 
         let inline (^<-) vr1 vr2 =
-            { vr1 with Values = (vr1 |> getValueRange) ^<- (vr2 |> getValueRange) }
+            try
+                { vr1 with Values = (vr1 |> getValueRange) ^<- (vr2 |> getValueRange) }
+            with
+            | _ ->
+                printfn $"cannot set {vr1.Name |> Name.toString} with {vr2.Name |> Name.toString}"
+                reraise ()
 
 
         let inline (@*) vr1 vr2 = calc (@*) (vr1, vr2)
@@ -1600,8 +1613,12 @@ module Variable =
         let inline (@-) vr1 vr2 = calc (@-) (vr1, vr2)
 
         let inline (@<-) vr1 vr2 =
-            { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
-
+            try
+                { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
+            with
+            | _ ->
+                printfn $"cannot set {vr1.Name |> Name.toString} with {vr2.Name |> Name.toString}"
+                reraise ()
 
         /// Constant 0
         let zero =

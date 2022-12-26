@@ -129,7 +129,7 @@ module Types =
             Gender : Gender
             Age : BigRational option
             Weight : BigRational option
-            BSA : BigRational option
+            Height : BigRational option
             GestAge : BigRational option
             PMAge : BigRational option
             Location : Location
