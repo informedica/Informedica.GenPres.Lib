@@ -1294,7 +1294,7 @@ module Order =
         ord |> fromOrdVars ovars
 
 
-    let solveMinMax logger (ord: Order) =
+    let solveMinMax printErr logger (ord: Order) =
         let ord = ord |> applyConstraints
 
         let mapping =
@@ -1320,11 +1320,12 @@ module Order =
             |> mapFromEquations ord
         with
         | _ ->
-            oEqs
-            |> Solver.orderEqsToUnit
-            |> mapFromEquations ord
-            |> toString
-            |> List.iteri (printfn "%i. %s")
+            if printErr then
+                oEqs
+                |> Solver.orderEqsToUnit
+                |> mapFromEquations ord
+                |> toString
+                |> List.iteri (printfn "%i. %s")
 
             reraise()
 

@@ -9,16 +9,14 @@ module Exceptions =
 
         /// Raise an `EquationException` with `Message` `m`.
         let raiseExc log m =
-            printfn $"Informedica.GenSolver.Lib error:\n{m}"
+//            printfn $"Informedica.GenSolver.Lib error:\n{m}"
 
             match log with
             | Some log ->
-                printfn $"logging error {m}"
+//                printfn $"logging error {m}"
                 m |> Logging.logError log
             | None -> ()
 
-            //if isReraise then ()
-            //else
             m |> SolverException |> raise
 
 

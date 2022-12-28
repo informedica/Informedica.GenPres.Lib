@@ -10,6 +10,12 @@
 * [ ] Filter parenteral meds for reconstitution and dilution
 * [ ] Filter prescription rule product list
 * [ ] Create nicely formatted generic product name
+* [ ] Investigate amfo B lipid vs complex problem
+* [ ] Fix problem with missing prescription time
+* [ ] Consider merging continuous with timed
+* [ ] Create seperate patient library and calculations lib
+
+
 
 
 

@@ -57,10 +57,10 @@ module PrescriptionRule =
                     DoseType = dr.DoseType
                     Dose = dose
                 }
-            |> fun xs ->
-                if xs |> Array.length > 1 then
-                    printfn $"multiple solution rules for {dr.Generic}, {dr.Shape}"
-                xs
+            //|> fun xs ->
+            //    if xs |> Array.length > 1 then
+            //        printfn $"multiple solution rules for {dr.Generic}, {dr.Shape}"
+            //    xs
             |> function
             | srs when srs |> Array.isEmpty ->
                 [| { Patient = pat; DoseRule = dr; SolutionRule = None }  |]

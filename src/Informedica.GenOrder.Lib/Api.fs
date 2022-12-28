@@ -120,7 +120,7 @@ module Api =
         dr
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
-        |> Order.solveMinMax { Log = ignore }
+        |> Order.solveMinMax false { Log = ignore }
 
 
     // print an order list

@@ -13,7 +13,7 @@ module DrugOrder =
 
     module DoseRule = Informedica.GenForm.Lib.DoseRule
     module DoseLimit = DoseRule.DoseLimit
-
+    module MinMax = Informedica.GenForm.Lib.MinMax
 
 
     module MinMax =
@@ -44,13 +44,14 @@ module DrugOrder =
             Products = []
             Quantities = []
             Unit = ""
-            FreqUnit = ""
-            TimeUnit = ""
-            RateUnit = ""
             Route = ""
             OrderType = AnyOrder
             Frequencies = []
+            FreqUnit = ""
             Rates = []
+            RateUnit = ""
+            Time = MinMax.none
+            TimeUnit = ""
             Dose = None
             DoseCount = None
             Adjust = None
@@ -169,7 +170,9 @@ module DrugOrder =
         | DiscontinuousOrder ->
             orbDto.Dose.Quantity.Unit <- du
             orbDto.Dose.QuantityAdjust.Unit <- $"{du}/{au}"
+
             orbDto.Dose.PerTime.Unit <- $"{du}/{fu}"
+            orbDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
             match d.Dose with
             | Some dl ->
                 orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> Array.toList
@@ -198,18 +201,14 @@ module DrugOrder =
 
         | TimedOrder ->
             orbDto |> setDoseRate
-            orbDto.Dose.Rate.Unit <-
-                d.RateUnit
-                |> unitGroup
-                |> sprintf "%s/%s" ou
-            orbDto.Dose.RateAdjust.Unit <-
-                d.RateUnit
-                |> unitGroup
-                |> sprintf "%s/%s/%s" ou au
+            orbDto.Dose.Rate.Unit <- $"{du}/{d.RateUnit |> unitGroup}"
+            orbDto.Dose.RateAdjust.Unit <- $"{du}/{au}/{d.RateUnit |> unitGroup}"
 
             orbDto.Dose.Quantity.Unit <- ou
             orbDto.Dose.QuantityAdjust.Unit <- $"{du}/{au}"
-            orbDto.Dose.PerTime.Unit <- $"{du}/{au}"
+
+            orbDto.Dose.PerTime.Unit <- $"{du}/{fu}"
+            orbDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
 
             match d.Dose with
             | Some dl ->
@@ -261,6 +260,26 @@ module DrugOrder =
 
                     cdto.Dose.Quantity.Constraints.Incr <- [ 1N / p.Divisible ]
                     cdto.Dose.Quantity.Unit <- du
+                    cdto.Dose.QuantityAdjust.Unit <- $"{du}/{au}"
+
+                    match d.OrderType with
+                    | ContinuousOrder ->
+                        cdto.Dose.Rate.Unit <- $"{du}/{ru}"
+                        cdto.Dose.RateAdjust.Unit <- $"{du}/{au}/{ru}"
+
+                    | DiscontinuousOrder ->
+                        cdto.Dose.PerTime.Unit <- $"{du}/{fu}"
+                        cdto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
+
+                    | TimedOrder ->
+                        cdto.Dose.Rate.Unit <- $"{du}/{ru}"
+                        cdto.Dose.RateAdjust.Unit <- $"{du}/{au}/{ru}"
+
+                        cdto.Dose.PerTime.Unit <- $"{du}/{fu}"
+                        cdto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
+
+                    | _ -> ()
+                    
 
                     cdto.Items <- [
                         for s in p.Substances do
@@ -366,6 +385,12 @@ module DrugOrder =
         dto.Prescription.Frequency.Unit <-
             $"x[Count]/{(d.FreqUnit |> unitGroup)}"
         dto.Prescription.Frequency.Constraints.Vals <- d.Frequencies
+
+        dto.Prescription.Time.Unit <- d.TimeUnit |> unitGroup
+        dto.Prescription.Time.Constraints.MinIncl <- d.Time.Minimum.IsSome
+        dto.Prescription.Time.Constraints.Min <- d.Time.Minimum
+        dto.Prescription.Time.Constraints.MaxIncl <- d.Time.Maximum.IsSome
+        dto.Prescription.Time.Constraints.Max <- d.Time.Maximum
 
         dto.Adjust.Constraints.Min <- Some (200N /1000N)
         dto.Adjust.Constraints.Max <- Some 150N

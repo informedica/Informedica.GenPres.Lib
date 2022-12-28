@@ -8,6 +8,7 @@
 
 
 open MathNet.Numerics
+open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 open Informedica.GenUnits.Lib
 open Informedica.GenSolver.Lib
@@ -115,6 +116,7 @@ module Api =
             Unit =
                 pr.DoseRule.Products
                 |> tryHead (fun p -> p.ShapeUnit)
+            Time = pr.DoseRule.Time
             TimeUnit = pr.DoseRule.TimeUnit
             RateUnit = "uur"
             Route = pr.DoseRule.Route
@@ -138,7 +140,7 @@ module Api =
                 match pr.SolutionRule with
                 | None -> dr
                 | Some sr ->
-                    printfn "found solutionrule"
+//                    printfn "found solutionrule"
                     { dr with
                         Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
@@ -152,7 +154,7 @@ module Api =
                             |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
                             |> function
                             | Some p ->
-                                printfn $"adding solution {p.Generic}"
+//                                printfn $"adding solution {p.Generic}"
                                 [|p|]
                                 |> createProductComponent true pr.DoseRule.FreqUnit [||]
                                 |> List.singleton
@@ -166,7 +168,7 @@ module Api =
         dr
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
-        |> Order.solveMinMax { Log = ignore }
+        |> Order.solveMinMax true { Log = ignore }
 
 
     // print an order list
@@ -208,17 +210,16 @@ let test a w h d n =
         |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
         |> Array.item n
 
-    [| pr |]
-    |> PrescriptionRule.toMarkdown
-    |> printfn "Found rule:\n%s"
-
+    //[| pr |]
+    //|> PrescriptionRule.toMarkdown
+    //|> printfn "Found rule:\n%s"
     try
         let ord =
             pr
             |> Api.createDrugOrder
             |> DrugOrder.toOrder
             |> Order.Dto.fromDto
-            |> Order.solveMinMax { Log = ignore }
+            |> Order.solveMinMax false { Log = ignore }
 
         let dto = ord |> Order.Dto.toDto
 
@@ -247,15 +248,16 @@ let test a w h d n =
                 shps
                 sbsts
 
-        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
+//        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
 
+        $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
         ord
         |> Order.toString
         |> String.concat "\n"
-        |> printfn "# Berekening:\n\n%s"
+//        |> printfn "# Berekening:\n\n%s"
     with
     | _ ->
-        printfn "bereken met handmatige bereiding"
+//        printfn "bereken met handmatige bereiding"
         let pr =
             { pr with
                 DoseRule =
@@ -271,7 +273,7 @@ let test a w h d n =
             |> Api.createDrugOrder
             |> DrugOrder.toOrder
             |> Order.Dto.fromDto
-            |> Order.solveMinMax { Log = ignore }
+            |> Order.solveMinMax false { Log = ignore }
 
         let dto = ord |> Order.Dto.toDto
 
@@ -300,27 +302,71 @@ let test a w h d n =
                 shps
                 sbsts
 
-        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
+//        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
 
+        $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
         ord
         |> Order.toString
         |> String.concat "\n"
-        |> printfn "# Berekening:\n\n%s"
+//        |> printfn "# Berekening:\n\n%s"
 
 
+let n =
+    let a = 15m * 365m |> BigRational.FromDecimal |> Some
+    let w = 70m * 1000m |> BigRational.FromDecimal |> Some
+    let h = 170m |> BigRational.FromDecimal |> Some
 
-20
-|> test 15m 70m 170m "ICK"
+    let pat =
+        Patient.patient
+        |> Patient.Optics.setAge a
+        |> Patient.Optics.setWeight w
+        |> Patient.Optics.setHeight h
+        |> Patient.Optics.setDepartment "ICK"
+
+    pat
+    |> PrescriptionRule.get
+    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+    |> Array.length
+    
+
+for i in [0..500] do
+    try
+        let (p, s) =
+            i
+            |> test 15m 70m 170m "ICK"
+        printfn $"calculated: {i}. {p}"
+    with
+    | _ ->
+        let a = 15m * 365m |> BigRational.FromDecimal |> Some
+        let w = 70m * 1000m |> BigRational.FromDecimal |> Some
+        let h = 170m |> BigRational.FromDecimal |> Some
+
+        let pat =
+            Patient.patient
+            |> Patient.Optics.setAge a
+            |> Patient.Optics.setWeight w
+            |> Patient.Optics.setHeight h
+            |> Patient.Optics.setDepartment "ICK"
+
+        let pr =
+            pat
+            |> PrescriptionRule.get
+            |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+            |> Array.item i
+            |> fun pr ->
+                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
+
+        printfn $"could not calculate: {i}. {pr}"
 
 
 Patient.patient
-|> Patient.Optics.setAge (3N * 365N |> Some)
-|> Patient.Optics.setWeight (15N * 1000N |> Some)
+|> Patient.Optics.setAge (15N * 365N |> Some)
+|> Patient.Optics.setWeight (70N * 1000N |> Some)
 |> Patient.Optics.setHeight (170N |> Some)
 |> Patient.Optics.setDepartment "ICK"
 |> PrescriptionRule.get
 |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-|> Array.item 16
+|> Array.item 20
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
@@ -412,7 +458,12 @@ GenPresProduct.get true
 
 
 
+GenPresProduct.get true
+|> Array.filter (fun gpp ->
+    gpp.Name |> String.startsWith "AMFO"
+)
+|> Array.map (fun gpp -> gpp.Name, gpp.Shape)
 
-
+ 
 
 

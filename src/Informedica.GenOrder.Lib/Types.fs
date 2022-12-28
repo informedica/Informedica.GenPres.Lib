@@ -237,6 +237,7 @@ module Types =
         | TimedOrder
 
 
+    type MinMax = Informedica.GenForm.Lib.Types.MinMax
     type DoseLimit = Informedica.GenForm.Lib.Types.DoseLimit
     type SolutionLimit = Informedica.GenForm.Lib.Types.SolutionLimit
 
@@ -257,18 +258,19 @@ module Types =
             /// The unit the `DrugOrder` is measured in,
             /// i.e. of the `Quantities`
             Unit : string
-            /// The time unit to be used when using a frequency
-            FreqUnit : string
-            /// The time unit for infusion time (duration)
-            TimeUnit : string
-            /// The time unit to be used when using a rate
-            RateUnit : string
             /// The route by which the order is applied
             Route : string
             // The type of order
             OrderType : OrderType
             Frequencies : BigRational list
+            /// The time unit to be used when using a frequency
+            FreqUnit : string
             Rates : BigRational list
+            /// The time unit to be used when using a rate
+            RateUnit : string
+            Time : MinMax
+            /// The time unit for infusion time (duration)
+            TimeUnit : string
             Dose : DoseLimit option
             DoseCount : BigRational option
             Adjust : BigRational option
