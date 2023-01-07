@@ -192,27 +192,7 @@ module Api =
 
 
 
-let test a w h d n =
-    let a = a * 365m |> BigRational.FromDecimal |> Some
-    let w = w * 1000m |> BigRational.FromDecimal |> Some
-    let h = h |> BigRational.FromDecimal |> Some
-
-    let pat =
-        Patient.patient
-        |> Patient.Optics.setAge a
-        |> Patient.Optics.setWeight w
-        |> Patient.Optics.setHeight h
-        |> Patient.Optics.setDepartment d
-
-    let pr =
-        pat
-        |> PrescriptionRule.get
-        |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-        |> Array.item n
-
-    //[| pr |]
-    //|> PrescriptionRule.toMarkdown
-    //|> printfn "Found rule:\n%s"
+let evaluate (pr : PrescriptionRule) =
     try
         let ord =
             pr
@@ -248,13 +228,7 @@ let test a w h d n =
                 shps
                 sbsts
 
-//        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
-
-        $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
-        ord
-        |> Order.toString
-        |> String.concat "\n"
-//        |> printfn "# Berekening:\n\n%s"
+        ord, pr
     with
     | _ ->
 //        printfn "bereken met handmatige bereiding"
@@ -302,52 +276,52 @@ let test a w h d n =
                 shps
                 sbsts
 
-//        printfn $"{[|pr|] |> PrescriptionRule.toMarkdown}"
+        ord, pr
 
-        $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
-        ord
-        |> Order.toString
-        |> String.concat "\n"
-//        |> printfn "# Berekening:\n\n%s"
+
+
+let test pat n =
+    let ord, pr =
+        pat
+        |> PrescriptionRule.get
+        |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+        |> Array.item n
+        |> evaluate
+
+    $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
+    ord
+    |> Order.toString
+    |> String.concat "\n"
+
+
+type Age = Patient.Optics.Age
+type Weight = Patient.Optics.Weight
+type Height = Patient.Optics.Height
+
+
+let pat =
+    Patient.patient
+    
+    |> Patient.Optics.setAge [ 15 |> Age.Years] 
+    |> Patient.Optics.setWeight (70m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (170 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
 
 
 let n =
-    let a = 15m * 365m |> BigRational.FromDecimal |> Some
-    let w = 70m * 1000m |> BigRational.FromDecimal |> Some
-    let h = 170m |> BigRational.FromDecimal |> Some
-
-    let pat =
-        Patient.patient
-        |> Patient.Optics.setAge a
-        |> Patient.Optics.setWeight w
-        |> Patient.Optics.setHeight h
-        |> Patient.Optics.setDepartment "ICK"
-
     pat
     |> PrescriptionRule.get
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
     |> Array.length
     
 
-for i in [0..500] do
+for i in [0..n - 1] do
     try
-        let (p, s) =
-            i
-            |> test 15m 70m 170m "ICK"
-        printfn $"calculated: {i}. {p}"
+        i
+        |> test pat
+        |> ignore
     with
     | _ ->
-        let a = 15m * 365m |> BigRational.FromDecimal |> Some
-        let w = 70m * 1000m |> BigRational.FromDecimal |> Some
-        let h = 170m |> BigRational.FromDecimal |> Some
-
-        let pat =
-            Patient.patient
-            |> Patient.Optics.setAge a
-            |> Patient.Optics.setWeight w
-            |> Patient.Optics.setHeight h
-            |> Patient.Optics.setDepartment "ICK"
-
         let pr =
             pat
             |> PrescriptionRule.get
@@ -357,113 +331,5 @@ for i in [0..500] do
                 $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
         printfn $"could not calculate: {i}. {pr}"
-
-
-Patient.patient
-|> Patient.Optics.setAge (15N * 365N |> Some)
-|> Patient.Optics.setWeight (70N * 1000N |> Some)
-|> Patient.Optics.setHeight (170N |> Some)
-|> Patient.Optics.setDepartment "ICK"
-|> PrescriptionRule.get
-|> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-|> Array.item 20
-|> Api.createDrugOrder
-|> DrugOrder.toOrder
-|> Order.Dto.fromDto
-|> Order.applyConstraints
-|> Order.toString
-
-
-Patient.patient
-|> Patient.Optics.setAge (3N * 365N |> Some)
-|> Patient.Optics.setWeight (15N * 1000N |> Some)
-|> Patient.Optics.setHeight (170N |> Some)
-|> Patient.Optics.setDepartment "ICK"
-|> PrescriptionRule.get
-|> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-|> Array.filter (fun pr -> pr.SolutionRule.IsSome)
-|> Array.item 2
-
-
-Patient.patient
-|> Patient.Optics.setAge (3N * 365N |> Some)
-|> Patient.Optics.setWeight (15N * 1000N |> Some)
-|> Patient.Optics.setHeight (170N |> Some)
-|> Patient.Optics.setDepartment "ICK"
-|> PrescriptionRule.get
-|> Array.filter (fun pr ->
-    pr.DoseRule.Patient |> PatientCategory.toString = "neonaten" //&& pr.DoseRule.Indication = "diurese"
-)
-|> PrescriptionRule.indications
-|> Array.sort
-|> Array.iteri (printfn "%i. %s")
-
-
-DoseRule.get ()
-|> Array.filter (fun dr -> dr.Products |> Array.isEmpty)
-|> Array.map (fun dr -> dr.Generic, dr.Shape, dr.Route)
-|> Array.map (fun (g, s, r) ->
-    let ps =
-        Product.get ()
-        |> Array.filter (fun p -> p.Generic = g)
-        |> Array.map (fun p -> p.Shape)
-        |> Array.distinct
-        |> String.concat ";"
-    $"{g}, {s}, {r}: {ps}"
-)
-|> Array.distinct
-|> Array.map (fun x -> printfn "%s" x; x)
-|> Array.length
-
-
-open Informedica.Utils.Lib.BCL
-
-let manual (p : Product) =
-    if p.Substances |> Array.isEmpty then None
-    else
-        match p.Substances[0].Quantity with
-        | Some sq ->
-            { p with
-                GPK = $"{90000000 + (p.GPK |> Int32.parse)}"
-                Product = p.Product  + " EIGEN BEREIDING" |> String.trim
-                Label = p.Label + " EIGEN BEREIDING" |> String.trim
-                ShapeQuantities = [| 1N |]
-                Substances =
-                    p.Substances
-                    |> Array.map (fun s ->
-                        { s with
-                            Quantity = s.Quantity |> Option.map (fun v -> v / sq)
-                        }
-                    )
-            }
-            |> Some
-        | None -> None
-
-
-Product.get ()
-|> Array.take 100
-|> Array.map manual
-
-
-open Informedica.ZIndex.Lib
-
-
-GenPresProduct.get true
-|> Array.filter (fun gpp ->
-    gpp.GenericProducts
-    |> Array.exists (fun gp -> gp.Id = 165638)
-)
-|> Array.map (fun gpp -> gpp.Name.ToLower())
-
-
-
-
-GenPresProduct.get true
-|> Array.filter (fun gpp ->
-    gpp.Name |> String.startsWith "AMFO"
-)
-|> Array.map (fun gpp -> gpp.Name, gpp.Shape)
-
- 
 
 

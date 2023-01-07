@@ -164,6 +164,14 @@ module BigRational =
     let toFloat br =
         ((br |> id).Numerator |> float) / (br.Denominator |> float)
 
+
+    let fromDecimal = BigRational.FromDecimal
+
+
+    let toDecimal (br : BigRational) =
+        (br.Numerator |> decimal) / (br.Numerator |> decimal)
+
+
     /// Perform a calculation when 
     /// both `n1` and `n2` are 'some'
     let calculate n1 o n2 = 
