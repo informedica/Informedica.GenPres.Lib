@@ -1315,9 +1315,20 @@ module Order =
             oEqs
             |> Solver.mapToSolverEqs
             |> Solver.solveMinMax logger
-            |> Solver.mapToOrderEqs oEqs
-            |> Solver.orderEqsToUnit
-            |> mapFromEquations ord
+            |> function
+            | Ok eqs ->
+                eqs
+                |> Solver.mapToOrderEqs oEqs
+                |> Solver.orderEqsToUnit
+                |> mapFromEquations ord
+                |> Ok
+            | Error (eqs, m) ->
+                eqs
+                |> Solver.mapToOrderEqs oEqs
+                |> Solver.orderEqsToUnit
+                |> mapFromEquations ord
+                |> fun eqs -> Error (eqs, m)
+
         with
         | _ ->
             if printErr then

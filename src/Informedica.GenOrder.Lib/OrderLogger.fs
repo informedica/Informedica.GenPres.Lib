@@ -129,7 +129,7 @@ module OrderLogger =
 
 
 
-    // Catches a message and will dispatch this to the appropiate
+    // Catches a message and will dispatch this to the appropriate
     // print function
     let printMsg (msgs : ResizeArray<float * Informedica.GenSolver.Lib.Types.Logging.Message> option) (msg : Informedica.GenSolver.Lib.Types.Logging.Message) =
         match msg.Message with
@@ -147,7 +147,7 @@ module OrderLogger =
         | Write of string
 
     // The type for an order logger agent that will
-    // catch a message and will proces this in an asynchronous way.
+    // catch a message and will process this in an asynchronous way.
     type OrderLogger =
         {
             Start : string option -> Level -> unit

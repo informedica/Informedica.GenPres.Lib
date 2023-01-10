@@ -227,7 +227,9 @@ module Patient =
         | Some w, Some h ->
             let w =(w |> BigRational.toDouble) / 1000.
             let h = h |> BigRational.toDouble
+
             sqrt (w * h / 3600.)
+            |> Double.fixPrecision 2
             |> BigRational.fromFloat
         | _ -> None
 

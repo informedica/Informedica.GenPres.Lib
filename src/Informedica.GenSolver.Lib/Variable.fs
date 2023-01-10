@@ -8,7 +8,7 @@ module Variable =
 
     open Types
 
-    let raiseExc m = m |> Exceptions.raiseExc None
+    let raiseExc errs m = m |> Exceptions.raiseExc None errs
 
 
     module Name =
@@ -36,7 +36,7 @@ module Variable =
 
         /// Create a `Name` that, raises
         /// an `NameException` when it fails.
-        let createExc = create id raiseExc
+        let createExc = create id (raiseExc [])
 
         /// Return the `string` value of a `Name`.
         let toString (Name s) = s
@@ -46,6 +46,7 @@ module Variable =
     module ValueRange =
 
         open Informedica.Utils.Lib.BCL
+
 
         module Minimum =
 
@@ -120,7 +121,7 @@ module Variable =
                 if (min |> toBigRational).Denominator > Constants.MAX_BIGINT then
                     min
                     |> Exceptions.ValueRangeMinOverFlow
-                    |> raiseExc
+                    |> raiseExc []
 
 
             let restrict newMin oldMin =
@@ -217,7 +218,7 @@ module Variable =
                 if (max |> toBigRational).Numerator > Constants.MAX_BIGINT then
                     max
                     |> Exceptions.ValueRangeMaxOverFlow
-                    |> raiseExc
+                    |> raiseExc []
 
 
             let restrict newMax oldMax =
@@ -250,7 +251,7 @@ module Variable =
                     if brs |> Set.isEmpty |> not then brs |> Increment
                     else
                         Exceptions.ValueRangeEmptyIncrement
-                        |> raiseExc
+                        |> raiseExc []
 
 
             let map f (Increment incr) = incr |> Set.map f |> create
@@ -324,7 +325,7 @@ module Variable =
             let create s =
                 if s |> Seq.isEmpty then
                     Exceptions.ValueRangeEmptyValueSet
-                    |> raiseExc
+                    |> raiseExc []
 
                 else
                     s
@@ -371,7 +372,7 @@ module Variable =
                 if (s1 |> Set.count) + (s2 |> Set.count) > Constants.MAX_CALC_COUNT then
                     (s1 |> Set.count) + (s2 |> Set.count)
                     |> Exceptions.ValueRangeTooManyValues
-                    |> raiseExc
+                    |> raiseExc []
 
                 else
                     Seq.allPairs s1 s2
@@ -688,7 +689,7 @@ module Variable =
             if min |> minGTmax max then
                 (min, max)
                 |> Exceptions.Message.ValueRangeMinLargerThanMax
-                |> raiseExc
+                |> raiseExc []
 
             elif min |> minEQmax max then
                 min
@@ -718,7 +719,7 @@ module Variable =
             if min |> minGTmax max then
                 (min, max)
                 |> Exceptions.Message.ValueRangeMinLargerThanMax
-                |> raiseExc
+                |> raiseExc []
             else
                 if onlyMinIncrMax && (min |> minEQmax max |> not) then
                     MinIncrMax(min, incr, max)
@@ -1049,10 +1050,14 @@ module Variable =
         /// <1N..3N> * <4N..5N> = <4N..15N>
         module MinMaxCalculator =
 
+
+            open Exceptions
+
+
             /// Exceptions that a MinMaxCalculator function can raise.
             module Exceptions =
 
-                exception MinMaxCalculatorException of Exceptions.Message
+                exception MinMaxCalculatorException of Message
 
                 let raiseExc m = m |> MinMaxCalculatorException |> raise
 
@@ -1132,10 +1137,17 @@ module Variable =
                 | Some min, _         when min = 0N             -> ZP
                 // failing cases
                 | Some min, Some max when min = 0N && max = 0N  ->
-                    $"{min} = {max} = 0" |> failwith
+                    $"{min} = {max} = 0"
+                    |> ValueRangeMinMaxException
+                    |> Exceptions.raiseExc
                 | Some min, Some max when min >= 0N && max < 0N ->
-                    $"{min} > {max}" |> failwith
-                | _ -> $"could not handle {min} {max}" |> failwith
+                    $"{min} > {max}"
+                    |> ValueRangeMinMaxException
+                    |> Exceptions.raiseExc
+                | _ ->
+                    $"could not handle {min} {max}"
+                    |> ValueRangeMinMaxException
+                    |> Exceptions.raiseExc
 
 
             /// Calculate `Minimum` option and
@@ -1281,7 +1293,7 @@ module Variable =
                 | BigRational.Add   -> addition
                 | BigRational.Subtr -> subtraction
                 | BigRational.NoMatch ->
-                    Exceptions.ValueRangeNotAValidOperator
+                    ValueRangeNotAValidOperator
                     |> Exceptions.raiseExc
 
 
@@ -1417,13 +1429,7 @@ module Variable =
         let applyExpr onlyMinIncrMax y expr =
             let set get set vr =
                 match expr |> get with
-                | Some m ->
-                    try
-                        vr |> set m
-                    with
-                    | _ ->
-                        printfn $"cannot set {vr} with {m}"
-                        reraise ()
+                | Some m -> vr |> set m
                 | None   -> vr
 
             match expr with
@@ -1521,18 +1527,17 @@ module Variable =
     /// `Variable` **v**.
     let setValueRange onlyMinIncrMax v vr =
         let op = if onlyMinIncrMax then (@<-) else (^<-)
+
         try
             { v with
                 Values = (v |> get).Values |> op <| vr
             }
 
         with
-        | _ ->
-            printfn $"{v.Name |> Name.toString} cannot be set with {vr}"
-
+        | Exceptions.SolverException errs ->
             (v, vr)
             |> Exceptions.VariableCannotSetValueRange
-            |> raiseExc
+            |> raiseExc errs
 
 
     /// Set the values to a `ValueRange`
@@ -1580,9 +1585,10 @@ module Variable =
             (v1 |> getValueRange) |> op <| (v2 |> getValueRange)
             |> createRes
         with
-        | _ ->
-            printfn $"couldn't calc {v1.Name |> Name.toString}, {v2.Name |> Name.toString}"
-            reraise ()
+        | Exceptions.SolverException errs ->
+            (v1, op, v2)
+            |> Exceptions.VariableCannotCalcVariables
+            |> raiseExc errs
 
 
     module Operators =
@@ -1596,12 +1602,7 @@ module Variable =
         let inline (^-) vr1 vr2 = calc (^-) (vr1, vr2)
 
         let inline (^<-) vr1 vr2 =
-            try
                 { vr1 with Values = (vr1 |> getValueRange) ^<- (vr2 |> getValueRange) }
-            with
-            | _ ->
-                printfn $"cannot set {vr1.Name |> Name.toString} with {vr2.Name |> Name.toString}"
-                reraise ()
 
 
         let inline (@*) vr1 vr2 = calc (@*) (vr1, vr2)
@@ -1613,12 +1614,7 @@ module Variable =
         let inline (@-) vr1 vr2 = calc (@-) (vr1, vr2)
 
         let inline (@<-) vr1 vr2 =
-            try
                 { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
-            with
-            | _ ->
-                printfn $"cannot set {vr1.Name |> Name.toString} with {vr2.Name |> Name.toString}"
-                reraise ()
 
         /// Constant 0
         let zero =
@@ -1752,7 +1748,7 @@ module Variable =
         let fromDto (dto: Dto) =
             let succ = id
 
-            let n = dto.Name |> Name.create succ (fun m -> m |> raiseExc)
+            let n = dto.Name |> Name.create succ (fun m -> m |> raiseExc [])
 
             let vs =
                 match dto.Vals with

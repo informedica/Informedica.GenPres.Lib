@@ -39,15 +39,15 @@ module Types =
 
 
     type Age =
-        | AgeInYsMsWsDs of AgeInYearsMonthsWeeksDays
-        | BirthDate of DateTime
-    and AgeInYearsMonthsWeeksDays =
         {
             Years: int
             Months: int
             Weeks: int
             Days: int
         }
+
+
+    type BirthDate = { Year : int; Month : int option; Day : int option }
 
 
     type WeightValue = | Kilogram of decimal | Gram of int
@@ -68,7 +68,7 @@ module Types =
 
     type EstimatedWeight = { Weight: WeightValue; SD : WeightValue }
 
-    
+
     type Height =
         {
             Actual : HeightAtDate list
@@ -77,12 +77,12 @@ module Types =
     and HeightAtDate = { Date : DateTime; Height : HeightValue }
 
 
-    type  EsitmatedHeight = { Height : HeightValue; SD : HeightValue }
+    type  EstimatedHeight = { Height : HeightValue; SD : HeightValue }
 
 
     type Patient =
         {
-            Department : string
+            Department : string option
             Diagnoses : string []
             Gender : Gender
             Age : Age

@@ -8,8 +8,6 @@ module Api =
 
     open Informedica.Utils.Lib.BCL
 
-    open Types
-
     module VRD = Variable.Dto
     module EQD = Equation.Dto
 
@@ -62,7 +60,7 @@ module Api =
         eqs
         |> setVariableValues onlyMinIncrMax n p
         |> function
-        | None -> eqs
+        | None -> eqs |> Ok
         | Some var ->
             eqs
             |> Solver.solveVariable onlyMinIncrMax log sortQue var

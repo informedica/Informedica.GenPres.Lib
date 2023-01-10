@@ -2,7 +2,7 @@ namespace Informedica.Utils.Lib.BCL
 
 /// Helper functions for `BigRational`
 [<RequireQualifiedAccess>]
-module BigRational = 
+module BigRational =
 
     open System
     open MathNet.Numerics
@@ -32,11 +32,11 @@ module BigRational =
     let id = apply id
 
 
-    /// Parse a string and pass the result 
+    /// Parse a string and pass the result
     /// either to `succ` or `fail` function
     let parseCont succ fail s =
-        try 
-            s 
+        try
+            s
             |> BigRational.Parse
             |> succ
         with
@@ -49,10 +49,10 @@ module BigRational =
     let parse = parseCont id raiseExc
 
 
-    /// Try to parse a string and 
-    /// return `None` if it fails 
+    /// Try to parse a string and
+    /// return `None` if it fails
     /// otherwise `Some` bigrational
-    let tryParse = 
+    let tryParse =
         parseCont Some (fun _ -> None)
 
 
@@ -141,7 +141,7 @@ module BigRational =
 
     /// Match an operator `op` to either
     /// multiplication, division, addition
-    /// or subtraction. </br> 
+    /// or subtraction. </br>
     /// Returns NoMatch otherwise
     let (|Mult|Div|Add|Subtr|NoMatch|) op =
         match op with
@@ -168,19 +168,18 @@ module BigRational =
     let fromDecimal = BigRational.FromDecimal
 
 
-    let toDecimal (br : BigRational) =
-        (br.Numerator |> decimal) / (br.Numerator |> decimal)
+    let toDecimal = toFloat >> decimal
 
 
-    /// Perform a calculation when 
+    /// Perform a calculation when
     /// both `n1` and `n2` are 'some'
-    let calculate n1 o n2 = 
+    let calculate n1 o n2 =
         match n1, n2 with
         |Some x1, Some x2 -> x1 |> o <| x2 |> Some
         |_ -> None
 
 
-    //let inline triangular n = (n * (n + (n/n))) / ((n + n) / n)  
+    //let inline triangular n = (n * (n + (n/n))) / ((n + n) / n)
 
 
     /// Calculate an ordered farey sequence
@@ -192,7 +191,7 @@ module BigRational =
             let p' = if asc then ref 1I else ref (n - 1I)
             let q' = ref n
             yield (p.Value, q.Value)
-            while (asc && not (p.Value = 1I && q.Value = 1I)) || 
+            while (asc && not (p.Value = 1I && q.Value = 1I)) ||
                   (not asc && p.Value > 0I) do
                 let c = (q.Value + n) / q'.Value
                 let p'' = c * p'.Value - p.Value
@@ -203,7 +202,7 @@ module BigRational =
                 q'.Value <- q''
                 yield (p.Value, q.Value) }
 
-    /// Calculate the set of possible solutions with a concentration `conc` up 
+    /// Calculate the set of possible solutions with a concentration `conc` up
     /// to a maximum value `max` in descending order
     let calcConc max conc =
         seq { for f in (farey max false) do
@@ -223,7 +222,7 @@ module BigRational =
 
 
     /// Generic function to calculate all divisors
-    /// of `n`, using a `modulo` function 
+    /// of `n`, using a `modulo` function
     let inline getDivisors modulo zero one two n =
         let n = abs n
         match n with
@@ -234,38 +233,38 @@ module BigRational =
     let divisorsOfBigInt = getDivisors (fun n x -> n % x) 0I 1I 2I
 
     /// Get all the divisors of a BigRational
-    let divisorsOfBigR n =  
+    let divisorsOfBigR n =
         let modulo =
-            fun (n : BigRational) (x : BigRational) -> 
+            fun (n : BigRational) (x : BigRational) ->
                 n.Numerator % x.Numerator
                 |> BigRational.FromBigInt
         getDivisors modulo 0N 1N 2N
 
     /// Generic function to check whether a `divisor`
-    /// is a divisor of a `dividend`, i.e. the number being 
+    /// is a divisor of a `dividend`, i.e. the number being
     /// divided
     let inline isDivisor zero dividend divisor =
         dividend % divisor = zero
 
     /// Check whether a divisor divides a dividend
-    let isDivisorOfBigR  (dividend:BigRational) (divisor:BigRational) = 
+    let isDivisorOfBigR  (dividend:BigRational) (divisor:BigRational) =
         isDivisor 0I dividend.Numerator divisor.Numerator
 
 
     /// Check whether a divisor divides a dividend
-    let isDivisorOfBigInt (dividend:bigint) (divisor:bigint) = 
+    let isDivisorOfBigInt (dividend:bigint) (divisor:bigint) =
         isDivisor 0I dividend divisor
 
     /// Reduce a ratio where `num` is the
     /// numerator and `denom` is the denominator
-    let reduceRatio num denom = 
+    let reduceRatio num denom =
         let n   = num / (gcd num denom)
         let denom = denom / (gcd n denom)
-        (n, denom)        
+        (n, denom)
 
-    /// Split a rational number in a 
+    /// Split a rational number in a
     /// numerator and denominator
-    let numDenom (v:BigRational) = (v.Numerator |> BigRational.FromBigInt, v.Denominator |> BigRational.FromBigInt) 
+    let numDenom (v:BigRational) = (v.Numerator |> BigRational.FromBigInt, v.Denominator |> BigRational.FromBigInt)
 
 
     [<Obsolete("use numDenom")>]
@@ -279,16 +278,16 @@ module BigRational =
         match r with
         | (Some n, true,  Some d, true)                            -> (n, d)
         | (Some n, false, Some d, false)                           -> let r = (vn * d) / (vd * n)
-                                                                      ((r.Numerator |> toBigR) * n), ((r.Denominator |> toBigR) * d)  
+                                                                      ((r.Numerator |> toBigR) * n), ((r.Denominator |> toBigR) * d)
         | (None   , _ ,   Some d, true) when (vd |> isDivisorOfBigR d) -> (vn * (d / vd), d)
         | (None   , _ ,   Some d, false)                           -> ((d / (gcd d vd)) * vn, (d / (gcd d vd)) * vd)
-        | (Some n, true,  None,   _ )   when (vn |> isDivisorOfBigR n) -> (n, (n / vn) * vd)  
-        | (Some n, false, None,   _ )                              -> ((n / (gcd n vn)) * vn, (n / (gcd n vn)) * vd) 
-        | (None,   _ ,    None,   _ )                              -> (vn, vd)                              
+        | (Some n, true,  None,   _ )   when (vn |> isDivisorOfBigR n) -> (n, (n / vn) * vd)
+        | (Some n, false, None,   _ )                              -> ((n / (gcd n vn)) * vn, (n / (gcd n vn)) * vd)
+        | (None,   _ ,    None,   _ )                              -> (vn, vd)
         | _                                                        -> (0N, 0N)
 
 
-    let valueToFactorRatio2 v r = 
+    let valueToFactorRatio2 v r =
         let n, nv, d, dv = r
         let toBigR x = match x with |Some i -> i |> BigRational.FromBigInt |> Some |None -> None
         let n, d = (n |> toBigR, nv, d |> toBigR, dv) |> valueToFactorRatio v
@@ -296,10 +295,10 @@ module BigRational =
 
 
     let toNumListDenom (vl: BigRational list) =
-        let d = 
+        let d =
             vl |> List.map(fun v -> v.Denominator)
             |> Seq.distinct
             |> Seq.toList
             |> Seq.fold(fun p d -> d * p) 1I
             |> BigRational.FromBigInt
-        (vl |> List.map(fun v -> v * d), d)      
+        (vl |> List.map(fun v -> v * d), d)

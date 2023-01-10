@@ -192,47 +192,44 @@ module Api =
 
 
 
-let evaluate (pr : PrescriptionRule) =
-    try
-        let ord =
-            pr
-            |> Api.createDrugOrder
-            |> DrugOrder.toOrder
-            |> Order.Dto.fromDto
-            |> Order.solveMinMax false { Log = ignore }
+let evaluate logger (rule : PrescriptionRule) =
+    let rec solve retry pr =
+        pr
+        |> Api.createDrugOrder
+        |> DrugOrder.toOrder
+        |> Order.Dto.fromDto
+        |> Order.solveMinMax false logger
+        |> function
+        | Ok ord ->
+            let dto = ord |> Order.Dto.toDto
 
-        let dto = ord |> Order.Dto.toDto
-
-        let shps =
-            dto.Orderable.Components
-            |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
-            |> List.toArray
-
-        let sbsts =
-            dto.Orderable.Components
-            |> List.toArray
-            |> Array.collect (fun cDto ->
-                cDto.Items
+            let shps =
+                dto.Orderable.Components
+                |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
                 |> List.toArray
-                |> Array.collect (fun iDto ->
-                    iDto.ComponentConcentration.Variable.Vals
+
+            let sbsts =
+                dto.Orderable.Components
+                |> List.toArray
+                |> Array.collect (fun cDto ->
+                    cDto.Items
                     |> List.toArray
-                    |> Array.map (fun v -> iDto.Name, v |> Some)
+                    |> Array.collect (fun iDto ->
+                        iDto.ComponentConcentration.Variable.Vals
+                        |> List.toArray
+                        |> Array.map (fun v -> iDto.Name, v |> Some)
+                    )
                 )
-            )
-            |> Array.distinct
+                |> Array.distinct
 
-        let pr =
-            pr
-            |> PrescriptionRule.filterProducts
-                shps
-                sbsts
+            let pr =
+                pr
+                |> PrescriptionRule.filterProducts
+                    shps
+                    sbsts
 
-        ord, pr
-    with
-    | _ ->
-//        printfn "bereken met handmatige bereiding"
-        let pr =
+            Ok (ord, pr)
+        | Error _ when retry ->
             { pr with
                 DoseRule =
                     { pr.DoseRule with
@@ -241,57 +238,38 @@ let evaluate (pr : PrescriptionRule) =
                             |> Array.choose Product.manual
                     }
             }
+            |> solve false
+        | Error (ord, m) -> Error (ord, pr, m)
 
-        let ord =
-            pr
-            |> Api.createDrugOrder
-            |> DrugOrder.toOrder
-            |> Order.Dto.fromDto
-            |> Order.solveMinMax false { Log = ignore }
-
-        let dto = ord |> Order.Dto.toDto
-
-        let shps =
-            dto.Orderable.Components
-            |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
-            |> List.toArray
-
-        let sbsts =
-            dto.Orderable.Components
-            |> List.toArray
-            |> Array.collect (fun cDto ->
-                cDto.Items
-                |> List.toArray
-                |> Array.collect (fun iDto ->
-                    iDto.ComponentConcentration.Variable.Vals
-                    |> List.toArray
-                    |> Array.map (fun v -> iDto.Name, v |> Some)
-                )
-            )
-            |> Array.distinct
-
-        let pr =
-            pr
-            |> PrescriptionRule.filterProducts
-                shps
-                sbsts
-
-        ord, pr
+    solve true rule
 
 
 
 let test pat n =
-    let ord, pr =
-        pat
-        |> PrescriptionRule.get
-        |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-        |> Array.item n
-        |> evaluate
+    pat
+    |> PrescriptionRule.get
+    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+    |> Array.item n
+    |> evaluate { Log = ignore }
+    |> function
+    | Ok (ord, pr) ->
+        let o =
+            ord
+            |> Order.toString
+            |> String.concat "\n"
+        let p =
+            $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
+        Ok (p, o)
+    | Error (ord, pr, m) ->
+        let o =
+            ord
+            |> Order.toString
+            |> String.concat "\n"
+        let p =
+            $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
-    $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}",
-    ord
-    |> Order.toString
-    |> String.concat "\n"
+        Error ($"%A{m}", p, o)
+
 
 
 type Age = Patient.Optics.Age
@@ -301,8 +279,8 @@ type Height = Patient.Optics.Height
 
 let pat =
     Patient.patient
-    
-    |> Patient.Optics.setAge [ 15 |> Age.Years] 
+
+    |> Patient.Optics.setAge [ 15 |> Age.Years]
     |> Patient.Optics.setWeight (70m |> Weight.Kilogram |> Some)
     |> Patient.Optics.setHeight (170 |> Height.Centimeter |> Some)
     |> Patient.Optics.setDepartment "ICK"
@@ -313,7 +291,8 @@ let n =
     |> PrescriptionRule.get
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
     |> Array.length
-    
+
+
 
 for i in [0..n - 1] do
     try
@@ -332,4 +311,51 @@ for i in [0..n - 1] do
 
         printfn $"could not calculate: {i}. {pr}"
 
+
+
+test pat 182
+
+let pr i =
+    pat
+    |> PrescriptionRule.get
+    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+    |> Array.item i
+
+
+startLogger ()
+
+
+pr 182
+|> Api.createDrugOrder
+|> DrugOrder.toOrder
+|> Order.Dto.fromDto
+|> Order.applyConstraints
+//|> Order.toString
+|> Order.solveMinMax false OrderLogger.logger.Logger
+
+
+5454356057317857N/35000000000000000000000N //< 11688685030832167551N/87500000000000000000000000N
+|> BigRational.toDouble
+
+5454356057317857N/280000000000000000000000N > 11688685030832167551N/700000000000000000000000000N
+
+49089204515860713N/700000000000000000000N
+|> BigRational.ToDouble
+|> decimal
+
+19999305543498809N/1714400000000N
+|> BigRational.ToDouble
+|> decimal
+
+
+1818118685772619N/1000000000000000N
+|> BigRational.ToDouble
+|> decimal
+
+169N/3840000000000N
+|> (*) (60N * 60N * 24N)
+|> (*) (1000N * 1000N)
+|> (*) (70N * 1000N)
+|> BigRational.ToDouble
+|> decimal
 

@@ -6,14 +6,20 @@
 * [ ] Refactor setting dose values and dose units in DrugOrder
 * [ ] Remove calculation of units?
 * [ ] Improve error management and printing
-* [ ] Add manual prepared generic products
+* [ ] Add manual prepared (i.e. no solutions for divisibility of product) generic products
 * [ ] Filter parenteral meds for reconstitution and dilution
 * [ ] Filter prescription rule product list
 * [ ] Create nicely formatted generic product name
 * [ ] Investigate amfo B lipid vs complex problem
 * [ ] Fix problem with missing prescription time
 * [ ] Consider merging continuous with timed
-* [ ] Create seperate patient library and calculations lib
+* [ ] Create separate library with core domain concepts (like patient)
+* [ ] Add cache management
+* [ ] Identify situations with undetermined dose counts (if they exist)
+* [ ] GenSolver able to detect min max calculation problems from initial equation set
+* [ ] Detect should have solution rule, but no solution rule
+* [ ] Solve incompatible max quantity with adjusted dose quantities
+
 
 
 

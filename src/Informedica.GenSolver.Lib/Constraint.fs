@@ -71,7 +71,7 @@ module Constraint =
         | [] ->
             (c, eqs)
             |> Exceptions.ConstraintVariableNotFound
-            |> Exceptions.raiseExc (Some log)
+            |> Exceptions.raiseExc (Some log) []
 
         | vr::_ ->
             c.Property

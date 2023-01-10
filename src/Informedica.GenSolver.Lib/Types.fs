@@ -1,7 +1,7 @@
 namespace Informedica.GenSolver.Lib
 
 [<AutoOpen>]
-module Types =
+module rec Types =
 
     open System
     open MathNet.Numerics
@@ -80,6 +80,7 @@ module Types =
     type SolveResult =
         | Unchanged
         | Changed of List<Variable * Property Set>
+        | Errored of Exceptions.Message list
 
 
     /// Represents a constraint on a `Variable`.
@@ -104,13 +105,18 @@ module Types =
             | ValueRangeEmptyIncrement
             | ValueRangeMinOverFlow of Minimum
             | ValueRangeMaxOverFlow of Maximum
+            | ValueRangeMinMaxException of string
             | VariableCannotSetValueRange of Variable * ValueRange
+            | VariableCannotCalcVariables of
+                v1: Variable *
+                op: (ValueRange -> ValueRange -> ValueRange) *
+                v2: Variable
             | EquationDuplicateVariables of duplicateVars: Variable list
             | EquationEmptyVariableList
             | ConstraintVariableNotFound of Constraint * Equation list
             | SolverInvalidEquations of Equation list
             | SolverTooManyLoops of loopCount : int * Equation list
-            | SolverErrored of loopCount: int * Message * Equation list
+            | SolverErrored of loopCount: int * Message list * Equation list
 
 
     module Events =

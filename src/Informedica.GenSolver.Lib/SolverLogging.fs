@@ -72,12 +72,18 @@ module SolverLogging =
 {eqs |> eqsToStr}
 """
 
-    | Exceptions.SolverErrored (n, msg, eqs) ->
+    | Exceptions.SolverErrored (n, msgs, eqs) ->
         $"=== Solver Errored Solving ({n} loops) ===\n{eqs |> eqsToStr}"
         |> fun s ->
-            match msg with
-            | Exceptions.SolverErrored _ -> s
-            | _ -> $"{s}\nError: {msg |> printException}"
+            msgs
+            |> List.map (fun msg ->
+                match msg with
+                | Exceptions.SolverErrored _ -> s
+                | _ ->
+                        $"Error: {msg |> printException}"
+            )
+            |> String.concat "\n"
+            |> fun es -> $"{s}\n{es}"
 
     | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
 
@@ -108,7 +114,7 @@ module SolverLogging =
 
             match eq |> Equation.toVars with
             | [] -> ""
-            | _::[] -> ""
+            | [ _ ] -> ""
             | y::xs ->
                 $"""{y |> varName } = {xs |> List.map varName |> String.concat op}"""
 
