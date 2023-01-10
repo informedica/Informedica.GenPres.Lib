@@ -1236,12 +1236,18 @@ module Order =
 
 
     let applyConstraints (ord : Order) =
-        { ord with
-            Adjust = ord.Adjust |> Quantity.applyConstraints
-            Duration = ord.Duration |> Time.applyConstraints
-            Prescription = ord.Prescription |> Prescription.applyConstraints
-            Orderable = ord.Orderable |> Orderable.applyConstraints
-        }
+        try
+            { ord with
+                Adjust = ord.Adjust |> Quantity.applyConstraints
+                Duration = ord.Duration |> Time.applyConstraints
+                Prescription = ord.Prescription |> Prescription.applyConstraints
+                Orderable = ord.Orderable |> Orderable.applyConstraints
+            }
+        with
+        | _ ->
+            let s = ord |> toString |> String.concat "\n"
+            printfn $"couldn't apply constraints:\n{s}"
+            reraise()
 
 
     let mapToEquations eqs (ord: Order)  =
@@ -1330,7 +1336,7 @@ module Order =
                 |> fun eqs -> Error (eqs, m)
 
         with
-        | _ ->
+        | e ->
             if printErr then
                 oEqs
                 |> Solver.orderEqsToUnit
@@ -1338,7 +1344,7 @@ module Order =
                 |> toString
                 |> List.iteri (printfn "%i. %s")
 
-            reraise()
+            raise e
 
 
     module Print =

@@ -11,6 +11,7 @@ module Exceptions =
         let raiseExc log errs m =
             match log with
             | Some log ->
+                printfn $"logging error {m} to {errs |> List.length}"
                 m |> Logging.logError log
             | None -> ()
 

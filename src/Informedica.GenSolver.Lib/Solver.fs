@@ -87,90 +87,104 @@ module Solver =
             try
                 Equation.solve onlyMinIncrMax log eq
             with
-            | Exceptions.SolverException errs  ->
-                 (n, errs, eqs)
-                 |> Exceptions.SolverErrored
-                 |> Exceptions.raiseExc None errs
+            | Exceptions.SolverException errs ->
+                printfn "exception solving equation"
+                (n, errs, eqs)
+                |> Exceptions.SolverErrored
+                |> Exceptions.raiseExc None errs
             | e ->
                 let msg = $"didn't catch {e}"
                 printfn $"{msg}"
                 msg |> failwith
 
         let rec loop n que acc =
+            printfn $"solver loop {n}"
             match acc with
             | Error _ -> acc
             | Ok acc  ->
                 let n = n + 1
                 if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
+                    printfn $"too many loops: {n}"
                     (n, que @ acc)
                     |> Exceptions.SolverTooManyLoops
                     |> Exceptions.raiseExc None []
+
                 let que = que |> sortQue
 
-                (n, que)
-                |> Events.SolverLoopedQue
-                |> Logging.logInfo log
+                //(n, que)
+                //|> Events.SolverLoopedQue
+                //|> Logging.logInfo log
 
                 match que with
                 | [] ->
                     match acc |> List.filter (Equation.check >> not) with
                     | []      -> acc |> Ok
                     | invalid ->
+                        printfn "invalid equations"
                         invalid
                         |> Exceptions.SolverInvalidEquations
                         |> Exceptions.raiseExc None []
 
                 | eq::tail ->
-                    // If the equation is already solved, or not solvable
-                    // just put it to  the accumulated equations and go on with the rest
-                    if eq |> Equation.isSolvable |> not then
-                        [ eq ]
-                        |> List.append acc
-                        |> Ok
-                        |> loop n tail
-                    // Else go solve the equation
-                    else
-                        match eq |> solveE n (acc @ que) with
-                        // Equation is changed, so every other equation can
-                        // be changed as well (if changed vars are in the other
-                        // equations) so start new
-                        | eq, Changed cs ->
-                            let vars = cs |> List.map fst
-                            // don't need to do this anymore
-                            //let eq = [ eq ] |> replace vars |> fst
-
-                            // find all eqs with vars in acc and put these back on que
-                            acc
-                            |> replace vars
-                            |> function
-                            | rpl, rst ->
-                                // replace vars in tail
-                                let que =
-                                    tail
-                                    |> replace vars
-                                    |> function
-                                    | es1, es2 ->
-                                        es1
-                                        |> List.append es2
-                                        |> List.append rpl
-
-                                rst
-                                |> List.append [ eq ]
-                                |> Ok
-                                |> loop n que
-
-                        // Equation did not in fact change, so put it to
-                        // the accumulated equations and go on with the rest
-                        | eq, Unchanged ->
-                            [eq]
+                    let q, r =
+                        // If the equation is already solved, or not solvable
+                        // just put it to  the accumulated equations and go on with the rest
+                        if eq |> Equation.isSolvable |> not then
+                            tail,
+                            [ eq ]
                             |> List.append acc
                             |> Ok
-                            |> loop n tail
-                        | eq, Errored m ->
-                            [eq]
-                            |> List.append acc
-                            |> List.append que
-                            |> fun eqs -> Error (eqs, m)
+                        //    |> loop n tail
+                        // Else go solve the equation
+                        else
+                            match eq |> solveE n (acc @ que) with
+                            // Equation is changed, so every other equation can
+                            // be changed as well (if changed vars are in the other
+                            // equations) so start new
+                            | eq, Changed cs ->
+                                let vars = cs |> List.map fst
+                                // don't need to do this anymore
+                                //let eq = [ eq ] |> replace vars |> fst
+
+                                // find all eqs with vars in acc and put these back on que
+                                acc
+                                |> replace vars
+                                |> function
+                                | rpl, rst ->
+                                    // replace vars in tail
+                                    let que =
+                                        tail
+                                        |> replace vars
+                                        |> function
+                                        | es1, es2 ->
+                                            es1
+                                            |> List.append es2
+                                            |> List.append rpl
+
+                                    que,
+                                    rst
+                                    |> List.append [ eq ]
+                                    |> Ok
+//                                    |> loop n que
+
+                            // Equation did not in fact change, so put it to
+                            // the accumulated equations and go on with the rest
+                            | eq, Unchanged ->
+                                tail,
+                                [eq]
+                                |> List.append acc
+                                |> Ok
+                                //|> loop n tail
+                            | eq, Errored m ->
+                                [],
+                                [eq]
+                                |> List.append acc
+                                |> List.append que
+                                |> fun eqs ->
+                                    //printfn "equation solved errored"
+                                    Error (eqs, m)
+                                    //|> loop n que
+                    loop n q r
 
         match var with
         | None     -> eqs, []

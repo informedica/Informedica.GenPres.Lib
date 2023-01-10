@@ -244,6 +244,7 @@ module Equation =
         let (<==) = if onlyMinIncrMax then (@<-) else (^<-)
 
         let rec calcXs op1 op2 y xs rest changed =
+            //printfn "loop calcXs"
             match rest with
             | []  ->
                 // log finishing the calculation
@@ -271,24 +272,41 @@ module Equation =
                 |> calcXs op1 op2 y (xs |> replAdd newX) tail
 
         let calcY op1 y xs =
-                if y |> Variable.isSolved then y, false
-                else
+            //printfn "calcY start"
+            if y |> Variable.isSolved then y, false
+            else
+                try
                     // log the calculation
                     (op1, op1, y, (xs |> List.head), (xs |> List.tail))
                     |> Events.EquationStartCalculation
                     |> Logging.logInfo log
                     // recalculate y
-                    let newY = y <== (xs |> List.reduce op1)
+                    printfn $"perform calcY calc with {xs |> List.length}"
+                    let temp = xs |> List.reduce op1
+                    printfn "finished calcY calc"
+
+                    //printfn "apply y start"
+                    let newY = y <== temp //(xs |> List.reduce op1)
+                    //printfn "apply y finished"
+
+                    //printfn "start comparing valueranges"
                     let yChanged = newY.Values <> y.Values
+                    //printfn "finish comparing valueranges"
+
                     // log finishing the calculation
                     (newY::xs, yChanged)
                     |> Events.EquationFinishedCalculation
                     |> Logging.logInfo log
+                    //printfn "calcY finish"
                     // return the result and whether it changed
                     newY, yChanged
-
+                with
+                | e ->
+                    printfn $"error in calcY:\n{e}"
+                    raise e
         // op1 = (*) or (+) and op2 = (/) or (-)
         let rec loop op1 op2 y xs changed =
+            //printfn "loop equation solve"
             let y, yChanged, xs, xChanged =
                 // for performance reasons pick the most efficient order of
                 // calculations, first xs then y or vice versa.

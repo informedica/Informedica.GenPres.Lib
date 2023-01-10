@@ -27,14 +27,22 @@ module OrderVariable =
     type Unit = ValueUnit.Unit
 
 
-    let createConstraints min incr max vs =
-        {
-            Min = min
-            Max = max
-            Incr = incr
-            Values = vs
-        }
+    module Constraints =
 
+        let create min incr max vs =
+            {
+                Min = min
+                Max = max
+                Incr = incr
+                Values = vs
+            }
+
+
+        let toString (cs : Constraints) = ""
+            //match cs.Min, cs.Incr, cs.Max with
+            //| Some min, Some incr, Some max ->
+                
+            //    $"{"
 
     /// Create a `OrderVariable` with preset values
     let create n min incr max vs un cs =
@@ -52,7 +60,8 @@ module OrderVariable =
     /// `Name` **nm** and `Unit` **un**
     let createNew n un =
         let min = Minimum.create false 0N |> Some
-        createConstraints min None None None
+
+        Constraints.create min None None None
         |> create n min None None None un
 
 
@@ -279,7 +288,7 @@ module OrderVariable =
 
                 let min  = dto.Constraints.Min  |> Option.map  (Minimum.create  dto.Constraints.MinIncl)
                 let max  = dto.Constraints.Max  |> Option.map  (Maximum.create  dto.Constraints.MaxIncl)
-                createConstraints min incr max vs
+                Constraints.create min incr max vs
 
             let n = dto.Name |> Name.fromString
             let vals =

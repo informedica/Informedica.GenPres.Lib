@@ -1051,29 +1051,19 @@ module Variable =
         module MinMaxCalculator =
 
 
-            open Exceptions
-
-
-            /// Exceptions that a MinMaxCalculator function can raise.
-            module Exceptions =
-
-                exception MinMaxCalculatorException of Message
-
-                let raiseExc m = m |> MinMaxCalculatorException |> raise
-
-
             /// Calculate **x1** and **x2** with operator **op**
             /// and use **incl1** and **inc2** to determine whether
             /// the result is inclusive. Use constructor **c** to
             /// create the optional result.
             let calc c op (x1, incl1) (x2, incl2) =
+                printfn "start minmax calc"
                 let opIsMultOrDiv = (op |> BigRational.opIsMult || op |> BigRational.opIsDiv)
 
                 let incl =
                     match incl1, incl2 with
                     | true, true -> true
                     | _ -> false
-
+                printfn "start minmax calc match"
                 match x1, x2 with
                 | Some v, _  when opIsMultOrDiv && v = 0N ->
                     0N |> c incl1 |> Some
@@ -1137,19 +1127,30 @@ module Variable =
                 | Some min, _         when min = 0N             -> ZP
                 // failing cases
                 | Some min, Some max when min = 0N && max = 0N  ->
-                    $"{min} = {max} = 0"
-                    |> ValueRangeMinMaxException
-                    |> Exceptions.raiseExc
+                    printfn "failing case"
+                    "{min} = {max} = 0"
+                    // |> ValueRangeMinMaxException
+                    //|> Exceptions.raiseExc
+                    |> string |> failwith
+
                 | Some min, Some max when min >= 0N && max < 0N ->
-                    $"{min} > {max}"
-                    |> ValueRangeMinMaxException
-                    |> Exceptions.raiseExc
+                    printfn "failing case"
+
+                    "{min} > {max}"
+                    //|> ValueRangeMinMaxException
+                    //|> Exceptions.raiseExc
+                    |> string |> failwith
+
                 | _ ->
-                    $"could not handle {min} {max}"
-                    |> ValueRangeMinMaxException
-                    |> Exceptions.raiseExc
+                    printfn "failing case"
+
+                    "could not handle min max"
+                    //|> ValueRangeMinMaxException
+//                    |> Exceptions.raiseExc
+                    |> string |> failwith
 
 
+                    
             /// Calculate `Minimum` option and
             /// `Maximum` option for addition of
             /// (**min1**, **max1**) and (**min2**, **max2)
@@ -1172,6 +1173,7 @@ module Variable =
             /// `Maximum` option for multiplication of
             /// (**min1**, **max1**) and (**min2**, **max2)
             let multiplication min1 max1 min2 max2 =
+                printfn "start multiplication"
                 match ((min1 |> fst), (max1 |> fst)), ((min2 |> fst), (max2 |> fst)) with
                 | PP, PP ->  // min = min1 * min2, max = max1 * max2
                     calcMin (*) min1 min2, calcMax (*) max1 max2
@@ -1287,14 +1289,18 @@ module Variable =
 
             /// Match the right minmax calcultion
             /// according to the operand
-            let calcMinMax = function
-                | BigRational.Mult  -> multiplication
+            let calcMinMax op =
+                match op with
+                | BigRational.Mult  ->
+                    printfn "return multiplication"
+                    multiplication
                 | BigRational.Div   -> division
                 | BigRational.Add   -> addition
                 | BigRational.Subtr -> subtraction
                 | BigRational.NoMatch ->
-                    ValueRangeNotAValidOperator
-                    |> Exceptions.raiseExc
+                    printfn "not a valid operator!"
+                    Exceptions.ValueRangeNotAValidOperator
+                    |> Exceptions.raiseExc None []
 
 
         /// Applies an infix operator **op**
@@ -1304,8 +1310,9 @@ module Variable =
         /// Doesn't perform any calculation when both
         /// **x1** and **x2** are `Unrestricted`.
         let calc onlyMinIncrMax op (x1, x2) =
-
+            //printfn "start valuerange calc"
             let calcMinMax min1 max1 min2 max2 =
+                //printfn "start minmax calc"
                 let getMin m =
                     let incl =
                         match m with
@@ -1326,7 +1333,6 @@ module Variable =
                     (max1 |> getMax)
                     (min2 |> getMin)
                     (max2 |> getMax)
-
 
             match x1, x2 with
             | Unrestricted, Unrestricted -> unrestricted
@@ -1375,7 +1381,9 @@ module Variable =
                 match min, incr, max with
                 | None, None, None -> unrestricted
                 | _ -> create onlyMinIncrMax min incr max None
-
+            |> fun res ->
+                //printfn "finish valuerange calc"
+                res
 
         /// Checks whether a `ValueRange` vr1 is a subset of
         /// `ValueRange` vr2.
@@ -1586,9 +1594,13 @@ module Variable =
             |> createRes
         with
         | Exceptions.SolverException errs ->
+            printfn "error with calc operation"
             (v1, op, v2)
             |> Exceptions.VariableCannotCalcVariables
             |> raiseExc errs
+        | e ->
+            printfn "unrecognized error with calc operation"
+            raise e
 
 
     module Operators =
@@ -1614,7 +1626,12 @@ module Variable =
         let inline (@-) vr1 vr2 = calc (@-) (vr1, vr2)
 
         let inline (@<-) vr1 vr2 =
+            try 
                 { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
+            with
+            | e ->
+                printfn $"apply error:\n{e}"
+                raise e
 
         /// Constant 0
         let zero =

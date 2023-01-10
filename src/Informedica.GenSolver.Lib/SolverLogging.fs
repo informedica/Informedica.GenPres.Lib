@@ -102,6 +102,7 @@ module SolverLogging =
         )
         }
         """
+    | _ -> "not a recognized msg"
 
     let printMsg = function
     | ExceptionMessage m ->

@@ -860,10 +860,19 @@ Variable.ValueRange.MinMaxCalculator.calcMinMax
 
 // calculating: a <0..> = b <0..> / c [1/86400]
 
+//start calculating: [1]_prs_tme [3600..> =
+//[vancomycine.poeder voor oplossing voor infusie]_dos_qty <0..> /
+//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18> 
+
+
 let varA = Variable.Dto.createNew "a" |> Variable.Dto.setMin (Some 0N) false |> Variable.Dto.fromDto
-let varB = Variable.Dto.createNew "b" |> Variable.Dto.setMin (Some 0N) false |> Variable.Dto.fromDto
-let varC = Variable.Dto.createNew "c" |> Variable.Dto.setVals [1N/86400N] |> Variable.Dto.fromDto
-Equation.createProductEqExc (varB, [varC; varA])
+let varB = Variable.Dto.createNew "c" |> Variable.Dto.setMin (Some 3600N) true |> Variable.Dto.fromDto
+let varC =
+    Variable.Dto.createNew "b"
+    |> Variable.Dto.setMin (Some 0N) false
+    |> Variable.Dto.setMax (Some (5N/18N)) false
+    |> Variable.Dto.fromDto
+Equation.createProductEqExc (varA, [varB; varC])
 |> fun eq ->
     printfn $"{eq |> Equation.toString true}"
     eq
@@ -871,3 +880,6 @@ Equation.createProductEqExc (varB, [varC; varA])
 |> resultToString
 |> printfn "%s"
 
+//start calculating: [1]_prs_tme [3600..> =
+//[vancomycine.poeder voor oplossing voor infusie]_dos_qty <0..> /
+//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18> 

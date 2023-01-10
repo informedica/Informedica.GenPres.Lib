@@ -294,8 +294,9 @@ let n =
 
 
 
-for i in [0..n - 1] do
+for i in [0..n-1] do
     try
+        printfn $"{i}. calculated"
         i
         |> test pat
         |> ignore
@@ -309,11 +310,12 @@ for i in [0..n - 1] do
             |> fun pr ->
                 $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
-        printfn $"could not calculate: {i}. {pr}"
+        printfn $"{i}. could not calculate: {pr}"
 
 
 
-test pat 182
+test pat 1050
+
 
 let pr i =
     pat
@@ -325,13 +327,20 @@ let pr i =
 startLogger ()
 
 
-pr 182
+pr 1050
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
 |> Order.applyConstraints
-//|> Order.toString
-|> Order.solveMinMax false OrderLogger.logger.Logger
+|> Order.solveMinMax false { Log = ignore }
+|> function
+| Error _ -> printfn "oeps error"
+| Ok ord  ->
+    ord
+    |> Order.toString
+    |> String.concat "\n"
+    |> printfn "%s"
+
 
 
 5454356057317857N/35000000000000000000000N //< 11688685030832167551N/87500000000000000000000000N
