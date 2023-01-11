@@ -88,7 +88,6 @@ module Solver =
                 Equation.solve onlyMinIncrMax log eq
             with
             | Exceptions.SolverException errs ->
-                printfn "exception solving equation"
                 (n, errs, eqs)
                 |> Exceptions.SolverErrored
                 |> Exceptions.raiseExc None errs
@@ -98,7 +97,6 @@ module Solver =
                 msg |> failwith
 
         let rec loop n que acc =
-            printfn $"solver loop {n}"
             match acc with
             | Error _ -> acc
             | Ok acc  ->
@@ -126,6 +124,7 @@ module Solver =
                         |> Exceptions.raiseExc None []
 
                 | eq::tail ->
+                    // need to calculate result first to enable tail call optimization
                     let q, r =
                         // If the equation is already solved, or not solvable
                         // just put it to  the accumulated equations and go on with the rest
@@ -134,7 +133,6 @@ module Solver =
                             [ eq ]
                             |> List.append acc
                             |> Ok
-                        //    |> loop n tail
                         // Else go solve the equation
                         else
                             match eq |> solveE n (acc @ que) with
@@ -143,9 +141,6 @@ module Solver =
                             // equations) so start new
                             | eq, Changed cs ->
                                 let vars = cs |> List.map fst
-                                // don't need to do this anymore
-                                //let eq = [ eq ] |> replace vars |> fst
-
                                 // find all eqs with vars in acc and put these back on que
                                 acc
                                 |> replace vars
@@ -165,7 +160,6 @@ module Solver =
                                     rst
                                     |> List.append [ eq ]
                                     |> Ok
-//                                    |> loop n que
 
                             // Equation did not in fact change, so put it to
                             // the accumulated equations and go on with the rest
@@ -174,16 +168,14 @@ module Solver =
                                 [eq]
                                 |> List.append acc
                                 |> Ok
-                                //|> loop n tail
+
                             | eq, Errored m ->
                                 [],
                                 [eq]
                                 |> List.append acc
                                 |> List.append que
                                 |> fun eqs ->
-                                    //printfn "equation solved errored"
                                     Error (eqs, m)
-                                    //|> loop n que
                     loop n q r
 
         match var with

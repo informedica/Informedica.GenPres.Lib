@@ -17,8 +17,11 @@
 * [ ] Add cache management
 * [ ] Identify situations with undetermined dose counts (if they exist)
 * [ ] GenSolver able to detect min max calculation problems from initial equation set
-* [ ] Detect should have solution rule, but no solution rule
+* [ ] Detect should have solution rule, but has no solution rule
 * [ ] Solve incompatible max quantity with adjusted dose quantities
+* [ ] Need more testing code for solver lib
+
+
 
 
 
