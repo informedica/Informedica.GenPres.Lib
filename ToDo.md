@@ -20,6 +20,9 @@
 * [ ] Detect should have solution rule, but has no solution rule
 * [ ] Solve incompatible max quantity with adjusted dose quantities
 * [ ] Need more testing code for solver lib
+* [ ] Add unrecognized units
+
+
 
 
 

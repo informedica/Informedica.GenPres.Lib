@@ -280,9 +280,9 @@ type Height = Patient.Optics.Height
 let pat =
     Patient.patient
 
-    |> Patient.Optics.setAge [ 15 |> Age.Years]
-    |> Patient.Optics.setWeight (70m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (170 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setAge [ 1 |> Age.Weeks]
+    |> Patient.Optics.setWeight (3.5m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (60 |> Height.Centimeter |> Some)
     |> Patient.Optics.setDepartment "ICK"
 
 
