@@ -5,13 +5,120 @@ namespace Informedica.MetaVision.Lib
 
 module Constants =
 
+
+    let [<Literal>] solveGroup = "Oplossen"
+
+    let [<Literal>] diluteGroup = "Verdunnen"
+
+    let [<Literal>] NoTime = "NoTime"
+
+    let [<Literal>] TRUE = "TRUE"
+
+    let [<Literal>] FALSE = "FALSE"
+
+    let [<Literal>] ``G-Standaard`` = "G-Standaard"
+
+    let [<Literal>] ``parenterale vloeistof`` = "parenterale vloeistof"
+
+    let [<Literal>] voeding =  "voeding"
+
+    let [<Literal>] Voeding = "Voeding"
+
+    let [<Literal>] ``poeder voor voeding`` = "poeder voor voeding"
+
+    let [<Literal>] Poeders = "Poeders"
+
+    let [<Literal>] milliliter = "milliliter" 
+
+    let [<Literal>] druppel = "druppel"
+
+    let [<Literal>] mL = "mL"
+
+    let [<Literal>] g = "g"
+
+    let [<Literal>] water = "water"
+
+    let [<Literal>] NaCl = "NaCl"
+
+    let [<Literal>] gluc = "gluc"
+
+    let [<Literal>] ``GPK-`` = "GPK-"
+
+    let [<Literal>] GPK = "GPK"
+
+    let [<Literal>] PROD = "PROD"
+
+    let [<Literal>] eContinuous = "eContinuous"
+
+    let [<Literal>] ``[All]`` = "[All]"
+
+    let [<Literal>] MainComponent = "MainComponent"
+
+    let [<Literal>] keer = "keer"
+
+    let [<Literal>] dosis = "dosis"
+
+    let [<Literal>] eenmalig = "eenmalig"
+
+    let [<Literal>] Continue = "Continue"
+
+    let [<Literal>] Nu = "Nu"
+
+    let [<Literal>] ``Volgende geplande dosis`` = "Volgende geplande dosis"
+
+    let [<Literal>] ``Geen tijdslimiet`` = "Geen tijdslimiet"
+
+    let [<Literal>] ActualWeight = "ActualWeight"
+
+    let [<Literal>] Parenteraal = "Parenteraal"
+
+    let [<Literal>] ``1,234`` = "1,234"
+
+    let [<Literal>] ``1,234.56`` = "1,234.56"
+
+    let [<Literal>] ``[None]`` = "[None]"
+
+    let [<Literal>] Apotheek = "Apotheek"
+
+    let [<Literal>] emulsie = "emulsie"
+
+    let [<Literal>] ``.`` = "."
+
+    let [<Literal>] iv = "iv"
+
+    let [<Literal>] im = "im"
+
+    let [<Literal>] ``or`` = "or"
+
+    let [<Literal>] ICC = "ICC"
+
+    let [<Literal>] ICK = "ICK"
+
+    let [<Literal>] NEO = "NEO"
+
+
+
+module Units =
+
     open Informedica.Utils.Lib.BCL
 
 
-    let solveGroup = "Oplossen"
+    let volumeUnits =
+        [|
+            Constants.milliliter
+            Constants.druppel
+            Constants.mL
+        |]
 
 
-    let diluteGroup = "Verdunnen"
+    let isVolumeUnit u =
+        volumeUnits
+        |> Array.exists (String.equalsCapInsens u)
+
+
+module Data =
+
+    open Informedica.Utils.Lib.BCL
 
 
     let excludeShapes =
@@ -25,6 +132,7 @@ module Constants =
     let solutionMeds =
         [|
             "water", "oplosvloeistof"
+            "oplvlst", "oplosvloeistof"
             "NaCl 0,9%", "oplosvloeistof"
             "gluc 5%", "oplosvloeistof"
             "gluc 10%", "oplosvloeistof"
@@ -627,29 +735,34 @@ module Constants =
     let parenteral n =
         let alsoEnt =
             match n with
-            | _ when n |> String.contains "water" -> true
-            | _ when n |> String.contains "gluc"  -> true 
-            | _ when n |> String.contains "NaCl"  -> true
+            | _ when n |> String.contains Constants.water -> true
+            | _ when n |> String.contains Constants.gluc  -> true 
+            | _ when n |> String.contains Constants.NaCl  -> true
             | _ -> false
 
         [|
             "MedicationName", n
             "Unit", "mL"
             "ATCCode", "parenteraal"
-            "Status", "Active"
-            "Format", "1,234.5"
+            "Status", $"{Active}"
+            "Format", Constants.``1,234.56``
             "IncrementValue", "0,1"
             "CodeSnippetName", n
-            "Frequencies", "[All]"
-            "DoseForms", if alsoEnt then "voeding;parenterale vloeistof" else "parenterale vloeistof"
-            "Routes", if alsoEnt then "or;iv" else "iv"
-            "AdditivesGroup", "[None]"
-            "DiluentsGroup", "[All]"
-            "DrugInDiluentGroup", "[None]"
-            "DrugFamily", "[None]"
-            "DrugSubfamily", "[None]"
-            "HideInAllergyEntry", "TRUE"
-            "IsFormulary", "TRUE"
+            "Frequencies", Constants.``[All]``
+
+            "DoseForms",
+            if alsoEnt then
+                $"{Constants.voeding};{Constants.``parenterale vloeistof``}"
+            else Constants.``parenterale vloeistof``
+
+            "Routes", Constants.``[All]`` // if alsoEnt then $"{Constants.``or``};{Constants.iv}" else Constants.iv
+            "AdditivesGroup", Constants.``[None]``
+            "DiluentsGroup", Constants.``[All]``
+            "DrugInDiluentGroup", Constants.``[None]``
+            "DrugFamily", Constants.``[None]``
+            "DrugSubfamily", Constants.``[None]``
+            "HideInAllergyEntry", Constants.TRUE
+            "IsFormulary", Constants.TRUE
         |]
 
 
@@ -657,21 +770,21 @@ module Constants =
         [|
             "MedicationName", n
             "Unit", un
-            "ATCCode", "voeding"
-            "Status", "Active"
-            "Format", "1,234.5"
+            "ATCCode", Constants.voeding
+            "Status", $"{Active}"
+            "Format", Constants.``1,234.56``
             "IncrementValue", "0,1"
             "CodeSnippetName", n
-            "Frequencies", "[All]"
-            "DoseForms", if un = "g" then "poeder voor voeding" else "voeding"
+            "Frequencies", Constants.``[All]``
+            "DoseForms", if un = Constants.g then Constants.``poeder voor voeding`` else Constants.voeding
             "Routes", "or"
-            "AdditivesGroup", if un = "g" then "[None]" else "Poeders"
-            "DiluentsGroup", if un = "g" then "[None]" else "[All]"
-            "DrugInDiluentGroup", "[None]"
-            "DrugFamily", "[None]"
-            "DrugSubfamily", "[None]"
-            "HideInAllergyEntry", "TRUE"
-            "IsFormulary", "TRUE"
+            "AdditivesGroup", if un = Constants.g then Constants.``[None]`` else Constants.Poeders
+            "DiluentsGroup", if un = Constants.g then Constants.``[None]`` else Constants.``[All]``
+            "DrugInDiluentGroup", Constants.``[None]``
+            "DrugFamily", Constants.``[None]``
+            "DrugSubfamily", Constants.``[None]``
+            "HideInAllergyEntry", Constants.TRUE
+            "IsFormulary", Constants.TRUE
         |]
 
 

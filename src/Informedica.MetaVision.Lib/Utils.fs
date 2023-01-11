@@ -215,7 +215,7 @@ module Utils =
 
 
     let mapBool b =
-        if b then "TRUE" else "FALSE"
+        if b then Constants.TRUE else Constants.FALSE
 
 
     let mapFreq freq =
@@ -241,17 +241,15 @@ module Utils =
         |> function
         | Some xs ->
             [|
-                if xs[1] <> "" then UMCU
-                if xs[6] = "TRUE" then ICC
-                if xs[8] = "TRUE" then ICK
-                if xs[7] = "TRUE" then NEO
+                if xs[1] |> String.notEmpty then UMCU
+                if xs[6] = Constants.TRUE then ICC
+                if xs[8] = Constants.TRUE then ICK
+                if xs[7] = Constants.TRUE then NEO
             |]
         | None -> [||]
 
 
-    let isSolutionUnit un =
-        let un = un |> String.trim |> String.toLower
-        un = "milliliter" || un = "druppel" || un = "ml"
+    let isSolutionUnit = Units.isVolumeUnit
 
 
     let removeEmptyUnitSubstances (gp : GenericProduct) =
@@ -268,7 +266,7 @@ module Utils =
         gpps
         |> Array.filter (fun gpp ->
             gpp |> hasNoUnit |> not &&
-            Constants.excludeShapes
+            Data.excludeShapes
             |> Array.exists (fun s -> gpp.Shape |> String.equalsCapInsens s)
             |> not
         )

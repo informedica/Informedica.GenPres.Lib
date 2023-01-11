@@ -4,7 +4,7 @@
 #r "nuget: Newtonsoft.Json"
 #r "nuget: Aether"
 #r "nuget: Markdig"
-#r "nuget: ClosedXML"
+#r "nuget: ClosedXML, 0.97"
 
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"

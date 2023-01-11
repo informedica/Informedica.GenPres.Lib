@@ -4,16 +4,14 @@ namespace Informedica.MetaVision.Lib
 
 
 
-open Informedica.Utils.Lib
-open Informedica.Utils.Lib.BCL
-open Informedica.ZForm.Lib.DoseRule.ShapeDosage
-open Informedica.ZForm.Lib.Utils
-open Informedica.ZIndex.Lib
-
-
-
 
 module MetaVision =
+
+
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
+    open Informedica.ZForm.Lib.DoseRule.ShapeDosage
+    open Informedica.ZIndex.Lib
 
 
 
@@ -46,13 +44,13 @@ module MetaVision =
     let entFeeding =
         mapEntFeeding
         |> Array.skip 1
-        |> Array.map (fun xs -> Constants.enteral xs[0] xs[1])
+        |> Array.map (fun xs -> Data.enteral xs[0] xs[1])
 
 
     let parentMeds =
         mapParentMeds
         |> Array.skip 1
-        |> Array.map (fun xs -> Constants.parenteral xs[0])
+        |> Array.map (fun xs -> Data.parenteral xs[0])
 
 
     let getDrugFamilies path =
@@ -83,7 +81,7 @@ module MetaVision =
 
 
     let createRoutes file newFile name =
-        let mapRts = (Array.mapStringHeadings Constants.routeHeadings) >> (String.concat "\t")
+        let mapRts = (Array.mapStringHeadings Data.routeHeadings) >> (String.concat "\t")
         // Get routes and external codes
         // Intra seperated by -
         let rts =
@@ -104,7 +102,7 @@ module MetaVision =
                     |> Array.fold (fun acc xs ->
                         match acc with
                         | NonInfuse ->
-                            if xs[2] |> String.contains "NoTime" then NonInfuse
+                            if xs[2] |> String.contains Constants.NoTime then NonInfuse
                             else Both
                         | Both -> Both
                     ) NonInfuse
@@ -112,7 +110,7 @@ module MetaVision =
             |]
             |> mapRts
         )
-        |> Array.append [| Constants.routeHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.routeHeadings |> String.concat "\t" |]
         |> createDataImport file newFile name
 
         rts
@@ -122,7 +120,7 @@ module MetaVision =
 
 
     let createDoseForms file newFile name routes =
-        let mapForms = (Array.mapStringHeadings Constants.doseFormHeadings) >> (String.concat "\t")
+        let mapForms = (Array.mapStringHeadings Data.doseFormHeadings) >> (String.concat "\t")
 
         // Get doseforms
         Names.getItems Names.Shape Names.Fifty
@@ -154,14 +152,14 @@ module MetaVision =
                     |> Array.fold (fun acc xs ->
                         match acc with
                         | NonInfuse ->
-                            if xs[4] = "TRUE" then Both
+                            if xs[4] = Constants.TRUE then Both
                             else acc
                         | Both -> Both
                     ) NonInfuse
                 IsDrugInSolution =
                     s |> shapeIsSolution "" "" ||
                     s |> shapeInDiluent "" ""
-                Category = "G-Standaard"
+                Category = Constants.``G-Standaard``
                 IsDispensableAmountAllowed = false
             }
         )
@@ -187,13 +185,17 @@ module MetaVision =
             |> mapForms
         )
         |> Array.append (
-            [| "parenterale vloeistof"; "voeding"; "poeder voor voeding" |]
+            [|
+                Constants.``parenterale vloeistof``
+                Constants.voeding
+                Constants.``poeder voor voeding``
+            |]
             |> Array.map (fun s ->
                 [|
                     "DoseFormName", s
                     "Routes", routes |> String.concat ";"
-                    "DefaultUnit", if s = "poeder voor voeding" then "g" else "mL"
-                    "OrderingType", "Both"
+                    "DefaultUnit", if s = Constants.``poeder voor voeding`` then Constants.g else Constants.mL
+                    "OrderingType", $"{Both}"
                     "IsDrugInSolution", false |> mapBool
                     "Category", "Overige"
                     "IsDispensableAmountAllowed", false |> mapBool
@@ -201,19 +203,19 @@ module MetaVision =
                 |> mapForms
             )
         )
-        |> Array.append [| Constants.doseFormHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.doseFormHeadings |> String.concat "\t" |]
         |> createDataImport file newFile name
 
 
     let createIngredients file newFile name (gp : GenericProduct[]) =
-        let mapIngrs = (Array.mapStringHeadings Constants.ingredientHeadings) >> (String.concat "\t")
+        let mapIngrs = (Array.mapStringHeadings Data.ingredientHeadings) >> (String.concat "\t")
 
         let substs =
             gp
             |> Array.collect (fun gp -> gp.Substances)
             |> Array.filter (fun s ->
-                s.SubstanceName |> String.equalsCapInsens "water" |> not &&
-                s.GenericName |> String.equalsCapInsens "water" |> not
+                s.SubstanceName |> String.equalsCapInsens Constants.water |> not &&
+                s.GenericName |> String.equalsCapInsens Constants.water |> not
             )
 
         // Ingredients
@@ -268,7 +270,7 @@ module MetaVision =
             |]
             |> mapIngrs
         )
-        |> Array.append [| Constants.ingredientHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.ingredientHeadings |> String.concat "\t" |]
         |> createDataImport file newFile name
 
 
@@ -279,7 +281,7 @@ module MetaVision =
 
 
     let createTemplates file newFile (meds : Medication[]) =
-        let mapTempl = (Array.mapStringHeadings Constants.orderTemplateHeadings) >> (String.concat "\t")
+        let mapTempl = (Array.mapStringHeadings Data.orderTemplateHeadings) >> (String.concat "\t")
 
         let templates =
             meds
@@ -294,7 +296,7 @@ module MetaVision =
                     |> Array.collect (fun r ->
                         if m.Products |> Array.isEmpty then
                             let dnv =
-                                let gpk = m.ExternalCode |> String.replace "GPK-" ""
+                                let gpk = m.ExternalCode |> String.replace Constants.``GPK-`` ""
                                 getReconsitiution gpk r $"{d}"
 
                             [|
@@ -327,7 +329,7 @@ module MetaVision =
         |> Array.map (fun t ->
             let ordStyle =
                 if t.Medication.IsSolution then
-                    if t.Medication.Frequencies = "eContinuous" then SetDoseAndRate
+                    if t.Medication.Frequencies = Constants.eContinuous then SetDoseAndRate
                     else
                         let b =
                             t.Medication.DoseForms
@@ -342,10 +344,10 @@ module MetaVision =
                 |> String.splitAt ';'
                 |> Array.filter (fun s ->
                     if ordStyle = SpecifyInfuseOver ||
-                       ordStyle = NoInfusedOver then s <> "eContinuous"
+                       ordStyle = NoInfusedOver then s <> Constants.eContinuous
                     else true
                 )
-                |> Array.filter ((<>) "[All]")
+                |> Array.filter ((<>) Constants.``[All]``)
                 |> Array.tryHead
                 |> Option.defaultValue "01x per dag (00)"
                 |> Frequency.map
@@ -357,10 +359,10 @@ module MetaVision =
                 ProductName = p
                 DoseForm = m.DoseForms
                 Route = r
-                IsPRN = "FALSE"
-                PatternMode = "Standard"
+                IsPRN = Constants.FALSE
+                PatternMode = $"{Standard}"
                 Frequency = f
-                ComponentType = "MainComponent"
+                ComponentType = Constants.MainComponent
                 OrderingStyle = ordStyle |> orderingStyleToString |> fst
                 LockerTemplate = ordStyle |> orderingStyleToString |> snd
                 ComponentMedicationName =
@@ -374,42 +376,46 @@ module MetaVision =
                         if p |> String.isNullOrWhiteSpace then ""
                         else p
                 ComponentQuantityVolumeValue =
-                    if m.Unit = "keer" || m.Unit = "druppel" || m.Unit = "dosis" then 1.
+                    if m.Unit = Constants.keer ||
+                       m.Unit = Constants.druppel ||
+                       m.Unit = Constants.dosis then 1.
                     else
                         match m.ComplexMedications |> Array.tryHead with
                         | Some cm -> cm.Concentration
                         | None -> 0.
                 ComponentQuantityVolumeUnit =
-                    if m.Unit = "keer" || m.Unit = "dosis" || m.Unit = "druppel" then m.Unit
+                    if m.Unit = Constants.keer ||
+                       m.Unit = Constants.dosis ||
+                       m.Unit = Constants.druppel then m.Unit
                     else
                         match m.ComplexMedications |> Array.tryHead with
                         | Some cm -> cm.ConcentrationUnit
                         | None -> ""
                 ComponentConcentrationMassUnit =
-                    if m.Unit = "keer" || m.Unit = "dosis" then m.Unit
+                    if m.Unit = Constants.keer || m.Unit = Constants.dosis then m.Unit
                     else
-                        if m.Unit = "druppel" then ""
+                        if m.Unit = Constants.druppel then ""
                         else
                             match m.ComplexMedications |> Array.tryHead with
                             | Some cm -> cm.ConcentrationUnit
                             | None -> ""
                 ComponentConcentrationVolumeUnit =
-                    if m.Unit = "druppel" || m.Unit = "mL" then ""
-                    else "mL"
+                    if m.Unit = Constants.druppel || m.Unit = Constants.mL then ""
+                    else Constants.mL
                 ComponentDrugInDiluentDiluentMedicationName = t.DiluentName
                 ComponentDrugInDiluentVolumeValue = t.DiluentVolume
-                ComponentDrugInDiluentVolumeUnit = if t.DiluentName |> String.isNullOrWhiteSpace then "" else "ml"
-                TotalVolumeUnit = "mL"
+                ComponentDrugInDiluentVolumeUnit = if t.DiluentName |> String.isNullOrWhiteSpace then "" else Constants.mL
+                TotalVolumeUnit = Constants.mL
                 StartMethod =
                     match f with
-                    | _ when f = "eenmalig" -> "Nu"
-                    | _ when f = "Continue" -> "Nu"
-                    | _ -> "Volgende geplande dosis"
-                EndMethod = if f = "eenmalig" then "" else "Geen tijdslimiet"
-                WeightType = "ActualWeight"
+                    | _ when f = Constants.eenmalig -> Constants.Nu
+                    | _ when f = Constants.Continue -> Constants.Nu
+                    | _ -> Constants.``Volgende geplande dosis``
+                EndMethod = if f = Constants.eenmalig then "" else Constants.``Geen tijdslimiet``
+                WeightType = Constants.ActualWeight
                 Comment = ""
                 Caption = m.Title
-                AvailableInRT = "TRUE"
+                AvailableInRT = Constants.TRUE
             }
         )
         |> Array.filter (fun r -> r.ComponentQuantityVolumeValue > 0.)
@@ -452,10 +458,10 @@ module MetaVision =
 
 
     let createMedications includeAssort file newFile ingrName medName complName brandName prodName meds =
-        let mapMeds = (Array.mapStringHeadings Constants.medicationHeadings) >> (String.concat "\t")
-        let mapComp = (Array.mapStringHeadings Constants.complexMedicationHeadings) >> (String.concat "\t")
-        let mapBrand = (Array.mapStringHeadings Constants.brandHeadings) >> (String.concat "\t")
-        let mapProd = (Array.mapStringHeadings Constants.productHeadings) >> (String.concat "\t")
+        let mapMeds = (Array.mapStringHeadings Data.medicationHeadings) >> (String.concat "\t")
+        let mapComp = (Array.mapStringHeadings Data.complexMedicationHeadings) >> (String.concat "\t")
+        let mapBrand = (Array.mapStringHeadings Data.brandHeadings) >> (String.concat "\t")
+        let mapProd = (Array.mapStringHeadings Data.productHeadings) >> (String.concat "\t")
 
         let gps =
             meds
@@ -495,7 +501,7 @@ module MetaVision =
                 let rts =
                     gp.Route
                     |> Array.collect (String.splitAt ',')
-                    |> Array.filter ((String.equalsCapInsens "Parenteraal") >> not)
+                    |> Array.filter ((String.equalsCapInsens Constants.Parenteraal) >> not)
                     |> Array.distinct
 
                 let su =
@@ -511,7 +517,7 @@ module MetaVision =
                 let assort = gp.Id |> getFormulary
 
                 {
-                    Medication.ExternalCode = $"GPK-{gp.Id}"
+                    Medication.ExternalCode = $"{Constants.``GPK-``}{gp.Id}"
                     MedicationName = name
                     Title =
                         if gp.Substances |> Array.length > 4 then name
@@ -534,14 +540,14 @@ module MetaVision =
                         |> String.concat ", "
                     Status = Active
                     Format =
-                        if un = "keer" || un = "druppel" || un = "dosis" then "1,234"
+                        if un = Constants.keer || un = Constants.druppel || un = Constants.dosis then Constants.``1,234``
                         else
-                            "1,234.5"
+                            Constants.``1,234.56``
                     IncrementValue = 0.1
-                    CodeSnippetName = $"GPK-{gp.Id} {System.Guid.NewGuid().ToString()}"
+                    CodeSnippetName = $"{Constants.``GPK-``}{gp.Id} {System.Guid.NewGuid().ToString()}"
                     Frequencies =
                         let freqs = drs |> getFrequencies (gp.Shape |> shapeIsInfuseOver)
-                        if freqs |> String.isNullOrWhiteSpace then "[All]"
+                        if freqs |> String.isNullOrWhiteSpace then Constants.``[All]``
                         else freqs
                     DoseForms = gp.Shape |> String.toLower |> String.trim
                     Routes =
@@ -549,17 +555,17 @@ module MetaVision =
                         |> Array.map mapRoute
                         |> Array.filter (String.isNullOrWhiteSpace >> not)
                         |> String.concat ";"
-                    AdditivesGroup = "[None]"
+                    AdditivesGroup = Constants.``[None]``
                     DiluentsGroup = // "Verdunnen"
                         if gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.diluteGroup
-                        else "[None]"
+                        else Constants.``[None]``
                     DrugInDiluentGroup = // "Oplossen"
-                        if gp.Shape |> shapeIsSolution "" un then "[None]"
+                        if gp.Shape |> shapeIsSolution "" un then Constants.``[None]``
                         else
                             if gp.Shape |> shapeInDiluent "" gp.Substances[0].ShapeUnit ||
                                gp.Shape |> shapeIsSolution "" gp.Substances[0].ShapeUnit then Constants.solveGroup
                             else
-                                "[None]"
+                                Constants.``[None]``
                     DrugFamily =
                         grps
                         |> Option.map (fun g -> drugFamilyName g.ATC1 g.AnatomicalGroup)
@@ -571,12 +577,12 @@ module MetaVision =
                     Assortment = assort
                     IsFormulary = assort |> Array.isEmpty |> not
                     CreateProduct =
-                        un <> "keer" &&
+                        un <> Constants.keer &&
                         gp.Substances[0].ShapeUnit |> isSolutionUnit
 
                     ComplexMedications =
                         if gp.Substances |> Array.length > 4 ||
-                           un = "keer" then [||]
+                           un = Constants.keer then [||]
                         else
                             let cms =
                                 gp.Substances
@@ -593,13 +599,13 @@ module MetaVision =
                                         Concentration = q
                                         ConcentrationUnit = u
                                         In =
-                                            if (gp.Shape |> shapeIsSolution "" un || un = "dosis") &&
+                                            if (gp.Shape |> shapeIsSolution "" un || un = Constants.dosis) &&
                                                un <> u then "1" else ""
                                         InUnit =
                                             if gp.Shape |> shapeIsSolution "" un |> not &&
-                                               un <> "dosis" then ""
+                                               un <> Constants.dosis then ""
                                             else
-                                                 if un = "druppel" then "mL" else un
+                                                 if un = Constants.druppel then Constants.mL else un
                                     }
                                 )
                                 |> Array.groupBy (fun cm -> cm.IngredientName)
@@ -655,34 +661,34 @@ module MetaVision =
                 { r with
                     Products =
                         if r.CreateProduct |> not ||
-                           r.Unit = "druppel" || r.Unit = "mL" ||
+                           r.Unit = Constants.druppel || r.Unit = Constants.mL ||
                            r.ComplexMedications |> Array.isEmpty then [||]
                         else
                             [|
                                 {
-                                    Id = r.ExternalCode |> String.replace "GPK" "PROD"
-                                    ProductID = r.ExternalCode |> String.replace "GPK-" ""
+                                    Id = r.ExternalCode |> String.replace Constants.GPK Constants.PROD
+                                    ProductID = r.ExternalCode |> String.replace Constants.``GPK-`` ""
                                     ProductName = r.MedicationName
                                     MedicationName = r.MedicationName
-                                    Manufacturer = "Apotheek"
+                                    Manufacturer = Constants.Apotheek
                                     DoseForm = r.DoseForms
                                     Routes = r.Routes
                                     Format = r.Format
                                     IncrementValue = r.IncrementValue
 //                                    Unit = "mL"
                                     DefaultUnit = r.Unit
-                                    IsUnknownStrength = "FALSE"
+                                    IsUnknownStrength = Constants.f
                                     StrengthLEFT = r.ComplexMedications[0].Concentration
                                     StrengthLEFTUnit = r.ComplexMedications[0].ConcentrationUnit
                                     StrengthRIGHT = "1"
-                                    StrengthRIGHTUnit = "mL"
+                                    StrengthRIGHTUnit = Constants.mL
                                     DiluentGroup = Constants.solveGroup
-                                    ProductRequiresReconstitution = "FALSE"
-                                    IsVolumeKnown = "FALSE"
+                                    ProductRequiresReconstitution = Constants.FALSE
+                                    IsVolumeKnown = Constants.FALSE
                                     Volume = "0"
                                     DiluentName =
-                                        if r.DoseForms |> String.contains "emulsie" then "emulsie"
-                                        else "."
+                                        if r.DoseForms |> String.contains Constants.emulsie then Constants.emulsie
+                                        else Constants.``.``
                                     IsFormulary = r.IsFormulary
                                 }
                             |]
@@ -709,7 +715,7 @@ module MetaVision =
                 |> mapBrand
             )
         )
-        |> Array.append [| Constants.brandHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.brandHeadings |> String.concat "\t" |]
         |> createDataImport file newFile brandName
 
         meds
@@ -725,7 +731,7 @@ module MetaVision =
             |]
             |> mapComp
         )
-        |> Array.append [| Constants.complexMedicationHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.complexMedicationHeadings |> String.concat "\t" |]
         |> createDataImport file newFile complName
 
         meds
@@ -757,7 +763,7 @@ module MetaVision =
             |]
             |> mapProd
         )
-        |> Array.append [| Constants.productHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.productHeadings |> String.concat "\t" |]
         |> createDataImport file newFile prodName
 
         meds
@@ -792,7 +798,7 @@ module MetaVision =
             entFeeding
             |> Array.map mapMeds
         )
-        |> Array.append [| Constants.medicationHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.medicationHeadings |> String.concat "\t" |]
         |> createDataImport file newFile medName
 
         meds
@@ -806,7 +812,7 @@ module MetaVision =
         |> Array.filter (fun gp -> gp.Id |> getFormulary |> Array.isEmpty |> not)
         |> Array.filter (fun gp -> gp.Substances |> Array.length <= 4)
         |> Array.filter (fun gp ->
-            Constants.includeSols |> Array.exists (fun s -> gp.Name |> String.toLower |> String.contains s)
+            Data.includeSols |> Array.exists (fun s -> gp.Name |> String.toLower |> String.contains s)
         )
         |> Array.filter (fun gp ->
             let su = gp.Substances[0].ShapeUnit
@@ -815,15 +821,19 @@ module MetaVision =
         )
         |> Array.sortBy (fun gp -> gp.Name, gp.Shape, gp.Route)
         |> Array.collect (fun gp ->
-            let mapSols = (Array.mapStringHeadings Constants.solutionHeadings) >> (String.concat "\t")
+            let mapSols = (Array.mapStringHeadings Data.solutionHeadings) >> (String.concat "\t")
 
             gp.Route
             |> Array.collect (fun r -> r |> String.splitAt ',')
             |> Array.map mapRoute
             |> Array.filter (String.isNullOrWhiteSpace >> not)
-            |> Array.filter (fun r -> r = "iv" || r = "im")
+            |> Array.filter (fun r -> r = Constants.iv || r = Constants.im)
             |> Array.collect (fun r ->
-                [| "ICC"; "PICU"; "NICU" |]
+                [|
+                    Constants.ICC
+                    Constants.ICK
+                    Constants.NEO
+                |]
                 |> Array.map (fun dep ->
                     let su = gp.Substances[0].ShapeUnit
                     {|
@@ -856,7 +866,7 @@ module MetaVision =
                 )
             )
         )
-        |> Array.append [| Constants.solutionHeadings |> String.concat "\t" |]
+        |> Array.append [| Data.solutionHeadings |> String.concat "\t" |]
 
 
     let insertClassification () =
@@ -951,7 +961,7 @@ set @InUnitID = (select u.UnitID from dbo.Units u where u.UnitName = 'mL')
 
                 )
                 |> Array.prepend [|
-                if xs[14] = "TRUE" then
+                if xs[14] = Constants.TRUE then
                     """
 set @ClassId = (select ClassificationSystemID from dbo.Orders_ClassificationSystem where ClassificationSystemName = 'Oplossen')
 set @ClassOrder = coalesce((select max(SortOrder) from dbo.Orders_ClassificationSystemMedications where ClassificationSystemID = @ClassId), -1) + 1
@@ -959,7 +969,7 @@ set @ClassOrder = coalesce((select max(SortOrder) from dbo.Orders_Classification
 if not exists (select * from dbo.Orders_ClassificationSystemMedications where ClassificationSystemID = @ClassId and MedicationID = @MedId)
 insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, MedicationID, SortOrder) values (@ClassId, @MedId, @Classorder)
 """
-                if xs[15] = "TRUE" then
+                if xs[15] = Constants.TRUE then
                     """
 set @ClassId = (select ClassificationSystemID from dbo.Orders_ClassificationSystem where ClassificationSystemName = 'Verdunnen')
 set @ClassOrder = coalesce((select max(SortOrder) from dbo.Orders_ClassificationSystemMedications where ClassificationSystemID = @ClassId), -1) + 1
@@ -1003,7 +1013,7 @@ set @InUnitID = (select u.UnitID from dbo.Units u where u.UnitName = '{xs[1]}')
                 )
                 |> Array.prepend [|
                 let classN =
-                    if xs[1] = "g" then "Poeders" else "Voeding"
+                    if xs[1] = Constants.g then Constants.Poeders else Constants.Voeding
 
                 $"""
 set @ClassId = (select ClassificationSystemID from dbo.Orders_ClassificationSystem where ClassificationSystemName = '{classN}')

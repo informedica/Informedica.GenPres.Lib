@@ -24,6 +24,14 @@ module Types =
     type Assortment = UMCU | ICC | ICK | NEO
 
 
+    type Units =
+        | VolumeUnit of string
+        | MassUnit of string
+        | MolarUnit of string
+        | UnitUnit of string
+        | WeightUnit of string
+
+
     type DoseForm =
         {
             ExternalCode : int
