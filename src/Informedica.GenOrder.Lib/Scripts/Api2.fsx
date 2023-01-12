@@ -296,10 +296,12 @@ let n =
 
 for i in [0..n-1] do
     try
-        printfn $"{i}. calculated"
         i
         |> test pat
-        |> ignore
+        |> function
+        | Ok (p, _) ->
+            printfn $"{i}.Ok: {p}"
+        | Error (_, p, _) -> printfn $"{i}.Fail: {p}"
     with
     | _ ->
         let pr =
