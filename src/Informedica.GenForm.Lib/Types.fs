@@ -71,6 +71,7 @@ module Types =
             Shape : string
             ShapeQuantities : BigRational []
             ShapeUnit : string
+            RequiresReconstitution : bool
             Reconstitution : Reconstitution []
             Divisible : BigRational option
             Substances : Substance array
@@ -85,7 +86,6 @@ module Types =
             ExpansionVolume : BigRational option
             Diluents : string []
         }
-
 
 
     type DoseLimit =

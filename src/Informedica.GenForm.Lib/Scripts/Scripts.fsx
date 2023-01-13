@@ -30,4 +30,11 @@ open Informedica.GenForm.Lib
 
 
 
+Product.get ()
+|> Array.filter (fun p -> p.RequiresReconstitution)
 
+
+Mapping.mappingRouteShape
+
+
+Mapping.filterRouteShapeUnit "INTRAMUSCULAIR" "POEDER VOOR SUSPENSIE VOOR INJECTIE" "stuk"

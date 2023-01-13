@@ -20,7 +20,7 @@ module Mapping =
                 let get = getColumn r
 
                 {|
-                    Long = get "Long" 
+                    Long = get "Long"
                     Short = get "Short"
                 |}
             )
@@ -40,7 +40,7 @@ module Mapping =
                 let get = getColumn r
 
                 {|
-                    Long = get "Z-IndexUnitLong" 
+                    Long = get "Z-IndexUnitLong"
                     Short = get "Z-IndexUnitShort"
                     MV = get "MetaVisionUnit"
                 |}
@@ -61,4 +61,27 @@ module Mapping =
             r.Long |> String.equalsCapInsens unt
         )
         |> Option.map (fun r -> r.MV)
+
+
+    let mappingRouteShape =
+        Web.getDataFromSheet Web.dataUrlId2  "ShapeRoute"
+
+
+    let filterRouteShapeUnit rte shape unt =
+        mappingRouteShape
+        |> Array.filter (fun xs ->
+            let eqsRte = rte |> String.isNullOrWhiteSpace || rte |> String.trim |> String.equalsCapInsens xs[0]
+            let eqsShp = shape |> String.isNullOrWhiteSpace || shape |> String.trim |> String.equalsCapInsens xs[1]
+            let eqsUnt = unt |> String.isNullOrWhiteSpace || unt |> String.trim |> String.equalsCapInsens xs[2]
+            eqsRte && eqsShp && eqsUnt
+        )
+
+
+    let requiresReconstitution rtes unt shape =
+        rtes
+        |> Array.collect (fun rte ->
+            filterRouteShapeUnit rte shape unt
+        )
+        |> Array.map (fun xs -> xs[5] = "TRUE")
+        |> Array.fold (fun acc b -> acc || b) false
 

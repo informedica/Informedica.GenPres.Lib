@@ -215,6 +215,7 @@ module Product =
                         Shape = ""
                         ShapeQuantities = [| 1N |]
                         ShapeUnit = "mL"
+                        RequiresReconstitution = false
                         Reconstitution = [||]
                         Divisible = 10N |> Some
                         Substances =
@@ -277,6 +278,11 @@ module Product =
                 let atc =
                     gp.ATC
                     |> ATCGroup.findByATC5 ()
+
+                let su =
+                    gp.Substances[0].ShapeUnit
+                    |> String.toLower
+
                 {
                     GPK =  $"{gp.Id}"
                     ATC = gp.ATC |> String.trim
@@ -330,6 +336,8 @@ module Product =
                         gp.Substances[0].ShapeUnit
                         |> Mapping.mapUnit
                         |> Option.defaultValue ""
+                    RequiresReconstitution =
+                        Mapping.requiresReconstitution gp.Route su gp.Shape
                     Reconstitution =
                         Reconstitution.get ()
                         |> Array.filter (fun r ->

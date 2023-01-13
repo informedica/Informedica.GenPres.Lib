@@ -94,11 +94,11 @@ module Api =
                 else pr.Patient |> Patient.calcBSA
             AdjustUnit = au
         }
-        |> fun dr ->
+        |> fun drug ->
                 match pr.SolutionRule with
-                | None -> dr
+                | None -> drug
                 | Some sr ->
-                    { dr with
+                    { drug with
                         Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
                         Products =
@@ -111,9 +111,9 @@ module Api =
                                     [|p|]
                                     |> createProductComponent true pr.DoseRule.FreqUnit [||]
                                     |> List.singleton
-                                    |> List.append dr.Products
-                                | None -> dr.Products
-                            | _ -> dr.Products
+                                    |> List.append drug.Products
+                                | None -> drug.Products
+                            | _ -> drug.Products
                     }
 
     let evaluate (dr : DrugOrder) =

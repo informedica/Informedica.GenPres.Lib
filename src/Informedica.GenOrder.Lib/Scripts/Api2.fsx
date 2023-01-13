@@ -230,6 +230,7 @@ let evaluate logger (rule : PrescriptionRule) =
 
             Ok (ord, pr)
         | Error _ when retry ->
+            printfn "trying a second time with manual product"
             { pr with
                 DoseRule =
                     { pr.DoseRule with
@@ -316,7 +317,7 @@ for i in [0..n-1] do
 
 
 
-test pat 1050
+test pat 60
 
 
 let pr i =
@@ -329,7 +330,7 @@ let pr i =
 startLogger ()
 
 
-pr 1050
+pr 353
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
@@ -344,29 +345,4 @@ pr 1050
     |> printfn "%s"
 
 
-
-5454356057317857N/35000000000000000000000N //< 11688685030832167551N/87500000000000000000000000N
-|> BigRational.toDouble
-
-5454356057317857N/280000000000000000000000N > 11688685030832167551N/700000000000000000000000000N
-
-49089204515860713N/700000000000000000000N
-|> BigRational.ToDouble
-|> decimal
-
-19999305543498809N/1714400000000N
-|> BigRational.ToDouble
-|> decimal
-
-
-1818118685772619N/1000000000000000N
-|> BigRational.ToDouble
-|> decimal
-
-169N/3840000000000N
-|> (*) (60N * 60N * 24N)
-|> (*) (1000N * 1000N)
-|> (*) (70N * 1000N)
-|> BigRational.ToDouble
-|> decimal
 

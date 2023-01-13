@@ -18,16 +18,9 @@
 * [ ] Identify situations with undetermined dose counts (if they exist)
 * [ ] GenSolver able to detect min max calculation problems from initial equation set
 * [ ] Detect should have solution rule, but has no solution rule
+* [ ] Detect should have reconstitution but has no reconstitution
 * [ ] Solve incompatible max quantity with adjusted dose quantities
 * [ ] Need more testing code for solver lib
 * [ ] Add unrecognized units
-
-
-
-
-
-
-
-
-
+* [ ] Unify configuration settings and mapping in one lib
 
