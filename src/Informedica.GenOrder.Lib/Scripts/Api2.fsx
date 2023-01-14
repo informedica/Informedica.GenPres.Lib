@@ -41,6 +41,12 @@ module Api =
         { DrugOrder.productComponent with
             Name =
                 ps
+                |> tryHead (fun p -> p.Label)
+                |> fun s ->
+                    if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
+                    else s
+            Shape =
+                ps
                 |> tryHead (fun p -> p.Shape)
                 |> fun s ->
                     if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
@@ -314,7 +320,6 @@ for i in [0..n-1] do
                 $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
         printfn $"{i}. could not calculate: {pr}"
-
 
 
 test pat 60

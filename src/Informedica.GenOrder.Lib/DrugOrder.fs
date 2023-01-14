@@ -258,10 +258,6 @@ module DrugOrder =
                     cdto.OrderableQuantity.Constraints.Incr <- [ 1N / p.Divisible ]
                     cdto.OrderableQuantity.Unit <- ou
 
-                    // cdto.Dose.Quantity.Constraints.Incr <- [ 1N / p.Divisible ]
-                    // cdto.Dose.Quantity.Unit <- du
-                    // cdto.Dose.QuantityAdjust.Unit <- $"{du}/{au}"
-
                     match d.OrderType with
                     | ContinuousOrder ->
                         cdto.Dose.Rate.Unit <- $"{du}/{ru}"
@@ -279,7 +275,6 @@ module DrugOrder =
                         cdto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
 
                     | _ -> ()
-
 
                     cdto.Items <- [
                         for s in p.Substances do
