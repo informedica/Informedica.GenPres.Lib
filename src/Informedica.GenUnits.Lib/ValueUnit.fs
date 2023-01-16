@@ -317,7 +317,7 @@ module ValueUnit =
                 | VolumeGroup -> "Volume"
                 | TimeGroup -> "Time"
                 | MolarGroup -> "Molar"
-                | InterNatUnitGroup -> "Internat. Unit"
+                | InterNatUnitGroup -> "IUnit"
                 | WeightGroup -> "Weight"
                 | HeightGroup -> "Height"
                 | BSAGroup -> "BSA"
@@ -1070,6 +1070,9 @@ module ValueUnit =
 
                 { Unit = Molar.mol; Group = Group.NoGroup;  Abbreviation = { Eng = "mol"; Dut = "mol" }; Name = { Eng = "mol"; Dut = "mol" }; Synonyms = [] }
                 { Unit = Molar.milliMol; Group = Group.NoGroup;  Abbreviation = { Eng = "mmol"; Dut = "mmol" }; Name = { Eng = "millimol"; Dut = "millimol" }; Synonyms = [] }
+
+                { Unit = InterNatUnit.IU; Group = Group.NoGroup;  Abbreviation = { Eng = "IE"; Dut = "IE" }; Name = { Eng = "IE"; Dut = "IE" }; Synonyms = [ "E"; "U"; "IU"] }
+                { Unit = InterNatUnit.MIU; Group = Group.NoGroup;  Abbreviation = { Eng = "miljIE"; Dut = "miljIE" }; Name = { Eng = "millionIE"; Dut = "miljoenIE" }; Synonyms = [ "milj.IE"; "milj.E"] }
 
                 { Unit = Weight.kiloGram; Group = Group.NoGroup;  Abbreviation = { Eng = "kg"; Dut = "kg" }; Name = { Eng = "kilogram"; Dut = "kilogram" }; Synonyms = [] }
                 { Unit = Weight.gram; Group = Group.NoGroup;  Abbreviation = { Eng = "g"; Dut = "g" }; Name = { Eng = "gram"; Dut = "gram" }; Synonyms = [ "gr" ] }

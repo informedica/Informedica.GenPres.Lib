@@ -340,6 +340,15 @@ module DoseRule =
             )
 
 
+    let reconstitute dep loc (dr : DoseRule) =
+        { dr with
+            Products =
+                if dr.Products |> Array.exists (fun p -> p.RequiresReconstitution) |> not then dr.Products
+                else
+                    dr.Products
+                    |> Array.choose (Product.reconstitute dr.Route dr.DoseType dep loc)
+
+        }
 
     let private get_ () =
         Web.getDataFromSheet Web.dataUrlId2 "DoseRules"

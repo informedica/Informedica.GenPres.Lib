@@ -43,7 +43,6 @@ module Api =
                                 |> Array.choose (fun s -> s.Quantity)
                                 |> Array.distinct
                                 |> Array.toList
-                            OrderableQuantities = []
                             Unit = xs |> tryHead (fun x -> x.Unit)
                             TimeUnit = freqUnit
                             Dose =

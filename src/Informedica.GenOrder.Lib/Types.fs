@@ -303,8 +303,6 @@ module Types =
             /// The possible concentrations of the substance
             /// in the products
             Concentrations : BigRational list
-            /// The possible quantities of the substance in the orderable
-            OrderableQuantities : BigRational list
             /// The unit by which the substance is
             /// measured.
             Unit : string

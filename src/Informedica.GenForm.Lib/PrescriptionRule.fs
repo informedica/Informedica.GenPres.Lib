@@ -15,6 +15,7 @@ module PrescriptionRule =
         DoseRule.get ()
         |> DoseRule.filter filter
         |> Array.collect (fun dr ->
+            let dr = dr |> DoseRule.reconstitute pat.Department pat.Location
             // ugly hack to get the right solution rule based on the dose quantity
             let dose =
                 dr.DoseLimits[0]

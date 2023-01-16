@@ -75,7 +75,6 @@ module DrugOrder =
         {
             Name = ""
             Concentrations = []
-            OrderableQuantities = []
             Unit = ""
             TimeUnit = ""
             Dose = DoseLimit.limit
@@ -289,7 +288,16 @@ module DrugOrder =
 
                             itmDto.ComponentConcentration.Constraints.Vals <- s.Concentrations
                             itmDto.ComponentConcentration.Unit <- $"{su}/{ou}"
-                            itmDto.OrderableQuantity.Constraints.Vals <- s.OrderableQuantities
+                            itmDto.OrderableConcentration.Unit <- $"{su}/{ou}"
+
+                            match s.Solution with
+                            | Some sl ->
+                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum
+                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum
+                                itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum
+                                itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum
+                            | None -> ()
+
                             itmDto.OrderableQuantity.Unit <- su
                             itmDto.ComponentQuantity.Unit <- su
 

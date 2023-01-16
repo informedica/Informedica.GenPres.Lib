@@ -394,8 +394,8 @@ module Product =
             | Some sq when sq > 0N ->
                 { p with
                     GPK = $"{90000000 + (p.GPK |> Int32.parse)}"
-                    Product = p.Product  + " EIGEN BEREIDING" |> String.trim
-                    Label = p.Label + " EIGEN BEREIDING" |> String.trim
+                    Product = p.Shape  + " EIGEN BEREIDING" |> String.trim
+                    Label = p.Shape + " EIGEN BEREIDING" |> String.trim
                     ShapeQuantities = [| 1N |]
                     Substances =
                         p.Substances
@@ -407,6 +407,36 @@ module Product =
                 }
                 |> Some
             | _ -> None
+
+
+    let reconstitute rte dtp dep loc (prod : Product) =
+        if prod.RequiresReconstitution |> not then None
+        else
+            prod.Reconstitution
+            |> Array.filter (fun r ->
+                (rte |> String.isNullOrWhiteSpace || r.Route |> String.equalsCapInsens rte) &&
+                (r.DoseType = AnyDoseType || r.DoseType = dtp) &&
+                (dep |> String.isNullOrWhiteSpace || r.Department |> String.equalsCapInsens dep) &&
+                (r.Location = AnyLocation || r.Location = loc)
+            )
+            |> Array.map (fun r ->
+                { prod with
+                    ShapeUnit = "milliliter"
+                    ShapeQuantities = [| r.DiluentVolume |]
+                    Substances =
+                        prod.Substances
+                        |> Array.map (fun s ->
+                            { s with
+                                Quantity =
+                                    s.Quantity
+                                    |> Option.map (fun q -> q / r.DiluentVolume)
+                            }
+                        )
+                }
+            )
+            |> function
+            | [| p |] -> Some p
+            | _       -> None
 
 
     let filter (filter : Filter) (prods : Product []) =

@@ -41,8 +41,8 @@ module ValueUnit =
                 |> snd
                 |> Some
             with
-            | _ ->
-                printfn $"could not parse to unit: %s{s}"
+            | e ->
+                printfn $"could not parse to unit: %s{s}\{e}"
                 None
 
 

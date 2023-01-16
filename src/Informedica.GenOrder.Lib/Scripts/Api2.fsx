@@ -77,7 +77,6 @@ module Api =
                                 |> Array.choose (fun s -> s.Quantity)
                                 |> Array.distinct
                                 |> Array.toList
-                            OrderableQuantities = []
                             Unit = xs |> tryHead (fun x -> x.Unit)
                             TimeUnit = freqUnit
                             Dose =
@@ -89,6 +88,18 @@ module Api =
                     )
                     |> Array.toList
         }
+
+
+    let setSolutionLimit (sls : SolutionLimit[]) (items : SubstanceItem list) =
+        items
+        |> List.map (fun item ->
+            match sls |> Array.tryFind (fun sl -> sl.Substance |> String.equalsCapInsens item.Name) with
+            | None -> item
+            | Some sl ->
+                { item with
+                    Solution = Some sl
+                }
+        )
 
 
     let createDrugOrder (pr : PrescriptionRule) =
@@ -108,6 +119,11 @@ module Api =
             dose
             |> Option.map (fun d -> d.DoseUnit = "keer")
             |> Option.defaultValue false
+
+        let prods =
+            pr.DoseRule.Products
+            |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+            |> List.singleton
 
         { DrugOrder.drugOrder with
             Id = Guid.NewGuid().ToString()
@@ -142,20 +158,31 @@ module Api =
                 else pr.Patient |> Patient.calcBSA
             AdjustUnit = au
         }
-        |> fun dr ->
+        |> fun dro ->
                 match pr.SolutionRule with
-                | None -> dr
+                | None -> dro
                 | Some sr ->
-//                    printfn "found solutionrule"
-                    { dr with
-                        Quantities = sr.Volumes |> Array.toList
+                    printfn "found solutionrule"
+                    { dro with
+//                        Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
                         Products =
+                            let ps =
+                                dro.Products
+                                |> List.map (fun p ->
+                                    { p with
+                                        Substances =
+                                            p.Substances
+                                            |> setSolutionLimit sr.SolutionLimits
+                                    }
+                                )
+
                             let s =
                                 // ugly hack to get default solution
                                 sr.Solutions
                                 |> Array.tryHead
                                 |> Option.defaultValue "x"
+
                             parenteral
                             |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
                             |> function
@@ -164,10 +191,10 @@ module Api =
                                 [|p|]
                                 |> createProductComponent true pr.DoseRule.FreqUnit [||]
                                 |> List.singleton
-                                |> List.append dr.Products
+                                |> List.append ps
                             | None ->
                                 printfn $"couldn't find {s} in parenterals"
-                                dr.Products
+                                ps
                     }
 
     let evaluate (dr : DrugOrder) =
@@ -322,7 +349,7 @@ for i in [0..n-1] do
         printfn $"{i}. could not calculate: {pr}"
 
 
-test pat 60
+test pat 34
 
 
 let pr i =
@@ -335,14 +362,21 @@ let pr i =
 startLogger ()
 
 
-pr 353
+pr 34
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
-|> Order.applyConstraints
+|> Order.applyConstraints |> Order.toString
 |> Order.solveMinMax false { Log = ignore }
 |> function
-| Error _ -> printfn "oeps error"
+| Error (ord, msgs) ->
+    printfn "oeps error"
+    printfn $"{msgs |> List.map string}"
+    ord
+    |> Order.toString
+    |> String.concat "\n"
+    |> printfn "%s"
+
 | Ok ord  ->
     ord
     |> Order.toString
