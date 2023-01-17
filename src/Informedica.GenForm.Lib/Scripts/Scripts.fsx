@@ -31,7 +31,7 @@ open Informedica.GenForm.Lib
 
 
 Product.get ()
-|> Array.filter (fun p -> p.Generic = "adrenaline")
+|> Array.filter (fun p -> p.Generic = "argipressine")
 
 
 Mapping.mappingRouteShape

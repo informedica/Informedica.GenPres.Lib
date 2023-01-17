@@ -272,11 +272,13 @@ module Variable =
                     |> Some
 
                 // when y = x1 + x2 then y.incr = x1.incr and x2.incr
+                (* ToDo Probably this is not true!!
                 | BigRational.Add | BigRational.Subtr ->
                     Seq.append incr1 incr2
                     |> Set.ofSeq
                     |> create
                     |> Some
+                *)
                 // incr cannot be calculated based on division
                 |  _ -> None
 
@@ -1131,7 +1133,7 @@ module Variable =
                     $"{min} = {max} = 0"
                     |> Exceptions.ValueRangeMinMaxException
                     |> Exceptions.raiseExc None []
-                    
+
                 | Some min, Some max when min >= 0N && max < 0N ->
                     $"{min} > {max}"
                     |> Exceptions.ValueRangeMinMaxException
@@ -1145,7 +1147,7 @@ module Variable =
                     |> Exceptions.raiseExc None []
 
 
-                    
+
             /// Calculate `Minimum` option and
             /// `Maximum` option for addition of
             /// (**min1**, **max1**) and (**min2**, **max2)
@@ -1605,7 +1607,14 @@ module Variable =
 
         let inline (^-) vr1 vr2 = calc (^-) (vr1, vr2)
 
-        let inline (^<-) vr1 vr2 = { vr1 with Values = (vr1 |> getValueRange) ^<- (vr2 |> getValueRange) }
+        let inline (^<-) vr1 vr2 =
+            try
+                { vr1 with Values = (vr1 |> getValueRange) ^<- (vr2 |> getValueRange) }
+            with
+            | Exceptions.SolverException errs ->
+                (vr1, vr2 |> getValueRange)
+                |> Exceptions.VariableCannotSetValueRange
+                |> Exceptions.raiseExc None errs
 
 
         let inline (@*) vr1 vr2 = calc (@*) (vr1, vr2)
@@ -1616,7 +1625,14 @@ module Variable =
 
         let inline (@-) vr1 vr2 = calc (@-) (vr1, vr2)
 
-        let inline (@<-) vr1 vr2 = { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
+        let inline (@<-) vr1 vr2 =
+            try
+                { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
+            with
+            | Exceptions.SolverException errs ->
+                (vr1, vr2 |> getValueRange)
+                |> Exceptions.VariableCannotSetValueRange
+                |> Exceptions.raiseExc None errs
 
 
         /// Constant 0

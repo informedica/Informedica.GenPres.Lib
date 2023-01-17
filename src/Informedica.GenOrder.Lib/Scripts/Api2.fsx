@@ -41,7 +41,7 @@ module Api =
         { DrugOrder.productComponent with
             Name =
                 ps
-                |> tryHead (fun p -> p.Label)
+                |> tryHead (fun p -> p.Shape)
                 |> fun s ->
                     if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
                     else s
@@ -345,7 +345,6 @@ let run n =
             printfn $"{i}. could not calculate: {pr}"
 
 
-
 let pr i =
     pat
     |> PrescriptionRule.get
@@ -354,20 +353,22 @@ let pr i =
 
 
 
-run 20
+run n
 
-test pat 7
+
+test pat 12
 
 
 startLogger ()
 
 
-pr 7
+pr 3
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
-|> Order.applyConstraints |> Order.toString
-|> Order.solveMinMax false { Log = ignore }
+|> Order.applyConstraints
+//|> Order.toString
+|> Order.solveMinMax true OrderLogger.logger.Logger
 |> function
 | Error (ord, msgs) ->
     printfn "oeps error"
@@ -419,3 +420,12 @@ with
 | :? Informedica.GenSolver.Lib.Exceptions.SolverException as e ->
     printfn $"{e.Data0}"
     raise e
+
+
+
+open MathNet.Numerics
+
+1N/36000000N = 1N/4500000000N + 31N/1125000000N
+1N/12000000N = 1N/1500000000N + 31N/375000000N
+13N/9000000N = 13N/1125000000N + 403N/281250000N
+

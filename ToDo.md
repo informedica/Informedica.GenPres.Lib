@@ -28,6 +28,11 @@
 * [ ] Adding continuous drip medications and rules
 * [ ] Improve product divisibility code, for example droplet detection
 * [ ] Adding dose check with Z-index
+* [ ] Differentiate between whether or not, try calculation with manual product
+* [ ] Mathematically investigate whether increment calc works with addition and/or subtraction
+
+
+
 
 
 
