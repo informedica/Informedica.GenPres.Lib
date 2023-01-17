@@ -48,7 +48,6 @@ module Api =
                             Dose =
                                 doseLimits
                                 |> Array.tryFind (fun l -> l.Substance = n)
-                                |> Option.defaultValue DoseRule.DoseLimit.limit
                             Solution = None
                         }
                     )

@@ -31,7 +31,7 @@ open Informedica.GenForm.Lib
 
 
 Product.get ()
-|> Array.filter (fun p -> p.RequiresReconstitution)
+|> Array.filter (fun p -> p.Generic = "adrenaline")
 
 
 Mapping.mappingRouteShape
@@ -55,4 +55,9 @@ Mapping.filterRouteShapeUnit "INTRAMUSCULAIR" "POEDER VOOR SUSPENSIE VOOR INJECT
     pr.DoseRule
     |> DoseRule.reconstitute pr.Patient.Department pr.Patient.Location
 
+
+DoseRule.get ()
+|> Array.filter (fun dr ->
+    dr.Generic = "adrenaline"
+)
 

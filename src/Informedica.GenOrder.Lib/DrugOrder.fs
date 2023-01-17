@@ -77,7 +77,7 @@ module DrugOrder =
             Concentrations = []
             Unit = ""
             TimeUnit = ""
-            Dose = DoseLimit.limit
+            Dose = None //DoseLimit.limit
             Solution = None
         }
 
@@ -279,9 +279,12 @@ module DrugOrder =
                         for s in p.Substances do
                             let su = s.Unit |> unitGroup
                             let du =
-                                if s.Dose.DoseUnit |> String.isNullOrWhiteSpace then su
-                                else
-                                    s.Dose.DoseUnit |> unitGroup
+                                match s.Dose with
+                                | Some dl ->
+                                    if dl.DoseUnit |> String.isNullOrWhiteSpace then su
+                                    else
+                                        dl.DoseUnit |> unitGroup
+                                | None -> ""
 
                             let itmDto =
                                 Order.Orderable.Item.Dto.dto d.Id d.Name p.Name s.Name
@@ -292,7 +295,10 @@ module DrugOrder =
 
                             match s.Solution with
                             | Some sl ->
+                                itmDto.OrderableQuantity.Constraints.MinIncl <- sl.Quantity.Minimum.IsSome
                                 itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum
+                                itmDto.OrderableQuantity.Constraints.MaxIncl <- sl.Quantity.Maximum.IsSome
+
                                 itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum
                                 itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum
                                 itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum
@@ -305,62 +311,72 @@ module DrugOrder =
                             | AnyOrder -> ()
                             | ProcessOrder -> ()
                             | ContinuousOrder ->
-                                itmDto.Dose.RateAdjust.Unit <- $"{du}/{au}/{s.Dose.RateUnit |> unitGroup}"
+                                match s.Dose with
+                                | None    -> ()
+                                | Some dl ->
+                                    itmDto.Dose.RateAdjust.Unit <- $"{du}/{au}/{dl.RateUnit |> unitGroup}"
 
-                                itmDto.Dose.Rate.Constraints <-
-                                    itmDto.Dose.Rate.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormRate s.Dose.Rate
+                                    itmDto.Dose.Rate.Constraints <-
+                                        itmDto.Dose.Rate.Constraints
+                                        |> MinMax.setConstraints dl.NormRate dl.Rate
 
-                                itmDto.Dose.RateAdjust.Constraints <-
-                                    itmDto.Dose.RateAdjust.Constraints
-                                    |> MinMax.setConstraints (s.Dose.NormRateAdjust |> toArr) s.Dose.RateAdjust
+                                    itmDto.Dose.RateAdjust.Constraints <-
+                                        itmDto.Dose.RateAdjust.Constraints
+                                        |> MinMax.setConstraints (dl.NormRateAdjust |> toArr) dl.RateAdjust
 
                             | DiscontinuousOrder ->
-                                itmDto.Dose.Quantity.Unit <- du
+                                match s.Dose with
+                                | None -> ()
+                                | Some dl ->
+                                    itmDto.Dose.Quantity.Unit <- du
 
-                                itmDto.Dose.Quantity.Constraints <-
-                                    itmDto.Dose.Quantity.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormQuantity s.Dose.Quantity
+                                    itmDto.Dose.Quantity.Constraints <-
+                                        itmDto.Dose.Quantity.Constraints
+                                        |> MinMax.setConstraints dl.NormQuantity dl.Quantity
 
-                                itmDto.Dose.QuantityAdjust.Constraints <-
-                                    itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints (s.Dose.NormQuantityAdjust |> toArr) s.Dose.QuantityAdjust
+                                    itmDto.Dose.QuantityAdjust.Constraints <-
+                                        itmDto.Dose.QuantityAdjust.Constraints
+                                        |> MinMax.setConstraints (dl.NormQuantityAdjust |> toArr) dl.QuantityAdjust
 
-                                itmDto.Dose.PerTime.Unit <- $"{du}/{s.TimeUnit |> unitGroup}"
+                                    itmDto.Dose.PerTime.Unit <- $"{du}/{s.TimeUnit |> unitGroup}"
 
-                                itmDto.Dose.PerTime.Constraints <-
-                                    itmDto.Dose.PerTime.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormPerTime s.Dose.PerTime
+                                    itmDto.Dose.PerTime.Constraints <-
+                                        itmDto.Dose.PerTime.Constraints
+                                        |> MinMax.setConstraints dl.NormPerTime dl.PerTime
 
-                                itmDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
+                                    itmDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
 
-                                itmDto.Dose.PerTimeAdjust.Constraints <-
-                                    itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints (s.Dose.NormPerTimeAdjust |> toArr) s.Dose.PerTimeAdjust
+                                    itmDto.Dose.PerTimeAdjust.Constraints <-
+                                        itmDto.Dose.PerTimeAdjust.Constraints
+                                        |> MinMax.setConstraints (dl.NormPerTimeAdjust |> toArr) dl.PerTimeAdjust
 
                             | TimedOrder ->
-                                itmDto.Dose.Quantity.Unit <- du
+                                match s.Dose with
+                                | None -> ()
+                                | Some dl ->
+                                    itmDto.Dose.Quantity.Unit <- du
 
-                                itmDto.Dose.Quantity.Constraints <-
-                                    itmDto.Dose.Quantity.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormQuantity s.Dose.Quantity
 
-                                itmDto.Dose.QuantityAdjust.Constraints <-
-                                    itmDto.Dose.QuantityAdjust.Constraints
-                                    |> MinMax.setConstraints (s.Dose.NormQuantityAdjust |> toArr) s.Dose.QuantityAdjust
+                                    itmDto.Dose.Quantity.Constraints <-
+                                        itmDto.Dose.Quantity.Constraints
+                                        |> MinMax.setConstraints dl.NormQuantity dl.Quantity
 
-                                itmDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
-                                itmDto.Dose.PerTime.Unit <- $"{du}/{s.TimeUnit |> unitGroup}"
+                                    itmDto.Dose.QuantityAdjust.Constraints <-
+                                        itmDto.Dose.QuantityAdjust.Constraints
+                                        |> MinMax.setConstraints (dl.NormQuantityAdjust |> toArr) dl.QuantityAdjust
 
-                                itmDto.Dose.PerTime.Constraints <-
-                                    itmDto.Dose.PerTime.Constraints
-                                    |> MinMax.setConstraints s.Dose.NormPerTime s.Dose.PerTime
+                                    itmDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
+                                    itmDto.Dose.PerTime.Unit <- $"{du}/{s.TimeUnit |> unitGroup}"
 
-                                itmDto.Dose.PerTimeAdjust.Constraints <-
-                                    itmDto.Dose.PerTimeAdjust.Constraints
-                                    |> MinMax.setConstraints (s.Dose.NormPerTimeAdjust |> toArr) s.Dose.PerTimeAdjust
+                                    itmDto.Dose.PerTime.Constraints <-
+                                        itmDto.Dose.PerTime.Constraints
+                                        |> MinMax.setConstraints dl.NormPerTime dl.PerTime
 
-                                itmDto.Dose.RateAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
+                                    itmDto.Dose.PerTimeAdjust.Constraints <-
+                                        itmDto.Dose.PerTimeAdjust.Constraints
+                                        |> MinMax.setConstraints (dl.NormPerTimeAdjust |> toArr) dl.PerTimeAdjust
+
+                                    itmDto.Dose.RateAdjust.Unit <- $"{du}/{au}/{s.TimeUnit |> unitGroup}"
 
                             itmDto
                     ]

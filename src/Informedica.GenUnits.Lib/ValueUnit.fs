@@ -42,6 +42,7 @@ module ValueUnit =
         | DeciLiter of DeciLiter
         | MilliLiter of MilliLiter
         | MicroLiter of MicroLiter
+        | Droplet of Droplet
     and TimeUnit =
         | Year of Year
         | Month of Month
@@ -85,6 +86,7 @@ module ValueUnit =
     and DeciLiter  = BigRational
     and MilliLiter = BigRational
     and MicroLiter = BigRational
+    and Droplet    = BigRational
     // Time
     and Second = BigRational
     and Minute = BigRational
@@ -142,6 +144,7 @@ module ValueUnit =
                 | DeciLiter n  -> n |> f |> DeciLiter
                 | MilliLiter n -> n |> f |> MilliLiter
                 | MicroLiter n -> n |> f |> MicroLiter
+                | Droplet n    -> n |> f |> Droplet
                 |> Volume
             | Time g  ->
                 match g with
@@ -208,6 +211,7 @@ module ValueUnit =
                 | DeciLiter n  -> n |> Some
                 | MilliLiter n -> n |> Some
                 | MicroLiter n -> n |> Some
+                | Droplet n    -> n |> Some
             | Time g  ->
                 match g with
                 | Year n   -> n |> Some
@@ -236,7 +240,7 @@ module ValueUnit =
             | BSA g ->
                 match g with
                 | M2 n -> n |> Some
-            | CombiUnit (_, _, _) -> None
+            | CombiUnit _ -> None
 
         app u
 
@@ -461,6 +465,7 @@ module ValueUnit =
                     | DeciLiter n  -> n * deci
                     | MilliLiter n -> n * milli
                     | MicroLiter n -> n * micro
+                    | Droplet n    -> n * (milli / 20N)
                 | Time g  ->
                     match g with
                     | Year n   -> n * year
@@ -510,7 +515,7 @@ module ValueUnit =
         |> BigRational.fromFloat
         |> function
         | None ->
-            sprintf $"{v} cannot be converted to a BigRational!"
+            $"{v} cannot be converted to a BigRational!"
             |> failwith
         | Some br -> create u br
 
@@ -975,11 +980,13 @@ module ValueUnit =
             let nDeciLiter n =  n |> DeciLiter |> toVolume
             let nMilliLiter n =  n |> MilliLiter |> toVolume
             let nMicroLiter n =  n |> MicroLiter |> toVolume
+            let nDroplet n = n |> Droplet |> toVolume
 
             let liter =  1N |> nLiter
             let deciLiter =  1N |> nDeciLiter
             let milliLiter =  1N |> nMilliLiter
             let microLiter =  1N |> nMicroLiter
+            let droplet = 1N |> nDroplet
 
 
         module Time =
@@ -1059,6 +1066,7 @@ module ValueUnit =
                 { Unit = Volume.deciLiter; Group = Group.NoGroup;  Abbreviation = { Eng = "dl"; Dut = "dl" }; Name = { Eng = "deciliter"; Dut = "deciliter" }; Synonyms = ["decil"] }
                 { Unit = Volume.milliLiter; Group = Group.NoGroup;  Abbreviation = { Eng = "ml"; Dut = "ml" }; Name = { Eng = "milliliter"; Dut = "milliliter" }; Synonyms = ["millil"] }
                 { Unit = Volume.microLiter; Group = Group.NoGroup;  Abbreviation = { Eng = "microl"; Dut = "microl" }; Name = { Eng = "microliter"; Dut = "microliter" }; Synonyms = ["µl"] }
+                { Unit = Volume.droplet; Group = Group.NoGroup;  Abbreviation = { Eng = "dr"; Dut = "dr" }; Name = { Eng = "droplet"; Dut = "druppel" }; Synonyms = [ "drop" ] }
 
                 { Unit = Time.year; Group = Group.NoGroup;  Abbreviation = { Eng = "yr"; Dut = "jr" }; Name = { Eng = "year"; Dut = "jaar" }; Synonyms = ["years"; "jaren"] }
                 { Unit = Time.month; Group = Group.NoGroup;  Abbreviation = { Eng = "mo"; Dut = "mnd" }; Name = { Eng = "month"; Dut = "maand" }; Synonyms = ["months"; "maanden"] }
@@ -1102,6 +1110,7 @@ module ValueUnit =
             | DeciLiter n  -> (n, Volume.deciLiter)
             | MilliLiter n -> (n, Volume.milliLiter)
             | MicroLiter n -> (n, Volume.microLiter)
+            | Droplet n    -> (n, Volume.droplet)
         | Time g  ->
             match g with
             | Year n   -> (n, Time.year)
@@ -1184,7 +1193,7 @@ module ValueUnit =
                     else ustr
 
                 | _ ->
-                    let (v, u) = u |> mapUnit
+                    let v, u = u |> mapUnit
                     match u |> tryFind with
                     | Some udt ->
                         match loc with
@@ -1240,7 +1249,7 @@ module ValueUnit =
                 match s |> String.trim |> String.split " " with
                 | [ug] ->
                     match Units.fromString ug with
-                    | Some (u') -> u' |> setUnitValue 1N
+                    | Some u' -> u' |> setUnitValue 1N
                     | None      -> failwith <| sprintf "Not a valid unit: %s" ug
 
                 | [v;ug] ->
@@ -1249,7 +1258,7 @@ module ValueUnit =
                         failwith <| sprintf "Cannot parse string: %s with value: %s" s v
                     | Some v' ->
                         match Units.fromString ug with
-                        | Some (u') -> u' |> setUnitValue v'
+                        | Some u' -> u' |> setUnitValue v'
                         | None     -> failwith <| sprintf "Not a valid unit: %s" ug
                 | _ -> failwith <| sprintf "Cannot parse string %s" s
 

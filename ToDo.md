@@ -23,4 +23,13 @@
 * [ ] Need more testing code for solver lib
 * [ ] Add unrecognized units
 * [ ] Unify configuration settings and mapping in one lib
+* [ ] Change ValueUnit to ValuesUnit, i.e. multiple values per unit
+* [ ] Differentiate between substance and shape dose
+* [ ] Adding continuous drip medications and rules
+* [ ] Improve product divisibility code, for example droplet detection
+* [ ] Adding dose check with Z-index
+
+
+
+
 

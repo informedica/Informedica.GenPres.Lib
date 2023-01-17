@@ -4,7 +4,6 @@ namespace Informedica.GenForm.Lib
 [<AutoOpen>]
 module Types =
 
-    open Informedica.Utils.Lib.BCL
     open MathNet.Numerics
 
 

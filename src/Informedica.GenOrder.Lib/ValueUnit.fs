@@ -42,7 +42,7 @@ module ValueUnit =
                 |> Some
             with
             | e ->
-                printfn $"could not parse to unit: %s{s}\{e}"
+                // printfn $"could not parse to unit: %s{s}\{e}"
                 None
 
 

@@ -82,7 +82,6 @@ module Api =
                             Dose =
                                 doseLimits
                                 |> Array.tryFind (fun l -> l.Substance = n)
-                                |> Option.defaultValue DoseRule.DoseLimit.limit
                             Solution = None
                         }
                     )
@@ -162,9 +161,9 @@ module Api =
                 match pr.SolutionRule with
                 | None -> dro
                 | Some sr ->
-                    printfn "found solutionrule"
+//                    printfn "found solutionrule"
                     { dro with
-//                        Quantities = sr.Volumes |> Array.toList
+                        Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
                         Products =
                             let ps =
@@ -278,7 +277,6 @@ let evaluate logger (rule : PrescriptionRule) =
     solve true rule
 
 
-
 let test pat n =
     pat
     |> PrescriptionRule.get
@@ -305,7 +303,6 @@ let test pat n =
         Error ($"%A{m}", p, o)
 
 
-
 type Age = Patient.Optics.Age
 type Weight = Patient.Optics.Weight
 type Height = Patient.Optics.Height
@@ -326,30 +323,27 @@ let n =
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
     |> Array.length
 
+let run n =
+    for i in [0..n-1] do
+        try
+            i
+            |> test pat
+            |> function
+            | Ok (p, _) ->
+                printfn $"{i}.Ok: {p}"
+            | Error (_, p, _) -> printfn $"{i}.Fail: {p}"
+        with
+        | _ ->
+            let pr =
+                pat
+                |> PrescriptionRule.get
+                |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+                |> Array.item i
+                |> fun pr ->
+                    $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
+            printfn $"{i}. could not calculate: {pr}"
 
-for i in [0..n-1] do
-    try
-        i
-        |> test pat
-        |> function
-        | Ok (p, _) ->
-            printfn $"{i}.Ok: {p}"
-        | Error (_, p, _) -> printfn $"{i}.Fail: {p}"
-    with
-    | _ ->
-        let pr =
-            pat
-            |> PrescriptionRule.get
-            |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-            |> Array.item i
-            |> fun pr ->
-                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
-
-        printfn $"{i}. could not calculate: {pr}"
-
-
-test pat 34
 
 
 let pr i =
@@ -359,10 +353,16 @@ let pr i =
     |> Array.item i
 
 
+
+run 20
+
+test pat 7
+
+
 startLogger ()
 
 
-pr 34
+pr 7
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
@@ -384,4 +384,38 @@ pr 34
     |> printfn "%s"
 
 
+open Order
 
+try
+    let ord =
+        pr 7
+        |> Api.createDrugOrder
+        |> DrugOrder.toOrder
+        |> Order.Dto.fromDto
+        |> Order.applyConstraints
+
+    let mapping =
+        match ord.Prescription with
+        | Continuous -> Mapping.continuous
+        | Discontinuous _ -> Mapping.discontinuous
+        | Timed _ -> Mapping.timed
+        |> Mapping.getEquations
+        |> Mapping.getEqsMapping ord
+
+    printfn $"{mapping}"
+
+    let oEqs =
+        ord
+        |> mapToEquations mapping
+        |> Solver.solveUnits { Log = ignore }
+        |> Solver.orderEqsToBase
+
+    oEqs
+//    |> Solver.mapToSolverEqs
+
+
+
+with
+| :? Informedica.GenSolver.Lib.Exceptions.SolverException as e ->
+    printfn $"{e.Data0}"
+    raise e

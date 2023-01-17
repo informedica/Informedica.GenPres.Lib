@@ -359,8 +359,11 @@ module Product =
                             }
                         )
                     Divisible =
-                        if isSol gp.Shape then 10N |> Some
-                        else None
+                        // ToDo ugly, needs refactoring
+                        if gp.Shape |> String.contains "DRUPPEL" then Some 20N
+                        else
+                            if isSol gp.Shape then 10N |> Some
+                                else None
                     Substances =
                         gp.Substances
                         |> Array.map (fun s ->

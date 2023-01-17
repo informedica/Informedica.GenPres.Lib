@@ -272,8 +272,11 @@ module Types =
             /// The time unit for infusion time (duration)
             TimeUnit : string
             Dose : DoseLimit option
+            // The amount of orderable that will be given each time
             DoseCount : BigRational option
+            // The adjust quantity for the adjusted dose calculations
             Adjust : BigRational option
+            // The adjust unit
             AdjustUnit : string
         }
     /// The product components that are used by the drug order
@@ -308,7 +311,7 @@ module Types =
             Unit : string
             /// The time unit used for the frequency
             TimeUnit : string
-            Dose : DoseLimit
+            Dose : DoseLimit option
             Solution : SolutionLimit option
         }
 
