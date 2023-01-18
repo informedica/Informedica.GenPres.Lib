@@ -8,6 +8,7 @@
 
 
 open MathNet.Numerics
+open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 open Informedica.GenUnits.Lib
@@ -118,7 +119,7 @@ module Api =
             dose
             |> Option.map (fun d -> d.DoseUnit = "keer")
             |> Option.defaultValue false
-
+        //ToDo ??
         let prods =
             pr.DoseRule.Products
             |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
@@ -278,17 +279,22 @@ let evaluate logger (rule : PrescriptionRule) =
 
 
 let test pat n =
-    pat
-    |> PrescriptionRule.get
-    |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
-    |> Array.item n
+    let pr =
+        pat
+        |> PrescriptionRule.get
+        |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
+        |> Array.item n
+
+    pr
     |> evaluate { Log = ignore }
     |> function
     | Ok (ord, pr) ->
+        let ns =
+            pr.DoseRule.DoseLimits
+            |> Array.map (fun dl -> dl.Substance)
         let o =
             ord
-            |> Order.toString
-            |> String.concat "\n"
+            |> Order.Print.printPrescription ns
         let p =
             $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
         Ok (p, o)
@@ -308,7 +314,18 @@ type Weight = Patient.Optics.Weight
 type Height = Patient.Optics.Height
 
 
-let pat =
+
+let premature =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 1 |> Age.Weeks]
+    |> Patient.Optics.setGestAge [ 32 |> Age.Weeks ]
+    |> Patient.Optics.setWeight (1200 |> Weight.Gram |> Some)
+    |> Patient.Optics.setHeight (45 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "NEO"
+
+
+let newBorn =
     Patient.patient
 
     |> Patient.Optics.setAge [ 1 |> Age.Weeks]
@@ -317,21 +334,66 @@ let pat =
     |> Patient.Optics.setDepartment "ICK"
 
 
-let n =
+let infant =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 1 |> Age.Years]
+    |> Patient.Optics.setWeight (10m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (70 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
+
+
+let toddler =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 3 |> Age.Years]
+    |> Patient.Optics.setWeight (15m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (90 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
+
+
+let child =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 4 |> Age.Years]
+    |> Patient.Optics.setWeight (17m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (100 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
+
+
+let teenager =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 12 |> Age.Years]
+    |> Patient.Optics.setWeight (40m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (150 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
+
+
+let adult =
+    Patient.patient
+
+    |> Patient.Optics.setAge [ 18 |> Age.Years]
+    |> Patient.Optics.setWeight (70m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setHeight (180 |> Height.Centimeter |> Some)
+    |> Patient.Optics.setDepartment "ICK"
+
+
+let getN pat =
     pat
     |> PrescriptionRule.get
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
     |> Array.length
 
-let run n =
+
+let run n pat =
     for i in [0..n-1] do
         try
             i
             |> test pat
             |> function
-            | Ok (p, _) ->
-                printfn $"{i}.Ok: {p}"
-            | Error (_, p, _) -> printfn $"{i}.Fail: {p}"
+            | Ok (p, _) -> $"{i}.Ok: {p}"
+            | Error (_, p, _) -> $"{i}.Fail: {p}"
         with
         | _ ->
             let pr =
@@ -342,27 +404,53 @@ let run n =
                 |> fun pr ->
                     $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
-            printfn $"{i}. could not calculate: {pr}"
+            $"{i}. could not calculate: {pr}"
+        |>  File.writeTextToFile "Scenarios.txt"
 
 
-let pr i =
+let getRule i pat =
     pat
     |> PrescriptionRule.get
     |> Array.filter (fun pr -> pr.DoseRule.Products |> Array.isEmpty |> not)
     |> Array.item i
 
 
+[
+    premature
+    newBorn
+    infant
+    toddler
+    child
+    teenager
+    adult
+]
+|> List.iter (fun pat ->
+    let n = getN pat
+    printfn $"=== Running pat: {pat |> Patient.toString}: {n} ==="
 
-run n
+    pat
+    |> run n
+)
 
 
-test pat 12
+test infant 407
+|> function
+| Ok (ind, (prs, prep, adm)) ->
+    [
+        $"Indicatie: {ind}"
+        $"Voorschrift: {prs}"
+        if prep |> String.notEmpty then $"Bereiding: {prep}"
+        $"Toediening: {adm}"
+    ]
+    |> List.iter (printfn "%s")
+| Error _ -> ()
 
 
 startLogger ()
 
 
-pr 3
+infant
+|> getRule 2
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
@@ -389,7 +477,8 @@ open Order
 
 try
     let ord =
-        pr 7
+        infant
+        |> getRule 7
         |> Api.createDrugOrder
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto

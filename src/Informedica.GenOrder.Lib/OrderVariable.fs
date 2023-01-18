@@ -9,6 +9,7 @@ module OrderVariable =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+    open Informedica.GenCore.Lib
     open Informedica.GenSolver.Lib.Types
 
     module Variable   = Informedica.GenSolver.Lib.Variable
@@ -29,6 +30,7 @@ module OrderVariable =
 
     module Constraints =
 
+
         let create min incr max vs =
             {
                 Min = min
@@ -38,11 +40,21 @@ module OrderVariable =
             }
 
 
-        let toString (cs : Constraints) = ""
-            //match cs.Min, cs.Incr, cs.Max with
-            //| Some min, Some incr, Some max ->
-                
-            //    $"{"
+        let toString (cs : Constraints) =
+            let toStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
+
+            match cs.Values with
+            | None ->
+                let min = cs.Min |> Option.map Minimum.toBoolBigRational
+                let max = cs.Max |> Option.map Maximum.toBoolBigRational
+                let incr = cs.Incr |> Option.map (Increment.toList >> Set.ofSeq)
+                MinIncrMax.toString toStr min incr max
+            | Some vs ->
+                vs
+                |> ValueSet.toSet
+                |> Set.map toStr
+                |> String.concat ", "
+
 
     /// Create a `OrderVariable` with preset values
     let create n min incr max vs un cs =
@@ -167,6 +179,8 @@ module OrderVariable =
             |> ValueRange.toString exact) + " " + us
 
 
+    /// Returns the values with the string equivalents
+    /// of an order variable value set
     let toValueUnitStringList get n x =
         x
         |> get
@@ -180,25 +194,51 @@ module OrderVariable =
                 vs, x |> get |> getUnit
             )
             |> Seq.map (fun (v, u) ->
-                v
-                |> ValueUnit.create u
-                |> ValueUnit.toUnit
-                |> fun v ->
-                    let vs =
-                        v
-                        |> BigRational.toFloat
-                        |> fun x ->
-                            match n with
-                            | Some n -> x |> Double.fixPrecision n
-                            | None   -> x
-                        |> string
+                let vs =
+                    v
+                    |> BigRational.toFloat
+                    |> fun x ->
+                        match n with
+                        | Some n -> x |> Double.fixPrecision n
+                        | None   -> x
+                    |> string
 
-                    u
-                    |> ValueUnit.unitToString
-                    |> String.removeTextBetweenBrackets
-                    |> fun us -> v, $"%s{vs} %s{us}"
+                u
+                |> ValueUnit.unitToString
+                |> String.removeTextBetweenBrackets
+                |> fun us -> v, $"%s{vs} %s{us}"
             )
         | None -> Seq.empty
+
+
+    let toValueUnitString get n x =
+        let toStr =
+            BigRational.toFloat >>
+            Double.toStringNumberNLWithoutTrailingZerosFixPrecision n
+
+        let unt =
+            x |> get |> getUnit
+            |> ValueUnit.unitToString
+            |> String.removeTextBetweenBrackets
+
+        x
+        |> get
+        |> getVar
+        |> Variable.getValueRange
+        |> fun vr ->
+            let min = vr |> ValueRange.getMin |> Option.map Minimum.toBoolBigRational
+            let incr = vr |> ValueRange.getIncr |> Option.map (Increment.toList >> Set.ofList)
+            let max = vr |> ValueRange.getMax |> Option.map Maximum.toBoolBigRational
+            match vr |> ValueRange.getValSet with
+            | Some vs ->
+                vs
+                |> ValueSet.toSet
+                |> Set.map toStr
+                |> Set.toSeq
+                |> String.concat ", "
+            | None ->
+                MinIncrMax.toString toStr min incr max
+        |> fun s -> $"%s{s} %s{unt}"
 
 
     let getUnits vu =
@@ -424,6 +464,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> Count
 
 
@@ -480,6 +523,9 @@ module OrderVariable =
 
         /// Print a `Time` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> Time
@@ -541,6 +587,9 @@ module OrderVariable =
 
         /// Print a `Frequency` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> Frequency
@@ -608,6 +657,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> Concentration
 
 
@@ -665,6 +717,9 @@ module OrderVariable =
 
         /// Print a `Quantity` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> Quantity
@@ -729,6 +784,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> PerTime
 
 
@@ -790,6 +848,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> Rate
 
 
@@ -847,6 +908,9 @@ module OrderVariable =
 
         /// Print a `Quantity` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> Total
@@ -908,6 +972,9 @@ module OrderVariable =
 
         /// Print a `QuantityAdjust` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> QuantityAdjust
@@ -977,6 +1044,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> PerTimeAdjust
 
 
@@ -1044,6 +1114,9 @@ module OrderVariable =
         let toValueUnitStringList = toValueUnitStringList toOrdVar
 
 
+        let toValueUnitString = toValueUnitString toOrdVar
+
+
         let toBase = toOrdVar >> toBase >> RateAdjust
 
 
@@ -1103,6 +1176,9 @@ module OrderVariable =
 
         /// Print a `QuantityAdjust` as a value unit string list
         let toValueUnitStringList = toValueUnitStringList toOrdVar
+
+
+        let toValueUnitString = toValueUnitString toOrdVar
 
 
         let toBase = toOrdVar >> toBase >> TotalAdjust

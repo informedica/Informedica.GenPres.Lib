@@ -25,6 +25,7 @@
     <None Include="Scripts\Patient.fsx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Informedica.GenCore.Lib\Informedica.GenCore.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.GenForm.Lib\Informedica.GenForm.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.GenUnits.Lib\Informedica.GenUnits.Lib.fsproj" />

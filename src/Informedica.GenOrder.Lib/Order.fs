@@ -1351,12 +1351,11 @@ module Order =
 
         let printItemConcentration (c : Component) =
             c.Items
-            |> Seq.collect (fun i ->
+            |> Seq.map (fun i ->
                 i.ComponentConcentration
-                |> Concentration.toValueUnitStringList (Some 1)
-                |> Seq.map (fun (_, s) ->
+                |> Concentration.toValueUnitString 1
+                |> fun s ->
                     $"{s} {i.Name |> Name.toString}"
-                )
             )
             |> String.concat " + "
 
@@ -1365,8 +1364,8 @@ module Order =
             o.Orderable.Components
             |> Seq.map (fun c ->
                 c.OrderableQuantity
-                |> Quantity.toValueUnitStringList (Some 1)
-                |> Seq.map (fun (_, q) ->
+                |> Quantity.toValueUnitString 1
+                |> fun q ->
                     let s =
                         c
                         |> printItemConcentration
@@ -1376,16 +1375,13 @@ module Order =
                             else
                                 $" ({s})"
                     $"{q} {c.Name |> Name.toString}{s}"
-                )
-                |> String.concat ""
-            ) |> String.concat " + "
+            )
+            |> String.concat " + "
 
 
         let printOrderableDoseQuantity o =
             o.Orderable.Dose.Quantity
-            |> Quantity.toValueUnitStringList (Some 2)
-            |> Seq.map snd
-            |> String.concat ""
+            |> Quantity.toValueUnitString 2
 
 
         let printPrescription sn (o : Order) =
@@ -1401,14 +1397,10 @@ module Order =
                             i
                             |> get
                             |> unt
-                            |> Seq.map snd
-                            |> fun xs ->
-                                if on |> String.startsWith n then
-                                    xs
-                                    |>Seq.map (sprintf "%s")
+                            |> fun s ->
+                                if on |> String.startsWith n then seq [ s ]
                                 else
-                                    xs
-                                    |> Seq.map (sprintf "%s %s" n)
+                                    seq [ $"{s} {n}" ]
 
                         else Seq.empty
                     )
@@ -1420,21 +1412,19 @@ module Order =
                 // frequencies
                 let fr =
                     fr
-                    |> Frequency.toValueUnitStringList None
-                    |> Seq.map snd
-                    |> String.concat ";"
+                    |> Frequency.toValueUnitString 0
 
                 let dq =
                     o
                     |> printItem
                         (fun i -> i.Dose.Quantity)
-                        (Quantity.toValueUnitStringList (Some 3))
+                        (Quantity.toValueUnitString 3)
 
                 let dt =
                     o
                     |> printItem
                         (fun i -> i.Dose.PerTimeAdjust)
-                        (PerTimeAdjust.toValueUnitStringList (Some 2))
+                        (PerTimeAdjust.toValueUnitString 2)
 
                 let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} ({dt})"
                 let prep = $"{o |> printComponentQuantity}"
@@ -1446,27 +1436,23 @@ module Order =
                 // infusion rate
                 let rt =
                     o.Orderable.Dose.Rate
-                    |> Rate.toValueUnitStringList (Some 1)
-                    |> Seq.map snd
-                    |> String.concat ""
+                    |> Rate.toValueUnitString 1
 
                 let oq =
                     o.Orderable.OrderableQuantity
-                    |> Quantity.toValueUnitStringList (Some 2)
-                    |> Seq.map snd
-                    |> String.concat ""
+                    |> Quantity.toValueUnitString 2
 
                 let it =
                     o
                     |> printItem
                         (fun i -> i.OrderableQuantity)
-                        (Quantity.toValueUnitStringList (Some 2))
+                        (Quantity.toValueUnitString 2)
 
                 let dr =
                     o
                     |> printItem
                         (fun i -> i.Dose.RateAdjust)
-                        (RateAdjust.toValueUnitStringList (Some 2))
+                        (RateAdjust.toValueUnitString 2)
 
                 let pres = $"""{sn |> String.concat " + "} {dr}"""
                 let prep = o |> printComponentQuantity
@@ -1479,33 +1465,28 @@ module Order =
                 // frequencies
                 let fr =
                     fr
-                    |> Frequency.toValueUnitStringList None
-                    |> Seq.map snd
-                    |> String.concat ";"
+                    |> Frequency.toValueUnitString 0
 
                 let tme =
                     tme
-                    |> Time.toValueUnitStringList (Some 2)
-                    |> Seq.map snd
-                    |> String.concat ""
+                    |> Time.toValueUnitString 2
+
                 // infusion rate
                 let rt =
                     o.Orderable.Dose.Rate
-                    |> Rate.toValueUnitStringList (Some 1)
-                    |> Seq.map snd
-                    |> String.concat ""
+                    |> Rate.toValueUnitString 1
 
                 let dq =
                     o
                     |> printItem
                         (fun i -> i.Dose.Quantity)
-                        (Quantity.toValueUnitStringList (Some 3))
+                        (Quantity.toValueUnitString 3)
 
                 let dt =
                     o
                     |> printItem
                         (fun i -> i.Dose.PerTimeAdjust)
-                        (PerTimeAdjust.toValueUnitStringList (Some 1))
+                        (PerTimeAdjust.toValueUnitString 1)
 
                 let pres = $"{o.Orderable.Name |> Name.toString} {fr} {dq} = ({dt}) {rt}"
                 let prep = o |> printComponentQuantity

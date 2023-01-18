@@ -151,3 +151,7 @@ module Double =
 
     let toStringNumberNLWithoutTrailingZeros =
         toStringNumberNL "" >> String.removeTrailingZerosFromDutchNumber
+
+
+    let toStringNumberNLWithoutTrailingZerosFixPrecision n =
+        fixPrecision n >> toStringNumberNLWithoutTrailingZeros

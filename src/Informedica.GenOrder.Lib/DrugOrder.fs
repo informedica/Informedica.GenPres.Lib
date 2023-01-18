@@ -300,7 +300,9 @@ module DrugOrder =
                                 itmDto.OrderableQuantity.Constraints.MaxIncl <- sl.Quantity.Maximum.IsSome
 
                                 itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum
+                                itmDto.OrderableConcentration.Constraints.MinIncl <- sl.Concentration.Minimum.IsSome
                                 itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum
+                                itmDto.OrderableConcentration.Constraints.MaxIncl <- sl.Concentration.Maximum.IsSome
                                 itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum
                             | None -> ()
 

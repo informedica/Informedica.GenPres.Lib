@@ -771,8 +771,7 @@ module ValueUnit =
             | BigRational.Subtr   ->
                 if u1 |> Group.eqsGroup u2 then u2
                 else
-                    failwith <| sprintf "cannot add or subtract different units %A %A" u1 u2
-            | BigRational.NoMatch -> failwith <| sprintf "invalid operator %A" op
+                    failwith <| $"cannot add or subtract different units %A{u1} %A{u2}"
         // recreate valueunit with base value and combined unit
         v
         |> create u

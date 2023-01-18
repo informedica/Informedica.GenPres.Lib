@@ -1292,10 +1292,6 @@ module Variable =
                 | BigRational.Div   -> division
                 | BigRational.Add   -> addition
                 | BigRational.Subtr -> subtraction
-                | BigRational.NoMatch ->
-                    printfn "not a valid operator!"
-                    Exceptions.ValueRangeNotAValidOperator
-                    |> Exceptions.raiseExc None []
 
 
         /// Applies an infix operator **op**
@@ -1376,9 +1372,6 @@ module Variable =
                 match min, incr, max with
                 | None, None, None -> unrestricted
                 | _ -> create onlyMinIncrMax min incr max None
-            |> fun res ->
-                //printfn "finish valuerange calc"
-                res
 
         /// Checks whether a `ValueRange` vr1 is a subset of
         /// `ValueRange` vr2.

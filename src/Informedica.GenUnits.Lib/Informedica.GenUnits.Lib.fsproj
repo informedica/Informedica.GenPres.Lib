@@ -11,11 +11,7 @@
     <Compile Include="ValueUnit.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="Api.fs" />
-    <None Include="Scripts/load-utils.fsx" />
     <None Include="Scripts/load.fsx" />
-    <None Include="Scripts/ValueUnit.fsx" />
-    <None Include="Scripts/Simplify.fsx" />
-    <None Include="Scripts/Scripts.fsx" />
     <None Include="Scripts/Parser.fsx" />
     <None Include="Scripts/Api.fsx" />
   </ItemGroup>

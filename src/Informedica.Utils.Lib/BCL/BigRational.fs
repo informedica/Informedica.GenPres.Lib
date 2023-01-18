@@ -233,7 +233,7 @@ module BigRational =
     let divisorsOfBigInt = getDivisors (fun n x -> n % x) 0I 1I 2I
 
     /// Get all the divisors of a BigRational
-    let divisorsOfBigR n =
+    let divisorsOfBigR =
         let modulo =
             fun (n : BigRational) (x : BigRational) ->
                 n.Numerator % x.Numerator
@@ -276,15 +276,18 @@ module BigRational =
         let toBigR = BigRational.FromBigInt
 
         match r with
-        | (Some n, true,  Some d, true)                            -> (n, d)
-        | (Some n, false, Some d, false)                           -> let r = (vn * d) / (vd * n)
-                                                                      ((r.Numerator |> toBigR) * n), ((r.Denominator |> toBigR) * d)
-        | (None   , _ ,   Some d, true) when (vd |> isDivisorOfBigR d) -> (vn * (d / vd), d)
-        | (None   , _ ,   Some d, false)                           -> ((d / (gcd d vd)) * vn, (d / (gcd d vd)) * vd)
-        | (Some n, true,  None,   _ )   when (vn |> isDivisorOfBigR n) -> (n, (n / vn) * vd)
-        | (Some n, false, None,   _ )                              -> ((n / (gcd n vn)) * vn, (n / (gcd n vn)) * vd)
-        | (None,   _ ,    None,   _ )                              -> (vn, vd)
-        | _                                                        -> (0N, 0N)
+        | Some n, true,  Some d, true  -> (n, d)
+        | Some n, false, Some d, false ->
+            let r = (vn * d) / (vd * n)
+            ((r.Numerator |> toBigR) * n), ((r.Denominator |> toBigR) * d)
+        | None   , _ ,   Some d, true when (vd |> isDivisorOfBigR d) -> (vn * (d / vd), d)
+        | None   , _ ,   Some d, false                           ->
+            ((d / (gcd d vd)) * vn, (d / (gcd d vd)) * vd)
+        | Some n, true,  None,   _   when (vn |> isDivisorOfBigR n) ->
+            (n, (n / vn) * vd)
+        | Some n, false, None,   _  -> ((n / (gcd n vn)) * vn, (n / (gcd n vn)) * vd)
+        | None,   _ ,    None,   _  -> (vn, vd)
+        | _  -> (0N, 0N)
 
 
     let valueToFactorRatio2 v r =
@@ -302,3 +305,68 @@ module BigRational =
             |> Seq.fold(fun p d -> d * p) 1I
             |> BigRational.FromBigInt
         (vl |> List.map(fun v -> v * d), d)
+
+
+    /// ToDo: doesn't return `NoOp` but fails,
+    /// have to rewrite
+    ///
+    /// Match an operator `op` to either
+    /// multiplication, division, addition
+    /// or subtraction, returns `NoOp` when
+    /// the operation is neither.
+    let (|Mult|Div|Add|Subtr|) op =
+        match op with
+        | _ when op |> opIsMult  -> Mult
+        | _ when op |> opIsDiv   -> Div
+        | _ when op |> opIsAdd   -> Add
+        | _ when op |> opIsSubtr -> Subtr
+        | _ -> failwith "Operator is not supported"
+
+
+    let private toMultipleOf2 b d n  =
+        if d = 0N then n
+        else
+            let m = (n / d) |> BigRational.ToBigInt |> BigRational.FromBigInt
+            if b then
+                if m * d < n then (m + 1N) * d else m * d
+            else
+                if m * d > n then (m - 1N) * d else m * d
+
+
+    let toMinMultipleOf = toMultipleOf2 true
+
+
+    let toMaxMultipleOf = toMultipleOf2 false
+
+
+    let calcMinOrMaxToMultiple isMax isIncl incrs minOrMax =
+        incrs
+        |> Set.filter ((<) 0N) // only accept positive incrs
+        |> Set.fold (fun (b, acc) i ->
+            let ec = if isMax then (>=) else (<=)
+            let nc = if isMax then (>) else (<)
+            let ad = if isMax then (-) else (+)
+
+            let m =
+                if isMax then minOrMax |> toMaxMultipleOf i
+                else minOrMax |> toMinMultipleOf i
+
+            let m =
+                if (isIncl |> not) && (m |> ec <| minOrMax) then
+                    (m |> ad <| i)
+                else m
+
+            match acc with
+            | Some a -> if (m |> nc <| a) then (true, Some m) else (b, Some a)
+            | None   -> (true, Some m)
+        ) (isIncl, None)
+        |> fun (b, r) -> b, r |> Option.defaultValue minOrMax
+
+
+    let maxInclMultipleOf = calcMinOrMaxToMultiple true true
+
+    let maxExclMultipleOf = calcMinOrMaxToMultiple true false
+
+    let minInclMultipleOf = calcMinOrMaxToMultiple false true
+
+    let minExclMultipleOf = calcMinOrMaxToMultiple false false
