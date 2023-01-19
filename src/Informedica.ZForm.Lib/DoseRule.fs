@@ -1377,11 +1377,11 @@ module DoseRule =
         module TradeProduct =
 
 
-            type TradeProduct = { HPK : int; Label : string }
+            type TradeProductLabel = { HPK : int; Label : string }
 
             let create hpk label = { HPK = hpk; Label = label }
 
-            let apply f (x: TradeProduct) = x |> f
+            let apply f (x: TradeProductLabel) = x |> f
 
             let get = apply id
 
@@ -1390,29 +1390,29 @@ module DoseRule =
             let hpk tp = (tp |> get).HPK
 
 
-            type TradeProduct with
+            type TradeProductLabel with
 
                 static member HPK_ :
-                    (TradeProduct -> int) * (int -> TradeProduct -> TradeProduct) =
+                    (TradeProductLabel -> int) * (int -> TradeProductLabel -> TradeProductLabel) =
                     (fun tp -> tp.HPK) ,
                     (fun hpk tp -> { tp with HPK = hpk })
 
 
                 static member Label_ :
-                    (TradeProduct -> string) * (string -> TradeProduct -> TradeProduct) =
+                    (TradeProductLabel -> string) * (string -> TradeProductLabel -> TradeProductLabel) =
                     (fun tp -> tp.Label) ,
                     (fun lbl tp -> { tp with Label = lbl })
 
 
             module Optics =
 
-                let setHPK = Optic.set TradeProduct.HPK_
+                let setHPK = Optic.set TradeProductLabel.HPK_
 
-                let getHPK = Optic.get TradeProduct.HPK_
+                let getHPK = Optic.get TradeProductLabel.HPK_
 
-                let setLabel = Optic.set TradeProduct.Label_
+                let setLabel = Optic.set TradeProductLabel.Label_
 
-                let getLabel = Optic.get TradeProduct.Label_
+                let getLabel = Optic.get TradeProductLabel.Label_
 
 
             module Dto =
@@ -1426,7 +1426,7 @@ module DoseRule =
                 let dto () = Dto ()
 
 
-                let toDto (tp: TradeProduct) =
+                let toDto (tp: TradeProductLabel) =
                     let dto = dto ()
 
                     dto.HPK <- tp.HPK
@@ -1445,11 +1445,11 @@ module DoseRule =
         module GenericProduct =
 
 
-            type GenericProduct = { GPK : int; Label : string }
+            type GenericProductLabel = { GPK : int; Label : string }
 
             let create gpk label = { GPK = gpk; Label = label }
 
-            let apply f (x : GenericProduct) = x |> f
+            let apply f (x : GenericProductLabel) = x |> f
 
             let get = apply id
 
@@ -1458,29 +1458,29 @@ module DoseRule =
             let gpk gp = (gp |> get).GPK
 
 
-            type GenericProduct with
+            type GenericProductLabel with
 
                 static member GPK_ :
-                    (GenericProduct -> int) * (int -> GenericProduct -> GenericProduct) =
+                    (GenericProductLabel -> int) * (int -> GenericProductLabel -> GenericProductLabel) =
                     (fun tp -> tp.GPK) ,
                     (fun hpk tp -> { tp with GPK = hpk })
 
 
                 static member Label_ :
-                    (GenericProduct -> string) * (string -> GenericProduct -> GenericProduct) =
+                    (GenericProductLabel -> string) * (string -> GenericProductLabel -> GenericProductLabel) =
                     (fun tp -> tp.Label) ,
                     (fun lbl tp -> { tp with Label = lbl })
 
 
             module Optics =
 
-                let setGPK = Optic.set GenericProduct.GPK_
+                let setGPK = Optic.set GenericProductLabel.GPK_
 
-                let getGPK = Optic.get GenericProduct.GPK_
+                let getGPK = Optic.get GenericProductLabel.GPK_
 
-                let setLabel = Optic.set GenericProduct.Label_
+                let setLabel = Optic.set GenericProductLabel.Label_
 
-                let getLabel = Optic.get GenericProduct.Label_
+                let getLabel = Optic.get GenericProductLabel.Label_
 
 
             module Dto =
@@ -1494,7 +1494,7 @@ module DoseRule =
                 let dto () = Dto ()
 
 
-                let toDto (gp: GenericProduct) =
+                let toDto (gp: GenericProductLabel) =
                     let dto = dto ()
 
                     dto.GPK <- gp.GPK
@@ -1511,8 +1511,8 @@ module DoseRule =
 
 
         type PatientDosage = PatientDosage.PatientDosage
-        type TradeProduct = TradeProduct.TradeProduct
-        type GenericProduct = GenericProduct.GenericProduct
+        type TradeProductLabel = TradeProduct.TradeProductLabel
+        type GenericProductLabel = GenericProduct.GenericProductLabel
 
 
         type ShapeDosage =
@@ -1520,9 +1520,9 @@ module DoseRule =
                 // Name of the shape the doserule applies to
                 Shape : String list
                 // TradeProducts the doserule applies to
-                TradeProducts : TradeProduct list
+                TradeProducts : TradeProductLabel list
                 // GenericProducts the doserule applies to
-                GenericProducts : GenericProduct list
+                GenericProducts : GenericProductLabel list
                 // Patients to wich the doserule applies to
                 PatientDosages : PatientDosage list
             }
@@ -1548,12 +1548,12 @@ module DoseRule =
                 (fun s rd -> { rd with Shape = s })
 
             static member TradeProducts_ :
-                (ShapeDosage -> TradeProduct list) * (TradeProduct list -> ShapeDosage -> ShapeDosage) =
+                (ShapeDosage -> TradeProductLabel list) * (TradeProductLabel list -> ShapeDosage -> ShapeDosage) =
                 (fun sd -> sd.TradeProducts) ,
                 (fun tps sd -> { sd with TradeProducts = tps |> List.distinct })
 
             static member GenericProducts_ :
-                (ShapeDosage -> GenericProduct list) * (GenericProduct list -> ShapeDosage -> ShapeDosage) =
+                (ShapeDosage -> GenericProductLabel list) * (GenericProductLabel list -> ShapeDosage -> ShapeDosage) =
                 (fun sd -> sd.GenericProducts) ,
                 (fun tps sd -> { sd with GenericProducts = tps |> List.distinct })
 
@@ -3684,7 +3684,7 @@ Synoniemen: {synonym}
 
 
     let toStringWithConfig (config : TextConfig) printRules (dr : DoseRule) =
-        let gpsToString (gps : ShapeDosage.GenericProduct list) =
+        let gpsToString (gps : ShapeDosage.GenericProductLabel list) =
             gps
             |> List.map (fun gp -> gp.Label)
             |> String.concat ", "

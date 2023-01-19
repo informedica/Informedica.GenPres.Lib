@@ -5,11 +5,14 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Library.fs" />
     <None Include="Scripts\Tests.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />
+    <ProjectReference Include="..\Informedica.GenUnits.Lib\Informedica.GenUnits.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
