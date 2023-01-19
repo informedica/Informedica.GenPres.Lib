@@ -297,7 +297,7 @@ let test pat n =
             |> Order.Print.printPrescription ns
         let p =
             $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
-        Ok (p, o)
+        Ok (pat, p, o)
     | Error (ord, pr, m) ->
         let o =
             ord
@@ -338,7 +338,7 @@ let infant =
     Patient.patient
 
     |> Patient.Optics.setAge [ 1 |> Age.Years]
-    |> Patient.Optics.setWeight (10m |> Weight.Kilogram |> Some)
+    |> Patient.Optics.setWeight (11.5m |> Weight.Kilogram |> Some)
     |> Patient.Optics.setHeight (70 |> Height.Centimeter |> Some)
     |> Patient.Optics.setDepartment "ICK"
 
@@ -392,8 +392,19 @@ let run n pat =
             i
             |> test pat
             |> function
-            | Ok (p, _) -> $"{i}.Ok: {p}"
-            | Error (_, p, _) -> $"{i}.Fail: {p}"
+            | Ok (pat, ind, (prs, prep, adm)) ->
+                [
+                    ""
+                    $"{i}"
+                    $"Patient: {pat |> Patient.toString}"
+                    $"Indicatie: {ind}"
+                    $"Voorschrift: {prs}"
+                    if prep |> String.notEmpty then $"Bereiding: {prep}"
+                    $"Toediening: {adm}"
+                    ""
+                ]
+                |> String.concat "\n"
+            | Error (_, p, _) -> $"\n{i}.Fail: {p}\n"
         with
         | _ ->
             let pr =
@@ -404,8 +415,8 @@ let run n pat =
                 |> fun pr ->
                     $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
-            $"{i}. could not calculate: {pr}"
-        |>  File.writeTextToFile "Scenarios.txt"
+            $"\n{i}. could not calculate: {pr}\n"
+        |>  File.appendTextToFile path.Value
 
 
 let getRule i pat =
@@ -424,6 +435,8 @@ let getRule i pat =
     teenager
     adult
 ]
+//|> List.skip 1
+//|> List.take 1
 |> List.iter (fun pat ->
     let n = getN pat
     printfn $"=== Running pat: {pat |> Patient.toString}: {n} ==="
@@ -433,10 +446,11 @@ let getRule i pat =
 )
 
 
-test infant 407
+test infant 408
 |> function
-| Ok (ind, (prs, prep, adm)) ->
+| Ok (pat, ind, (prs, prep, adm)) ->
     [
+        $"Patient: {pat |> Patient.toString}"
         $"Indicatie: {ind}"
         $"Voorschrift: {prs}"
         if prep |> String.notEmpty then $"Bereiding: {prep}"

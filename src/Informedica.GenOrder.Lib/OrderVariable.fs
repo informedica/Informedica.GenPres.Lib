@@ -48,7 +48,7 @@ module OrderVariable =
                 let min = cs.Min |> Option.map Minimum.toBoolBigRational
                 let max = cs.Max |> Option.map Maximum.toBoolBigRational
                 let incr = cs.Incr |> Option.map (Increment.toList >> Set.ofSeq)
-                MinIncrMax.toString toStr min incr max
+                MinIncrMax.toStringNL toStr min incr max
             | Some vs ->
                 vs
                 |> ValueSet.toSet
@@ -237,7 +237,7 @@ module OrderVariable =
                 |> Set.toSeq
                 |> String.concat ", "
             | None ->
-                MinIncrMax.toString toStr min incr max
+                MinIncrMax.toStringNL toStr min incr max
         |> fun s -> $"%s{s} %s{unt}"
 
 
