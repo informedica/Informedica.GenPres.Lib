@@ -25,7 +25,7 @@ module Parser =
             data
             |> Array.map (Array.pickArray pick)
 
-    let isDoubleFormat s =
+    let isDecimalFormat s =
         let s = s |> String.replace "(" "" |> String.replace ")" ""
         if s |> String.contains "," then
             match s |> String.splitAt ',' with

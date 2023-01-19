@@ -9,6 +9,31 @@ module Types =
 
     module ZIndex =
 
+
+        type Name = Full | Short | Memo | Label
+
+
+        type Length = TwentyFive | Fifty
+
+
+        type Item =
+            | Shape
+            | Route
+            | GenericUnit
+            | ShapeUnit
+            | PrescriptionContainer
+            | ConsumerContainer
+
+
+        type Substance =
+            {
+                Id : int
+                Name : string
+                Mole : decimal
+                MoleReal : decimal
+            }
+
+
         type ConsumerProduct =
             {
                 Id : int
@@ -55,10 +80,10 @@ module Types =
                 ATCName : string
                 Shape : string
                 Route : string []
-                Substances : Substance []
+                Substances : ProductSubstance []
                 PrescriptionProducts : PrescriptionProduct []
             }
-        and Substance =
+        and ProductSubstance =
             {
                 SubstanceId : int
                 SortOrder : int
@@ -83,6 +108,162 @@ module Types =
                 DisplayName: string
                 Unit : string
                 Synonyms: string []
+            }
+
+
+
+        type DoseRule =
+            {
+                /// The id of the doserule
+                Id : int
+                /// The caregroup the doserule applies to
+                /// this is either 'intensieve' or 'niet-intensieve' or 'all'
+                CareGroup : string
+                /// This is the usage of the dose rule, can be therapeutic or
+                /// profylactic
+                Usage : string
+                /// The dose type, 'standaard' means that the dose rule applies without
+                /// a specific indication, 'verbyzondering' means the dose rule needs
+                /// an indication other than 'Algemeen'.
+                DoseType : string
+                /// The list of generic products for which the dose rule applies
+                GenericProduct : RuleGenericProduct[]
+                /// The list of prescription products for which the dose rule applies
+                PrescriptionProduct : Product[]
+                /// The list of trade products for which the dose rule applies
+                TradeProduct : Product[]
+                /// The route for which the dose rule applies
+                Routes : string []
+                /// The indication id for which the dose rule applies.
+                /// The indications are coded by ICPC/ICD-10
+                IndicationId : int
+                /// The indication text for which the dose rule applies.
+                /// The indications are coded by ICPC/ICD-10
+                Indication : string
+                /// If high risk, than the dose margins are smaller
+                HighRisk : bool
+                /// Gender is either 'man', 'vrouw' or an empty string.
+                /// When gender is empty the dose rule can apply to either
+                /// gender.
+                Gender : string
+                /// The optional minimum or maximum age limits for the dose rule
+                Age : MinMax
+                /// The optional minimum or maximum weight limits for which the dose
+                /// rule applies
+                Weight : MinMax
+                /// The optional BSA min/max for which the dose rule applies
+                BSA : MinMax
+                /// The frequency of the dose rule. The total dose can be calculated
+                /// by multiplying the dose by the frequency.
+                Freq : Frequency
+                /// The normal optional min/max of the unadjusted dose
+                Norm : MinMax
+                /// The absolute optional min/max of the unadjusted dose
+                Abs : MinMax
+                /// The normal optional min/max of the dose adjusted by weight
+                NormKg : MinMax
+                /// The absolute optional min/max of the dose adjusted by weight
+                AbsKg : MinMax
+                /// The absolute optional min/max of the dose adjusted by BSA
+                NormM2 : MinMax
+                /// The absolute optional min/max of the dose adjusted by BSA
+                AbsM2 : MinMax
+                /// The unit in which the dose is measured
+                Unit : string
+            }
+        and Product = { Id: int; Name: string }
+        and RuleGenericProduct =
+            {
+                Id: int
+                Name: string
+                Route: string []
+                Unit: string
+                Substances : RuleSubstance []
+            }
+        and RuleSubstance = { Name: string; Quantity: decimal; Unit: string }
+        and Frequency = { Frequency: decimal; Time: string }
+        and MinMax = { Min: decimal Option; Max: decimal Option }
+
+
+        type ATCGroup =
+            {
+                ATC1 : string
+                AnatomicalGroup : string
+                AnatomicalGroupEng : string
+                ATC2 : string
+                TherapeuticMainGroup : string
+                TherapeuticMainGroupEng : string
+                ATC3 : string
+                TherapeuticSubGroup : string
+                TherapeuticSubGroupEng : string
+                ATC4 : string
+                PharmacologicalGroup : string
+                PharmacologicalGroupEng : string
+                ATC5 : string
+                Substance : string
+                SubstanceEng : string
+                Generic : string
+                Shape : string
+                Routes : string
+            }
+
+
+        type AgeInMo = decimal Option
+
+        type WeightInKg = decimal Option
+
+        type BSAInM2 = decimal Option
+
+
+        type PatientFilter =
+            {
+                Age: AgeInMo
+                Weight: WeightInKg
+                BSA: BSAInM2
+            }
+
+        type ProductFilter =
+            | GPKRoute of (int * string)
+            | GenericShapeRoute of GenericShapeRoute
+        and GenericShapeRoute =
+            {
+                Generic: string
+                Shape: string
+                Route: string
+            }
+
+
+        type Filter =
+            {
+                Patient: PatientFilter
+                Product: ProductFilter
+            }
+
+
+        type RuleResult =
+            {
+                Product: GenPresProduct
+                DoseRules: string []
+                Doses: FreqDose []
+            }
+        and FreqDose =
+            {
+                /// The frequency of the dose rule
+                Freq: Frequency
+                /// The optional min/max values of a 'normal dose range'
+                NormDose: MinMax
+                /// The optional min/max values of the 'absolute dose range'
+                AbsDose: MinMax
+                /// The optional min/max values of a 'normal dose range' per kg
+                NormKg: MinMax
+                /// The optional min/max values of the 'absolute dose range' per kg
+                AbsKg: MinMax
+                /// The optional min/max values of a 'normal dose range' per m2
+                NormM2: MinMax
+                /// The optional min/max values of the 'absolute dose range' per m2
+                AbsM2: MinMax
+                /// The unit in which the doses are measured
+                Unit: string
             }
 
 
@@ -224,8 +405,6 @@ module Types =
             {
                 Name : string
                 Concentration : ValueUnit
-                /// The quantity of substance which is the multiple
-                /// of which a dose is made of.
             }
         and TradeProduct =
             {

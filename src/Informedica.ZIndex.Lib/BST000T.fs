@@ -64,13 +64,13 @@ module BST000T =
         Parser.getData name posl pickList
         |> Array.map (Array.map String.trim)
         |> Array.map (fun d ->
-            let rl = Int32.Parse d.[3]
-            let ua = Int32.Parse d.[5]
-            let dl = Int32.Parse d.[6]
-            let al = Int32.Parse d.[7]
-            let nw = Int32.Parse d.[8]
-            let tt = Int32.Parse d.[9]
-            create d.[0] d.[1] d.[2] rl d.[4] ua dl al nw tt)
+            let rl = Int32.Parse d[3]
+            let ua = Int32.Parse d[5]
+            let dl = Int32.Parse d[6]
+            let al = Int32.Parse d[7]
+            let nw = Int32.Parse d[8]
+            let tt = Int32.Parse d[9]
+            create d[0] d[1] d[2] rl d[4] ua dl al nw tt)
 
     let table n =
         records ()
@@ -83,16 +83,16 @@ module BST000T =
             let t = table n
 
             if t.MDRECL <> BST001T.recordLength n then
-                sprintf "Calculated record length: %i, is not equal to table record length: %i" t.MDRECL (BST001T.recordLength n)
+                $"Calculated record length: %i{t.MDRECL}, is not equal to table record length: %i{BST001T.recordLength n}"
                 |> failwith
             t.MDOBST
 
         let i = ref -1
-        let s = sprintf "\n%s/// <summary>" tab
-        let s = s + sprintf "\n%s/// <para> Tabel: %s: %s </para>\n" tab n d + "    /// <para> --------------- </para>\n"
+        let s = $"\n%s{tab}/// <summary>"
+        let s = s + $"\n%s{tab}/// <para> Tabel: %s{n}: %s{d} </para>\n" + "    /// <para> --------------- </para>\n"
         (BST001T.columns n
         |> Seq.pickSeq pl
         |> Seq.fold (fun s c ->
-                i := !i + 1
-                s + sprintf "%s/// <para> %i.\t%s: \t%s </para>\n" tab !i c.MDRNAM c.MDROMS
+                i.Value <- i.Value + 1
+                s + $"%s{tab}/// <para> %i{i.Value}.\t%s{c.MDRNAM}: \t%s{c.MDROMS} </para>\n"
             ) s) + "    /// </summary>"

@@ -16,10 +16,10 @@ module GenericProduct =
             ATCName : string
             Shape : string
             Route : string []
-            Substances : Substance []
+            Substances : ProductSubstance []
             PrescriptionProducts : PrescriptionProduct.PrescriptionProduct []
         }
-    and Substance =
+    and ProductSubstance =
         {
             SubstanceId : int
             SortOrder : int

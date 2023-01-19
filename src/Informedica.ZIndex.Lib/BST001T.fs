@@ -70,10 +70,10 @@ module BST001T =
     let records _ =
         _data
         |> Array.map (fun d ->
-            let vn = Int32.Parse d.[2]
-            let ln = Int32.Parse d.[7]
-            let dc = Int32.Parse d.[8]
-            create d.[0] d.[1] vn d.[3] d.[4] d.[5] d.[6] ln dc d.[9])
+            let vn = Int32.Parse d[2]
+            let ln = Int32.Parse d[7]
+            let dc = Int32.Parse d[8]
+            create d[0] d[1] vn d[3] d[4] d[5] d[6] ln dc d[9])
         |> Array.filter (fun r -> r.MUTKOD <> "1")
         |> Array.sortBy (fun r -> r.MDBST, r.MDVNR)
 
@@ -100,8 +100,8 @@ module BST001T =
 
     let recordString n pl =
         let tab = "    "
-        let s = sprintf "type %s =\n" n
-        let s = s + sprintf "%s%s%s{\n" tab tab tab
+        let s = $"type %s{n} =\n"
+        let s = s + $"%s{tab}%s{tab}%s{tab}{{\n"
         let s =
             s + (
                 columns n
@@ -109,10 +109,10 @@ module BST001T =
                 |> Seq.fold (fun s c ->
                     let t =
                         if c.MDRTYP = "N" then
-                            if c.MDROPM |> Parser.isDoubleFormat then "float" else "int"
+                            if c.MDROPM |> Parser.isDecimalFormat then "decimal" else "int"
                         else "string"
-                    s + sprintf "%s%s%s%s%s : %s\n" tab tab tab tab c.MDRNAM t) "")
-        s + (sprintf "%s%s%s}\n" tab tab tab)
+                    s + $"%s{tab}%s{tab}%s{tab}%s{tab}%s{c.MDRNAM} : %s{t}\n") "")
+        s + $"%s{tab}%s{tab}%s{tab}}}\n"
 
     let createString n pl =
         let tab = "    "
@@ -124,8 +124,8 @@ module BST001T =
             |> Seq.fold (fun s c ->
                 s + c.MDRNAM.ToLower() + " " ) ""
 
-        let s = sprintf "let create %s =\n" args
-        let s = s + sprintf "%s%s%s{\n" tab tab tab
+        let s = $"let create %s{args} =\n"
+        let s = s + $"%s{tab}%s{tab}%s{tab}{{\n"
         let s =
             s + (
                 cs
@@ -133,13 +133,11 @@ module BST001T =
                 let m =
                     if c.MDRTYP = "N" then
                         let typ, opm = "\"" + c.MDRTYP + "\"", "\"" + c.MDROPM + "\""
-                        if c.MDROPM |> Parser.isDoubleFormat then
-                            sprintf "|> ((Parser.parseValue %s %s) >> Double.parse)"
-                                    typ opm
+                        if c.MDROPM |> Parser.isDecimalFormat then
+                            $"|> ((Parser.parseValue %s{typ} %s{opm}) >> Decimal.parse)"
                         else
-                            sprintf "|> ((Parser.parseValue %s %s) >> Int32.parse)"
-                                    typ opm
+                            $"|> ((Parser.parseValue %s{typ} %s{opm}) >> Int32.parse)"
                     elif c.MDRNAM = "ATCODE" then ""
                     else "|> String.trim"
-                s + sprintf "%s%s%s%s%s = %s %s\n" tab tab tab tab c.MDRNAM (c.MDRNAM.ToLower()) m) "")
-        s + (sprintf "%s%s%s}\n" tab tab tab)
+                s + $"%s{tab}%s{tab}%s{tab}%s{tab}%s{c.MDRNAM} = %s{c.MDRNAM.ToLower()} %s{m}\n") "")
+        s + $"%s{tab}%s{tab}%s{tab}}}\n"

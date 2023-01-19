@@ -52,7 +52,7 @@ module Zindex =
             let pl = if pl = [] then [0..(BST001T.columnCount n - 1)] else [0..((pl |> List.length) - 1)]
             let args =
                 pl
-                |> List.fold (fun s p -> s + " (xs |> Array.item " + (string) p + ")") ""
+                |> List.fold (fun s p -> s + " (xs |> Array.item " + string p + ")") ""
             "(fun xs -> create {args})"
             |> String.replace "{args}" args
 
