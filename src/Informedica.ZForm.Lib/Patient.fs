@@ -189,7 +189,7 @@ module Patient =
         | _  -> Undetermined
 
 
-    let toString ({ GestAge = ga; Age = age; Weight = wght; BSA = bsa; Gender = gen }) =
+    let toString { GestAge = ga; Age = age; Weight = wght; BSA = bsa; Gender = gen } =
         let (>+) sl sr =
             let l, s = sr
 
@@ -269,7 +269,7 @@ module Patient =
             |>! ignore
 
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- 1m
             dto.Age.Min.Unit <- "maand"
             dto.Age.Min.Group <- "Time"
             dto.Age.Min.Language <- "dutch"
@@ -287,7 +287,7 @@ module Patient =
             // group defaults to general when no unit can be found in group
             // ToDo: need to fix this behaviour
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- 1m
             dto.Age.Min.Unit <- "m"
             dto.Age.Min.Group <- "Time"
             dto.Age.Min.Language <- "dutch"
@@ -301,7 +301,7 @@ module Patient =
             // need to check for the correct units
             // ToDo!!
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- 1m
             dto.Age.Min.Unit <- "g"
             dto.Age.Min.Group <- "Mass"
             dto.Age.Min.Language <- "dutch"

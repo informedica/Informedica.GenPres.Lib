@@ -629,12 +629,12 @@ module MinMax =
             |>! ignore
 
             // Add min and max to dto and there and back again
-            dto.Min.Value <- 1.
+            dto.Min.Value <- 1m
             dto.Min.Unit <- "mg"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2.
+            dto.Max.Value <- 2m
             dto.Max.Unit <- "g"
             dto.Max.Group <- "mass"
             dto.HasMax <- true
@@ -645,12 +645,12 @@ module MinMax =
             |>! ignore
 
             // Add min > and max to dto and there and back again
-            dto.Min.Value <- 1.
+            dto.Min.Value <- 1m
             dto.Min.Unit <- "g"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2.
+            dto.Max.Value <- 2m
             dto.Max.Unit <- "mg"
             dto.Max.Group <- "mass"
             dto.HasMax <- true

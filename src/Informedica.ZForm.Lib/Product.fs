@@ -47,8 +47,6 @@ module Product =
         {
             Name : string
             Concentration : ValueUnit.ValueUnit
-            /// The quantity of substance which is the multiple
-            /// of which a dose is made of.
         }
     and TradeProduct =
         {

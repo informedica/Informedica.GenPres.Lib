@@ -512,12 +512,8 @@ module ValueUnit =
 
     let withUnit u v =
         v
-        |> BigRational.fromFloat
-        |> function
-        | None ->
-            $"{v} cannot be converted to a BigRational!"
-            |> failwith
-        | Some br -> create u br
+        |> BigRational.fromDecimal
+        |> create u
 
 
     let withValue v u = create u v
@@ -1139,7 +1135,7 @@ module ValueUnit =
             match g with
             | M2 n -> (n, BSA.M2)
         | CombiUnit (u1, op, u2) ->
-            failwith <| sprintf "Cannot map combined unit %A" ((u1, op, u2) |> CombiUnit)
+            failwith <| $"Cannot map combined unit %A{(u1, op, u2) |> CombiUnit}"
 
 
         let tryFind u =
@@ -1234,10 +1230,10 @@ module ValueUnit =
     let toStringEngShort   = toString BigRational.toString Units.English Units.Short
     let toStringEngLong    = toString BigRational.toString Units.English Units.Long
 
-    let toStringFloatDutchShort = toString (BigRational.toFloat >> string) Units.Dutch Units.Short
-    let toStringFloatDutchLong  = toString (BigRational.toFloat >> string) Units.Dutch Units.Long
-    let toStringFloatEngShort   = toString (BigRational.toFloat >> string) Units.English Units.Short
-    let toStringFloatEngLong    = toString (BigRational.toFloat >> string) Units.English Units.Long
+    let toStringFloatDutchShort = toString (BigRational.toDecimal >> string) Units.Dutch Units.Short
+    let toStringFloatDutchLong  = toString (BigRational.toDecimal >> string) Units.Dutch Units.Long
+    let toStringFloatEngShort   = toString (BigRational.toDecimal >> string) Units.English Units.Short
+    let toStringFloatEngLong    = toString (BigRational.toDecimal >> string) Units.English Units.Long
 
     let fromString s =
 
@@ -1249,17 +1245,17 @@ module ValueUnit =
                 | [ug] ->
                     match Units.fromString ug with
                     | Some u' -> u' |> setUnitValue 1N
-                    | None      -> failwith <| sprintf "Not a valid unit: %s" ug
+                    | None      -> failwith <| $"Not a valid unit: %s{ug}"
 
                 | [v;ug] ->
                     match v |> BigRational.tryParse with
                     | None ->
-                        failwith <| sprintf "Cannot parse string: %s with value: %s" s v
+                        failwith <| $"Cannot parse string: %s{s} with value: %s{v}"
                     | Some v' ->
                         match Units.fromString ug with
                         | Some u' -> u' |> setUnitValue v'
-                        | None     -> failwith <| sprintf "Not a valid unit: %s" ug
-                | _ -> failwith <| sprintf "Cannot parse string %s" s
+                        | None     -> failwith <| $"Not a valid unit: %s{ug}"
+                | _ -> failwith <| $"Cannot parse string %s{s}"
 
                 |> UnitItem.UnitItem
 
@@ -1294,7 +1290,7 @@ module ValueUnit =
         | vs::rest ->
             match vs |> BigRational.tryParse with
             | None ->
-                failwith <| sprintf "Cannot parse string %s" s
+                failwith <| $"Cannot parse string %s{s}"
             | Some v ->
                 let u =
                     rest
@@ -1304,7 +1300,7 @@ module ValueUnit =
                 (v, u) |> ValueUnit
         | _ ->
             if s = "" then failwith "Cannot parse empty string"
-            else failwith <| sprintf "Cannot parse string %s" s
+            else failwith <| $"Cannot parse string %s{s}"
 
 
 

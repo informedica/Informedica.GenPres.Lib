@@ -18,6 +18,7 @@
     <Compile Include="BCL\BigInteger.fs" />
     <Compile Include="BCL\BigRational.fs" />
     <Compile Include="BCL\DateTime.fs" />
+    <Compile Include="BCL\Decimal.fs" />
     <Compile Include="Option.fs" />
     <Compile Include="Array.fs" />
     <Compile Include="List.fs" />

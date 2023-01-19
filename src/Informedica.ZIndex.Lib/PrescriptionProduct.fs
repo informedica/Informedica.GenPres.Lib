@@ -10,7 +10,7 @@ module PrescriptionProduct =
             Id : int
             Name : string
             Label  : string
-            Quantity : float
+            Quantity : decimal
             Unit : string
             Container : string
             TradeProducts : TradeProduct.TradeProduct []

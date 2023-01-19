@@ -110,9 +110,9 @@ module DoseRule =
             Unit: string
             Substances : Substance []
         }
-    and Substance = { Name: string; Quantity: float; Unit: string }
-    and Frequency = { Frequency: float; Time: string }
-    and MinMax = { Min: float Option; Max: float Option }
+    and Substance = { Name: string; Quantity: decimal; Unit: string }
+    and Frequency = { Frequency: decimal; Time: string }
+    and MinMax = { Min: decimal Option; Max: decimal Option }
 
 
     let foldMinMax xs =
@@ -130,16 +130,16 @@ module DoseRule =
             let mms =
                 match mm.Min, mm.Max with
                 | Some min, Some max ->
-                    let min = Double.fixPrecision p min |> string
-                    let max = Double.fixPrecision p max |> string
+                    let min = Decimal.fixPrecision p min |> string
+                    let max = Decimal.fixPrecision p max |> string
                     sprintf "%s - %s" min max
                 | Some min, None ->
-                    let min = Double.fixPrecision p min |> string
+                    let min = Decimal.fixPrecision p min |> string
                     sprintf "vanaf %s" min
                 | None, Some max ->
-                    if max = 0. then ""
+                    if max = 0m then ""
                     else
-                        let max = Double.fixPrecision p max |> string
+                        let max = Decimal.fixPrecision p max |> string
                         sprintf "tot %s" max
                 | None, None -> ""
             if mms = "" then s
@@ -186,7 +186,7 @@ module DoseRule =
         let s = s |> minMaxToString "BSA" "m2" 3 r.BSA
 
         let s =
-            if r.Freq.Frequency <= 0. then s
+            if r.Freq.Frequency <= 0m then s
             else
                 s + "Freq: " + (r.Freq |> freqToString) + " " + del
 
@@ -218,8 +218,8 @@ module DoseRule =
 
         if mx < mn then minmax
         else
-            let mn = if mn = 0. then None else Some mn
-            let mx = if mx = 0. || chkmx then None else Some mx
+            let mn = if mn = 0m then None else Some mn
+            let mx = if mx = 0m || chkmx then None else Some mx
 
             { Min = mn; Max = mx }
 
@@ -268,7 +268,7 @@ module DoseRule =
             Age = minmax
             Weight = minmax
             BSA = minmax
-            Freq = createFrequency 0. ""
+            Freq = createFrequency 0m ""
             Norm = minmax
             Abs = minmax
             NormKg = minmax
@@ -466,7 +466,7 @@ module DoseRule =
         |> Seq.toArray
         // Get Generic products
         |> Array.map ((fun (bas, r) ->
-            let (gpk, _, _) = bas
+            let gpk, _, _ = bas
             let gpks =
                 getGenericProducts ()
                 |> Array.filter (fun gp ->
@@ -494,7 +494,7 @@ module DoseRule =
             (bas, r)
         // Get prescription products
          ) >> (fun (bas, r) ->
-            let (_, prk, _) = bas
+            let _, prk, _ = bas
             let prks =
                 getPresciptionProducts ()
                 |> Array.filter (fun pp ->
@@ -503,7 +503,7 @@ module DoseRule =
             (bas, { r with PrescriptionProduct = prks })
         // Get trade products
         ) >> (fun (bas, r) ->
-            let (_, _, hpk) = bas
+            let _, _, hpk = bas
             let hpks =
                 getTradeProducts ()
                 |> Array.filter (fun tp ->
@@ -536,23 +536,18 @@ module DoseRule =
         let freqToString (fr: Frequency) =
             (fr.Frequency |> string) + " " + (fr.Time |> string)
 
-        let optToString pre post o =
-            let s =
-                if o |> Option.isSome then o |> Option.get |> string else ""
-            if s = "" then "" else pre + " " +  s + " " + post
-
         let minMaxToString u (mm: MinMax) =
             let s =
                 match mm.Min, mm.Max with
                 | None, None -> ""
                 | Some min, None -> "vanaf " + (min |> string)
                 | None, Some max ->
-                    if max = 0. then "" else "tot " + (max |> string)
+                    if max = 0m then "" else "tot " + (max |> string)
                 | Some min, Some max -> (min |> string) + " - " + (max |> string)
             if s = "" then "" else s + " " + u
 
         if dr.GenericProduct |> Array.length = 1 then
-            dr.GenericProduct.[0].Name + ": "
+            dr.GenericProduct[0].Name + ": "
         else ""
         + (addString "Indicatie" dr.Indication)
         + (addString "Geslacht" dr.Gender)

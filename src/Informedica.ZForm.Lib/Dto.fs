@@ -32,12 +32,12 @@ module Dto =
     [<CLIMutable>]
     type Dto =
         {
-            AgeInMo : float
-            WeightKg : float
-            LengthCm : float
-            BSAInM2 : float
+            AgeInMo : decimal
+            WeightKg : decimal
+            LengthCm : decimal
+            BSAInM2 : decimal
             Gender : string
-            BirthWeightGram : float
+            BirthWeightGram : decimal
             GestAgeWeeks : int
             GestAgeDays : int
             GPK : int
@@ -48,9 +48,9 @@ module Dto =
             TradeProduct : string
             Shape : string
             Label : string
-            Concentration : float
+            Concentration : decimal
             ConcentrationUnit : string
-            Multiple : float
+            Multiple : decimal
             MultipleUnit : string
             Route : string
             Indication : string
@@ -62,57 +62,57 @@ module Dto =
     and Rule =
         {
             Substance : string
-            Concentration : float
+            Concentration : decimal
             Unit : string
 
             Frequency : string
 
-            NormTotalDose : float
-            MinTotalDose : float
-            MaxTotalDose : float
-            MaxPerDose : float
+            NormTotalDose : decimal
+            MinTotalDose : decimal
+            MaxTotalDose : decimal
+            MaxPerDose : decimal
 
-            NormTotalDosePerKg : float
-            MinTotalDosePerKg : float
-            MaxTotalDosePerKg : float
-            MaxPerDosePerKg : float
+            NormTotalDosePerKg : decimal
+            MinTotalDosePerKg : decimal
+            MaxTotalDosePerKg : decimal
+            MaxPerDosePerKg : decimal
 
-            NormTotalDosePerM2 : float
-            MinTotalDosePerM2 : float
-            MaxTotalDosePerM2 : float
-            MaxPerDosePerM2 : float
+            NormTotalDosePerM2 : decimal
+            MinTotalDosePerM2 : decimal
+            MaxTotalDosePerM2 : decimal
+            MaxPerDosePerM2 : decimal
         }
 
     let rule =
         {
             Substance = ""
-            Concentration = 0.
+            Concentration = 0m
             Unit = ""
             Frequency = ""
-            NormTotalDose = 0.
-            MinTotalDose = 0.
-            MaxTotalDose = 0.
-            MaxPerDose = 0.
-            NormTotalDosePerKg = 0.
-            MinTotalDosePerKg = 0.
-            MaxTotalDosePerKg = 0.
-            MaxPerDosePerKg = 0.
-            NormTotalDosePerM2 = 0.
-            MinTotalDosePerM2 = 0.
-            MaxTotalDosePerM2 = 0.
-            MaxPerDosePerM2 = 0.
+            NormTotalDose = 0m
+            MinTotalDose = 0m
+            MaxTotalDose = 0m
+            MaxPerDose = 0m
+            NormTotalDosePerKg = 0m
+            MinTotalDosePerKg = 0m
+            MaxTotalDosePerKg = 0m
+            MaxPerDosePerKg = 0m
+            NormTotalDosePerM2 = 0m
+            MinTotalDosePerM2 = 0m
+            MaxTotalDosePerM2 = 0m
+            MaxPerDosePerM2 = 0m
         }
 
 
 
     let dto =
         {
-            AgeInMo = 0.
-            WeightKg = 0.
-            LengthCm = 0.
-            BSAInM2 = 0.
+            AgeInMo = 0m
+            WeightKg = 0m
+            LengthCm = 0m
+            BSAInM2 = 0m
             Gender = ""
-            BirthWeightGram = 0.
+            BirthWeightGram = 0m
             GestAgeWeeks = 0
             GestAgeDays = 0
             GPK = 0
@@ -123,9 +123,9 @@ module Dto =
             TradeProduct = ""
             Shape = ""
             Label = ""
-            Concentration = 0.
+            Concentration = 0m
             ConcentrationUnit = ""
-            Multiple = 0.
+            Multiple = 0m
             MultipleUnit = ""
             Route = ""
             Indication = ""
@@ -175,7 +175,7 @@ module Dto =
                     let conc, unt =
                         match gp.Substances |> Seq.tryFind (fun s -> s.SubstanceName |> String.equalsCapInsens gpp.Name) with
                         | Some s -> s.SubstanceQuantity, s.SubstanceUnit
-                        | None -> 0., ""
+                        | None -> 0m, ""
 
                     let tps =
                         gp.PrescriptionProducts
@@ -191,12 +191,12 @@ module Dto =
 
                 | None ->
                     printfn "Could not find product %s %s %s with GPK: %i" dto.Generic dto.Shape dto.Route dto.GPK
-                    0, "", 0., "", ""
+                    0, "", 0m, "", ""
 
             gpk, gpp.Name, gpp.Shape, lbl, conc, unt, tps
         | _ ->
             printfn "Could not find product %s %s %s with GPK: %i" dto.Generic dto.Shape dto.Route dto.GPK
-            0, "", "", "", 0., "", ""
+            0, "", "", "", 0m, "", ""
 
 
     let fillRuleWithDosage  gpk (d : Dosage)  (r : Rule) =
@@ -207,7 +207,7 @@ module Dto =
                 |> GPP.getSubstQtyUnit
                 |> Array.tryFind (fun (n, _, _) -> n |> String.equalsCapInsens d.Name) with
             | Some (_, conc, unt) -> conc, unt
-            | None -> 0., ""
+            | None -> 0m, ""
 
         let freqsToStr (fr : Dosage.Frequency) =
             fr.Frequencies
@@ -227,9 +227,9 @@ module Dto =
                 | Some vu ->
                     vu
                     |> ValueUnit.getValue
-                    |> BigRational.ToDouble
-                    |> Double.fixPrecision 2
-                | None -> 0.
+                    |> BigRational.toDecimal
+                    |> Decimal.fixPrecision 2
+                | None -> 0m
             )
 
         {
@@ -253,22 +253,22 @@ module Dto =
                 MaxTotalDosePerM2 = d |> getValue Dosage.Optics.exclMaxNormBSATotalDosagePrism
 
                 MaxPerDose   =
-                    if r.MaxPerDose = 0. then
+                    if r.MaxPerDose = 0m then
                         let d1 = d |> getValue Dosage.Optics.exclMaxNormSingleDosagePrism
                         let d2 = d |> getValue Dosage.Optics.exclMaxNormStartDosagePrism
-                        if d1 = 0. then d2 else d1
+                        if d1 = 0m then d2 else d1
                     else r.MaxPerDose
                 MaxPerDosePerKg =
-                    if r.MaxPerDosePerKg = 0. then
+                    if r.MaxPerDosePerKg = 0m then
                         let d1 = d |> getValue Dosage.Optics.exclMaxNormWeightSingleDosagePrism
                         let d2 = d |> getValue Dosage.Optics.exclMaxNormWeightStartDosagePrism
-                        if d1 = 0. then d2 else d1
+                        if d1 = 0m then d2 else d1
                     else r.MaxPerDosePerKg
                 MaxPerDosePerM2 =
-                    if r.MaxTotalDosePerM2 = 0. then
+                    if r.MaxTotalDosePerM2 = 0m then
                         let d1 = d |> getValue Dosage.Optics.exclMaxNormBSASingleDosagePrism
                         let d2 = d |> getValue Dosage.Optics.exclMaxNormBSAStartDosagePrism
-                        if d1 = 0. then d2 else d1
+                        if d1 = 0m then d2 else d1
                     else r.MaxTotalDosePerM2
         }
 
@@ -290,14 +290,14 @@ module Dto =
             )
 
         let dto =
-            if dto.BSAInM2 > 0. then dto
+            if dto.BSAInM2 > 0m then dto
             else
-                if dto.LengthCm > 0. && dto.WeightKg > 0. then
+                if dto.LengthCm > 0m && dto.WeightKg > 0m then
                     {
                         dto with
                             BSAInM2 =
                                 // (w / (l  ** 2.)) |> Some
-                                dto.WeightKg / (dto.LengthCm ** 2.)
+                                dto.WeightKg / (((dto.LengthCm |> float) ** 2.) |> decimal)
                     }
                 else
                     dto
@@ -434,7 +434,7 @@ module Dto =
                         unt
                         |> Mapping.mapUnit Mapping.GStandMap Mapping.AppMap
                     Multiple =
-                        if dto.Multiple = 0. then conc
+                        if dto.Multiple = 0m then conc
                         else dto.Multiple
                     MultipleUnit =
                         if dto.MultipleUnit = "" then

@@ -15,7 +15,7 @@ module TradeProduct =
             Brand : string
             Company : string
             Denominator : int
-            UnitWeight : float
+            UnitWeight : decimal
             Route : string []
             ConsumerProducts : ConsumerProduct.ConsumerProduct []
         }

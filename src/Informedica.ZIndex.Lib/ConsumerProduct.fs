@@ -10,7 +10,7 @@ module ConsumerProduct =
             Id : int
             Name : string
             Label : string
-            Quantity : float
+            Quantity : decimal
             Container : string
             BarCodes : string []
         }
@@ -39,7 +39,7 @@ module ConsumerProduct =
             let br =
                 Zindex.BST200T.records ()
                 |> Array.filter (fun b ->
-                    b.ATKODE = r.ATKODE 
+                    b.ATKODE = r.ATKODE
                 )
                 |> Array.map (fun b -> b.BARCOD)
 

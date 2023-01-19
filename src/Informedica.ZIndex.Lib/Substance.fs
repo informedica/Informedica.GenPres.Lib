@@ -9,8 +9,8 @@ module Substance =
         {
             Id : int
             Name : string
-            Mole : float
-            MoleReal : float
+            Mole : decimal
+            MoleReal : decimal
         }
 
     let create id nm ms mr =

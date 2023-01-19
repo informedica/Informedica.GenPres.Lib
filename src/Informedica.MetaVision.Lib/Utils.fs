@@ -344,7 +344,7 @@ module Utils =
             xs[3] = rte &&
             xs[5] = dep
         )
-        |> Option.map (fun xs -> xs[8] |> Double.tryParse, xs[9])
+        |> Option.map (fun xs -> xs[8] |> Decimal.tryParse, xs[9])
         |> Option.filter (fun (n, _) -> n |> Option.isSome)
         |> Option.map (fun (n, s) -> n |> Option.get, s)
 

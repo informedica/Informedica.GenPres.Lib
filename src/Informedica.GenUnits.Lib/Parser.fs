@@ -39,7 +39,7 @@ module Parser =
             opt pfloat
             .>> ws
             .>>. p
-            |>> (fun (f, u) -> f |> Option.bind BigRational.fromFloat, u)
+            |>> (fun (f, u) -> f |> Option.map (decimal >> BigRational.fromDecimal), u)
 
 
     let pCombiUnit units =  sepBy1 (pUnit units) (ws >>. (pchar '/') .>> ws)

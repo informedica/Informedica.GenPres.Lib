@@ -24,11 +24,11 @@ module GenericProduct =
             SubstanceId : int
             SortOrder : int
             SubstanceName : string
-            SubstanceQuantity : float
+            SubstanceQuantity : decimal
             SubstanceUnit : string
             GenericId : int
             GenericName : string
-            GenericQuantity : float
+            GenericQuantity : decimal
             GenericUnit : string
             ShapeUnit : string
         }

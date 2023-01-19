@@ -46,7 +46,7 @@ module GenPresProduct =
                     if a = "" then s
                     else a + "/" + s) ""
             ((n, gp.Shape), gp))
-        |> Array.groupBy (fun (key, gp) -> key)
+        |> Array.groupBy (fun (key, _) -> key)
         |> Array.map (fun ((nm, sh), xs) ->
             let gps = xs |> Array.map (fun (_, gp) -> gp)
 

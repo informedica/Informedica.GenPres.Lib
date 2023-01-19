@@ -18,9 +18,9 @@ module ProductRange =
             Label: string
             Shape: string
             Route: string
-            Concentration: float Option
+            Concentration: decimal Option
             ConcentrationUnit : string
-            DoseMultiple: float Option
+            DoseMultiple: decimal Option
             DoseMultipleUnit: string
             Indications: string
         }
@@ -47,20 +47,20 @@ module ProductRange =
         File.readAllLines FilePath.mapping
         |> Array.skip 1
         |> Array.map  ((String.splitAt ';') >> (fun sa ->
-            create (sa.[0] |> Int32.tryParse)
-                   sa.[1]
-                   sa.[2]
-                   sa.[3]
-                   sa.[4]
-                   sa.[5]
-                   sa.[6]
-                   sa.[7]
-                   sa.[8]
-                   (sa.[9] |> Double.tryParse)
-                   sa.[10]
-                   (sa.[11] |> Double.tryParse)
-                   sa.[12]
-                   sa.[13]
+            create (sa[0] |> Int32.tryParse)
+                   sa[1]
+                   sa[2]
+                   sa[3]
+                   sa[4]
+                   sa[5]
+                   sa[6]
+                   sa[7]
+                   sa[8]
+                   (sa[9] |> Decimal.tryParse)
+                   sa[10]
+                   (sa[11] |> Decimal.tryParse)
+                   sa[12]
+                   sa[13]
             )
         )
 

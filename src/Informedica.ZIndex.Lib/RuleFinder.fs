@@ -125,11 +125,11 @@ module RuleFinder =
             |> Array.map createRoute
             |> Array.exists ((=) r)
 
-    type AgeInMo = float Option
+    type AgeInMo = decimal Option
 
-    type WeightInKg = float Option
+    type WeightInKg = decimal Option
 
-    type BSAInM2 = float Option
+    type BSAInM2 = decimal Option
 
     let inRange n { DoseRule.Min = min; DoseRule.Max = max } =
         if n |> Option.isNone then true
@@ -327,9 +327,9 @@ module RuleFinder =
 
                 let mn, mx =
                     match min, max with
-                    | None, None           -> (0., 0.)
-                    | Some min', None      -> (min' * m, 0.)
-                    | None, Some max'      -> (0., max' * m )
+                    | None, None           -> (0m, 0m)
+                    | Some min', None      -> (min' * m, 0m)
+                    | None, Some max'      -> (0m, max' * m )
                     | Some min', Some max' -> (min' * m, max' * m)
 
                 DoseRule.createMinMax mn mx

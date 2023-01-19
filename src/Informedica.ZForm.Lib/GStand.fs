@@ -76,8 +76,8 @@ module GStand =
     /// Map GSTand min max float Option values to
     /// a `DoseRule` `MinMax`
     let mapMinMax<'a>
-                  (setMin : float Option -> 'a -> 'a)
-                  (setMax : float Option -> 'a -> 'a)
+                  (setMin : decimal Option -> 'a -> 'a)
+                  (setMax : decimal Option -> 'a -> 'a)
                   (minmax : DR.MinMax)
                   (o : 'a) =
         o
@@ -148,9 +148,8 @@ module GStand =
             | None -> vu
 
         let s =
-            match fr.Frequency |> BigRational.fromFloat with
-            | Some br -> br |> string
-            | None -> ""
+            fr.Frequency
+            |> BigRational.fromDecimal |> string
         let s = s + " X[Count]"
 
         fr.Time
@@ -196,7 +195,7 @@ module GStand =
         // ToDo remove n and mapping
         let toVu n mapping v =
 
-            match unit |> ValueUnit.fromFloat (v * qty) with
+            match unit |> ValueUnit.fromDecimal (v * qty) with
             | Some vu ->
                 let x =
                     fr
@@ -212,7 +211,7 @@ module GStand =
             |> setMax (mm.Max |> Option.bind (toVu n mapping))
 
 
-        (n, gstdsr.Freq.Time |> parseTimeString, gstdsr.Freq.Frequency = 1.) ,
+        (n, gstdsr.Freq.Time |> parseTimeString, gstdsr.Freq.Frequency = 1m) ,
 
         (gstdsr.Routes |> Array.toList,
          gstdsr.Indication,

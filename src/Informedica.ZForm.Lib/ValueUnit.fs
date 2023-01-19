@@ -5,13 +5,16 @@
 /// `Informedica.GenUnits.Lib.ValueUnit` library
 module ValueUnit =
 
+    open System
     open MathNet.Numerics
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
 
-    open ValueUnit
+    module Units= ValueUnit.Units
+
+
 
     /// Get the value of the value unit `vu`, i.e.
     /// the number without the unit.
@@ -36,15 +39,15 @@ module ValueUnit =
         |> String.removeBrackets
 
     let readableStringToWeightUnit s =
-        sprintf "%s[Weight]" s
+        $"%s{s}[Weight]"
         |> Units.fromString
 
     let readableStringToBSAUnit s =
-        sprintf "%s[BSA]" s
+        $"%s{s}[BSA]"
         |> Units.fromString
 
     let readableStringToTimeUnit s =
-        sprintf "%s[Time]" s
+        $"%s{s}[Time]"
         |> Units.fromString
 
     /// Map a unit `u` to a `ValueUnit.Unit`
@@ -62,7 +65,8 @@ module ValueUnit =
 
     /// Create a value unit using a specific mapping `m`
     /// with value `v` and unit `u`.
-    let createValueUnit m v u =
+    let createValueUnit m (d : decimal) u =
+        let v = d |> float
         match u |> unitFromMappedString m with
         | None -> None
         | Some u ->
@@ -82,8 +86,9 @@ module ValueUnit =
 
     /// Create a `ValueUnit` using a float value
     /// `v` and a `Unit` `u`.
-    let fromFloat v u =
+    let fromDecimal (v: decimal) u =
         v
+        |> float
         |> BigRational.fromFloat
         |> Option.bind (fun br ->
             ValueUnit.create u br
@@ -112,31 +117,35 @@ module ValueUnit =
         |> ValueUnit.Units.toString Units.Localization.English Units.Short
         |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.AppMap
 
-    let timeInMinute = (fun n -> fromFloat n Units.Time.minute)
+    let timeInMinute = (fun n -> fromDecimal n Units.Time.minute)
 
 
-    let timeInHour =  (fun n -> fromFloat n Units.Time.hour)
+    let timeInHour =  (fun n -> fromDecimal n Units.Time.hour)
 
 
-    let timeInDay =  (fun n -> fromFloat n Units.Time.day)
+    let timeInDay =  (fun n -> fromDecimal n Units.Time.day)
 
 
-    let timeInWeek =  (fun n -> fromFloat n Units.Time.week)
+    let timeInWeek =  (fun n -> fromDecimal n Units.Time.week)
 
 
-    let ageInWk =  (fun n -> fromFloat n Units.Time.week)
+    let ageInWk =  (fun n -> fromDecimal n Units.Time.week)
 
 
-    let ageInMo =  (fun n -> fromFloat n Units.Time.month)
+    let ageInMo =  (fun n -> fromDecimal n Units.Time.month)
 
 
-    let ageInYr =  (fun n -> fromFloat n Units.Time.year)
+    let ageInYr =  (fun n -> fromDecimal n Units.Time.year)
 
 
-    let weightInKg =  (fun n -> fromFloat n Units.Weight.kiloGram)
+    let weightInKg =  (fun n -> fromDecimal n Units.Weight.kiloGram)
 
 
-    let bsaInM2 =  (fun n -> fromFloat n Units.BSA.M2)
+    let bsaInM2 =  (fun n -> fromDecimal n Units.BSA.M2)
+
+
+    open ValueUnit
+
 
     /// Create a frequency unit
     /// per `n` days
@@ -162,9 +171,9 @@ module ValueUnit =
     let gestAgeInDaysAndWeeks gest =
         gest
         |> Option.bind (fun (w, d) ->
-            fromFloat w Units.Time.week
+            fromDecimal w Units.Time.week
             |> Option.bind (fun vu1 ->
-                fromFloat d Units.Time.day
+                fromDecimal d Units.Time.day
                 |> Option.bind (fun vu2 -> vu1 + vu2 |> Some)
             )
         )
@@ -235,7 +244,7 @@ module ValueUnit =
         let dutch = "dutch"
 
         type Dto () =
-            member val Value = 0. with get, set
+            member val Value = Decimal.Zero with get, set
             member val Unit = "" with get, set
             member val Group = "" with get, set
             member val Short = true with get, set
@@ -268,7 +277,7 @@ module ValueUnit =
                     else ValueUnit.Units.Long
 
                 let v, u = vu |> get
-                let v = v |> BigRational.toFloat
+                let v = v |> BigRational.toDecimal
                 let g =
                     u
                     |> ValueUnit.Group.unitToGroup
@@ -293,12 +302,11 @@ module ValueUnit =
         let toDtoEnglisLong vu  =  vu |>toDto false english |> Option.get
 
         let fromDto (dto: Dto) =
-            let v = dto.Value |> BigRational.fromFloat
-            let u =
-                sprintf "%s[%s]" dto.Unit dto.Group
-                |> ValueUnit.Units.fromString
-            match v, u with
-            | Some v, Some u ->
+            let v = dto.Value |> BigRational.fromDecimal
+            $"%s{dto.Unit}[%s{dto.Group}]"
+            |> ValueUnit.Units.fromString
+            |> function
+            | Some u ->
                 v
                 |> ValueUnit.create u
                 |> Some
@@ -312,38 +320,38 @@ module ValueUnit =
                 printfn "%A" x
                 f x
 
-            createValueUnit (Mapping.GStandMap) 10. "milligram"
+            createValueUnit (Mapping.GStandMap) Decimal.Ten "milligram"
             |> printfn "Create value unit 10 milligram using GStand mapping: %A"
 
             Mapping.allGStandUnits ()
             |> Array.iter (fun s ->
-                printfn "Mapping %s: %A" s (s |> unitFromGStandString)
+                printfn $"Mapping %s{s}: %A{s |> unitFromGStandString}"
                 match s |> unitFromGStandString with
                 | Some u ->
                     u
                     |> ValueUnit.Units.toString Units.Localization.English Units.Short
                     |> printfn "ValueUnit unit string: %s"
                 | None -> ()
-                printfn "ValueUnit: %A" (valueUnitFromGStandUnitString 1.5 s)
-                match (valueUnitFromGStandUnitString 1.5 s) |> (Option.bind (valueUnitToGStandUnitString >> Some)) with
+                printfn $"ValueUnit: %A{valueUnitFromGStandUnitString 1.5m s}"
+                match (valueUnitFromGStandUnitString 1.5m s) |> (Option.bind (valueUnitToGStandUnitString >> Some)) with
                 | Some (_, u) ->
-                    if u = "" then printfn "Cannot parse: %s" s
+                    if u = "" then printfn $"Cannot parse: %s{s}"
                 | None -> ()
             )
 
             Mapping.allAppUnits ()
             |> Array.iter (fun s ->
-                printfn "Mapping %s: %A" s (s |> unitFromAppString)
+                printfn $"Mapping %s{s}: %A{s |> unitFromAppString}"
                 match s |> unitFromAppString with
                 | Some u ->
                     u
                     |> ValueUnit.Units.toString Units.Localization.English Units.Short
                     |> printfn "ValueUnit unit string: %s"
                 | None -> ()
-                let vu = valueUnitFromAppUnitString 1.5 s
+                let vu = valueUnitFromAppUnitString 1.5m s
                 match vu with
                 | Some vu ->
-                    printfn "ValueUnit: %A" vu
+                    printfn $"ValueUnit: %A{vu}"
                     vu
                     |> Dto.toDtoDutcLong
                     |> (fun dto -> dto |> Dto.toString |> printfn "dto: %s"; dto)
@@ -353,7 +361,7 @@ module ValueUnit =
                 | None -> ()
                 match vu |> (Option.bind (valueUnitToAppUnitString >> Some)) with
                 | Some (_, u) ->
-                    if u = "" then printfn "Cannot parse: %s" s
+                    if u = "" then printfn $"Cannot parse: %s{s}"
                 | None -> ()
             )
 

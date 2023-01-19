@@ -1,55 +1,29 @@
 namespace Informedica.Utils.Lib.BCL
 
-open System.Globalization
-
 
 [<RequireQualifiedAccess>]
-module Double =
+module Decimal =
 
     open System
-    open System.Numerics
-
-    open MathNet.Numerics
+    open System.Globalization
 
 
-    /// Check whether a `Double` is a `NaN` value
-    let isNaN = Double.IsNaN
-
-
-    /// Check whether a `Double` is positive or
-    /// negative infinity
-    let isInfinity n = (n = infinity) || (n = -infinity)
-
-
-    /// Check whether a `Double` is valid
-    let isValid n =
-        (isNaN n ||
-         isInfinity n ||
-         n >= Double.MaxValue ||
-         n <= Double.MinValue) |> not
+    let Ten = 10m
 
 
     /// Get the double value of a string
     /// using `InvariantCulture`
-    let parse s = Double.Parse(s, CultureInfo.InvariantCulture)
+    let parse s = Decimal.Parse(s, CultureInfo.InvariantCulture)
 
 
     /// Get a `float Option` from a string
     let tryParse (s : string) =
         let style = NumberStyles.Any
         let cult = CultureInfo.InvariantCulture
-        match Double.TryParse(s, style, cult) with
+        match Decimal.TryParse(s, style, cult) with
         | true, v -> Some v
         | false, _ -> None
 
-
-    /// Get a `float32` from a string
-    /// returns a 0 value when the string
-    /// cannot be parsed
-    let stringToFloat32 s =
-        match s |> tryParse with
-        | Some v -> float32 v
-        | None -> 0.f
 
 
     /// Calculates the number of decimal digits that
@@ -70,12 +44,12 @@ module Double =
     /// * 6.6666 |> getPrecision 3 = 2
     /// etc
     /// If n < 0 then n = 0 is used.
-    let getPrecision n f =
+    let getPrecision n d =
         try
             let n = if n < 0 then 0 else n
-            if f = 0. || n = 0 then n
+            if d = 0m || n = 0 then n
             else
-                let s = (f |> abs |> string)
+                let s = (d |> abs |> string)
                 // chech whether the string is of type "1E-05"
                 if(s.Contains "E") then
                     let k = s.IndexOf("E")+2 // get the index of the number after the "-"
@@ -96,7 +70,7 @@ module Double =
                     c + p
         with
         | e ->
-            printfn $"cannot get precision %i{n} for %f{f}"
+            printfn $"cannot get precision %i{n} for %A{d}"
             printfn $"catching error %A{e}"
             printfn "returning 1 as default value"
             1
@@ -120,33 +94,11 @@ module Double =
     /// * 6.6666 |> fixPrecision 3 = 6.67
     /// etc
     /// If n < 0 then n = 0 is used.
-    let fixPrecision n (f: float) =
-        Math.Round(f, f |> getPrecision n)
+    let fixPrecision n (d: decimal) =
+        Math.Round(d, d |> getPrecision n)
 
 
-    /// Check whether a float has any
-    /// decimal digits
-    let floatHasDecimals (v: float) =
-        v <> 0. &&
-        (if v  > 0. then v > float(BigInteger v)
-         else v < float(BigInteger v))
-
-
-    /// Return a float as a fraction of
-    /// two `BigInteger`s
-    let floatToFract v =
-        if v = infinity || v = -infinity || v |> isNaN then None
-        else
-            let rec fract (v:float) m =
-                match v |> floatHasDecimals with
-                | false -> (BigInteger(v) , m)
-                | true  -> fract (v * 10.) (m * 10N)
-            fract v 1N
-            |> (fun (n, d) -> (n, d.Numerator))
-            |> Some
-
-
-    let toStringNumberNL p (n: float) = n.ToString("R" + p, CultureInfo.GetCultureInfo("nl"))
+    let toStringNumberNL p (d: decimal) = d.ToString("R" + p, CultureInfo.GetCultureInfo("nl"))
 
 
     let toStringNumberNLWithoutTrailingZeros =

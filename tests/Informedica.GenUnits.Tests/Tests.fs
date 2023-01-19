@@ -5,16 +5,17 @@ open Expecto.Flip
 open Expecto.Logging
 
 open MathNet.Numerics
+open Informedica.Utils.Lib.BCL
 open Informedica.GenUnits.Lib
+
+open Informedica.GenUnits.Lib.ValueUnit
 
 let run = runTestsWithCLIArgs [ CLIArguments.Verbosity LogLevel.Verbose ] [||]
 
 
-open Informedica.GenUnits.Lib.ValueUnit
-
 let toString = toStringEngShort
 
-let inline (>>*) u f = 
+let inline (>>*) u f =
     u |> printfn "%A"
     f u
 
@@ -23,12 +24,12 @@ let mg400 = 400N |> create Units.Mass.milliGram
 let gram2 = 2N   |> create Units.Mass.gram
 let ml50  = 50N  |> create Units.Volume.milliLiter
 let ml5  = 5N    |> create Units.Volume.milliLiter
-let l5 = 5N      |> create Units.Volume.liter 
+let l5 = 5N      |> create Units.Volume.liter
 let day2 = 2N    |> create Units.Time.day
 let hour3 = 3N   |> create Units.Time.hour
 
-// The count group is a special unit group 
-// with only one unit: times. 
+// The count group is a special unit group
+// with only one unit: times.
 let times3 = 3N |> create Units.Count.times
 let times100 = 100N |> create Units.Count.times
 
@@ -36,81 +37,81 @@ let times100 = 100N |> create Units.Count.times
 [<Tests>]
 let unitTests =
 
-    let toBase = toBase >> BigRational.ToDouble
+    let toBase = toBase >> BigRational.toDecimal
 
     testList "Unit" [
         test "base value of 400 mg " {
-            Expect.equal "should equal 0.4 g" 0.4 (mg400 |> toBase)
+            Expect.equal "should equal 0.4 g" 0.4m (mg400 |> toBase)
         }
 
         test "base value of 50 ml = 0.05 l" {
-            Expect.isTrue "should equal 0.05" (ml50 |> toBase = 0.05)
+            Expect.isTrue "should equal 0.05" (ml50 |> toBase = 0.05m)
         }
 
         test "base value of 5 ml = 0.005 l" {
-            Expect.isTrue "should equal 0.005" (ml5 |> toBase = 0.005)
+            Expect.isTrue "should equal 0.005" (ml5 |> toBase = 0.005m)
         }
 
         test "base value of 5 l = 5 l" {
-            Expect.isTrue "should equal 5" (l5 |> toBase = 5.)
-        }        
-        
+            Expect.isTrue "should equal 5" (l5 |> toBase = 5m)
+        }
+
         test "count 3 times 5 ml results in 15 ml" {
-            Expect.equal "should equal 0.015 L" 0.015 (ml5 * times3 |> toBase)
+            Expect.equal "should equal 0.015 L" 0.015m (ml5 * times3 |> toBase)
         }
 
         test "base value of 1 day" {
-            let vu = (1. |> withUnit (Units.Time.day))
-            Expect.equal "" (60. * 60. * 24.) (vu |> toBase)
+            let vu = (1m |> withUnit (Units.Time.day))
+            Expect.equal "" (60m * 60m * 24m) (vu |> toBase)
         }
 
         test "3 days" {
-            let vu = (1. |> withUnit (Units.Time.nDay 3N))
-            Expect.equal "" (3. * 60. * 60. * 24.) (vu |> toBase)
+            let vu = (1m |> withUnit (Units.Time.nDay 3N))
+            Expect.equal "" (3m * 60m * 60m * 24m) (vu |> toBase)
         }
 
         test "there and back again one unit" {
-            let vu = 
-                mg400 
-                |> get 
+            let vu =
+                mg400
+                |> get
                 |> fun (_, u) ->
                     mg400
                     |> ValueUnit.toBase
-                    |> create u 
-                    |> toUnit 
+                    |> create u
+                    |> toUnit
                     |> create u
             Expect.equal "" vu mg400
         }
 
         test "there and back again 2 units" {
-            let vu1 = 
-                1. |> withUnit (Units.Mass.milliGram |> per Units.Volume.milliLiter)
-            let vu2 = 
-                vu1     
-                |> get 
+            let vu1 =
+                1m |> withUnit (Units.Mass.milliGram |> per Units.Volume.milliLiter)
+            let vu2 =
+                vu1
+                |> get
                 |> fun (_, u) ->
                     vu1
                     |> ValueUnit.toBase
-                    |> create u 
-                    |> toUnit 
+                    |> create u
+                    |> toUnit
                     |> create u
             Expect.equal "" vu1 vu2
         }
 
         test "there and back again 3 units" {
-            let vu1 = 
-                1. 
-                |> withUnit (Units.Mass.milliGram 
+            let vu1 =
+                1m
+                |> withUnit (Units.Mass.milliGram
                 |> per Units.Volume.milliLiter
                 |> per Units.Time.day)
-            let vu2 = 
-                vu1     
-                |> get 
+            let vu2 =
+                vu1
+                |> get
                 |> fun (_, u) ->
                     vu1
                     |> ValueUnit.toBase
-                    |> create u 
-                    |> toUnit 
+                    |> create u
+                    |> toUnit
                     |> create u
             Expect.equal "" vu1 vu2
         }
@@ -158,17 +159,17 @@ let calculationTests =
         test "3 times 3 = 9" {
             times3 * times3 |> toBase = 9N
             |> Expect.isTrue ""
-        }        
+        }
 
         test "3 divided by 3 = 1" {
             times3 / times3 |> toBase = 1N
             |> Expect.isTrue  ""
-        }        
+        }
 
         test "3 plus 3 = 6" {
             times3 + times3 |> toBase = 6N
             |> Expect.isTrue ""
-        }        
+        }
 
         test "3 minus 3 = 0" {
             times3 - times3 |> toBase = 0N
@@ -181,13 +182,13 @@ let calculationTests =
 
             (l5 - ml50) <? l5
             |> Expect.isTrue ""
-        }        
+        }
 
         test "cannot add or subrract with different unit groups" {
             (fun _ -> (l5 + mg400) >? l5 |> ignore)
             |> Expect.throws ""
 
-            (fun _ -> (l5 - mg400) <? l5 |> ignore) 
+            (fun _ -> (l5 - mg400) <? l5 |> ignore)
             |> Expect.throws ""
         }
 
@@ -195,12 +196,12 @@ let calculationTests =
             // division by a simple unit
             let (_, u) = (l5 / ml50) |> get
             let g = u |> Group.unitToGroup
-            
-            g = Group.CountGroup 
+
+            g = Group.CountGroup
             |> Expect.isTrue ""
 
             // division by a more complex unit
-            let vu1 = (mg400 / ml5 / day2) 
+            let vu1 = (mg400 / ml5 / day2)
             let vu2 = (mg400 / l5  / hour3)
 
             vu1 / vu2
@@ -223,13 +224,13 @@ let calculationTests =
             // 800 mg - 400 mg = 400 mg
             |> (fun vu -> vu - mg400)
             >>? "400 mg[Mass]"
-            |> ignore    
+            |> ignore
         }
 
         test "division with 3 unit values" {
             let vu =
                 mg400 / (mg400 / ml50) // equals mg400 * (ml50 / mg400) = mg50
-            
+
             Expect.equal "should be 50 ml" ml50 vu
         }
 
@@ -239,22 +240,22 @@ let calculationTests =
 
             Expect.equal "" (mg400 / day2) vu
         }
-    ] 
+    ]
 
 
 [<Tests>]
-let conversionTests = 
+let conversionTests =
 
     testList "Conversion" [
-        
+
         test "can convert from 5 liter to 5000 ml" {
             5000N |> create Units.Volume.milliLiter
-            |> Expect.equal "" (l5 ==> Units.Volume.milliLiter) 
+            |> Expect.equal "" (l5 ==> Units.Volume.milliLiter)
         }
 
         test "unit group from 400 mg / day = mass per timegroup" {
             (mg400 / (1N |> create Units.Time.day))
-            |> get 
+            |> get
             |> snd
             |> Group.unitToGroup
             |> Group.toString
@@ -273,9 +274,9 @@ let conversionTests =
             |> Group.unitToGroup
             |> Group.getUnits
             |> List.length
-            // the number of units for the Mass/Volume group is 
+            // the number of units for the Mass/Volume group is
             // the multiple of mc * vc
             |> Expect.equal "" (mc* vc)
         }
-    
+
     ]
