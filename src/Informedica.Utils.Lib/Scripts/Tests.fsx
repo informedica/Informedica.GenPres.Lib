@@ -1,12 +1,13 @@
-namespace Informedica.Utils.Tests
 
+#load "load.fsx"
+
+open Expecto
 
 
 
 module Tests =
 
     open System
-    open Expecto
     open Expecto.Flip
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
@@ -481,6 +482,30 @@ module Tests =
         open Informedica.Utils.Lib.BCL
 
 
+        /// Create the necessary test generators
+        module Generators =
+
+            open FsCheck
+
+            let bigRGen (n, d) =
+                    let d = if d = 0 then 1 else d
+                    let n' = abs(n) |> BigRational.FromInt
+                    let d' = abs(d) |> BigRational.FromInt
+                    n'/d'
+
+            let bigRGenerator =
+                gen {
+                    let! n = Arb.generate<int>
+                    let! d = Arb.generate<int>
+                    return bigRGen(n, d)
+                }
+
+            type MyGenerators () =
+                static member BigRational () =
+                    { new Arbitrary<BigRational>() with
+                        override x.Generator = bigRGenerator }
+
+
         [<Tests>]
         let tests =
 
@@ -489,7 +514,7 @@ module Tests =
             let config =
                 { FsCheckConfig.defaultConfig with
                     maxTest = 10000
-                    arbitrary = [ typeof<Generators.BigRGenerator> ] }
+                    arbitrary = [ typeof<Generators.MyGenerators> ] }
 
             let opMult f () = f (*)
 
@@ -850,6 +875,21 @@ module Tests =
                 tryGetColumnTests
                 parseCsvTests
             ]
+
+
+
+
+testList "Tests" [
+    Tests.testHelloWorld
+    Tests.String.tests
+    Tests.Double.tests
+    Tests.BigRational.tests
+    Tests.List.tests
+    Tests.Reflection.tests
+    Tests.Csv.tests
+]
+|> Expecto.run
+
 
 
 

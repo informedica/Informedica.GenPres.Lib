@@ -8,7 +8,7 @@ module File =
 
 
     let enumerate path =
-        seq { for file in (new DirectoryInfo(path)).EnumerateFiles() -> file }
+        seq { for file in DirectoryInfo(path).EnumerateFiles() -> file }
 
 
     let readAllLines path = File.ReadAllLines(path)
@@ -16,8 +16,6 @@ module File =
 
     let readAllLinesAsync path =
         async {
-            use stream = File.OpenText(path)
-
             return File.ReadAllLines(path) |> Array.toList
         }
 

@@ -4,8 +4,7 @@ open System
 open MathNet.Numerics
 
 
-type ValueUnit = ValueUnit of  BigRational * Unit
-and Unit =
+type Unit =
     | NoUnit
     | CombiUnit of Unit * Operator * Unit
     | General of (string * BigRational)
@@ -59,6 +58,10 @@ and Operator =
     | OpPer
     | OpPlus
     | OpMinus
+
+
+type ValueUnit = ValueUnit of  BigRational * Unit
+
 
 
 module Group =
@@ -1300,7 +1303,7 @@ module ValueUnit =
         let dto () = Dto ()
 
         let toString (dto : Dto) =
-            sprintf "%A %s" dto.Value dto.Unit
+            $"%A{dto.Value} %s{dto.Unit}"
 
         let toDto short lang vu =
             let isLang s l =

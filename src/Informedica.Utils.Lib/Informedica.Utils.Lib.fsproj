@@ -19,15 +19,21 @@
     <Compile Include="BCL\BigRational.fs" />
     <Compile Include="BCL\DateTime.fs" />
     <Compile Include="BCL\Decimal.fs" />
+    <Compile Include="BCL\Tuple.fs" />
     <Compile Include="Option.fs" />
+    <Compile Include="StringBuilder.fs" />
     <Compile Include="Array.fs" />
     <Compile Include="List.fs" />
     <Compile Include="Seq.fs" />
     <Compile Include="Path.fs" />
     <Compile Include="File.fs" />
+    <Compile Include="Csv.fs" />
+    <Compile Include="Env.fs" />
     <Compile Include="App.fs" />
+    <None Include="Scripts\Expecto.fsx" />
     <None Include="Scripts/load.fsx" />
     <None Include="Scripts/Scripts.fsx" />
+    <None Include="Scripts\Tests.fsx" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
