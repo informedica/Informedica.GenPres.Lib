@@ -6,37 +6,19 @@
 module ValueUnit =
 
     open System
+    open Informedica.GenCore.Lib.Types.ZForm
     open MathNet.Numerics
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
 
-    module Units= ValueUnit.Units
-
-
-
-    /// Get the value of the value unit `vu`, i.e.
-    /// the number without the unit.
-    let getValue vu = let v, _ = vu |> ValueUnit.get in v
-
-    let getUnit vu = let _, u = vu |> ValueUnit.get in u
-
-    let eqsGroup vu1 vu2 =
-        let u1 = vu1 |> getUnit
-        let u2 = vu2 |> getUnit
-        u1 |> ValueUnit.Group.eqsGroup u2
+    open ValueUnit
 
     let unitFromString = Units.fromString
+
     let unitToString = Units.toString Units.Localization.English Units.Short
 
-    /// Get the user readable string version
-    /// of a unit, i.e. without unit group between
-    /// brackets
-    let unitToReadableString u =
-        u
-        |> Units.toString Units.Dutch Units.Short
-        |> String.removeBrackets
 
     let readableStringToWeightUnit s =
         $"%s{s}[Weight]"
@@ -72,8 +54,7 @@ module ValueUnit =
         | Some u ->
             match v |> BigRational.fromFloat with
             | None -> None
-            | Some v  ->
-                ValueUnit.create u v |> Some
+            | Some v  -> create u v |> Some
 
     /// Create a `ValueUnit` using a float value
     /// and a string unit using the GStand mapping
@@ -88,33 +69,30 @@ module ValueUnit =
     /// `v` and a `Unit` `u`.
     let fromDecimal (v: decimal) u =
         v
-        |> float
-        |> BigRational.fromFloat
-        |> Option.bind (fun br ->
-            ValueUnit.create u br
-            |> Some
-        )
+        |> BigRational.fromDecimal
+        |> create u
+
 
     /// Turn a `ValueUnit` to a float, string tuple.
     /// Where the unit string representation is a
     /// GSTand string.
     let valueUnitToGStandUnitString vu =
-        let v, u = ValueUnit.get vu
+        let v, u = get vu
 
-        v |> BigRational.toFloat,
+        v |> BigRational.toDecimal,
         u
-        |> ValueUnit.Units.toString Units.Localization.English Units.Short
+        |> Units.toString Units.Localization.English Units.Short
         |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.GStandMap
 
     /// Turn a `ValueUnit` to a float, string tuple.
     /// Where the unit string representation is an
     /// App string.
     let valueUnitToAppUnitString vu =
-        let v, u = ValueUnit.get vu
+        let v, u = get vu
 
-        v |> BigRational.toFloat,
+        v |> BigRational.toDecimal,
         u
-        |> ValueUnit.Units.toString Units.Localization.English Units.Short
+        |> Units.toString Units.Localization.English Units.Short
         |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.AppMap
 
     let timeInMinute = (fun n -> fromDecimal n Units.Time.minute)
@@ -144,9 +122,6 @@ module ValueUnit =
     let bsaInM2 =  (fun n -> fromDecimal n Units.BSA.M2)
 
 
-    open ValueUnit
-
-
     /// Create a frequency unit
     /// per `n` days
     let freqUnitPerNday n =
@@ -171,11 +146,9 @@ module ValueUnit =
     let gestAgeInDaysAndWeeks gest =
         gest
         |> Option.bind (fun (w, d) ->
-            fromDecimal w Units.Time.week
-            |> Option.bind (fun vu1 ->
-                fromDecimal d Units.Time.day
-                |> Option.bind (fun vu2 -> vu1 + vu2 |> Some)
-            )
+            let vu1 = fromDecimal w Units.Time.week
+            let vu2 = fromDecimal d Units.Time.day
+            vu1 + vu2 |> Some
         )
 
     /// Turn a frequency `ValueUnit` `freq`
@@ -183,27 +156,11 @@ module ValueUnit =
     let freqToValueUnitString freq =
         freq |> toStringDutchLong
 
-    /// Turn a `ValueUnit` `vu` into
-    /// a string using precision `prec`.
-    let toStringPrec prec vu =
-        let v, u = vu |> ValueUnit.get
-
-        let vs =
-            v
-            |> BigRational.toFloat
-            |> Double.fixPrecision prec
-            |> string
-
-        let us =
-            u
-            |> unitToReadableString
-
-        vs + " " + us
 
     /// Check whether a unit `u`
     /// is a time unit.
     let isTimeUnit u =
-        (u |> ValueUnit.Group.unitToGroup) = ValueUnit.Group.TimeGroup
+        (u |> Group.unitToGroup) = Group.TimeGroup
 
 
     /// Helper functions to quicly create
@@ -235,84 +192,9 @@ module ValueUnit =
         let hour = Units.Time.hour
 
 
-    module Dto =
-
-        [<Literal>]
-        let english = "english"
-
-        [<Literal>]
-        let dutch = "dutch"
-
-        type Dto () =
-            member val Value = Decimal.Zero with get, set
-            member val Unit = "" with get, set
-            member val Group = "" with get, set
-            member val Short = true with get, set
-            member val Language = "" with get, set
-
-        let dto () = Dto ()
-
-        let toString (dto : Dto) =
-            sprintf "%A %s" dto.Value dto.Unit
-
-        let toDto short lang vu =
-            let isLang s l =
-                l
-                |> String.trim
-                |> String.toLower
-                |> (fun l -> s |> String.startsWith l)
-            let l =
-                match lang with
-                | _ when lang |> isLang english ->
-                    ValueUnit.Units.English |> Some
-                | _ when lang |> isLang dutch ->
-                    ValueUnit.Units.Dutch |> Some
-                | _ -> None
-
-            match l with
-            | None -> None
-            | Some l ->
-                let s =
-                    if short then ValueUnit.Units.Short
-                    else ValueUnit.Units.Long
-
-                let v, u = vu |> get
-                let v = v |> BigRational.toDecimal
-                let g =
-                    u
-                    |> ValueUnit.Group.unitToGroup
-                    |> ValueUnit.Group.toString
-                let u =
-                    u
-                    |> ValueUnit.Units.toString l s
-                    |> String.removeBrackets
-
-                let dto = dto ()
-                dto.Value <- v
-                dto.Unit <- u
-                dto.Group <- g
-                dto.Language <- lang
-                dto.Short <- short
-
-                dto |> Some
-
-        let toDtoDutchShort vu  =  vu |>toDto true dutch    |> Option.get
-        let toDtoDutcLong vu    =  vu |>toDto false dutch   |> Option.get
-        let toDtoEnglisShort vu =  vu |>toDto true english  |> Option.get
-        let toDtoEnglisLong vu  =  vu |>toDto false english |> Option.get
-
-        let fromDto (dto: Dto) =
-            let v = dto.Value |> BigRational.fromDecimal
-            $"%s{dto.Unit}[%s{dto.Group}]"
-            |> ValueUnit.Units.fromString
-            |> function
-            | Some u ->
-                v
-                |> ValueUnit.create u
-                |> Some
-            | _ -> None
 
     module ValueUnitTests =
+
 
         let tests () =
 
@@ -320,7 +202,7 @@ module ValueUnit =
                 printfn "%A" x
                 f x
 
-            createValueUnit (Mapping.GStandMap) Decimal.Ten "milligram"
+            createValueUnit Mapping.GStandMap Decimal.Ten "milligram"
             |> printfn "Create value unit 10 milligram using GStand mapping: %A"
 
             Mapping.allGStandUnits ()
@@ -353,7 +235,7 @@ module ValueUnit =
                 | Some vu ->
                     printfn $"ValueUnit: %A{vu}"
                     vu
-                    |> Dto.toDtoDutcLong
+                    |> Dto.toDtoDutchLong
                     |> (fun dto -> dto |> Dto.toString |> printfn "dto: %s"; dto)
                     |> Dto.fromDto
                     |>! ignore

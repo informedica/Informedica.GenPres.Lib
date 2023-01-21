@@ -1,4 +1,4 @@
-﻿namespace Informedica.ZForm.Lib
+﻿namespace Informedica.GenCore.Lib
 
 
 /// Functions to handle a `MinMax` type.
@@ -10,12 +10,8 @@
 module MinMax =
 
     open MathNet.Numerics
-
     open Aether
-
-    module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-
-    type ValueUnit = ValueUnit.ValueUnit
+    open Informedica.GenUnits.Lib
 
 
     let (<?) = ValueUnit.st
@@ -44,6 +40,7 @@ module MinMax =
 
 
     let empty = create None None
+
 
     /// A `MinMax` range with value 1, can
     /// be used in calculations as a "unit"

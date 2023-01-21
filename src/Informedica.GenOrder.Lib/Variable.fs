@@ -5,6 +5,7 @@ module Variable =
 
     open Informedica.GenSolver.Lib.Types
 
+
     module ValueRange =
 
         open Informedica.GenSolver.Lib.Variable.ValueRange

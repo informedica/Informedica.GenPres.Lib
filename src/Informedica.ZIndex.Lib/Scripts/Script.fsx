@@ -12,6 +12,7 @@ open Informedica.ZIndex.Lib
 // File
 File.exists <| FilePath.GStandPath + "BST000T"
 
+
 //Json.clearCache ()
 // Load all
 printfn "Loading GenPresProduct ..."

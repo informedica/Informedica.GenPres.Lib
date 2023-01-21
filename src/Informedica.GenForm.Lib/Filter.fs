@@ -3,6 +3,8 @@ namespace Informedica.GenForm.Lib
 
 module Filter =
 
+    open Informedica.GenCore.Lib.Types.GenForm
+
 
     let filter =
         {
@@ -20,7 +22,7 @@ module Filter =
             PMAge = None
             DoseType = AnyDoseType
             Dose = None
-            Location = AnyLocation
+            Location = AnyAccess
         }
 
 

@@ -9,7 +9,6 @@
     <Compile Include="Markdown.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="ValueUnit.fs" />
-    <Compile Include="MinMax.fs" />
     <Compile Include="Route.fs" />
     <Compile Include="Product.fs" />
     <Compile Include="Patient.fs" />

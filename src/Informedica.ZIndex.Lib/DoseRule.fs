@@ -10,7 +10,11 @@ module DoseRule =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
+    open Informedica.GenCore.Lib.Types.ZIndex
 
+    type MinMax = RuleMinMax
+    type Frequency = RuleFrequency
+    type Product = RuleProduct
 
     module Constants =
 
@@ -41,78 +45,6 @@ module DoseRule =
         [<Literal>]
         let female = "vrouw"
 
-
-    type DoseRule =
-        {
-            /// The id of the doserule
-            Id : int
-            /// The caregroup the doserule applies to
-            /// this is either 'intensieve' or 'niet-intensieve' or 'all'
-            CareGroup : string
-            /// This is the usage of the dose rule, can be therapeutic or
-            /// profylactic
-            Usage : string
-            /// The dose type, 'standaard' means that the dose rule applies without
-            /// a specific indication, 'verbyzondering' means the dose rule needs
-            /// an indication other than 'Algemeen'.
-            DoseType : string
-            /// The list of generic products for which the dose rule applies
-            GenericProduct : GenericProduct[]
-            /// The list of prescription products for which the dose rule applies
-            PrescriptionProduct : Product[]
-            /// The list of trade products for which the dose rule applies
-            TradeProduct : Product[]
-            /// The route for which the dose rule applies
-            Routes : string []
-            /// The indication id for which the dose rule applies.
-            /// The indications are coded by ICPC/ICD-10
-            IndicationId : int
-            /// The indication text for which the dose rule applies.
-            /// The indications are coded by ICPC/ICD-10
-            Indication : string
-            /// If high risk, than the dose margins are smaller
-            HighRisk : bool
-            /// Gender is either 'man', 'vrouw' or an empty string.
-            /// When gender is empty the dose rule can apply to either
-            /// gender.
-            Gender : string
-            /// The optional minimum or maximum age limits for the dose rule
-            Age : MinMax
-            /// The optional minimum or maximum weight limits for which the dose
-            /// rule applies
-            Weight : MinMax
-            /// The optional BSA min/max for which the dose rule applies
-            BSA : MinMax
-            /// The frequency of the dose rule. The total dose can be calculated
-            /// by multiplying the dose by the frequency.
-            Freq : Frequency
-            /// The normal optional min/max of the unadjusted dose
-            Norm : MinMax
-            /// The absolute optional min/max of the unadjusted dose
-            Abs : MinMax
-            /// The normal optional min/max of the dose adjusted by weight
-            NormKg : MinMax
-            /// The absolute optional min/max of the dose adjusted by weight
-            AbsKg : MinMax
-            /// The absolute optional min/max of the dose adjusted by BSA
-            NormM2 : MinMax
-            /// The absolute optional min/max of the dose adjusted by BSA
-            AbsM2 : MinMax
-            /// The unit in which the dose is measured
-            Unit : string
-        }
-    and Product = { Id: int; Name: string }
-    and GenericProduct =
-        {
-            Id: int
-            Name: string
-            Route: string []
-            Unit: string
-            Substances : Substance []
-        }
-    and Substance = { Name: string; Quantity: decimal; Unit: string }
-    and Frequency = { Frequency: decimal; Time: string }
-    and MinMax = { Min: decimal Option; Max: decimal Option }
 
 
     let foldMinMax xs =
@@ -311,7 +243,7 @@ module DoseRule =
             }
         )
 
-    let getGenericProducts : unit -> GenericProduct[] =
+    let getGenericProducts : unit -> RuleGenericProduct[] =
         Memoization.memoize _getGenericProducts
 
 

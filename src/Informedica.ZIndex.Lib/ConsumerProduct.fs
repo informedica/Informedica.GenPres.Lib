@@ -4,16 +4,8 @@ namespace Informedica.ZIndex.Lib
 module ConsumerProduct =
 
     open Informedica.Utils.Lib
+    open Informedica.GenCore.Lib.Types.ZIndex
 
-    type ConsumerProduct =
-        {
-            Id : int
-            Name : string
-            Label : string
-            Quantity : decimal
-            Container : string
-            BarCodes : string []
-        }
 
     let create id nm lb qt ct br =
         {

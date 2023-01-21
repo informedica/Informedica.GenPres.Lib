@@ -31,6 +31,8 @@
 * [ ] Differentiate between whether or not, try calculation with manual product
 * [ ] Mathematically investigate whether increment calc works with addition and/or subtraction
 * [ ] Maybe add abs max to constraints
+* [ ] Rewrite GStand.fs using anonymous records and split functions
+
 
 
 

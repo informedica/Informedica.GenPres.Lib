@@ -1,13 +1,14 @@
 namespace Informedica.GenOrder.Lib
 
-open Informedica.GenSolver.Lib
-open Informedica.GenSolver.Lib.Variable.ValueRange.MinMaxCalculator
 
 
 module OrderLogger =
 
     open System
     open System.Diagnostics
+
+    open Informedica.GenCore.Lib.Types.GenOrder
+    open Informedica.GenSolver.Lib
 
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
@@ -21,7 +22,7 @@ module OrderLogger =
 
     type Logger = Informedica.GenSolver.Lib.Types.Logging.Logger
     type SolverMessage = Informedica.GenSolver.Lib.Types.Logging.SolverMessage
-    type OrderMessage = Types.Logging.OrderMessage
+    type OrderMessage = Logging.OrderMessage
 
 
     type Agent<'Msg> = MailboxProcessor<'Msg>

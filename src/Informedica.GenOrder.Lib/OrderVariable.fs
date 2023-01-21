@@ -10,22 +10,19 @@ module OrderVariable =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenCore.Lib
-    open Informedica.GenSolver.Lib.Types
+    open Informedica.GenCore.Lib.Types.GenOrder
+    open Informedica.GenSolver.Lib
+    open Informedica.GenUnits.Lib
 
-    module Variable   = Informedica.GenSolver.Lib.Variable
     module ValueRange = Variable.ValueRange
     module Minimum    = ValueRange.Minimum
     module Maximum    = ValueRange.Maximum
     module Increment  = ValueRange.Increment
     module ValueSet   = ValueRange.ValueSet
-    module Equation   = Informedica.GenSolver.Lib.Equation
 
     module VariableDto = Variable.Dto
-    module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
     module Units = ValueUnit.Units
     module Multipliers = ValueUnit.Multipliers
-
-    type Unit = ValueUnit.Unit
 
 
     module Constraints =
@@ -106,7 +103,7 @@ module OrderVariable =
     let getUnit = getVariableUnit >> snd
 
 
-    let hasUnit = getUnit >> ((<>) ValueUnit.NoUnit)
+    let hasUnit = getUnit >> ((<>) Unit.NoUnit)
 
 
     let scale n ovar =
@@ -307,11 +304,11 @@ module OrderVariable =
 
         let fromDto (dto: Dto) =
             let un =
-                if dto.Unit |> String.isNullOrWhiteSpace then ValueUnit.NoUnit
+                if dto.Unit |> String.isNullOrWhiteSpace then Unit.NoUnit
                 else
                     dto.Unit
                     |> ValueUnit.unitFromString
-                    |> Option.defaultValue ValueUnit.NoUnit
+                    |> Option.defaultValue Unit.NoUnit
 
             let cs =
                 let vs =
@@ -421,12 +418,14 @@ module OrderVariable =
     /// Type and functions that represent a count
     module Count =
 
+        let count = Count.Count
+
 
         let [<Literal>] name = "cnt"
 
 
         /// Turn `Count` in a `VariableUnit`
-        let toOrdVar (Count cnt) = cnt
+        let toOrdVar (Count.Count cnt) = cnt
 
 
         let unitToString =
@@ -441,19 +440,19 @@ module OrderVariable =
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Count
+        let fromDto dto = dto |> Dto.fromDto |> count
 
 
         /// Set a `Count` with a `Variable`
         /// in a list fromVariable` lists
-        let fromOrdVar = fromOrdVar toOrdVar Count
+        let fromOrdVar = fromOrdVar toOrdVar count
 
 
         /// Create a `Count` with name **n**
         let create n =
             Units.Count.times
             |> createNew (n |> Name.add name)
-            |> Count
+            |> Count.Count
 
 
         /// Turn a `Count` to a string
@@ -467,13 +466,13 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Count
+        let toBase = toOrdVar >> toBase >> count
 
 
-        let toUnit = toOrdVar >> toUnit >> Count
+        let toUnit = toOrdVar >> toUnit >> count
 
 
-        let applyConstraints = toOrdVar >> applyConstraints >> Count
+        let applyConstraints = toOrdVar >> applyConstraints >> count
 
 
 
@@ -481,12 +480,14 @@ module OrderVariable =
     /// Type and functions that represent a time
     module Time =
 
+        let time = Time.Time
+
 
         let [<Literal>] name = "tme"
 
 
         /// Turn `Time` in a `VariableUnit`
-        let toOrdVar (Time tme) = tme
+        let toOrdVar (Time.Time tme) = tme
 
 
         let unitToString =
@@ -501,12 +502,12 @@ module OrderVariable =
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Time
+        let fromDto dto = dto |> Dto.fromDto |> time
 
 
         /// Set a `Time` with a `Variable`
         /// in a list fromVariable` lists
-        let fromOrdVar = fromOrdVar toOrdVar Time
+        let fromOrdVar = fromOrdVar toOrdVar time
 
 
         /// Create a `Time` with name **n**
@@ -514,7 +515,7 @@ module OrderVariable =
         let create n un =
             un
             |> createNew (n |> Name.add name)
-            |> Time
+            |> Time.Time
 
 
         /// Turn a `Time` to a string
@@ -528,13 +529,13 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Time
+        let toBase = toOrdVar >> toBase >> time
 
 
-        let toUnit = toOrdVar >> toUnit >> Time
+        let toUnit = toOrdVar >> toUnit >> time
 
 
-        let applyConstraints = toOrdVar >> applyConstraints >> Time
+        let applyConstraints = toOrdVar >> applyConstraints >> time
 
 
 
@@ -573,7 +574,7 @@ module OrderVariable =
         /// with `Unit` time unit **tu**
         let create n tu =
             match tu with
-            | ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 Units.Count.times
                 |> ValueUnit.per tu
@@ -640,8 +641,8 @@ module OrderVariable =
         /// and `Unit` **un** per shape unit **su**
         let create n un su =
             match un, su with
-            | ValueUnit.NoUnit, _
-            | _, ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit, _
+            | _, Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per su
@@ -768,7 +769,7 @@ module OrderVariable =
         /// and `Unit` **un** and time unit **tu**
         let create n un tu =
             match un with
-            | ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per tu
@@ -832,7 +833,7 @@ module OrderVariable =
         /// and `Unit` **un** and time unit **tu**
         let create n un tu =
             match un with
-            | ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per tu
@@ -957,8 +958,8 @@ module OrderVariable =
         /// and `Unit` **un** per adjust **adj**
         let create n un adj =
             match un, adj with
-            | ValueUnit.NoUnit, _
-            | _, ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit, _
+            | _, Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per adj
@@ -1025,9 +1026,9 @@ module OrderVariable =
         /// and `Unit` **un** per adjust **adj** per time unit **tu**
         let create n un adj tu =
             match un, adj, tu with
-            | ValueUnit.NoUnit, _, _
-            | _, ValueUnit.NoUnit, _
-            | _, _, ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit, _, _
+            | _, Unit.NoUnit, _
+            | _, _, Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per adj
@@ -1095,9 +1096,9 @@ module OrderVariable =
         /// and `Unit` **un** per adjust **adj** per time unit **tu**
         let create n un adj tu =
             match un, adj, tu with
-            | ValueUnit.NoUnit, _, _
-            | _, ValueUnit.NoUnit, _
-            | _, _, ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit, _, _
+            | _, Unit.NoUnit, _
+            | _, _, Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per adj
@@ -1161,8 +1162,8 @@ module OrderVariable =
         /// and `Unit` **un** per adjust **adj**
         let create n un adj =
             match un, adj with
-            | ValueUnit.NoUnit, _
-            | _, ValueUnit.NoUnit -> ValueUnit.NoUnit
+            | Unit.NoUnit, _
+            | _, Unit.NoUnit -> Unit.NoUnit
             | _ ->
                 un
                 |> ValueUnit.per adj

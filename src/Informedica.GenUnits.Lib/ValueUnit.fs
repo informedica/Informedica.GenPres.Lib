@@ -1,108 +1,90 @@
 namespace Informedica.GenUnits.Lib
 
+open System
+open MathNet.Numerics
+
+
+type ValueUnit = ValueUnit of  BigRational * Unit
+and Unit =
+    | NoUnit
+    | CombiUnit of Unit * Operator * Unit
+    | General of (string * BigRational)
+    | Count of CountUnit
+    | Mass of MassUnit
+    | Volume of VolumeUnit
+    | Time of TimeUnit
+    | Molar of MolarUnit
+    | InterNatUnit of IUnit
+    | Weight of WeightUnit
+    | Height of HeightUnit
+    | BSA of BSAUnit
+and CountUnit =
+    | Times of BigRational
+and MassUnit =
+    | KiloGram of BigRational
+    | Gram of BigRational
+    | MilliGram of BigRational
+    | MicroGram of BigRational
+    | NanoGram of BigRational
+and VolumeUnit =
+    | Liter of BigRational
+    | DeciLiter of BigRational
+    | MilliLiter of BigRational
+    | MicroLiter of BigRational
+    | Droplet of BigRational
+and TimeUnit =
+    | Year of BigRational
+    | Month of BigRational
+    | Week of BigRational
+    | Day of BigRational
+    | Hour of BigRational
+    | Minute of BigRational
+    | Second of BigRational
+and MolarUnit =
+    | Mol of BigRational
+    | MilliMol of BigRational
+and IUnit =
+    | MIU of BigRational
+    | IU of BigRational
+and WeightUnit =
+    | WeightKiloGram of BigRational
+    | WeightGram of BigRational
+and HeightUnit =
+    | HeightMeter of BigRational
+    | HeightCentiMeter of BigRational
+and BSAUnit =
+    | M2 of BigRational
+and Operator =
+    | OpTimes
+    | OpPer
+    | OpPlus
+    | OpMinus
+
+
+module Group =
+
+
+    type Group =
+        | NoGroup
+        | GeneralGroup of string
+        | CountGroup
+        | MassGroup
+        | VolumeGroup
+        | TimeGroup
+        | MolarGroup
+        | InterNatUnitGroup
+        | WeightGroup
+        | HeightGroup
+        | BSAGroup
+        | CombiGroup of (Group * Operator * Group)
+
 
 
 module ValueUnit =
 
-    open MathNet.Numerics
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-
-
-    type Value = BigRational
-
-    type Name = string
-
-
-    type ValueUnit = ValueUnit of  Value * Unit
-    and Unit =
-        | NoUnit
-        | CombiUnit of Unit * Operator * Unit
-        | General of (Name * Value)
-        | Count of CountUnit
-        | Mass of MassUnit
-        | Volume of VolumeUnit
-        | Time of TimeUnit
-        | Molar of MolarUnit
-        | InterNatUnit of IUnit
-        | Weight of WeightUnit
-        | Height of HeightUnit
-        | BSA of BSAUnit
-    and CountUnit =
-        | Times of Times
-    and MassUnit =
-        | KiloGram of KiloGram
-        | Gram of Gram
-        | MilliGram of MilliGram
-        | MicroGram of MicroGram
-        | NanoGram of NanoGram
-    and VolumeUnit =
-        | Liter of Liter
-        | DeciLiter of DeciLiter
-        | MilliLiter of MilliLiter
-        | MicroLiter of MicroLiter
-        | Droplet of Droplet
-    and TimeUnit =
-        | Year of Year
-        | Month of Month
-        | Week of Week
-        | Day of Day
-        | Hour of Hour
-        | Minute of Minute
-        | Second of Second
-    and MolarUnit =
-        | Mol of Mol
-        | MilliMol of MilliMol
-    and IUnit =
-        | MIU of MIU
-        | IU of IU
-    and WeightUnit =
-        | WeightKiloGram of KiloGram
-        | WeightGram of Gram
-    and HeightUnit =
-        | HeightMeter of Meter
-        | HeightCentiMeter of CentiMeter
-    and BSAUnit =
-        | M2 of M2
-    and Operator =
-        | OpTimes
-        | OpPer
-        | OpPlus
-        | OpMinus
-    // Count
-    and Times = BigRational
-    // InterNatUnit
-    and IU  = BigRational
-    and MIU = BigRational
-    // Mass
-    and KiloGram  = BigRational
-    and Gram      = BigRational
-    and MilliGram = BigRational
-    and MicroGram = BigRational
-    and NanoGram  = BigRational
-    // Volume
-    and Liter      = BigRational
-    and DeciLiter  = BigRational
-    and MilliLiter = BigRational
-    and MicroLiter = BigRational
-    and Droplet    = BigRational
-    // Time
-    and Second = BigRational
-    and Minute = BigRational
-    and Hour   = BigRational
-    and Day    = BigRational
-    and Week   = BigRational
-    and Month  = BigRational
-    and Year   = BigRational
-    // Height
-    and CentiMeter = BigRational
-    and Meter      = BigRational
-    // Molar
-    and Mol      = BigRational
-    and MilliMol = BigRational
-    // BSA
-    and M2 = BigRational
 
 
     let opToStr op =
@@ -119,7 +101,7 @@ module ValueUnit =
         | _ when s = "*" -> OpPer
         | _ when s = "+" -> OpPer
         | _ when s = "-" -> OpPer
-        | _ -> failwith  <| sprintf "Cannot parse %s to operand" s
+        | _ -> failwith  <| $"Cannot parse %s{s} to operand"
 
 
     let apply f u =
@@ -247,37 +229,23 @@ module ValueUnit =
 
     module Group =
 
-        type Group =
-            | NoGroup
-            | GeneralGroup of Name
-            | CountGroup
-            | MassGroup
-            | VolumeGroup
-            | TimeGroup
-            | MolarGroup
-            | InterNatUnitGroup
-            | WeightGroup
-            | HeightGroup
-            | BSAGroup
-            | CombiGroup of (Group * Operator * Group)
-
 
         let unitToGroup u =
             let rec get u =
                 match u with
-                    | NoUnit         -> NoGroup
-                    | General (n, _) -> GeneralGroup n
-                    | Count _        -> CountGroup
-                    | Mass _         -> MassGroup
-                    | Volume _       -> VolumeGroup
-                    | Time _         -> TimeGroup
-                    | Molar _        -> MolarGroup
-                    | InterNatUnit _ -> InterNatUnitGroup
-                    | Weight _       -> WeightGroup
-                    | Height _       -> HeightGroup
-                    | BSA _          -> BSAGroup
+                    | NoUnit         -> Group.NoGroup
+                    | General (n, _) -> Group.GeneralGroup n
+                    | Count _        -> Group.CountGroup
+                    | Mass _         -> Group.MassGroup
+                    | Volume _       -> Group.VolumeGroup
+                    | Time _         -> Group.TimeGroup
+                    | Molar _        -> Group.MolarGroup
+                    | InterNatUnit _ -> Group.InterNatUnitGroup
+                    | Weight _       -> Group.WeightGroup
+                    | Height _       -> Group.HeightGroup
+                    | BSA _          -> Group.BSAGroup
                     | CombiUnit (ul, op, ur) ->
-                        (get ul, op, get ur) |> CombiGroup
+                        (get ul, op, get ur) |> Group.CombiGroup
 
             get u
 
@@ -285,18 +253,18 @@ module ValueUnit =
         let contains g2 g1 =
             let rec cont g =
                 match g with
-                | GeneralGroup _
-                | NoGroup
-                | CountGroup
-                | MassGroup
-                | VolumeGroup
-                | TimeGroup
-                | MolarGroup
-                | InterNatUnitGroup
-                | WeightGroup
-                | HeightGroup
-                | BSAGroup -> g = g2
-                | CombiGroup (gl, _, gr) ->
+                | Group.GeneralGroup _
+                | Group.NoGroup
+                | Group.CountGroup
+                | Group.MassGroup
+                | Group.VolumeGroup
+                | Group.TimeGroup
+                | Group.MolarGroup
+                | Group.InterNatUnitGroup
+                | Group.WeightGroup
+                | Group.HeightGroup
+                | Group.BSAGroup -> g = g2
+                | Group.CombiGroup (gl, _, gr) ->
                     cont gl || cont gr
 
             cont g1
@@ -314,18 +282,18 @@ module ValueUnit =
         let toString g =
             let rec str g s =
                 match g with
-                | NoGroup -> ""
-                | GeneralGroup _ -> "General"
-                | CountGroup -> "Count"
-                | MassGroup -> "Mass"
-                | VolumeGroup -> "Volume"
-                | TimeGroup -> "Time"
-                | MolarGroup -> "Molar"
-                | InterNatUnitGroup -> "IUnit"
-                | WeightGroup -> "Weight"
-                | HeightGroup -> "Height"
-                | BSAGroup -> "BSA"
-                | CombiGroup (gl, op, gr) ->
+                | Group.NoGroup -> ""
+                | Group.GeneralGroup _ -> "General"
+                | Group.CountGroup -> "Count"
+                | Group.MassGroup -> "Mass"
+                | Group.VolumeGroup -> "Volume"
+                | Group.TimeGroup -> "Time"
+                | Group.MolarGroup -> "Molar"
+                | Group.InterNatUnitGroup -> "IUnit"
+                | Group.WeightGroup -> "Weight"
+                | Group.HeightGroup -> "Height"
+                | Group.BSAGroup -> "BSA"
+                | Group.CombiGroup (gl, op, gr) ->
                     let gls = str gl s
                     let grs = str gr s
 
@@ -335,10 +303,10 @@ module ValueUnit =
 
 
         let getGroupUnits = function
-                | NoGroup -> [ NoUnit ]
-                | GeneralGroup n -> [ (n, 1N) |> General ]
-                | CountGroup -> [ 1N |> Times |> Count ]
-                | MassGroup ->
+                | Group.NoGroup -> [ NoUnit ]
+                | Group.GeneralGroup n -> [ (n, 1N) |> General ]
+                | Group.CountGroup -> [ 1N |> Times |> Count ]
+                | Group.MassGroup ->
                     [
                         1N |> KiloGram |> Mass
                         1N |> Gram |> Mass
@@ -346,14 +314,14 @@ module ValueUnit =
                         1N |> MicroGram |> Mass
                         1N |> NanoGram |> Mass
                     ]
-                | VolumeGroup ->
+                | Group.VolumeGroup ->
                     [
                         1N |> Liter |> Volume
                         1N |> DeciLiter |> Volume
                         1N |> MilliLiter |> Volume
                         1N |> MicroLiter |> Volume
                     ]
-                | TimeGroup ->
+                | Group.TimeGroup ->
                     [
                         1N |> Year |> Time
                         1N |> Month |> Time
@@ -363,34 +331,34 @@ module ValueUnit =
                         1N |> Minute |> Time
                         1N |> Second |> Time
                     ]
-                | MolarGroup ->
+                | Group.MolarGroup ->
                     [
                         1N |> Mol |> Molar
                         1N |> MilliMol |> Molar
                     ]
-                | InterNatUnitGroup ->
+                | Group.InterNatUnitGroup ->
                     [
                         1N |> MIU |> InterNatUnit
                         1N |> IU |> InterNatUnit
                     ]
-                | WeightGroup ->
+                | Group.WeightGroup ->
                     [
                         1N |> WeightKiloGram |> Weight
                         1N |> WeightGram |> Weight
                     ]
-                | HeightGroup ->
+                | Group.HeightGroup ->
                     [
                         1N |> HeightMeter |> Height
                         1N |> HeightCentiMeter |> Height
                     ]
-                | BSAGroup -> [ 1N |> M2 |> BSA ]
-                | CombiGroup _ -> []
+                | Group.BSAGroup -> [ 1N |> M2 |> BSA ]
+                | Group.CombiGroup _ -> []
 
 
         let getUnits g =
             let rec get g =
                 match g with
-                | CombiGroup (gl, op, gr) ->
+                | Group.CombiGroup (gl, op, gr) ->
                     [
                         for ul in gl |> get do
                             for ur in gr |> get do
@@ -403,6 +371,8 @@ module ValueUnit =
 
         module internal GroupItem =
 
+            type Group = Group.Group
+
             type GroupItem =
                 | GroupItem of Group
                 | OperatorItem of Operator
@@ -411,7 +381,7 @@ module ValueUnit =
             let toList g =
                 let rec parse g acc =
                     match g with
-                    | CombiGroup (gl, op, gr) ->
+                    | Group.CombiGroup (gl, op, gr) ->
                         let gll = parse gl acc
                         let grl = parse gr acc
 
@@ -550,6 +520,12 @@ module ValueUnit =
 
 
     let count = 1N |> Times |> Count
+
+
+    let eqsGroup vu1 vu2 =
+        let u1 = vu1 |> getUnit
+        let u2 = vu2 |> getUnit
+        u1 |> Group.eqsGroup u2
 
 
     // ToDo: need to check if this is correct!!
@@ -806,31 +782,6 @@ module ValueUnit =
             |> create u
             |> toUnit
             |> create u
-
-
-
-    type ValueUnit with
-
-        static member (*) (vu1, vu2) = calc true (*) vu1 vu2
-
-        static member (/) (vu1, vu2) = calc true (/) vu1 vu2
-
-        static member (+) (vu1, vu2) = calc true (+) vu1 vu2
-
-        static member (-) (vu1, vu2) = calc true (-) vu1 vu2
-
-        static member (=?) (vu1, vu2) = cmp (=) vu1 vu2
-
-        static member (>?) (vu1, vu2) = cmp (>) vu1 vu2
-
-        static member (<?) (vu1, vu2) = cmp (<) vu1 vu2
-
-        static member (>=?) (vu1, vu2) = cmp (>=) vu1 vu2
-
-        static member (<=?) (vu1, vu2) = cmp (<=) vu1 vu2
-
-        static member (==>) (vu, u) = vu |> convertTo u
-
 
 
     module Units =
@@ -1218,6 +1169,14 @@ module ValueUnit =
         let toStringEngLong    = toString English Long
 
 
+    /// Get the user readable string version
+    /// of a unit, i.e. without unit group between
+    /// brackets
+    let unitToReadableString u =
+        u
+        |> Units.toString Units.Dutch Units.Short
+        |> String.removeBrackets
+
 
     let toString brf loc verb vu =
         let v, u = vu |> get
@@ -1234,6 +1193,25 @@ module ValueUnit =
     let toStringFloatDutchLong  = toString (BigRational.toDecimal >> string) Units.Dutch Units.Long
     let toStringFloatEngShort   = toString (BigRational.toDecimal >> string) Units.English Units.Short
     let toStringFloatEngLong    = toString (BigRational.toDecimal >> string) Units.English Units.Long
+
+
+    /// Turn a `ValueUnit` `vu` into
+    /// a string using precision `prec`.
+    let toStringPrec prec vu =
+        let v, u = vu |> get
+
+        let vs =
+            v
+            |> BigRational.toFloat
+            |> Double.fixPrecision prec
+            |> string
+
+        let us =
+            u
+            |> unitToReadableString
+
+        vs + " " + us
+
 
     let fromString s =
 
@@ -1301,6 +1279,109 @@ module ValueUnit =
         | _ ->
             if s = "" then failwith "Cannot parse empty string"
             else failwith <| $"Cannot parse string %s{s}"
+
+
+    module Dto =
+
+
+        [<Literal>]
+        let english = "english"
+
+        [<Literal>]
+        let dutch = "dutch"
+
+        type Dto () =
+            member val Value = Decimal.Zero with get, set
+            member val Unit = "" with get, set
+            member val Group = "" with get, set
+            member val Short = true with get, set
+            member val Language = "" with get, set
+
+        let dto () = Dto ()
+
+        let toString (dto : Dto) =
+            sprintf "%A %s" dto.Value dto.Unit
+
+        let toDto short lang vu =
+            let isLang s l =
+                l
+                |> String.trim
+                |> String.toLower
+                |> (fun l -> s |> String.startsWith l)
+            let l =
+                match lang with
+                | _ when lang |> isLang english ->
+                    Units.English |> Some
+                | _ when lang |> isLang dutch ->
+                    Units.Dutch |> Some
+                | _ -> None
+
+            match l with
+            | None -> None
+            | Some l ->
+                let s =
+                    if short then Units.Short
+                    else Units.Long
+
+                let v, u = vu |> get
+                let v = v |> BigRational.toDecimal
+                let g =
+                    u
+                    |> Group.unitToGroup
+                    |> Group.toString
+                let u =
+                    u
+                    |> Units.toString l s
+                    |> String.removeBrackets
+
+                let dto = dto ()
+                dto.Value <- v
+                dto.Unit <- u
+                dto.Group <- g
+                dto.Language <- lang
+                dto.Short <- short
+
+                dto |> Some
+
+        let toDtoDutchShort vu  =  vu |>toDto true dutch    |> Option.get
+        let toDtoDutchLong vu    =  vu |>toDto false dutch   |> Option.get
+        let toDtoEnglishShort vu =  vu |>toDto true english  |> Option.get
+        let toDtoEnglishLong vu  =  vu |>toDto false english |> Option.get
+
+        let fromDto (dto: Dto) =
+            let v = dto.Value |> BigRational.fromDecimal
+            $"%s{dto.Unit}[%s{dto.Group}]"
+            |> Units.fromString
+            |> function
+            | Some u ->
+                v
+                |> create u
+                |> Some
+            | _ -> None
+
+
+type ValueUnit with
+
+    static member (*) (vu1, vu2) = ValueUnit.calc true (*) vu1 vu2
+
+    static member (/) (vu1, vu2) = ValueUnit.calc true (/) vu1 vu2
+
+    static member (+) (vu1, vu2) = ValueUnit.calc true (+) vu1 vu2
+
+    static member (-) (vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
+
+    static member (=?) (vu1, vu2) = ValueUnit.cmp (=) vu1 vu2
+
+    static member (>?) (vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
+
+    static member (<?) (vu1, vu2) = ValueUnit.cmp (<) vu1 vu2
+
+    static member (>=?) (vu1, vu2) = ValueUnit.cmp (>=) vu1 vu2
+
+    static member (<=?) (vu1, vu2) = ValueUnit.cmp (<=) vu1 vu2
+
+    static member (==>) (vu, u) = vu |> ValueUnit.convertTo u
+
 
 
 

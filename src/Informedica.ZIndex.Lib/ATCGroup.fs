@@ -4,28 +4,8 @@ module ATCGroup =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
+    open Informedica.GenCore.Lib.Types.ZIndex
 
-    type ATCGroup =
-        {
-            ATC1 : string
-            AnatomicalGroup : string
-            AnatomicalGroupEng : string
-            ATC2 : string
-            TherapeuticMainGroup : string
-            TherapeuticMainGroupEng : string
-            ATC3 : string
-            TherapeuticSubGroup : string
-            TherapeuticSubGroupEng : string
-            ATC4 : string
-            PharmacologicalGroup : string
-            PharmacologicalGroupEng : string
-            ATC5 : string
-            Substance : string
-            SubstanceEng : string
-            Generic : string
-            Shape : string
-            Routes : string
-        }
 
     let create atc1 ang ange atc2 thg thge atc3 ths thse atc4 phg phge atc5 sub sube gen shp rts =
         {

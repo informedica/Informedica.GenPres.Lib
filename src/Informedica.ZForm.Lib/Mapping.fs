@@ -7,7 +7,6 @@
 module Mapping =
 
     open System
-    open System.IO
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
@@ -63,7 +62,7 @@ module Mapping =
         |> readMappingFile
         |> Array.map (fun row ->
             if row |> Array.length < n then ""
-            else row.[n]
+            else row[n]
         )
 
     let allAppUnits () = getAll unitPath AppMap
@@ -120,11 +119,11 @@ module Mapping =
         if i1 = 0 && i2 = 0 || (i1 > mapping.Length || i2 > mapping.Length) then ""
         else
             mapping
-            |> Array.filter (fun x -> x.[i1] |> eqs s)
+            |> Array.filter (fun x -> x[i1] |> eqs s)
             |> Array.fold (fun acc xs ->
-                if acc = "" then xs.[i2]
-                elif xs.[i2] = "" then acc
-                else acc + "||" + xs.[i2]
+                if acc = "" then xs[i2]
+                elif xs[i2] = "" then acc
+                else acc + "||" + xs[i2]
             ) ""
 
 
@@ -155,15 +154,15 @@ module Mapping =
               (PedFormMap, allPedFormUnits ())
               (ValueUnitMap, allValueUnitUnits ()) ]
             |> List.map (fun (m, units) ->
-                printfn "Printing all units for: %A" m
+                printfn $"Printing all units for: %A{m}"
                 units
                 |> Array.iter (fun s -> if s <> "" then s|> printfn "%s")
                 (m, units)
             )
             |> (fun units ->
                 printfn "Mapping all units"
-                [ for (m1, us1) in units do
-                    for (m2, us2) in units do
+                [ for m1, us1 in units do
+                    for m2, us2 in units do
                         if m1 = m2 then ()
                         else
                             for u1 in us1 do
@@ -182,15 +181,15 @@ module Mapping =
               (GStandMap, allGStandRoutes ())
               (PedFormMap, allPedFormRoutes ()) ]
             |> List.map (fun (m, routes) ->
-                printfn "Printing all routes for: %A" m
+                printfn $"Printing all routes for: %A{m}"
                 routes
                 |> Array.iter (fun s -> if s <> "" then s|> printfn "%s")
                 (m, routes)
             )
             |> (fun routes ->
                 printfn "Mapping all routes"
-                [ for (m1, rts1) in routes do
-                    for (m2, rts2) in routes do
+                [ for m1, rts1 in routes do
+                    for m2, rts2 in routes do
                         if m1 = m2 then ()
                         else
                             for r1 in rts1 do
@@ -217,8 +216,8 @@ module Mapping =
             )
             |> (fun freqs ->
                 printfn "Mapping all freqs"
-                [ for (m1, fs1) in freqs do
-                    for (m2, fs2) in freqs do
+                [ for m1, fs1 in freqs do
+                    for m2, fs2 in freqs do
                         if m1 = m2 then ()
                         else
                             for f1 in fs1 do

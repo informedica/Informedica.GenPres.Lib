@@ -13,6 +13,8 @@ module Order =
     open Informedica.GenUnits.Lib
     open WrappedString
 
+    open Informedica.GenCore.Lib.Types.GenOrder
+
 
     /// Utility functions to
     /// enable mapping of a `Variable`s
@@ -171,7 +173,6 @@ module Order =
     module Orderable =
 
         open Informedica.GenSolver.Lib
-        open Types
 
         type Name = Types.Name
 
@@ -217,7 +218,7 @@ module Order =
                 }
 
             let createNew n =
-                let un = ValueUnit.NoUnit
+                let un = Unit.NoUnit
                 let n = n |> Name.add Literals.dose
 
                 let qty = Quantity.create n un
@@ -396,7 +397,7 @@ module Order =
             /// **id**: the order id
             /// **n**: the string name of the item
             let createNew id orbN cmpN itmN =
-                let un = ValueUnit.NoUnit
+                let un = Unit.NoUnit
                 let n =
                     [ id; orbN; cmpN; itmN ]
                     |> Name.create
@@ -570,7 +571,7 @@ module Order =
             /// * `id`: the id of the component
             /// * `n`: the name of the component
             let createNew id orbN cmpN sh =
-                let un = ValueUnit.NoUnit
+                let un = Unit.NoUnit
                 let nm = [ id; orbN; cmpN ] |> Name.create
                 let id = Id.create id
 
@@ -775,7 +776,7 @@ module Order =
         /// * time unit `tu`
         /// * adjust unit `adj`
         let createNew id orbN =
-            let un = ValueUnit.NoUnit
+            let un = Unit.NoUnit
             let n = [id; orbN] |> Name.create
 
             let orb_qty = let n = n |> Name.add Literals.orderable in Quantity.create n un
@@ -935,7 +936,6 @@ module Order =
 
     module Prescription =
 
-        open Types
 
         module Frequency = OrderVariable.Frequency
         module Time = OrderVariable.Time
@@ -1059,7 +1059,7 @@ module Order =
                 let f, t =
                     n
                     |> Name.fromString
-                    |> freqTime ValueUnit.NoUnit ValueUnit.NoUnit
+                    |> freqTime Unit.NoUnit Unit.NoUnit
 
                 dto.Frequency <- f |> Frequency.toDto
                 dto.Time <- t |> Time.toDto
@@ -1175,10 +1175,10 @@ module Order =
         let n = [id] |> Name.create
 
         let adj =
-            Quantity.create (n |> Name.add Mapping.adj) ValueUnit.NoUnit
+            Quantity.create (n |> Name.add Mapping.adj) Unit.NoUnit
 
         let tme =
-            Time.create (n |> Name.add Mapping.ord) ValueUnit.NoUnit
+            Time.create (n |> Name.add Mapping.ord) Unit.NoUnit
 
         let prs =
             n
@@ -1562,17 +1562,17 @@ module Order =
 
 
         let continuous id orbN rte cmps  =
-            Prescription.continuous ValueUnit.NoUnit ValueUnit.NoUnit
+            Prescription.continuous Unit.NoUnit Unit.NoUnit
             |> dto id orbN rte cmps
 
 
         let discontinuous id orbN rte cmps =
-            Prescription.discontinuous ValueUnit.NoUnit ValueUnit.NoUnit
+            Prescription.discontinuous Unit.NoUnit Unit.NoUnit
             |> dto  id orbN rte cmps
 
 
         let timed  id orbN rte cmps=
-            Prescription.timed ValueUnit.NoUnit ValueUnit.NoUnit
+            Prescription.timed Unit.NoUnit Unit.NoUnit
             |> dto id orbN rte cmps
 
 

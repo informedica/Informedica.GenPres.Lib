@@ -5,6 +5,7 @@ namespace Informedica.GenForm.Lib
 module MinMax =
 
 
+    open Informedica.GenCore.Lib.Types.GenForm
 
 
     let fromTuple (min, max) =

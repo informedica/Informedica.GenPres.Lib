@@ -11,8 +11,9 @@ module Dto =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
+    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Types.ZForm
 
-    open GStand
 
     module Dosage = DoseRule.Dosage
     module DoseRange = DoseRule.DoseRange
@@ -209,11 +210,11 @@ module Dto =
             | Some (_, conc, unt) -> conc, unt
             | None -> 0m, ""
 
-        let freqsToStr (fr : Dosage.Frequency) =
+        let freqsToStr (fr : Frequency) =
             fr.Frequencies
             |> List.map (fun f ->
                 f
-                |> ValueUnit.create (ValueUnit.createCombiUnit (ValueUnit.Units.Count.times, ValueUnit.OpPer, fr.TimeUnit))
+                |> ValueUnit.create (ValueUnit.createCombiUnit (ValueUnit.Units.Count.times, OpPer, fr.TimeUnit))
                 |> ValueUnit.freqToValueUnitString
                 |> Mapping.mapFreq Mapping.ValueUnitMap Mapping.AppMap
             )
@@ -319,8 +320,13 @@ module Dto =
                     dto.RateUnit
                     |> ValueUnit.unitFromAppString
 
-            let cfg =
-                { UseAll = true ; IsRate = dto.IsRate ; SubstanceUnit = su ; TimeUnit = tu }
+            let cfg : GStand.CreateConfig =
+                {
+                    UseAll = true
+                    IsRate = dto.IsRate
+                    SubstanceUnit = su
+                    TimeUnit = tu
+                }
 
             GStand.createDoseRules
                 cfg

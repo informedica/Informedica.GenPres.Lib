@@ -2,14 +2,18 @@
 
 module DoseRule =
 
-    open System
     open MathNet.Numerics
-
-    open Informedica.Utils.Lib
-    open Informedica.Utils.Lib.BCL
 
     open Aether
     open Aether.Operators
+
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
+    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Types.ZForm
+    open Informedica.GenUnits.Lib
+
+    module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
 
 
     /// Models a medication dose range with lower and upper limits
@@ -22,31 +26,6 @@ module DoseRule =
     module DoseRange =
 
 
-        module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-
-
-        type MinMax = MinMax.MinMax
-
-
-        /// Dose limits
-        type DoseRange =
-            {
-                // Normal limits
-                Norm : MinMax
-                // Normal limits adjusted by weight
-                NormWeight : MinMax * WeightUnit
-                // Normal limits adjusted by BSA
-                NormBSA : MinMax * BSAUnit
-                // Absolute limits
-                Abs : MinMax
-                // Absolute limits adjusted by weight
-                AbsWeight : MinMax * WeightUnit
-                // Absolute limits adjusted by BSA
-                AbsBSA : MinMax * BSAUnit
-            }
-        and WeightUnit = ValueUnit.Unit
-        and BSAUnit = ValueUnit.Unit
-
         let create norm normWght normBSA abs absWght absBSA =
             {
                 Norm = norm
@@ -57,10 +36,10 @@ module DoseRule =
                 AbsBSA = absBSA
             }
 
-        let emptyWeight = MinMax.empty, ValueUnit.NoUnit
+        let emptyWeight = MinMax.empty, Unit.NoUnit
 
 
-        let emptyBSA = MinMax.empty, ValueUnit.NoUnit
+        let emptyBSA = MinMax.empty, Unit.NoUnit
 
 
         let empty = create MinMax.empty emptyWeight emptyBSA MinMax.empty emptyWeight emptyBSA
@@ -121,43 +100,6 @@ module DoseRule =
                         dr.AbsBSA |> fst |> MinMax.convertTo u ,
                         dr.AbsBSA |> snd
             }
-
-
-        type DoseRange with
-
-            static member Norm_ :
-                (DoseRange -> MinMax) * (MinMax -> DoseRange -> DoseRange) =
-                (fun dr -> dr.Norm),
-                (fun mm dr -> { dr with Norm = mm })
-
-            static member NormWeight_ :
-                (DoseRange -> MinMax * WeightUnit) * (MinMax * WeightUnit -> DoseRange -> DoseRange) =
-                (fun dr -> dr.NormWeight),
-                (fun mm dr -> { dr with NormWeight = mm })
-
-            static member NormBSA_ :
-                (DoseRange -> MinMax * BSAUnit) * (MinMax * BSAUnit -> DoseRange -> DoseRange) =
-                (fun dr -> dr.NormBSA),
-                (fun mm dr -> { dr with NormBSA = mm })
-
-            static member Abs_ :
-                (DoseRange -> MinMax) * (MinMax -> DoseRange -> DoseRange) =
-                (fun dr -> dr.Abs),
-                (fun mm dr -> { dr with Abs = mm })
-
-            static member AbsWeight_ :
-                (DoseRange -> MinMax * WeightUnit) * (MinMax * WeightUnit -> DoseRange -> DoseRange) =
-                (fun dr -> dr.AbsWeight),
-                (fun mm dr -> { dr with AbsWeight = mm })
-
-            static member AbsBSA_ :
-                (DoseRange -> MinMax * BSAUnit) * (MinMax * BSAUnit -> DoseRange -> DoseRange) =
-                (fun dr -> dr.AbsBSA),
-                (fun mm dr -> { dr with AbsBSA = mm })
-
-            static member (*) (dr1, dr2) = calc (*) dr1 dr2
-
-            static member (/) (dr1, dr2) = calc (/) dr1 dr2
 
 
 
@@ -304,7 +246,7 @@ module DoseRule =
                     if u |> String.isNullOrWhiteSpace || g |> String.isNullOrWhiteSpace then o
                     else
                         match
-                            sprintf "%s[%s]" u g
+                            $"%s{u}[%s{g}]"
                             |> ValueUnit.Units.fromString with
                         | None -> o
                         | Some u ->
@@ -333,7 +275,7 @@ module DoseRule =
         module DoseRangeTests =
 
             let (|>!) x f =
-                printfn "%A" x
+                printfn $"%A{x}"
                 x |> f
 
             let tests () =
@@ -381,39 +323,6 @@ module DoseRule =
     /// per time period and/or a minimal interval
     module Dosage =
 
-        module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-
-
-        type DoseRange = DoseRange.DoseRange
-        type ValueUnit = ValueUnit.ValueUnit
-        type Unit = ValueUnit.Unit
-
-        /// Dosage
-        type Dosage =
-            {
-                /// Indentifies the indication
-                Name : string
-                /// Dosage at the start
-                StartDosage : DoseRange
-                /// Dosage per administration
-                SingleDosage : DoseRange
-                /// Dosage rate
-                RateDosage : DoseRange * RateUnit
-                /// Total dosage per time period
-                TotalDosage : DoseRange * Frequency
-                /// List of original doserules
-                Rules : Rule list
-            }
-        and Frequency =
-            {
-                Frequencies : Frequencies
-                TimeUnit : TimeUnit
-                MinimalInterval : ValueUnit Option
-            }
-        and Frequencies = ValueUnit.Value list
-        and TimeUnit = Unit
-        and RateUnit = Unit
-        and Rule = GStandRule of string | PedFormRule of string
 
         let createFrequency frs tu mi =
             {
@@ -434,7 +343,7 @@ module DoseRule =
             }
 
 
-        let emptyFrequency = { Frequencies = []; TimeUnit = ValueUnit.NoUnit; MinimalInterval = None }
+        let emptyFrequency = { Frequencies = []; TimeUnit = Unit.NoUnit; MinimalInterval = None }
 
 
         let empty =
@@ -442,7 +351,7 @@ module DoseRule =
                 ""
                 DoseRange.empty
                 DoseRange.empty
-                (DoseRange.empty, ValueUnit.NoUnit)
+                (DoseRange.empty, Unit.NoUnit)
                 (DoseRange.empty, emptyFrequency)
                 []
 
@@ -481,63 +390,13 @@ module DoseRule =
                             |> snd
                             |> getCount u
 
-                        (ds.RateDosage |> fst) / factor,
+                        DoseRange.calc (/) (ds.RateDosage |> fst)  factor,
                         u
             }
 
 
-        type Frequency with
-
-            static member Frequencies_ :
-                (Frequency -> Frequencies) * (Frequencies -> Frequency -> Frequency) =
-                (fun fr -> fr.Frequencies) ,
-                (fun frs fr -> { fr with Frequencies = frs })
-
-            static member TimeUnit_ :
-                (Frequency -> TimeUnit) * (TimeUnit -> Frequency -> Frequency) =
-                (fun fr -> fr.TimeUnit) ,
-                (fun tu fr -> { fr with TimeUnit = tu })
-
-            static member MinimalInterval_ :
-                (Frequency -> ValueUnit Option) * (ValueUnit Option -> Frequency -> Frequency) =
-                (fun fr -> fr.MinimalInterval) ,
-                (fun mi fr -> { fr with MinimalInterval = mi })
-
-
-        type Dosage with
-
-            static member Name_ :
-                (Dosage -> string) * (string -> Dosage -> Dosage) =
-                (fun d -> d.Name),
-                (fun s d -> { d with Name = s })
-
-            static member StartDosage_ :
-                (Dosage -> DoseRange) * (DoseRange -> Dosage -> Dosage) =
-                (fun d -> d.StartDosage),
-                (fun dr d -> { d with StartDosage = dr })
-
-            static member SingleDosage_ :
-                (Dosage -> DoseRange) * (DoseRange -> Dosage -> Dosage) =
-                (fun d -> d.SingleDosage),
-                (fun dr d -> { d with SingleDosage = dr })
-
-            static member RateDosage_ :
-                (Dosage -> DoseRange * RateUnit) * (DoseRange * RateUnit -> Dosage -> Dosage) =
-                (fun d -> d.RateDosage),
-                (fun dr d -> { d with RateDosage = dr })
-
-            static member TotalDosage_ :
-                (Dosage -> DoseRange * Frequency) * (DoseRange * Frequency -> Dosage -> Dosage) =
-                (fun d -> d.TotalDosage),
-                (fun dt d -> { d with TotalDosage = dt })
-
-            static member Rules_ :
-                (Dosage -> Rule list) * (Rule list -> Dosage -> Dosage) =
-                (fun d -> d.Rules) ,
-                (fun rs d -> { d with Rules = rs })
-
-
         module Optics =
+
 
             module DoseRange = DoseRange.Optics
 
@@ -549,6 +408,15 @@ module DoseRule =
 
             let freqsFrequencyLens =
                 Dosage.TotalDosage_ >-> snd_ >-> Frequency.Frequencies_
+
+
+            let setRules = Optic.set Dosage.Rules_
+
+
+            let setStartDossage = Optic.set Dosage.StartDosage_
+
+
+            let setRateDosage = Optic.set Dosage.RateDosage_
 
 
             let getFrequencyValues = Optic.get freqsFrequencyLens
@@ -630,13 +498,13 @@ module DoseRule =
                 freqs.Frequencies |> List.toString
             else
                 match freqs.Frequencies |> List.headTail with
-                | Some h, Some t -> sprintf "%s - %s" (h.ToString ()) (t.ToString ())
+                | Some h, Some t -> $"%s{h.ToString ()} - %s{t.ToString ()}"
                 | _ -> freqs.Frequencies |> List.toString
             |> (fun s ->
                 if s |> String.isNullOrWhiteSpace ||
                    s |> String.isNullOrWhiteSpace then ""
                 else
-                    sprintf "%s x/%s" s fu
+                    $"%s{s} x/%s{fu}"
             )
 
 
@@ -673,11 +541,11 @@ module DoseRule =
                 if frqs.Frequencies |> List.isEmpty ||
                    fu |> String.isNullOrWhiteSpace then s
                 else
-                    sprintf "%s in %s" s (frqs |> freqsToStr)
+                    $"%s{s} in %s{frqs |> freqsToStr}"
                     |> (fun s ->
                         match frqs.MinimalInterval with
                         | Some mi ->
-                            s + " " + (sprintf "minimaal interval: %s" (mi |> vuToStr))
+                            s + " " + $"minimaal interval: %s{mi |> vuToStr}"
                         | None -> s
 
                     )
@@ -783,44 +651,14 @@ module DoseRule =
 
     module PatientDosage =
 
-        type Dosage = Dosage.Dosage
-        type Patient = Patient.Patient
-
-        type PatientDosage =
-            {
-                // The patient group the doserules applies
-                Patient : Patient
-                // List of shapes that have a dosage
-                ShapeDosage : Dosage
-                // List of substances that have a dosage
-                SubstanceDosages : Dosage list
-            }
-
         let create pat =
             { Patient = pat; ShapeDosage = Dosage.empty; SubstanceDosages = [] }
-
-
-        type PatientDosage with
-
-            static member Patient_ :
-                (PatientDosage -> Patient) * (Patient -> PatientDosage -> PatientDosage) =
-                (fun pd -> pd.Patient) ,
-                (fun pat pd -> { pd with Patient = pat })
-
-            static member ShapeDosage_ :
-                (PatientDosage -> Dosage) * (Dosage -> PatientDosage -> PatientDosage) =
-                (fun pd -> pd.ShapeDosage) ,
-                (fun sd pd -> { pd with ShapeDosage = sd })
-
-            static member SubstanceDosages_ :
-                (PatientDosage -> Dosage list) * (Dosage list -> PatientDosage -> PatientDosage) =
-                (fun sd -> sd.SubstanceDosages) ,
-                (fun d sd -> { sd with SubstanceDosages = d })
 
 
 
         module Optics =
 
+            let substanceDosages = PatientDosage.SubstanceDosages_
 
             let setShapeDosage = Optic.set PatientDosage.ShapeDosage_
 
@@ -872,9 +710,6 @@ module DoseRule =
 
         module TradeProduct =
 
-
-            type TradeProductLabel = { HPK : int; Label : string }
-
             let create hpk label = { HPK = hpk; Label = label }
 
             let apply f (x: TradeProductLabel) = x |> f
@@ -884,20 +719,6 @@ module DoseRule =
             let label tp = (tp |> get).Label
 
             let hpk tp = (tp |> get).HPK
-
-
-            type TradeProductLabel with
-
-                static member HPK_ :
-                    (TradeProductLabel -> int) * (int -> TradeProductLabel -> TradeProductLabel) =
-                    (fun tp -> tp.HPK) ,
-                    (fun hpk tp -> { tp with HPK = hpk })
-
-
-                static member Label_ :
-                    (TradeProductLabel -> string) * (string -> TradeProductLabel -> TradeProductLabel) =
-                    (fun tp -> tp.Label) ,
-                    (fun lbl tp -> { tp with Label = lbl })
 
 
 
@@ -930,9 +751,6 @@ module DoseRule =
 
         module GenericProduct =
 
-
-            type GenericProductLabel = { GPK : int; Label : string }
-
             let create gpk label = { GPK = gpk; Label = label }
 
             let apply f (x : GenericProductLabel) = x |> f
@@ -943,19 +761,6 @@ module DoseRule =
 
             let gpk gp = (gp |> get).GPK
 
-
-            type GenericProductLabel with
-
-                static member GPK_ :
-                    (GenericProductLabel -> int) * (int -> GenericProductLabel -> GenericProductLabel) =
-                    (fun tp -> tp.GPK) ,
-                    (fun hpk tp -> { tp with GPK = hpk })
-
-
-                static member Label_ :
-                    (GenericProductLabel -> string) * (string -> GenericProductLabel -> GenericProductLabel) =
-                    (fun tp -> tp.Label) ,
-                    (fun lbl tp -> { tp with Label = lbl })
 
 
             module Optics =
@@ -995,24 +800,6 @@ module DoseRule =
                     }
 
 
-
-        type PatientDosage = PatientDosage.PatientDosage
-        type TradeProductLabel = TradeProduct.TradeProductLabel
-        type GenericProductLabel = GenericProduct.GenericProductLabel
-
-
-        type ShapeDosage =
-            {
-                // Name of the shape the doserule applies to
-                Shape : String list
-                // TradeProducts the doserule applies to
-                TradeProducts : TradeProductLabel list
-                // GenericProducts the doserule applies to
-                GenericProducts : GenericProductLabel list
-                // Patients to wich the doserule applies to
-                PatientDosages : PatientDosage list
-            }
-
         let create shp gps tps =
             if shp |> List.exists String.isNullOrWhiteSpace then None
             else
@@ -1020,36 +807,15 @@ module DoseRule =
                 |> Some
 
 
-        let genericProductLabel = GenericProduct.lablel
-
-
-        let tradeProductLabel = TradeProduct.label
-
-
-        type ShapeDosage with
-
-            static member Shape_ :
-                (ShapeDosage -> string list) * (string list -> ShapeDosage -> ShapeDosage) =
-                (fun rd -> rd.Shape) ,
-                (fun s rd -> { rd with Shape = s })
-
-            static member TradeProducts_ :
-                (ShapeDosage -> TradeProductLabel list) * (TradeProductLabel list -> ShapeDosage -> ShapeDosage) =
-                (fun sd -> sd.TradeProducts) ,
-                (fun tps sd -> { sd with TradeProducts = tps |> List.distinct })
-
-            static member GenericProducts_ :
-                (ShapeDosage -> GenericProductLabel list) * (GenericProductLabel list -> ShapeDosage -> ShapeDosage) =
-                (fun sd -> sd.GenericProducts) ,
-                (fun tps sd -> { sd with GenericProducts = tps |> List.distinct })
-
-            static member PatientDosages_ :
-                (ShapeDosage -> PatientDosage list) * (PatientDosage list -> ShapeDosage -> ShapeDosage) =
-                (fun rd -> rd.PatientDosages) ,
-                (fun pdl rd -> { rd with PatientDosages = pdl })
-
 
         module Optics =
+
+            let genericProducts = ShapeDosage.GenericProducts_
+
+            let tradeProducts = ShapeDosage.TradeProducts_
+
+            let patientDosages = ShapeDosage.PatientDosages_
+
 
             let setShape = Optic.set ShapeDosage.Shape_
 
@@ -1062,6 +828,7 @@ module DoseRule =
 
         module Dto =
 
+            module GenericProduct = GenericProduct
 
             type Dto () =
                 member val Shape : string list = [] with get, set
@@ -1105,15 +872,6 @@ module DoseRule =
 
     module RouteDosage =
 
-        type private ShapeDosage = ShapeDosage.ShapeDosage
-
-        type RouteDosage =
-            {
-                // Administration route
-                Route : string
-                // The dosage rules per shape
-                ShapeDosages : ShapeDosage list
-            }
 
         let create rt =
             if rt |> String.isNullOrWhiteSpace then None
@@ -1122,22 +880,14 @@ module DoseRule =
                 |> Some
 
 
-        type RouteDosage with
-
-            static member Route_ :
-                (RouteDosage -> string) * (string -> RouteDosage -> RouteDosage) =
-                (fun rd -> rd.Route) ,
-                (fun s rd -> { rd with Route = s })
-
-            static member ShapeDosages_ :
-                (RouteDosage -> ShapeDosage list) * (ShapeDosage list -> RouteDosage -> RouteDosage) =
-                (fun rd -> rd.ShapeDosages) ,
-                (fun pdl rd -> { rd with ShapeDosages = pdl })
-
 
         module Optics =
 
+            let shapeDosages = RouteDosage.ShapeDosages_
+
             let setShapeDosages = Optic.set RouteDosage.ShapeDosages_
+
+            let getRouteDosage n = List.pos_ n >?> RouteDosage.ShapeDosages_
 
 
         module Dto =
@@ -1172,37 +922,18 @@ module DoseRule =
 
     module IndicationDosage =
 
-        type RouteDosage = RouteDosage.RouteDosage
-
-        type IndicationDosage =
-            {
-                // The indication(-s) the dose rule applies to
-                Indications : string list
-                // The dosage rules per administration route
-                RouteDosages : RouteDosage list
-            }
 
         let create inds =
             { Indications = inds; RouteDosages = [] }
 
-
-        type IndicationDosage with
-
-            static member Indications_ :
-                (IndicationDosage -> string list) * (string list -> IndicationDosage -> IndicationDosage) =
-                (fun inds -> inds.Indications) ,
-                (fun sl inds -> { inds with Indications = sl })
-
-            static member RouteDosages_ :
-                (IndicationDosage -> RouteDosage list) * (RouteDosage list -> IndicationDosage -> IndicationDosage) =
-                (fun inds -> inds.RouteDosages) ,
-                (fun rdl inds -> { inds with RouteDosages = rdl })
 
 
         module Optics =
 
 
             let setRouteDosages = Optic.set IndicationDosage.RouteDosages_
+
+            let getRouteDosage n = List.pos_ n >?> IndicationDosage.RouteDosages_
 
 
         module Dto =
@@ -1234,32 +965,6 @@ module DoseRule =
                                            |> List.map Option.get)
 
 
-    type Dosage = Dosage.Dosage
-    type MinMax = MinMax.MinMax
-    type Patient = Patient.Patient
-    type IndicationDosage = IndicationDosage.IndicationDosage
-
-
-    /// Doserule
-    type DoseRule =
-        {
-            // Generic the doserule applies to
-            Generic : string
-            // List of synonyms for the generic
-            Synonyms : string list
-            // The ATC code
-            ATC : string
-            // ATCTherapyGroup the doserule applies to
-            ATCTherapyGroup : string
-            // ATCTherapySubGroup the doserule applies to
-            ATCTherapySubGroup : string
-            // The generic group the doserule applies to
-            GenericGroup : string
-            // The generic subgroup the doserule applies to
-            GenericSubGroup : string
-            // The doserules per indication(-s)
-            IndicationsDosages : IndicationDosage list
-        }
 
 
     let apply f (dr : DoseRule) = f dr
@@ -1293,7 +998,9 @@ module DoseRule =
     let createPatientDosage = PatientDosage.create
 
 
-    let createDosage n = Dosage.empty |> (Optic.set Dosage.Name_) n
+    let createDosage n =
+        Dosage.empty
+        |> Dosage.Optics.setName n
 
 
     let createSubstanceDosage sn =
@@ -1353,40 +1060,11 @@ module DoseRule =
             }
 
 
-    let genericProductLabel = ShapeDosage.genericProductLabel
-
-
-    let tradeProductLabel = ShapeDosage.tradeProductLabel
-
-
-    type DoseRule with
-
-        static member Generic_ :
-            (DoseRule -> string) * (string -> DoseRule -> DoseRule) =
-            (fun dr -> dr.Generic),
-            (fun s dr -> { dr with Generic = s })
-
-        static member Synonyms_ :
-            (DoseRule -> string list) * (string list -> DoseRule -> DoseRule) =
-            (fun dr -> dr.Synonyms) ,
-            (fun sns dr -> { dr with Synonyms = sns |> List.distinct })
-
-
-        static member IndicationDosages_ :
-            (DoseRule -> IndicationDosage list) * (IndicationDosage list -> DoseRule -> DoseRule) =
-            (fun dr -> dr.IndicationsDosages) ,
-            (fun inds dr -> { dr with IndicationsDosages = inds })
-
-
 
     module Optics =
 
         module Patient = Patient.Optics
         module Dosage = Dosage.Optics
-
-        type ShapeDosage = ShapeDosage.ShapeDosage
-        type RouteDosage = RouteDosage.RouteDosage
-        type PatientDosage = PatientDosage.PatientDosage
 
 
         let setGeneric = Optic.set DoseRule.Generic_
@@ -1396,7 +1074,8 @@ module DoseRule =
 
 
         let indDosDosagesLens n =
-            DoseRule.IndicationDosages_ >-> List.pos_ n >?> IndicationDosage.RouteDosages_
+            DoseRule.IndicationDosages_
+            >-> IndicationDosage.Optics.getRouteDosage n
 
 
         let getRouteDosages indd dr =
@@ -1424,7 +1103,9 @@ module DoseRule =
 
 
         let shapeDosagesPrism n1 n2 =
-            indDosDosagesLens n1 >?> List.pos_ n2 >?> RouteDosage.ShapeDosages_
+            indDosDosagesLens n1
+            >?> RouteDosage.Optics.getRouteDosage n2
+            //List.pos_ n2 >?> RouteDosage.ShapeDosages_
 
 
         let getShapeDosages inds rt dr =
@@ -1481,14 +1162,14 @@ module DoseRule =
             | None -> dr
 
 
-        let setGenericProducts = shapeDosageProductsSetter ShapeDosage.GenericProducts_
+        let setGenericProducts = shapeDosageProductsSetter ShapeDosage.Optics.genericProducts
 
 
-        let setTradeProducts = shapeDosageProductsSetter ShapeDosage.TradeProducts_
+        let setTradeProducts = shapeDosageProductsSetter ShapeDosage.Optics.tradeProducts
 
 
         let patientDosagesPrism n1 n2 n3 =
-            shapeDosagePrism n1 n2 n3 >?> ShapeDosage.PatientDosages_
+            shapeDosagePrism n1 n2 n3 >?> ShapeDosage.Optics.patientDosages
 
 
         let getPatientDosages inds rt shp dr =
@@ -1526,7 +1207,7 @@ module DoseRule =
 
 
         let substanceDosagesPrism n1 n2 n3 n4 =
-            patientDosagePrism n1 n2 n3 n4 >?> PatientDosage.SubstanceDosages_
+            patientDosagePrism n1 n2 n3 n4 >?> PatientDosage.Optics.substanceDosages
 
 
         let getSubstanceDosages inds rt shp pat dr =
@@ -1674,7 +1355,7 @@ Synoniemen: {synonym}
 
 
     let toStringWithConfig (config : TextConfig) printRules (dr : DoseRule) =
-        let gpsToString (gps : ShapeDosage.GenericProductLabel list) =
+        let gpsToString (gps : GenericProductLabel list) =
             gps
             |> List.map (fun gp -> gp.Label)
             |> String.concat ", "
@@ -1789,7 +1470,7 @@ Synoniemen: {synonym}
     module DoseRuleTests =
 
         let (|>!) x f =
-            printfn "%A" x
+            printfn $"%A{x}"
             x |> f
 
         let test () =

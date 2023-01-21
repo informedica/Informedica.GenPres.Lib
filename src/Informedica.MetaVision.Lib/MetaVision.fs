@@ -10,16 +10,8 @@ module MetaVision =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.ZForm.Lib.DoseRule.ShapeDosage
+    open Informedica.GenCore.Lib.Types.ZIndex
     open Informedica.ZIndex.Lib
-
-
-
-    type GenPresProduct = GenPresProduct.GenPresProduct
-
-
-    type GenericProduct = GenericProduct.GenericProduct
-
 
 
     module Frequency =
@@ -130,7 +122,7 @@ module MetaVision =
             let rts =
                 GenPresProduct.get true
                 |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
-                |> Array.collect (fun gpp -> gpp.Route)
+                |> Array.collect (fun gpp -> gpp.Routes)
                 |> Array.collect (String.splitAt ',')
                 |> Array.filter (mapRoute >> String.isNullOrWhiteSpace >> not)
                 |> Array.distinct
@@ -1068,7 +1060,6 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
         printfn "creating dose forms"
         rts
         |> createDoseForms config.ImportFile fstFile "DoseForms"
-        |> ignore
 
         printfn "creating non G-Standard medications"
         Array.empty
@@ -1081,7 +1072,6 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
             config.ComplexMedications
             config.Brands
             config.Products
-        |> ignore
 
 
         printfn "creating G-Standard medications"

@@ -5,6 +5,7 @@ module DoseType =
 
 
     open Informedica.Utils.Lib.BCL
+    open Informedica.GenCore.Lib.Types.GenForm
 
 
     let sortBy = function

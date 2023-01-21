@@ -10,19 +10,112 @@ module Types =
     module ZIndex =
 
 
-        type Name = Full | Short | Memo | Label
+        module Names =
+
+            type Name = Full | Short | Memo | Label
 
 
-        type Length = TwentyFive | Fifty
+            type Length = TwentyFive | Fifty
 
 
-        type Item =
-            | Shape
-            | Route
-            | GenericUnit
-            | ShapeUnit
-            | PrescriptionContainer
-            | ConsumerContainer
+            type Item =
+                | Shape
+                | Route
+                | GenericUnit
+                | ShapeUnit
+                | PrescriptionContainer
+                | ConsumerContainer
+
+
+        module Route =
+
+            // * ARTI/LESION
+            // * AURICULAIR
+            // * CUTAAN
+            // DENTAAL
+            // ENDOCERVIC
+            // * ENDOTR.PULM
+            // * ENDOTRACHEOPULMONAIR
+            // * EPIDURAAL
+            // EPIDURAAL, INTRATHECAAL, PERINEURAAL
+            // EXTRACORPORAAL
+            // * GASTR-ENTER
+            // * IM
+            // * INHALATIE
+            // INTRA-ART.
+            // INTRA-ARTERIEEL
+            // INTRA-ARTICULAIR
+            // INTRA-OCUL.
+            // INTRA-UTERIEN
+            // INTRABURSAAL
+            // INTRACARDIAAL
+            // INTRACAVERNEUS
+            // INTRACORONAIR
+            // * INTRADERMAAL
+            // INTRALAESIONAAL
+            // INTRALYMFATISCH
+            // * INTRAMUSCULAIR
+            // INTRAMUSCULAIR, INTRAVENEUS
+            // INTRAMUSCULAIR, SUBCUTAAN
+            // INTRAOSSAAL
+            // INTRAPERITONEAAL
+            // INTRAPLEURAAL
+            // INTRATHECAAL
+            // * INTRAVENEUS
+            // INTRAVENEUS, SUBCUTAAN
+            // * INTRAVESIC.
+            // * INTRAVESICAAL
+            // INTRAVITR.
+            // INTRAVITREAAL
+            // * IV
+            // * LOKAAL
+            // * NASAAL
+            // * NEUS
+            // NIET GESPEC
+            // NVT
+            // OOG
+            // * OOR
+            // * ORAAL
+            // ORAAL/RECT
+            // * OROMUCOSAAL
+            // PAR./ORAAL
+            // PAR/UTERIEN
+            // PAR/VESICAL
+            // PARABULBAIR
+            // PARENT/RECT
+            // PARENTERAAL
+            // PERI-ARTICULAIR
+            // PERIBULBAIR
+            // PERINEURAAL
+            // PERITONEAAL
+            // * RECTAAL
+            // RETROBULBAIR
+            // SUBCONJUNCTIVAAL
+            // * SUBCUTAAN
+            // SUBLINGUAAL
+            // * TRANSDERMAAL
+            // TRANSDERML
+            // URETHRAAL
+            // UTERIEN
+            // VAGINAAL
+
+            type Route =
+                | Alternative of string
+                | AUR // AURICULAIR OOR
+                | CUT // CUTAAN TRANSDERMAAL TRANSDERML LOKAAL
+                | ENDOTR // ENDOTR.PULM ENDOTRACHEOPULMONAIR
+                | EPIDUR // EPIDURAAL
+                | IM // INTRAMUSCULAIR IM
+                | INH // INHALATIE
+                | INTRAVESIC // INTRAVESIC. INTRAVESICAAL
+                | IV // INTRAVENEUS IV
+                | LESION // ARTI/LESION
+                | NASAL // NASAAL NEUS
+                | ORAL // ORAAL GASTR-ENTER OROMUCOSAAL
+                | OROMUCOSAL //OROMUCOSAAL
+                | RECTAL // RECTAAL
+                | SUBCUT // INTRADERMAAL SUBCUTAAN
+                | NoRoute
 
 
         type Substance =
@@ -129,9 +222,9 @@ module Types =
                 /// The list of generic products for which the dose rule applies
                 GenericProduct : RuleGenericProduct[]
                 /// The list of prescription products for which the dose rule applies
-                PrescriptionProduct : Product[]
+                PrescriptionProduct : RuleProduct[]
                 /// The list of trade products for which the dose rule applies
-                TradeProduct : Product[]
+                TradeProduct : RuleProduct[]
                 /// The route for which the dose rule applies
                 Routes : string []
                 /// The indication id for which the dose rule applies.
@@ -147,31 +240,31 @@ module Types =
                 /// gender.
                 Gender : string
                 /// The optional minimum or maximum age limits for the dose rule
-                Age : MinMax
+                Age : RuleMinMax
                 /// The optional minimum or maximum weight limits for which the dose
                 /// rule applies
-                Weight : MinMax
+                Weight : RuleMinMax
                 /// The optional BSA min/max for which the dose rule applies
-                BSA : MinMax
+                BSA : RuleMinMax
                 /// The frequency of the dose rule. The total dose can be calculated
                 /// by multiplying the dose by the frequency.
-                Freq : Frequency
+                Freq : RuleFrequency
                 /// The normal optional min/max of the unadjusted dose
-                Norm : MinMax
+                Norm : RuleMinMax
                 /// The absolute optional min/max of the unadjusted dose
-                Abs : MinMax
+                Abs : RuleMinMax
                 /// The normal optional min/max of the dose adjusted by weight
-                NormKg : MinMax
+                NormKg : RuleMinMax
                 /// The absolute optional min/max of the dose adjusted by weight
-                AbsKg : MinMax
+                AbsKg : RuleMinMax
                 /// The absolute optional min/max of the dose adjusted by BSA
-                NormM2 : MinMax
+                NormM2 : RuleMinMax
                 /// The absolute optional min/max of the dose adjusted by BSA
-                AbsM2 : MinMax
+                AbsM2 : RuleMinMax
                 /// The unit in which the dose is measured
                 Unit : string
             }
-        and Product = { Id: int; Name: string }
+        and RuleProduct = { Id: int; Name: string }
         and RuleGenericProduct =
             {
                 Id: int
@@ -181,8 +274,8 @@ module Types =
                 Substances : RuleSubstance []
             }
         and RuleSubstance = { Name: string; Quantity: decimal; Unit: string }
-        and Frequency = { Frequency: decimal; Time: string }
-        and MinMax = { Min: decimal Option; Max: decimal Option }
+        and RuleFrequency = { Frequency: decimal; Time: string }
+        and RuleMinMax = { Min: decimal Option; Max: decimal Option }
 
 
         type ATCGroup =
@@ -249,127 +342,31 @@ module Types =
         and FreqDose =
             {
                 /// The frequency of the dose rule
-                Freq: Frequency
+                Freq: RuleFrequency
                 /// The optional min/max values of a 'normal dose range'
-                NormDose: MinMax
+                NormDose: RuleMinMax
                 /// The optional min/max values of the 'absolute dose range'
-                AbsDose: MinMax
+                AbsDose: RuleMinMax
                 /// The optional min/max values of a 'normal dose range' per kg
-                NormKg: MinMax
+                NormKg: RuleMinMax
                 /// The optional min/max values of the 'absolute dose range' per kg
-                AbsKg: MinMax
+                AbsKg: RuleMinMax
                 /// The optional min/max values of a 'normal dose range' per m2
-                NormM2: MinMax
+                NormM2: RuleMinMax
                 /// The optional min/max values of the 'absolute dose range' per m2
-                AbsM2: MinMax
+                AbsM2: RuleMinMax
                 /// The unit in which the doses are measured
                 Unit: string
             }
 
 
+
     module ZForm =
 
+        open Informedica.GenUnits.Lib
 
-        type ValueUnit = Informedica.GenUnits.Lib.ValueUnit.ValueUnit
-        type Unit = Informedica.GenUnits.Lib.ValueUnit.Unit
-
-        /// Range with min and/or max
-        type MinMax =
-            {
-                Min : Value option
-                Max : Value option
-            }
-        /// Can be either `Inclusive` or `Exclusive`
-        and Value = Inclusive of ValueUnit | Exclusive of ValueUnit
-
-
-        // * ARTI/LESION
-        // * AURICULAIR
-        // * CUTAAN
-        // DENTAAL
-        // ENDOCERVIC
-        // * ENDOTR.PULM
-        // * ENDOTRACHEOPULMONAIR
-        // * EPIDURAAL
-        // EPIDURAAL, INTRATHECAAL, PERINEURAAL
-        // EXTRACORPORAAL
-        // * GASTR-ENTER
-        // * IM
-        // * INHALATIE
-        // INTRA-ART.
-        // INTRA-ARTERIEEL
-        // INTRA-ARTICULAIR
-        // INTRA-OCUL.
-        // INTRA-UTERIEN
-        // INTRABURSAAL
-        // INTRACARDIAAL
-        // INTRACAVERNEUS
-        // INTRACORONAIR
-        // * INTRADERMAAL
-        // INTRALAESIONAAL
-        // INTRALYMFATISCH
-        // * INTRAMUSCULAIR
-        // INTRAMUSCULAIR, INTRAVENEUS
-        // INTRAMUSCULAIR, SUBCUTAAN
-        // INTRAOSSAAL
-        // INTRAPERITONEAAL
-        // INTRAPLEURAAL
-        // INTRATHECAAL
-        // * INTRAVENEUS
-        // INTRAVENEUS, SUBCUTAAN
-        // * INTRAVESIC.
-        // * INTRAVESICAAL
-        // INTRAVITR.
-        // INTRAVITREAAL
-        // * IV
-        // * LOKAAL
-        // * NASAAL
-        // * NEUS
-        // NIET GESPEC
-        // NVT
-        // OOG
-        // * OOR
-        // * ORAAL
-        // ORAAL/RECT
-        // * OROMUCOSAAL
-        // PAR./ORAAL
-        // PAR/UTERIEN
-        // PAR/VESICAL
-        // PARABULBAIR
-        // PARENT/RECT
-        // PARENTERAAL
-        // PERI-ARTICULAIR
-        // PERIBULBAIR
-        // PERINEURAAL
-        // PERITONEAAL
-        // * RECTAAL
-        // RETROBULBAIR
-        // SUBCONJUNCTIVAAL
-        // * SUBCUTAAN
-        // SUBLINGUAAL
-        // * TRANSDERMAAL
-        // TRANSDERML
-        // URETHRAAL
-        // UTERIEN
-        // VAGINAAL
-
-        type Route =
-            | Alternative of string
-            | AUR // AURICULAIR OOR
-            | CUT // CUTAAN TRANSDERMAAL TRANSDERML LOKAAL
-            | ENDOTR // ENDOTR.PULM ENDOTRACHEOPULMONAIR
-            | EPIDUR // EPIDURAAL
-            | IM // INTRAMUSCULAIR IM
-            | INH // INHALATIE
-            | INTRAVESIC // INTRAVESIC. INTRAVESICAAL
-            | IV // INTRAVENEUS IV
-            | LESION // ARTI/LESION
-            | NASAL // NASAAL NEUS
-            | ORAL // ORAAL GASTR-ENTER OROMUCOSAAL
-            | OROMUCOSAL //OROMUCOSAAL
-            | RECTAL // RECTAAL
-            | SUBCUT // INTRADERMAAL SUBCUTAAN
-            | NoRoute
+        type Route = ZIndex.Route.Route
+        type MinMax = MinMax.MinMax
 
 
         /// A product is a medical substance or
@@ -423,7 +420,30 @@ module Types =
                 BSA : MinMax
                 Gender : Gender
             }
+
+            static member GestAge_ :
+                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (fun p -> p.GestAge), (fun a p -> { p with GestAge = a })
+
+            static member Age_ :
+                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (fun p -> p.Age), (fun a p -> { p with Age = a })
+
+            static member Weight_ :
+                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (fun p -> p.Weight), (fun w p -> { p with Weight = w })
+
+            static member BSA_ :
+                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (fun p -> p.BSA), (fun b p -> { p with BSA = b })
+
+            static member Gender_ :
+                (Patient -> Gender) * (Gender -> Patient -> Patient) =
+                (fun p -> p.Gender), (fun g p -> { p with Gender = g })
+
         and Gender = Male | Female | Undetermined
+
+
 
 
         /// Dose limits
@@ -432,18 +452,45 @@ module Types =
                 // Normal limits
                 Norm : MinMax
                 // Normal limits adjusted by weight
-                NormWeight : MinMax * WeightUnit
+                NormWeight : MinMax * Unit
                 // Normal limits adjusted by BSA
-                NormBSA : MinMax * BSAUnit
+                NormBSA : MinMax * Unit
                 // Absolute limits
                 Abs : MinMax
                 // Absolute limits adjusted by weight
-                AbsWeight : MinMax * WeightUnit
+                AbsWeight : MinMax * Unit
                 // Absolute limits adjusted by BSA
-                AbsBSA : MinMax * BSAUnit
+                AbsBSA : MinMax * Unit
             }
-        and WeightUnit = Unit
-        and BSAUnit = Unit
+            static member Norm_ :
+                (DoseRange -> MinMax) * (MinMax -> DoseRange -> DoseRange) =
+                (fun dr -> dr.Norm),
+                (fun mm dr -> { dr with Norm = mm })
+
+            static member NormWeight_ :
+                (DoseRange -> MinMax * Unit) * (MinMax * Unit -> DoseRange -> DoseRange) =
+                (fun dr -> dr.NormWeight),
+                (fun mm dr -> { dr with NormWeight = mm })
+
+            static member NormBSA_ :
+                (DoseRange -> MinMax * Unit) * (MinMax * Unit -> DoseRange -> DoseRange) =
+                (fun dr -> dr.NormBSA),
+                (fun mm dr -> { dr with NormBSA = mm })
+
+            static member Abs_ :
+                (DoseRange -> MinMax) * (MinMax -> DoseRange -> DoseRange) =
+                (fun dr -> dr.Abs),
+                (fun mm dr -> { dr with Abs = mm })
+
+            static member AbsWeight_ :
+                (DoseRange -> MinMax * Unit) * (MinMax * Unit -> DoseRange -> DoseRange) =
+                (fun dr -> dr.AbsWeight),
+                (fun mm dr -> { dr with AbsWeight = mm })
+
+            static member AbsBSA_ :
+                (DoseRange -> MinMax * Unit) * (MinMax * Unit -> DoseRange -> DoseRange) =
+                (fun dr -> dr.AbsBSA),
+                (fun mm dr -> { dr with AbsBSA = mm })
 
 
         /// Dosage
@@ -462,15 +509,63 @@ module Types =
                 /// List of original doserules
                 Rules : Rule list
             }
+            static member Name_ :
+                (Dosage -> string) * (string -> Dosage -> Dosage) =
+                (fun d -> d.Name),
+                (fun s d -> { d with Name = s })
+
+            static member StartDosage_ :
+                (Dosage -> DoseRange) * (DoseRange -> Dosage -> Dosage) =
+                (fun d -> d.StartDosage),
+                (fun dr d -> { d with StartDosage = dr })
+
+            static member SingleDosage_ :
+                (Dosage -> DoseRange) * (DoseRange -> Dosage -> Dosage) =
+                (fun d -> d.SingleDosage),
+                (fun dr d -> { d with SingleDosage = dr })
+
+            static member RateDosage_ :
+                (Dosage -> DoseRange * RateUnit) * (DoseRange * RateUnit -> Dosage -> Dosage) =
+                (fun d -> d.RateDosage),
+                (fun dr d -> { d with RateDosage = dr })
+
+            static member TotalDosage_ :
+                (Dosage -> DoseRange * Frequency) * (DoseRange * Frequency -> Dosage -> Dosage) =
+                (fun d -> d.TotalDosage),
+                (fun dt d -> { d with TotalDosage = dt })
+
+            static member Rules_ :
+                (Dosage -> Rule list) * (Rule list -> Dosage -> Dosage) =
+                (fun d -> d.Rules) ,
+                (fun rs d -> { d with Rules = rs })
+
         and Frequency =
             {
                 Frequencies : Frequencies
                 TimeUnit : TimeUnit
                 MinimalInterval : ValueUnit Option
             }
+            static member Frequencies_ :
+                (Frequency -> Frequencies) * (Frequencies -> Frequency -> Frequency) =
+                (fun fr -> fr.Frequencies) ,
+                (fun frs fr -> { fr with Frequencies = frs })
+
+            static member TimeUnit_ :
+                (Frequency -> Unit) * (Unit -> Frequency -> Frequency) =
+                (fun fr -> fr.TimeUnit) ,
+                (fun tu fr -> { fr with TimeUnit = tu })
+
+            static member MinimalInterval_ :
+                (Frequency -> ValueUnit Option) * (ValueUnit Option -> Frequency -> Frequency) =
+                (fun fr -> fr.MinimalInterval) ,
+                (fun mi fr -> { fr with MinimalInterval = mi })
+
         and Frequencies = BigRational list
+
         and TimeUnit = Unit
+
         and RateUnit = Unit
+
         and Rule = GStandRule of string | PedFormRule of string
 
 
@@ -483,12 +578,48 @@ module Types =
                 // List of substances that have a dosage
                 SubstanceDosages : Dosage list
             }
+            static member Patient_ :
+                (PatientDosage -> Patient) * (Patient -> PatientDosage -> PatientDosage) =
+                (fun pd -> pd.Patient) ,
+                (fun pat pd -> { pd with Patient = pat })
+
+            static member ShapeDosage_ :
+                (PatientDosage -> Dosage) * (Dosage -> PatientDosage -> PatientDosage) =
+                (fun pd -> pd.ShapeDosage) ,
+                (fun sd pd -> { pd with ShapeDosage = sd })
+
+            static member SubstanceDosages_ :
+                (PatientDosage -> Dosage list) * (Dosage list -> PatientDosage -> PatientDosage) =
+                (fun sd -> sd.SubstanceDosages) ,
+                (fun d sd -> { sd with SubstanceDosages = d })
 
 
-        type TradeProductLabel = { HPK : int; Label : string }
+        type TradeProductLabel =
+            { HPK : int; Label : string }
+            static member HPK_ :
+                (TradeProductLabel -> int) * (int -> TradeProductLabel -> TradeProductLabel) =
+                (fun tp -> tp.HPK) ,
+                (fun hpk tp -> { tp with HPK = hpk })
 
 
-        type GenericProductLabel = { GPK : int; Label : string }
+            static member Label_ :
+                (TradeProductLabel -> string) * (string -> TradeProductLabel -> TradeProductLabel) =
+                (fun tp -> tp.Label) ,
+                (fun lbl tp -> { tp with Label = lbl })
+
+
+        type GenericProductLabel =
+            { GPK : int; Label : string }
+            static member GPK_ :
+                (GenericProductLabel -> int) * (int -> GenericProductLabel -> GenericProductLabel) =
+                (fun tp -> tp.GPK) ,
+                (fun hpk tp -> { tp with GPK = hpk })
+
+
+            static member Label_ :
+                (GenericProductLabel -> string) * (string -> GenericProductLabel -> GenericProductLabel) =
+                (fun tp -> tp.Label) ,
+                (fun lbl tp -> { tp with Label = lbl })
 
 
         type ShapeDosage =
@@ -503,6 +634,26 @@ module Types =
                 PatientDosages : PatientDosage list
             }
 
+            static member Shape_ :
+                (ShapeDosage -> string list) * (string list -> ShapeDosage -> ShapeDosage) =
+                (fun rd -> rd.Shape) ,
+                (fun s rd -> { rd with Shape = s })
+
+            static member TradeProducts_ :
+                (ShapeDosage -> TradeProductLabel list) * (TradeProductLabel list -> ShapeDosage -> ShapeDosage) =
+                (fun sd -> sd.TradeProducts) ,
+                (fun tps sd -> { sd with TradeProducts = tps |> List.distinct })
+
+            static member GenericProducts_ :
+                (ShapeDosage -> GenericProductLabel list) * (GenericProductLabel list -> ShapeDosage -> ShapeDosage) =
+                (fun sd -> sd.GenericProducts) ,
+                (fun tps sd -> { sd with GenericProducts = tps |> List.distinct })
+
+            static member PatientDosages_ :
+                (ShapeDosage -> PatientDosage list) * (PatientDosage list -> ShapeDosage -> ShapeDosage) =
+                (fun rd -> rd.PatientDosages) ,
+                (fun pdl rd -> { rd with PatientDosages = pdl })
+
 
         type RouteDosage =
             {
@@ -511,6 +662,15 @@ module Types =
                 // The dosage rules per shape
                 ShapeDosages : ShapeDosage list
             }
+            static member Route_ :
+                (RouteDosage -> string) * (string -> RouteDosage -> RouteDosage) =
+                (fun rd -> rd.Route) ,
+                (fun s rd -> { rd with Route = s })
+
+            static member ShapeDosages_ :
+                (RouteDosage -> ShapeDosage list) * (ShapeDosage list -> RouteDosage -> RouteDosage) =
+                (fun rd -> rd.ShapeDosages) ,
+                (fun pdl rd -> { rd with ShapeDosages = pdl })
 
 
         type IndicationDosage =
@@ -520,6 +680,15 @@ module Types =
                 // The dosage rules per administration route
                 RouteDosages : RouteDosage list
             }
+            static member Indications_ :
+                (IndicationDosage -> string list) * (string list -> IndicationDosage -> IndicationDosage) =
+                (fun inds -> inds.Indications) ,
+                (fun sl inds -> { inds with Indications = sl })
+
+            static member RouteDosages_ :
+                (IndicationDosage -> RouteDosage list) * (RouteDosage list -> IndicationDosage -> IndicationDosage) =
+                (fun inds -> inds.RouteDosages) ,
+                (fun rdl inds -> { inds with RouteDosages = rdl })
 
 
         /// Doserule
@@ -542,6 +711,21 @@ module Types =
                 // The doserules per indication(-s)
                 IndicationsDosages : IndicationDosage list
             }
+            static member Generic_ :
+                (DoseRule -> string) * (string -> DoseRule -> DoseRule) =
+                (fun dr -> dr.Generic),
+                (fun s dr -> { dr with Generic = s })
+
+            static member Synonyms_ :
+                (DoseRule -> string list) * (string list -> DoseRule -> DoseRule) =
+                (fun dr -> dr.Synonyms) ,
+                (fun sns dr -> { dr with Synonyms = sns |> List.distinct })
+
+
+            static member IndicationDosages_ :
+                (DoseRule -> IndicationDosage list) * (IndicationDosage list -> DoseRule -> DoseRule) =
+                (fun dr -> dr.IndicationsDosages) ,
+                (fun inds dr -> { dr with IndicationsDosages = inds })
 
 
         type TextConfig =
@@ -683,6 +867,26 @@ module Types =
                 PMAge : BigRational option
                 Location : VenousAccess
             }
+            static member Gender_ =
+                (fun (p : Patient) -> p.Gender), (fun g (p : Patient) -> { p with Gender = g})
+
+            static member Age_ =
+                (fun (p : Patient) -> p.Age), (fun a (p : Patient) -> { p with Age = a})
+
+            static member Weight_ =
+                (fun (p : Patient) -> p.Weight), (fun w (p : Patient) -> { p with Weight = w})
+
+            static member Height_ =
+                (fun (p : Patient) -> p.Height), (fun b (p : Patient) -> { p with Height = b})
+
+            static member GestAge_ =
+                (fun (p : Patient) -> p.GestAge), (fun a (p : Patient) -> { p with GestAge = a})
+
+            static member PMAge_ =
+                (fun (p : Patient) -> p.PMAge), (fun a (p : Patient) -> { p with PMAge = a})
+
+            static member Department_ =
+                (fun (p : Patient) -> p.Department), (fun d (p : Patient) -> { p with Department = d})
 
 
         type DoseRule =
@@ -769,12 +973,10 @@ module Types =
 
 
         open System
-        open MathNet.Numerics
         open Informedica.GenUnits.Lib
         open Informedica.GenSolver.Lib.Types
 
 
-        type Unit = ValueUnit.Unit
         type Gender = GenForm.Gender
         type Patient = GenForm.Patient
 

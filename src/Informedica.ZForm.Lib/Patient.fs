@@ -5,22 +5,11 @@ module Patient =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Types.ZForm
 
     open Aether
     open Aether.Operators
-
-    type MinMax = MinMax.MinMax
-
-
-    type Patient =
-        {
-            GestAge : MinMax
-            Age : MinMax
-            Weight : MinMax
-            BSA : MinMax
-            Gender : Gender
-        }
-    and Gender = Male | Female | Undetermined
 
 
     let create ga age wght bsa gend =
@@ -36,33 +25,12 @@ module Patient =
     let empty = create MinMax.empty MinMax.empty MinMax.empty MinMax.empty Undetermined
 
 
-    type Patient with
-
-        static member GestAge_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.GestAge), (fun a p -> { p with GestAge = a })
-
-        static member Age_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.Age), (fun a p -> { p with Age = a })
-
-        static member Weight_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.Weight), (fun w p -> { p with Weight = w })
-
-        static member BSA_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.BSA), (fun b p -> { p with BSA = b })
-
-        static member Gender_ :
-            (Patient -> Gender) * (Gender -> Patient -> Patient) =
-            (fun p -> p.Gender), (fun g p -> { p with Gender = g })
-
-
-
     module Optics =
 
         module MinMax = MinMax.Optics
+
+
+        let setGender = Optic.set Patient.Gender_
 
 
         let inclMinGestAge =

@@ -4,17 +4,8 @@
 module PrescriptionProduct =
 
     open Informedica.Utils.Lib
+    open Informedica.GenCore.Lib.Types.ZIndex
 
-    type PrescriptionProduct =
-        {
-            Id : int
-            Name : string
-            Label  : string
-            Quantity : decimal
-            Unit : string
-            Container : string
-            TradeProducts : TradeProduct.TradeProduct []
-        }
 
     let create id nm lb qt un ct ps =
         {

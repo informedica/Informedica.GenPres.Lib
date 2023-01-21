@@ -3,6 +3,7 @@ namespace Informedica.ZForm.Lib
 
 module GStand =
 
+    open Informedica.GenCore.Lib.Types
     open MathNet.Numerics
 
     open Informedica.Utils.Lib
@@ -12,8 +13,10 @@ module GStand =
     open Aether.Optics
     open DoseRule
     open DoseRule.Dosage
-    open MinMax
-    open System.Drawing
+
+    open Informedica.GenUnits.Lib
+    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Types.ZForm
 
     module GPP = Informedica.ZIndex.Lib.GenPresProduct
     module ATC = Informedica.ZIndex.Lib.ATCGroup
@@ -22,20 +25,8 @@ module GStand =
 
 
     module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
+    module Dosage = Dosage
     module UNTS = ValueUnit.Units
-
-    type GenPresProduct = GPP.GenPresProduct
-
-    type DoseRule = DoseRule.DoseRule
-    type IndicationDosage = DoseRule.IndicationDosage
-    type RouteDosage = DoseRule.RouteDosage.RouteDosage
-    type ShapeDosage = DoseRule.ShapeDosage.ShapeDosage
-    type TradeProduct = DoseRule.ShapeDosage.TradeProductLabel
-    type GenericProduct = DoseRule.ShapeDosage.GenericProductLabel
-    type PatientDosage = DoseRule.PatientDosage.PatientDosage
-    type SubstanceDosage = DoseRule.Dosage.Dosage
-    type Patient = Patient.Patient
-    type Dosage = DoseRule.Dosage.Dosage
 
 
     let groupByFst xs =
@@ -58,8 +49,8 @@ module GStand =
         {
             UseAll : bool
             IsRate : bool
-            SubstanceUnit : ValueUnit.Unit Option
-            TimeUnit : ValueUnit.Unit Option
+            SubstanceUnit : Unit Option
+            TimeUnit : Unit Option
         }
 
 
@@ -78,7 +69,7 @@ module GStand =
     let mapMinMax<'a>
                   (setMin : decimal Option -> 'a -> 'a)
                   (setMax : decimal Option -> 'a -> 'a)
-                  (minmax : DR.MinMax)
+                  (minmax : ZIndex.RuleMinMax)
                   (o : 'a) =
         o
         |> setMin minmax.Min
@@ -86,7 +77,7 @@ module GStand =
 
 
     // Get the min max weight if there is one min weight or max weight
-    let calcWeightMinMax (drs : DR.DoseRule seq) =
+    let calcWeightMinMax (drs : ZIndex.DoseRule seq) =
 
         match drs |> Seq.toList with
         | [] -> DR.minmax
@@ -94,12 +85,12 @@ module GStand =
         | h::tail ->
             if tail |> List.forall (fun mm -> mm.Weight = h.Weight) then h.Weight
             else DR.minmax
-        |> mapMinMax ((Option.bind ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.inclMinLens))
-                     ((Option.bind ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.exclMaxLens))
+        |> mapMinMax ((Option.map ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.inclMinLens))
+                     ((Option.map ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.exclMaxLens))
 
 
     // Get the min max bsa if there is one min bsa or max bsa
-    let calcBSAMinMax (drs : DR.DoseRule seq) =
+    let calcBSAMinMax (drs : ZIndex.DoseRule seq) =
 
         match drs |> Seq.toList with
         | [] -> DR.minmax
@@ -107,8 +98,8 @@ module GStand =
         | h::tail ->
             if tail |> List.forall (fun mm -> mm.BSA = h.Weight) then h.BSA
             else DR.minmax
-        |> mapMinMax ((Option.bind ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.inclMinLens))
-                     ((Option.bind ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.exclMaxLens))
+        |> mapMinMax ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.inclMinLens))
+                     ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.exclMaxLens))
 
 
     /// Make sure that a GSTand time string
@@ -185,7 +176,7 @@ module GStand =
     /// by calculating
     /// - substance shape concentration * dose shape quantity * frequency
     /// for each dose
-    let mapDoses n qty unit (gstdsr : DR.DoseRule) =
+    let mapDoses n qty unit (gstdsr : ZIndex.DoseRule) =
 
         let fr = mapFreq gstdsr.Freq
 
@@ -193,17 +184,17 @@ module GStand =
         let setMax = Optic.set MinMax.Optics.exclMaxLens
 
         // ToDo remove n and mapping
-        let toVu n mapping v =
+        let toVu _ _ v =
 
-            match unit |> ValueUnit.fromDecimal (v * qty) with
-            | Some vu ->
+            unit
+            |> ValueUnit.fromDecimal (v * qty)
+            |> fun vu ->
                 let x =
                     fr
                     |> ValueUnit.get
                     |> fst
                     |> ValueUnit.create ValueUnit.Units.Count.times
                 vu * x |> Some
-            | None -> None
 
         let minmax n mapping (mm : DR.MinMax) =
             MinMax.empty
@@ -225,9 +216,9 @@ module GStand =
          gstdsr)
 
 
-    let getSubstanceDoses (cfg : CreateConfig) (drs : DR.DoseRule seq) =
+    let getSubstanceDoses (cfg : CreateConfig) (drs : ZIndex.DoseRule seq) =
         // fold maximize with preservation of min
-        let fold (mm : MinMax) (mm_ : MinMax) =
+        let fold (mm : ZForm.MinMax) (mm_ : ZForm.MinMax) =
             match mm.Min, mm.Min with
             | Some m, None
             | None, Some m -> [ mm |> MinMax.setMin ( Some m); mm_ |> MinMax.setMin (Some m) ]
@@ -268,7 +259,7 @@ module GStand =
                             |> List.map (ValueUnit.toStringPrec 1)
                             |> String.concat ", "
 
-                        failwith <| sprintf "cannot add frequency %s to list with units %s" s1 s2
+                        failwith <| $"cannot add frequency %s{s1} to list with units %s{s2}"
 
 
                     if frs |> List.exists ((=) fr) then frs else frs @ [ fr ]
@@ -292,7 +283,7 @@ module GStand =
             let b = MinMax.empty |> calcBSAMinMax gstdsrs
 
             // if weight or bsa is known the adjusted or unadjusted doses can be calculated
-            let calcNoneAndAdjusted (c : MinMax) (un : MinMax) (adj : MinMax) =
+            let calcNoneAndAdjusted (c : ZForm.MinMax) (un : ZForm.MinMax) (adj : ZForm.MinMax) =
                 // remove the adjust unit by making it a count
                 let c =
                     c |> MinMax.withUnit ValueUnit.Units.Count.times
@@ -337,17 +328,17 @@ module GStand =
                 match frs with
                 | fr::_ ->
                     match fr |> ValueUnit.get |> snd with
-                    | ValueUnit.CombiUnit(_, ValueUnit.OpPer, tu) -> tu
-                    | _ -> ValueUnit.NoUnit
-                | _ -> ValueUnit.NoUnit
+                    | Unit.CombiUnit(_, OpPer, tu) -> tu
+                    | _ -> Unit.NoUnit
+                | _ -> Unit.NoUnit
 
             inds ,
             DoseRule.Dosage.empty
-            |> (Optic.set Dosage.Name_ n)
-            |> (Optic.set Dosage.Rules_ (gstdsrs |> List.map (DR.toString2 >> Dosage.GStandRule)))
+            |> Dosage.Optics.setName n
+            |> Dosage.Optics.setRules (gstdsrs |> List.map (DR.toString2 >> ZForm.Rule.GStandRule))
             |> (fun ds ->
                 match tu with
-                | _ when tu = ValueUnit.NoUnit || (tu |> ValueUnit.isCountUnit) ->
+                | _ when tu = Unit.NoUnit || (tu |> ValueUnit.isCountUnit) ->
                     ds
                     |> (Optic.set Dosage.StartDosage_ dr)
 
@@ -387,12 +378,12 @@ module GStand =
             ))))
 
 
-    let getPatients (cfg : CreateConfig) (drs : DR.DoseRule seq) =
-        let map = mapMinMax<Patient>
+    let getPatients (cfg : CreateConfig) (drs : ZIndex.DoseRule seq) =
+        let map = mapMinMax<ZForm.Patient>
 
-        let ageInMo = Option.bind ValueUnit.ageInMo
+        let ageInMo = Option.map ValueUnit.ageInMo
 
-        let wghtKg = Option.bind ValueUnit.weightInKg
+        let wghtKg = Option.map ValueUnit.weightInKg
 
         let mapAge =
             map (ageInMo >> Patient.Optics.setInclMinAge)
@@ -404,10 +395,10 @@ module GStand =
 
         let mapGender s =
             match s with
-            | _ when s = "man" -> Patient.Male
-            | _ when s = "vrouw" -> Patient.Female
-            | _ -> Patient.Undetermined
-            |> (Optic.set Patient.Gender_)
+            | _ when s = "man" -> ZForm.Male
+            | _ when s = "vrouw" -> ZForm.Female
+            | _ -> ZForm.Undetermined
+            |> Patient.Optics.setGender //(Optic.set Patient.Gender_)
 
         drs
         |> Seq.map (fun dr ->
@@ -428,7 +419,7 @@ module GStand =
 
 
     // Get the ATC codes for a GenPresProduct
-    let getATCs gpk (gpp : GenPresProduct) =
+    let getATCs gpk (gpp : ZIndex.GenPresProduct) =
         gpp.GenericProducts
         |> Array.filter (fun gp ->
             match gpk with
@@ -440,14 +431,14 @@ module GStand =
 
 
     // Get the list of routes for a GenPresProduct
-    let getRoutes (gpp: GenPresProduct) =
+    let getRoutes (gpp: ZIndex.GenPresProduct) =
         gpp.GenericProducts
         |> Array.collect (fun gp -> gp.Route)
         |> Array.distinct
 
 
     // Get the list of ATC groups for a GenPresProduct
-    let getATCGroups gpk (gpp: GenPresProduct) =
+    let getATCGroups gpk (gpp: ZIndex.GenPresProduct) =
 
         ATC.get ()
         |> Array.filter (fun g ->
@@ -461,8 +452,8 @@ module GStand =
 
     // Get the doserules for a genpresproduct
     // ToDo Temp hack ignore route and shape
-    let getDoseRules all (gpp : GenPresProduct) =
-        gpp.Route
+    let getDoseRules all (gpp : ZIndex.GenPresProduct) =
+        gpp.Routes
         |> Seq.collect (fun r ->
             RF.createFilter None None None None gpp.Name gpp.Shape r
             |> RF.find all
@@ -471,7 +462,7 @@ module GStand =
         |> Seq.groupBy fst
 
 
-    let getTradeNames (gpp : GenPresProduct) =
+    let getTradeNames (gpp : ZIndex.GenPresProduct) =
         gpp.GenericProducts
         |> Seq.collect (fun gp -> gp.PrescriptionProducts)
         |> Seq.collect (fun pp -> pp.TradeProducts)
@@ -618,8 +609,8 @@ module GStand =
                 dr
                 |> DoseRule.Optics.setSynonyms (gpps |> Seq.collect getTradeNames |> Seq.toList) ,
                 gpps
-                |> Seq.collect (fun (gpp : GenPresProduct) ->
-                    gpp.Route
+                |> Seq.collect (fun (gpp : ZIndex.GenPresProduct) ->
+                    gpp.Routes
                     |> Seq.filter (fun r -> rte |> String.isNullOrWhiteSpace || r |> String.equalsCapInsens rte)
                     |> Seq.collect (fun r ->
                         RF.createFilter age wght bsa gpk gpp.Name gpp.Shape r

@@ -5,8 +5,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Types.fs" />
     <Compile Include="Library.fs" />
+    <Compile Include="MinMax.fs" />
+    <Compile Include="Types.fs" />
     <None Include="Scripts\Tests.fsx" />
     <None Include="Scripts\load.fsx" />
   </ItemGroup>

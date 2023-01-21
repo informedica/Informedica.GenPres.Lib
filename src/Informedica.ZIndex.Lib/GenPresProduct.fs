@@ -5,27 +5,15 @@ module GenPresProduct =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
-
-
-    type GenPresProduct =
-        {
-            Name : string
-            Shape : string
-            Route : string []
-            Pharmacologic : string []
-            GenericProducts : GenericProduct.GenericProduct []
-            DisplayName: string
-            Unit : string
-            Synonyms: string []
-        }
+    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create nm sh rt ph gps dpn unt sns =
         {
             Name = nm
             Shape = sh
-            Route = rt
-            Pharmacologic = ph
+            Routes = rt
+            PharmacologicalGroups = ph
             GenericProducts = gps
             DisplayName = dpn
             Unit = unt
@@ -157,15 +145,15 @@ module GenPresProduct =
 
 
     let toString (gpp : GenPresProduct) =
-        gpp.Name + " " + gpp.Shape + " " + (gpp.Route |> String.concat "/")
+        gpp.Name + " " + gpp.Shape + " " + (gpp.Routes |> String.concat "/")
 
 
     let filter all n s r =
         if all then getAll () else getAssortment ()
         |> Array.filter (fun gpp ->
-            (n = "" || gpp.Name  |> String.equalsCapInsens n) &&
-            (s = "" || gpp.Shape |> String.equalsCapInsens s) &&
-            (r = "" || gpp.Route |> Array.exists (fun r' -> r' |> String.equalsCapInsens r))
+            (n = "" || gpp.Name   |> String.equalsCapInsens n) &&
+            (s = "" || gpp.Shape  |> String.equalsCapInsens s) &&
+            (r = "" || gpp.Routes |> Array.exists (fun r' -> r' |> String.equalsCapInsens r))
         )
 
 
@@ -186,7 +174,7 @@ module GenPresProduct =
         fun () ->
             getAssortment ()
             |> Array.collect (fun gpp ->
-                gpp.Route
+                gpp.Routes
             )
             |> Array.distinct
             |> Array.sort
@@ -219,7 +207,7 @@ module GenPresProduct =
         fun () ->
             getAssortment ()
             |> Array.map (fun gpp ->
-                gpp.Shape, gpp.Route
+                gpp.Shape, gpp.Routes
             )
             |> Array.groupBy fst
             |> Array.map (fun (k, vs) ->

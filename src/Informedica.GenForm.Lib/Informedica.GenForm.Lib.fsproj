@@ -5,7 +5,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="MinMax.fs" />

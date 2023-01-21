@@ -4,14 +4,8 @@
 module Substance =
 
     open Informedica.Utils.Lib
+    open Informedica.GenCore.Lib.Types.ZIndex
 
-    type Substance =
-        {
-            Id : int
-            Name : string
-            Mole : decimal
-            MoleReal : decimal
-        }
 
     let create id nm ms mr =
         {
