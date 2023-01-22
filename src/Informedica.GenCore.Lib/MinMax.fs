@@ -20,12 +20,14 @@ module MinMax =
     let (>=?) = ValueUnit.gte
     let (>>=) l r = ValueUnit.convertTo r l
 
+
     /// Range with min and/or max
     type MinMax =
         {
             Min : Value option
             Max : Value option
         }
+
     /// Can be either `Inclusive` or `Exclusive`
     and Value = Inclusive of ValueUnit | Exclusive of ValueUnit
 
@@ -47,8 +49,8 @@ module MinMax =
     /// with multiplication and division
     let one u =
         {
-            Min = 1N |> ValueUnit.create u |> inclusive |> Some
-            Max = 1N |> ValueUnit.create u |> inclusive |> Some
+            Min = 1N |> ValueUnit.createSingle u |> inclusive |> Some
+            Max = 1N |> ValueUnit.createSingle u |> inclusive |> Some
         }
 
 
@@ -85,6 +87,7 @@ module MinMax =
     /// inclusive and exclusive logic
     let valueSTE = applyValue2 (<=?) (<=?) (<=?) (<=?)
 
+
     /// Calculate the comparison of 2
     /// optional `Value` types `v1` and `v2`.
     let compOpt comp nn sn ns v1 v2 =
@@ -105,6 +108,7 @@ module MinMax =
 
 
     let valueOptSTE = compOpt valueSTE false false true
+
 
     /// Check whether a `MinMax` is valid in the
     /// sense that the lower limit never can exceed
@@ -528,8 +532,8 @@ module MinMax =
 
 
     let valueToString = function
-        | Inclusive vu -> sprintf "incl %s" (vu |> ValueUnit.toStringPrec 2)
-        | Exclusive vu -> sprintf "excl %s" (vu |> ValueUnit.toStringPrec 2)
+        | Inclusive vu -> $"incl %s{vu |> ValueUnit.toStringPrec 2}"
+        | Exclusive vu -> $"excl %s{vu |> ValueUnit.toStringPrec 2}"
 
 
     /// Turn a `MinMax` to a string with
@@ -550,8 +554,8 @@ module MinMax =
             vu
             |> (fun vu ->
                 match vu |> ValueUnit.get with
-                | v, u when v >= 1000N && u = milliGram -> vu |> convertTo gram
-                | v, u when v >= 1000N && u = milliGramPerDay -> vu |> convertTo gramPerDay
+                | v, u when v >= [|1000N|] && u = milliGram -> vu |> convertTo gram
+                | v, u when v >= [|1000N|] && u = milliGramPerDay -> vu |> convertTo gramPerDay
                 | _ -> vu
             )
             |> ValueUnit.toStringPrec 2
@@ -583,9 +587,9 @@ module MinMax =
 
 
     let ageToString { Min = min; Max = max } =
-        let oneWk = 1N |> ValueUnit.create ValueUnit.Units.Time.week
-        let oneMo = 1N |> ValueUnit.create ValueUnit.Units.Time.month
-        let oneYr = 1N |> ValueUnit.create ValueUnit.Units.Time.year
+        let oneWk = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.week
+        let oneMo = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.month
+        let oneYr = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.year
 
         let convert =
             let c vu =
@@ -623,12 +627,12 @@ module MinMax =
             |>! ignore
 
             // Add min and max to dto and there and back again
-            dto.Min.Value <- 1m
+            dto.Min.Value <- [|1m|]
             dto.Min.Unit <- "mg"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2m
+            dto.Max.Value <- [|2m|]
             dto.Max.Unit <- "g"
             dto.Max.Group <- "mass"
             dto.HasMax <- true
@@ -639,12 +643,12 @@ module MinMax =
             |>! ignore
 
             // Add min > and max to dto and there and back again
-            dto.Min.Value <- 1m
+            dto.Min.Value <- [|1m|]
             dto.Min.Unit <- "g"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2m
+            dto.Max.Value <- [|1m|]
             dto.Max.Unit <- "mg"
             dto.Max.Group <- "mass"
             dto.HasMax <- true

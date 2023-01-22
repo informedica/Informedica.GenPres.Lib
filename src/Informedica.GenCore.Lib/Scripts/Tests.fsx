@@ -1,24 +1,22 @@
 
-#load "Expecto.fsx"
+#load "../../../scripts/Expecto.fsx"
 #load "load.fsx"
-#load "../Library.fs"
-
-open Expecto
-open Informedica.GenCore.Lib
+#load "../MinIncrMax.fs"
 
 
 
 
 module Tests =
 
-    open Informedica.Utils.Lib.BCL
     open Expecto
+    open Informedica.GenCore.Lib
+    open Informedica.Utils.Lib.BCL
 
 
     module MinIncrMaxTests =
 
         [<Tests>]
-        let tests = testList "MinIncrMax.toIncrement" [
+        let tests = testList "MinIncrMax.validate" [
             fun min incr max ->
                 let min =
                     min
@@ -26,13 +24,13 @@ module Tests =
                 let max =
                     max
                     |> Option.map (fun (maxIncl, max) -> maxIncl, max |> BigRational.fromInt)
-                let incr = incr |> Set.map (BigRational.fromInt) |> Some
+                let incr = incr |> Set.map BigRational.fromInt |> Some
 
                 try
-                    MinIncrMax.toIncrement min incr max
+                    MinIncrMax.validate min incr max
                     |> function
-                    | None -> ()
-                    | Some (min, incr, max) ->
+                    | Error _ -> ()
+                    | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
                         MinIncrMax.toString toBrStr min incr max
                         |> printfn "Pass: %s"
@@ -49,13 +47,13 @@ module Tests =
                 let max =
                     max
                     |> Option.map (fun (maxIncl, max) -> maxIncl, max |> BigRational.fromInt)
-                let incr = incr |> Set.map (BigRational.fromInt) |> Some
+                let incr = incr |> Set.map BigRational.fromInt |> Some
 
                 try
-                    MinIncrMax.toIncrement min incr max
+                    MinIncrMax.validate min incr max
                     |> function
-                    | None -> ()
-                    | Some (min, incr, max) ->
+                    | Error _ -> ()
+                    | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
                         MinIncrMax.toStringNL toBrStr min incr max
                         |> printfn "Pass: %s"
@@ -67,7 +65,7 @@ module Tests =
 
             fun min incr max ->
                 try
-                    MinIncrMax.toIncrement min incr max
+                    MinIncrMax.validate min incr max
                     |> ignore
                     true
                 with
@@ -75,9 +73,20 @@ module Tests =
             |> Generators.testProp "never throws an exception"
 
 
+            fun min incr max ->
+                MinIncrMax.validate min incr max
+                |> function
+                | Ok (Some min, _, Some max) ->
+                    let min = min |> snd
+                    let max = max |> snd
+                    min <= max
+                | _ -> true
+            |> Generators.testProp "min always is equal or less than max"
         ]
 
 
+
+open Expecto
 
 Tests.MinIncrMaxTests.tests
 |> Expecto.run

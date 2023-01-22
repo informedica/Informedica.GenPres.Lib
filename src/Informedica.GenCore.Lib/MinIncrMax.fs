@@ -3,30 +3,28 @@
 
 
 
-[<RequireQualifiedAccess>]
-module Set =
-
-    open Informedica.Utils.Lib.BCL
-
-    let removeBigRationalMultiples xs =
-        if xs |> Set.isEmpty then xs
-        else
-            xs
-            |> Set.fold (fun acc x1 ->
-                acc
-                |> Set.filter (fun x2 ->
-                    x1 = x2 ||
-                    x2 |> BigRational.isMultiple x1 |> not
-                )
-            ) xs
-
-
-
 module MinIncrMax =
+
 
     open MathNet.Numerics
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+
+
+    module Errors =
+
+        type Msg =
+            | MinLargerThanMax of minIncl: bool * min: BigRational * maxIncl: bool * max: BigRational
+            | NoValidIncrements of BigRational Set
+
+
+        let toString = function
+            | MinLargerThanMax (minIncl, min, maxIncl, max) ->
+                let left = if minIncl then "[" else "<"
+                let right = if maxIncl then "]" else ">"
+                $"{left}{min} > {max}{right}"
+            | NoValidIncrements incr ->
+                incr |> Set.toString
 
 
     let maxMultipleOf incr min =
@@ -53,52 +51,62 @@ module MinIncrMax =
             brs
             |> Set.filter ((<) 0N)
             |> Set.removeBigRationalMultiples
-            |> fun brs ->
-                if brs |> Set.isEmpty then None
-                else
+            |> fun brs1 ->
+                if brs1 |> Set.isEmpty then
                     brs
-                    |> Some
+                    |> Errors.NoValidIncrements
+                    |> Error
+                else
+                    brs1
+                    |> Ok
 
 
-    let toIncrement min incr max =
+
+    let validate min incr max =
         match min, incr, max with
         | None, None, None
         | Some _, None, None
-        | None, None, Some _ -> (min, incr, max) |> Some
+        | None, None, Some _
+        | Some _, None, Some _ -> (min, incr, max) |> Ok
         | None, Some incr, None ->
-            match incr |> calcIncrement with
-            | None -> None
-            | Some incr ->
-                (min, incr |> Some, max) |> Some
-        | Some min, None, Some max ->
-            if min |> minGTmax max then None
-            else
-                (min |> Some, None, max |> Some) |> Some
+            incr
+            |> calcIncrement
+            |> Result.map (fun incr -> (min, incr |> Some, max))
         | Some min, Some incr, None ->
-            match incr |> calcIncrement with
-            | None -> None
-            | Some incr ->
+            incr
+            |> calcIncrement
+            |> Result.map (fun incr ->
                 (min |> minMultipleOf incr |> Some,
                 incr |> Some, max)
-                |> Some
+            )
         | None, Some incr, Some max ->
-            match incr |> calcIncrement with
-            | None -> None
-            | Some incr ->
+            incr
+            |> calcIncrement
+            |> Result.map (fun incr ->
                 (min,
                 incr |> Some,
                 max |> maxMultipleOf incr |> Some)
-                |> Some
+            )
         | Some min, Some incr, Some max ->
-            match incr |> calcIncrement with
-            | None -> None
-            | Some incr ->
-                if min |> minGTmax max then None
-                else
-                    (min |> minMultipleOf incr |> Some,
-                    incr |> Some,
-                    max |> maxMultipleOf incr |> Some)
-                    |> Some
+            incr
+            |> calcIncrement
+            |> Result.map (fun incr ->
+                (min |> minMultipleOf incr |> Some,
+                incr |> Some,
+                max |> maxMultipleOf incr |> Some)
+            )
+        |> function
+        | Ok (Some min, incr, Some max) ->
+            if min |> minGTmax max then
+                let minIncl, min = min
+                let maxIncl, max = max
+                (minIncl, min, maxIncl, max)
+                |> Errors.MinLargerThanMax
+                |> Error
+            else
+                (Some min, incr, Some max)
+                |> Ok
+        | result -> result
 
 
     let toString_  st ste gt gte dotsL dotsR dotsM brToStr min incr max =
@@ -123,7 +131,7 @@ module MinIncrMax =
         | None, Some incr, Some (maxIncl, max) ->
             let ste = if maxIncl then ste else st
             $"{incr |> toStr}{dotsR}{ste}%s{max |> brToStr}"
-        | Some (minIncl, min), None, Some (maxIncl, max) ->
+        | Some (_, min), None, Some (_, max) ->
             // let gte = if minIncl then gte else gt
             // let ste = if maxIncl then ste else st
             $"%s{min |> brToStr}{dotsM}%s{max |> brToStr}"

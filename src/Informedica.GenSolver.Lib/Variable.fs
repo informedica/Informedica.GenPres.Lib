@@ -85,11 +85,14 @@ module Variable =
 
             let minSTmin min1 min2 = min2 |> minGTEmin min1 |> not
 
+
             /// Checks whether `Minimum` is exclusive.
             let isExcl = function | MinIncl _ -> false | MinExcl _ -> true
 
+
             /// Checks whether `Minimum` is inclusive.
             let isIncl = isExcl >> not
+
 
             /// Creates a `Minimum` from a `BigRational` set.
             /// Returns `None` if an empty set.
@@ -101,8 +104,10 @@ module Variable =
                     |> MinIncl
                     |> Some
 
+
             /// Convert a `Minimum` to a `BigRational`.
             let toBigRational = function | MinIncl v | MinExcl v -> v
+
 
             /// Convert a `Minimum` to a `BigRational` and a `bool`
             /// that signifies inclusive or exclusive

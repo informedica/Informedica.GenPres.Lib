@@ -1,23 +1,9 @@
 ﻿namespace Informedica.ZIndex.Lib
 
-// Tabel: BST000T: Bestand 000 Bestanden
-// ---------------
-// 0.   BSTNUM:     Bestand-nummer
-// 1.   MUTKOD:     Mutatiecode
-// 2.   MDBST:      Naam van het Bestand
-// 3.   MDOBST:     Bestand-omschrijving
-// 4.   MDBCOD:     BestandsCode
-// 5.   MDRECL:     Recordlengte
-// 6.   MDDATI:     Ingangsdatum
-// 7.   MDDATW:     Eindedatum uitlevering
-// 8.   MDDATU:     Uitgavedatum
-// 9.   MDSTAT:     Status (in voorbereiding, test, productie)
-// 10.  MDANM0:     Aantal ongewijzigde records
-// 11.  MDANM1:     Aantal vervallen records
-// 12.  MDANM2:     Aantal gewijzigde records
-// 13.  MDANM3:     Aantal nieuwe records
-// 14.  MDANTL:     Totaal aantal records
 
+/// The BST00T file contains all the
+/// available files that need to be
+/// parsed to tables
 module BST000T =
 
     open System
@@ -28,6 +14,24 @@ module BST000T =
 
     let name = "BST000T"
 
+
+    // Tabel: BST000T: Bestand 000 Bestanden
+    // ---------------
+    // 0.   BSTNUM:     Bestand-nummer
+    // 1.   MUTKOD:     Mutatiecode
+    // 2.   MDBST:      Naam van het Bestand
+    // 3.   MDOBST:     Bestand-omschrijving
+    // 4.   MDBCOD:     BestandsCode
+    // 5.   MDRECL:     Recordlengte
+    // 6.   MDDATI:     Ingangsdatum
+    // 7.   MDDATW:     Eindedatum uitlevering
+    // 8.   MDDATU:     Uitgavedatum
+    // 9.   MDSTAT:     Status (in voorbereiding, test, productie)
+    // 10.  MDANM0:     Aantal ongewijzigde records
+    // 11.  MDANM1:     Aantal vervallen records
+    // 12.  MDANM2:     Aantal gewijzigde records
+    // 13.  MDANM3:     Aantal nieuwe records
+    // 14.  MDANTL:     Totaal aantal records
     type BST000T =
         {
             MUTKOD: string
@@ -41,6 +45,7 @@ module BST000T =
             MDANM3: int
             MDANTL: int
         }
+
 
     let create mc nm ds rl st ua dl al nw tt =
         {
@@ -56,9 +61,12 @@ module BST000T =
             MDANTL = tt
         }
 
+
     let posl = BST001T.getPosl name
 
+
     let pickList = [1] @ [2; 3] @ [5] @ [9..14]
+
 
     let records _ =
         Parser.getData name posl pickList
@@ -71,6 +79,7 @@ module BST000T =
             let nw = Int32.Parse d[8]
             let tt = Int32.Parse d[9]
             create d[0] d[1] d[2] rl d[4] ua dl al nw tt)
+
 
     let table n =
         records ()

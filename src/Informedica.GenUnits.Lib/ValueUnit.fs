@@ -60,7 +60,7 @@ and Operator =
     | OpMinus
 
 
-type ValueUnit = ValueUnit of  BigRational * Unit
+type ValueUnit = ValueUnit of  BigRational[] * Unit
 
 
 
@@ -480,22 +480,33 @@ module ValueUnit =
 
 
 
-    let create u v = (v, u) |> ValueUnit
+    let create u v = (v |> Array.distinct, u) |> ValueUnit
+
+
+    let createSingle u v = [|v|] |> create u
 
 
     let withUnit u v =
         v
-        |> BigRational.fromDecimal
+        |> Array.map BigRational.fromDecimal
         |> create u
 
 
+    let withUnitSingle u v = [|v|] |> withUnit u
+
     let withValue v u = create u v
+
+
+    let withSingleValue v u = [| v |] |> create u
 
 
     let generalUnit v s = (s, v) |> General
 
 
     let generalValueUnit n v s = create (generalUnit v s) n
+
+
+    let generalSingleValueUnit n v s = generalValueUnit [|n|] v s
 
 
     let get (ValueUnit (v, u)) = v, u
@@ -513,13 +524,13 @@ module ValueUnit =
     let valueToBase u v = v |> Multipliers.toBase (u |> Multipliers.getMultiplier)
 
 
-    let toBase (ValueUnit (v, u)) = v |> valueToBase u
+    let toBase (ValueUnit (v, u)) = v |> Array.map (valueToBase u)
 
 
     let valueToUnit u v = v |> Multipliers.toUnit (u |> Multipliers.getMultiplier)
 
 
-    let toUnit (ValueUnit (v, u)) = v |> valueToUnit u
+    let toUnit (ValueUnit (v, u)) = v |> Array.map (valueToUnit u)
 
 
     let count = 1N |> Times |> Count
@@ -736,7 +747,11 @@ module ValueUnit =
         let (ValueUnit (_, u1)) = vu1
         let (ValueUnit (_, u2)) = vu2
         // calculate value in base
-        let v = vu1 |> toBase |> op <| (vu2 |> toBase)
+        let v =
+            let vs1 = vu1 |> toBase
+            let vs2 = vu2 |> toBase
+            Array.allPairs vs1 vs2
+            |> Array.map (fun (v1, v2) -> v1 |> op <| v2)
         // calculate new combi unit
         let u =
             match op with
@@ -758,7 +773,12 @@ module ValueUnit =
 
 
     let cmp cp vu1 vu2 =
-        (vu1 |> toBase) |> cp <| (vu2 |> toBase)
+        let vs1 = vu1 |> toBase
+        let vs2 = vu2 |> toBase
+        Array.allPairs vs1 vs2
+        |> Array.forall (fun (v1, v2)  ->
+            v1 |> cp <| v2
+        )
 
 
     let eq = cmp (=)
@@ -1184,7 +1204,7 @@ module ValueUnit =
     let toString brf loc verb vu =
         let v, u = vu |> get
 
-        $"{v |> brf} {Units.toString loc verb u}"
+        $"{v |> Array.map brf |> Array.toString} {Units.toString loc verb u}"
 
 
     let toStringDutchShort = toString BigRational.toString Units.Dutch Units.Short
@@ -1205,9 +1225,9 @@ module ValueUnit =
 
         let vs =
             v
-            |> BigRational.toFloat
-            |> Double.fixPrecision prec
-            |> string
+            |> Array.map BigRational.toDecimal
+            |> Array.map (Decimal.fixPrecision prec)
+            |> Array.toString
 
         let us =
             u
@@ -1222,6 +1242,7 @@ module ValueUnit =
             let dels = "#"
 
             let ufs s =
+                // ToDo doesn't work with units with spaces
                 match s |> String.trim |> String.split " " with
                 | [ug] ->
                     match Units.fromString ug with
@@ -1278,7 +1299,7 @@ module ValueUnit =
                     |> String.concat " "
                     |> String.trim
                     |> fs
-                (v, u) |> ValueUnit
+                ([|v|], u) |> ValueUnit
         | _ ->
             if s = "" then failwith "Cannot parse empty string"
             else failwith <| $"Cannot parse string %s{s}"
@@ -1294,7 +1315,7 @@ module ValueUnit =
         let dutch = "dutch"
 
         type Dto () =
-            member val Value = Decimal.Zero with get, set
+            member val Value = [||] with get, set
             member val Unit = "" with get, set
             member val Group = "" with get, set
             member val Short = true with get, set
@@ -1327,7 +1348,7 @@ module ValueUnit =
                     else Units.Long
 
                 let v, u = vu |> get
-                let v = v |> BigRational.toDecimal
+                let v = v |> Array.map BigRational.toDecimal
                 let g =
                     u
                     |> Group.unitToGroup
@@ -1352,7 +1373,7 @@ module ValueUnit =
         let toDtoEnglishLong vu  =  vu |>toDto false english |> Option.get
 
         let fromDto (dto: Dto) =
-            let v = dto.Value |> BigRational.fromDecimal
+            let v = dto.Value |> Array.map BigRational.fromDecimal
             $"%s{dto.Unit}[%s{dto.Group}]"
             |> Units.fromString
             |> function

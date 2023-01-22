@@ -6,6 +6,7 @@ module ProductRange =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
+
     // GPK;ATC;HoofdGroep;SubGroep;Generiek;Product;Etiket;Vorm;Route;Sterkte;Eenheid;StandDose;DoseEenheid;Indicaties;InFormDb
     type ProductRange =
         {
@@ -25,6 +26,7 @@ module ProductRange =
             Indications: string
         }
 
+
     let create gpk atc grp sub gen prod lbl shp route conc concU dose doseU inds =
         {
             GPK = gpk // 0
@@ -42,6 +44,7 @@ module ProductRange =
             DoseMultipleUnit = doseU
             Indications = inds
         }
+
 
     let data_ () =
         File.readAllLines FilePath.mapping

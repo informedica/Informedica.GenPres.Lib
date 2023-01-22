@@ -74,7 +74,7 @@ module Parser =
                     |> List.rev
                     |> List.reduce ValueUnit.per
                     |> ValueUnit.create
-                    |> fun f -> f br
+                    |> fun f -> f  [|br|]
                     |> Some
                 | None -> None
             | Failure (msg, _, _) ->

@@ -16,7 +16,6 @@
 
 // These can be loaded all at once.
 
-#load "../Types.fs"
 #load "../Utils.fs"
 #load "../Logging.fs"
 #load "../Exceptions.fs"

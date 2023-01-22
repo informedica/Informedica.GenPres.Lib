@@ -18,6 +18,7 @@ module PrescriptionProduct =
             TradeProducts = ps
         }
 
+
     let _get id =
         Zindex.BST051T.records ()
         |> Array.filter (fun r ->
@@ -40,5 +41,6 @@ module PrescriptionProduct =
 
             create r.PRKODE nm lb r.HPGALG un ct ps
         )
+
 
     let get : int -> PrescriptionProduct [] = Memoization.memoize _get

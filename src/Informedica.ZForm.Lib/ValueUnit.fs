@@ -54,7 +54,7 @@ module ValueUnit =
         | Some u ->
             match v |> BigRational.fromFloat with
             | None -> None
-            | Some v  -> create u v |> Some
+            | Some v  -> createSingle u v |> Some
 
     /// Create a `ValueUnit` using a float value
     /// and a string unit using the GStand mapping
@@ -70,7 +70,7 @@ module ValueUnit =
     let fromDecimal (v: decimal) u =
         v
         |> BigRational.fromDecimal
-        |> create u
+        |> createSingle u
 
 
     /// Turn a `ValueUnit` to a float, string tuple.
@@ -79,7 +79,7 @@ module ValueUnit =
     let valueUnitToGStandUnitString vu =
         let v, u = get vu
 
-        v |> BigRational.toDecimal,
+        v |> Array.map BigRational.toDecimal,
         u
         |> Units.toString Units.Localization.English Units.Short
         |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.GStandMap
@@ -90,7 +90,7 @@ module ValueUnit =
     let valueUnitToAppUnitString vu =
         let v, u = get vu
 
-        v |> BigRational.toDecimal,
+        v |> Array.map BigRational.toDecimal,
         u
         |> Units.toString Units.Localization.English Units.Short
         |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.AppMap

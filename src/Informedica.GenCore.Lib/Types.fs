@@ -176,6 +176,7 @@ module Types =
                 Substances : ProductSubstance []
                 PrescriptionProducts : PrescriptionProduct []
             }
+
         and ProductSubstance =
             {
                 SubstanceId : int
@@ -264,7 +265,49 @@ module Types =
                 /// The unit in which the dose is measured
                 Unit : string
             }
+
+            static member Weight_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.Weight) ,
+                (fun mm dr -> { dr with Weight = mm })
+
+            static member BSA_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.BSA) ,
+                (fun mm dr -> { dr with BSA = mm })
+
+            static member Norm_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.Norm) ,
+                (fun mm dr -> { dr with Norm = mm })
+
+            static member Abs_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.Abs) ,
+                (fun mm dr -> { dr with Abs = mm })
+
+            static member NormKg_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.NormKg) ,
+                (fun mm dr -> { dr with NormKg = mm })
+
+            static member AbsKg_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.AbsKg) ,
+                (fun mm dr -> { dr with AbsKg = mm })
+
+            static member NormM2_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.NormM2) ,
+                (fun mm dr -> { dr with NormM2 = mm })
+
+            static member AbsM2_ :
+                (DoseRule -> RuleMinMax) * (RuleMinMax -> DoseRule -> DoseRule) =
+                (fun dr -> dr.AbsM2) ,
+                (fun mm dr -> { dr with AbsM2 = mm })
+
         and RuleProduct = { Id: int; Name: string }
+
         and RuleGenericProduct =
             {
                 Id: int
@@ -273,8 +316,11 @@ module Types =
                 Unit: string
                 Substances : RuleSubstance []
             }
+
         and RuleSubstance = { Name: string; Quantity: decimal; Unit: string }
+
         and RuleFrequency = { Frequency: decimal; Time: string }
+
         and RuleMinMax = { Min: decimal Option; Max: decimal Option }
 
 
@@ -315,9 +361,11 @@ module Types =
                 BSA: BSAInM2
             }
 
+
         type ProductFilter =
             | GPKRoute of (int * string)
             | GenericShapeRoute of GenericShapeRoute
+
         and GenericShapeRoute =
             {
                 Generic: string
@@ -339,6 +387,7 @@ module Types =
                 DoseRules: string []
                 Doses: FreqDose []
             }
+
         and FreqDose =
             {
                 /// The frequency of the dose rule
@@ -389,7 +438,9 @@ module Types =
                 DivisibleBy : Divisibility
                 GenericProducts : GenericProduct List
             }
+
         and Divisibility = NoDiv | Div of bigint
+
         and GenericProduct =
             {
                 Id : int
@@ -398,11 +449,13 @@ module Types =
                 Substances : Substance list
                 TradeProducts : TradeProduct list
             }
+
         and Substance =
             {
                 Name : string
                 Concentration : ValueUnit
             }
+
         and TradeProduct =
             {
                 Id : int

@@ -25,12 +25,12 @@
     <Compile Include="Array.fs" />
     <Compile Include="List.fs" />
     <Compile Include="Seq.fs" />
+    <Compile Include="Set.fs" />
     <Compile Include="Path.fs" />
     <Compile Include="File.fs" />
     <Compile Include="Csv.fs" />
     <Compile Include="Env.fs" />
     <Compile Include="App.fs" />
-    <None Include="Scripts\Expecto.fsx" />
     <None Include="Scripts/load.fsx" />
     <None Include="Scripts/Scripts.fsx" />
     <None Include="Scripts\Tests.fsx" />

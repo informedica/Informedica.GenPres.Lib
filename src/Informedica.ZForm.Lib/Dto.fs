@@ -214,7 +214,7 @@ module Dto =
             fr.Frequencies
             |> List.map (fun f ->
                 f
-                |> ValueUnit.create (ValueUnit.createCombiUnit (ValueUnit.Units.Count.times, OpPer, fr.TimeUnit))
+                |> ValueUnit.createSingle (ValueUnit.createCombiUnit (ValueUnit.Units.Count.times, OpPer, fr.TimeUnit))
                 |> ValueUnit.freqToValueUnitString
                 |> Mapping.mapFreq Mapping.ValueUnitMap Mapping.AppMap
             )
@@ -228,6 +228,7 @@ module Dto =
                 | Some vu ->
                     vu
                     |> ValueUnit.getValue
+                    |> Array.head
                     |> BigRational.toDecimal
                     |> Decimal.fixPrecision 2
                 | None -> 0m

@@ -37,7 +37,7 @@ let parse =
 // fix calculation count when combining units
 "1 g/100 mg"
 |> parse
-|> Option.map (fun vu -> vu * (1N |> create count))
+|> Option.map (fun vu -> vu * ([|1N|] |> create count))
 
 "10 gram/dag"
 |> parse

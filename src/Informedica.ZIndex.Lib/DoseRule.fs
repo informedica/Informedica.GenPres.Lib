@@ -16,6 +16,7 @@ module DoseRule =
     type Frequency = RuleFrequency
     type Product = RuleProduct
 
+
     module Constants =
 
         [<Literal>]
@@ -46,7 +47,6 @@ module DoseRule =
         let female = "vrouw"
 
 
-
     let foldMinMax xs =
         xs |> Array.fold (fun { Min = min; Max = max} (acc: MinMax) ->
             { Min = Option.min acc.Min min; Max = Option.max acc.Max max }
@@ -64,7 +64,7 @@ module DoseRule =
                 | Some min, Some max ->
                     let min = Decimal.fixPrecision p min |> string
                     let max = Decimal.fixPrecision p max |> string
-                    sprintf "%s - %s" min max
+                    $"%s{min} - %s{max}"
                 | Some min, None ->
                     let min = Decimal.fixPrecision p min |> string
                     sprintf "vanaf %s" min
@@ -72,7 +72,7 @@ module DoseRule =
                     if max = 0m then ""
                     else
                         let max = Decimal.fixPrecision p max |> string
-                        sprintf "tot %s" max
+                        $"tot %s{max}"
                 | None, None -> ""
             if mms = "" then s
             else
@@ -135,11 +135,15 @@ module DoseRule =
 
     let minmax = { Min = None; Max = None }
 
+
     let createProduct id nm : Product = { Id = id; Name = nm }
+
 
     let createGenericProduct id nm rt un sl = { Id = id; Name = nm; Route = rt; Unit = un; Substances = sl }
 
+
     let createFrequency fr tm = { Frequency = fr; Time = tm }
+
 
     let createMinMax mn mx =
 
@@ -154,6 +158,7 @@ module DoseRule =
             let mx = if mx = 0m || chkmx then None else Some mx
 
             { Min = mn; Max = mx }
+
 
     let create id gr us dt gp pr tr rt ci ic hr sx ag wt bs fr no ab nk ak nm am un =
         {
@@ -243,6 +248,7 @@ module DoseRule =
             }
         )
 
+
     let getGenericProducts : unit -> RuleGenericProduct[] =
         Memoization.memoize _getGenericProducts
 
@@ -293,6 +299,7 @@ module DoseRule =
             |> String.splitAt ','
             |> Array.map String.trim
         )
+
 
     let getDoseType (bas : Zindex.BST641T.BST641T) =
         Zindex.BST902T.records ()
@@ -455,9 +462,12 @@ module DoseRule =
             rules |> Json.cache FilePath.ruleCache
             rules
 
+
     let get : unit -> DoseRule [] = Memoization.memoize _get
 
+
     let load () = get () |> ignore
+
 
     let toString2 (dr : DoseRule) =
         let addString lbl s =
@@ -495,6 +505,7 @@ module DoseRule =
         + (addString "Abs grens" (dr.Abs |> minMaxToString dr.Unit))
         |> String.remove 1
 
+
     let indications_ () =
         // Get all distinct indciations
         Zindex.BST642T.records ()
@@ -502,7 +513,9 @@ module DoseRule =
         |> Array.distinct
         |> Array.sort
 
+
     let indications = Memoization.memoize indications_
+
 
     let routes_ () =
         Zindex.BST642T.records ()
@@ -510,7 +523,9 @@ module DoseRule =
         |> Array.distinct
         |> Array.sort
 
+
     let routes = Memoization.memoize routes_
+
 
     let frequencies_ () =
         Zindex.BST643T.records ()
@@ -518,50 +533,8 @@ module DoseRule =
         |> Array.distinct
         |> Array.sortBy (fun f -> (f.Time, f.Frequency))
 
+
     let frequencies = Memoization.memoize frequencies_
-
-
-    type DoseRule with
-
-        static member Weight_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.Weight) ,
-            (fun mm dr -> { dr with Weight = mm })
-
-        static member BSA_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.BSA) ,
-            (fun mm dr -> { dr with BSA = mm })
-
-        static member Norm_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.Norm) ,
-            (fun mm dr -> { dr with Norm = mm })
-
-        static member Abs_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.Abs) ,
-            (fun mm dr -> { dr with Abs = mm })
-
-        static member NormKg_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.NormKg) ,
-            (fun mm dr -> { dr with NormKg = mm })
-
-        static member AbsKg_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.AbsKg) ,
-            (fun mm dr -> { dr with AbsKg = mm })
-
-        static member NormM2_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.NormM2) ,
-            (fun mm dr -> { dr with NormM2 = mm })
-
-        static member AbsM2_ :
-            (DoseRule -> MinMax) * (MinMax -> DoseRule -> DoseRule) =
-            (fun dr -> dr.AbsM2) ,
-            (fun mm dr -> { dr with AbsM2 = mm })
 
 
 

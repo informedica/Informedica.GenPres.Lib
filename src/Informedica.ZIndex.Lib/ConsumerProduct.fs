@@ -17,6 +17,7 @@ module ConsumerProduct =
             BarCodes = br
         }
 
+
     let _get id =
         Zindex.BST004T.records ()
         |> Array.filter (fun r ->
@@ -37,5 +38,6 @@ module ConsumerProduct =
 
             create r.ATKODE nm lb r.VPDLHV ct br
         )
+
 
     let get : int -> ConsumerProduct [] = Memoization.memoize _get

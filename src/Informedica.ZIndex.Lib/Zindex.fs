@@ -31,10 +31,7 @@ module Zindex =
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
 
-    
 
-
-    
     /// <summary>
     /// <para> Tabel: BST004T: Bestand 004 Artikelen </para>
     /// <para> --------------- </para>
@@ -81,10 +78,10 @@ module Zindex =
 
         let records : unit -> BST004T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST020T: Bestand 020 Namen </para>
     /// <para> --------------- </para>
@@ -131,10 +128,10 @@ module Zindex =
 
         let records : unit -> BST020T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST031T: Bestand 031 Handelsproducten </para>
     /// <para> --------------- </para>
@@ -202,10 +199,10 @@ module Zindex =
 
         let records : unit -> BST031T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST050T: Bestand 050 Voorschrijfproducten (PRK) </para>
     /// <para> --------------- </para>
@@ -243,10 +240,10 @@ module Zindex =
 
         let records : unit -> BST050T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST051T: Bestand 051 Voorschrijfpr. geneesmiddel identific. </para>
     /// <para> --------------- </para>
@@ -293,10 +290,10 @@ module Zindex =
 
         let records : unit -> BST051T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST200T: Bestand 200 Relatie tussen ZI-nummer / HIBC </para>
     /// <para> --------------- </para>
@@ -340,10 +337,10 @@ module Zindex =
 
         let records : unit -> BST200T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST360T: Bestand 360 t-tabel (tijdseenheid) </para>
     /// <para> --------------- </para>
@@ -381,10 +378,10 @@ module Zindex =
 
         let records : unit -> BST360T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST380T: Bestand 380 ICPC - 1 </para>
     /// <para> --------------- </para>
@@ -422,10 +419,10 @@ module Zindex =
 
         let records : unit -> BST380T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST640T: Bestand 640 Doseringen Basis-Algemeen </para>
     /// <para> --------------- </para>
@@ -466,10 +463,10 @@ module Zindex =
 
         let records : unit -> BST640T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST641T: Bestand 641 Doseringen Basis-Artikelkeuze </para>
     /// <para> --------------- </para>
@@ -519,10 +516,10 @@ module Zindex =
 
         let records : unit -> BST641T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST642T: Bestand 642 Doseringen Uitzonderingen op Basis </para>
     /// <para> --------------- </para>
@@ -578,10 +575,10 @@ module Zindex =
 
         let records : unit -> BST642T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST643T: Bestand 643 Categorieen </para>
     /// <para> --------------- </para>
@@ -649,10 +646,10 @@ module Zindex =
 
         let records : unit -> BST643T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST649T: Bestand 649 Dosisgegevens - Nieuw per 01/11/2016 </para>
     /// <para> --------------- </para>
@@ -723,10 +720,10 @@ module Zindex =
 
         let records : unit -> BST649T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST701T: Bestand 701 Ingegeven samenstellingen </para>
     /// <para> --------------- </para>
@@ -788,10 +785,10 @@ module Zindex =
 
         let records : unit -> BST701T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST711T: Bestand 711 Generieke producten </para>
     /// <para> --------------- </para>
@@ -838,7 +835,7 @@ module Zindex =
                 GPMLCI = gpmlci |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPMLCT = gpmlct |> ((Parser.parseValue "N" "") >> Int32.parse)
                 SPKODE = spkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
@@ -853,10 +850,10 @@ module Zindex =
 
         let records : unit -> BST711T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST715T: Bestand 715 Generieke samenstellingen </para>
     /// <para> --------------- </para>
@@ -906,10 +903,10 @@ module Zindex =
 
         let records : unit -> BST715T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST720T: Bestand 720 Superprodukten </para>
     /// <para> --------------- </para>
@@ -947,10 +944,10 @@ module Zindex =
 
         let records : unit -> BST720T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST725T: Bestand 725 Stamnaam + stamtoedieningsweg </para>
     /// <para> --------------- </para>
@@ -991,10 +988,10 @@ module Zindex =
 
         let records : unit -> BST725T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST750T: Bestand 750 Generieke namen </para>
     /// <para> --------------- </para>
@@ -1068,10 +1065,10 @@ module Zindex =
 
         let records : unit -> BST750T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST760T: Bestand 760 Enkelvoudige toedieningswegen HPK </para>
     /// <para> --------------- </para>
@@ -1109,10 +1106,10 @@ module Zindex =
 
         let records : unit -> BST760T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST801T: Bestand 801 ATC codes </para>
     /// <para> --------------- </para>
@@ -1139,7 +1136,7 @@ module Zindex =
         let create mutkod atcode atoms atomse atkind  =
             {
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 ATOMS = atoms |> String.trim
                 ATOMSE = atomse |> String.trim
                 ATKIND = atkind |> String.trim
@@ -1156,10 +1153,10 @@ module Zindex =
 
         let records : unit -> BST801T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST902T: Bestand 902 Thesauri totaal </para>
     /// <para> --------------- </para>
@@ -1203,10 +1200,10 @@ module Zindex =
 
         let records : unit -> BST902T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST921T: Bestand 921 Tekstblokken ASCII (vervangt 920) </para>
     /// <para> --------------- </para>
@@ -1262,6 +1259,5 @@ module Zindex =
 
         let records : unit -> BST921T [] = Memoization.memoize _records
 
-    
 
-    
+

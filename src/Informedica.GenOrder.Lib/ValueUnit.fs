@@ -52,8 +52,8 @@ module ValueUnit =
         | NoUnit, _
         | _, NoUnit -> NoUnit
         | u1, u2 ->
-            let vu1 = 1N |> create u1
-            let vu2 = 1N |> create u2
+            let vu1 = 1N |> createSingle u1
+            let vu2 = 1N |> createSingle u2
 
             vu1 |> op <| vu2
             |> get

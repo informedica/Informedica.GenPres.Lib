@@ -1,9 +1,11 @@
 namespace Informedica.ZIndex.Lib
 
+
 module RuleFinder =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.GenCore.Lib.Types.ZIndex
+
 
     type MinMax = RuleMinMax
 
@@ -25,6 +27,7 @@ module RuleFinder =
             (Route.SUBCUT, ["SUBCUTAAN"; "SC"])
         ]
 
+
     let createRoute s =
         let m =
             routeMapping
@@ -36,6 +39,7 @@ module RuleFinder =
         | Some (r, _) -> r
         | _ -> Route.NoRoute
 
+
     let eqsRoute r rs =
         if r = Route.NoRoute then true
         else
@@ -43,11 +47,15 @@ module RuleFinder =
             |> Array.map createRoute
             |> Array.exists ((=) r)
 
+
     type AgeInMo = decimal Option
+
 
     type WeightInKg = decimal Option
 
+
     type BSAInM2 = decimal Option
+
 
     let inRange n { Min = min; Max = max } =
         if n |> Option.isNone then true
@@ -59,12 +67,14 @@ module RuleFinder =
             | None, Some max -> n <= max
             | Some min, Some max -> n >= min && n <= max
 
+
     type PatientFilter =
         {
             Age: AgeInMo
             Weight: WeightInKg
             BSA: BSAInM2
         }
+
 
     type ProductFilter =
         | GPKRoute of (int * string)
@@ -110,7 +120,9 @@ module RuleFinder =
             Product = prod
         }
 
+
     let createGPKRouteFilter gpk rte = createFilter None None None gpk "" "" rte
+
 
     let find all { Filter.Patient = pat; Product = prod } =
         let r =
@@ -147,6 +159,7 @@ module RuleFinder =
             DoseRules = drs
             Doses = ds
         }
+
 
     let createFreqDose freq norm abs normKg absKg normM2 absM2 un =
         {

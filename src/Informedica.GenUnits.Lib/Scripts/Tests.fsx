@@ -1,16 +1,6 @@
-module Tests
 
-open Expecto
-open Expecto.Flip
-open Expecto.Logging
-
-open MathNet.Numerics
-open Informedica.Utils.Lib.BCL
-open Informedica.GenUnits.Lib
-
-open Informedica.GenUnits.Lib.ValueUnit
-
-let run = runTestsWithCLIArgs [ CLIArguments.Verbosity LogLevel.Verbose ] [||]
+#load "../../../scripts/Expecto.fsx"
+#load "load.fsx"
 
 
 module Tests =
@@ -298,3 +288,10 @@ module Tests =
             comparisonTests
             unitTests
         ]
+
+
+open Expecto
+
+Tests.tests
+|> Expecto.run
+

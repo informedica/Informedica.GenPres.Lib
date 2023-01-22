@@ -134,7 +134,7 @@ module GStand =
                 [
                     2N, ValueUnit.freqUnitPerNday 3N, ValueUnit.freqUnitPerNHour 36N
                 ]
-                |> List.tryFind (fun (f, u, _) -> f |> ValueUnit.create u = vu) with
+                |> List.tryFind (fun (f, u, _) -> f |> ValueUnit.createSingle u = vu) with
             | Some (_, _, c) -> vu |> ValueUnit.convertTo c
             | None -> vu
 
@@ -360,7 +360,7 @@ module GStand =
                     let frs =
                         let fr =
                             frs
-                            |> List.map ValueUnit.getValue
+                            |> List.collect (ValueUnit.getValue >> Array.toList)
                             |> List.sort
                         Dosage.createFrequency fr tu None
 

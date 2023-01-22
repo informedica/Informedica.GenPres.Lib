@@ -274,23 +274,3 @@ module GenPresProduct =
                 )
             )
         )
-
-(*
-    let getPediatric () =
-        getAssortment ()
-        |> Array.filter (fun gpp ->
-            FormularyParser.WebSiteParser.getFormulary ()
-            |> Array.exists (fun d ->
-                gpp.GenericProducts
-                |> Array.exists (fun gp ->
-                    let gpAtc, dAtc = gp.ATC.Trim(), d.Atc.Trim()
-                    let gpn, dn =
-                        gpp.Name |> String.toLower |> String.trim,
-                        d.Generic |> String.toLower |> String.trim
-                    gpAtc = dAtc ||
-                    (gpAtc |> String.startsWith dAtc &&
-                     (dn |> String.contains gpn || (gpn |> String.contains dn)))
-                )
-            )
-        )
-*)

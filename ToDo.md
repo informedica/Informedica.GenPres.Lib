@@ -1,6 +1,6 @@
 # To Do List
 
-* [ ] Switch from float to decimal types
+* [x] Switch from float to decimal types
 * [ ] Add possibility to select none assortment products
 * [ ] Refactor magic values like "keer"
 * [ ] Refactor setting dose values and dose units in DrugOrder

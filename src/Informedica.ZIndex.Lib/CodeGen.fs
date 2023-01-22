@@ -1,10 +1,17 @@
 namespace Informedica.ZIndex.Lib
 
 
+/// Contains the code that generates the
+/// ZIndex file containing all the base tables
+///
+/// Use the code like:
+/// CodeGen.generateZIndex (CodeGen.tableList)
+///|> printfn "%s"
 module CodeGen =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+
 
     [<Literal>]
     let codeString = """
@@ -64,7 +71,8 @@ module Zindex =
         |> String.replace "{create}" cr
         |> String.replace "{map}" mp
 
-    let tabelList =
+
+    let tableList =
         [
             ("BST004T", [1;2;3;4;11;12])
             ("BST020T", [1..6])
@@ -91,6 +99,7 @@ module Zindex =
             ("BST921T", [1..9])
         ]
 
+
     let generateZIndex tl =
         let code =
             tl
@@ -113,5 +122,3 @@ module Zindex =
 
 
 
-//CodeGen.generateZIndex (CodeGen.tabelList)
-//|> printfn "%s"

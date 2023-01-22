@@ -282,23 +282,23 @@ module DoseRule =
                 let dto = Dto.dto ()
 
                 dto.Norm.HasMin <- true
-                dto.Norm.Min.Value <- 1m
+                dto.Norm.Min.Value <- [|1m|]
                 dto.Norm.Min.Unit <- "mg"
                 dto.Norm.Min.Group <- "mass"
 
                 dto.Norm.HasMax <- true
-                dto.Norm.Max.Value <- 10m
+                dto.Norm.Max.Value <- [|10m|]
                 dto.Norm.Max.Unit <- "mg"
                 dto.Norm.Max.Group <- "mass"
 
                 dto.NormWeight.HasMin <- true
-                dto.NormWeight.Min.Value <- 0.01m
+                dto.NormWeight.Min.Value <- [|0.01m|]
                 dto.NormWeight.Min.Unit <- "mg"
                 dto.NormWeight.Min.Group <- "mass"
                 dto.NormWeightUnit <- "kg"
 
                 dto.NormWeight.HasMax <- true
-                dto.NormWeight.Max.Value <- 1m
+                dto.NormWeight.Max.Value <- [|1m|]
                 dto.NormWeight.Max.Unit <- "mg"
                 dto.NormWeight.Max.Group <- "mass"
                 dto.NormWeightUnit <- "kg"
@@ -375,7 +375,7 @@ module DoseRule =
         let convertRateUnitTo u (ds : Dosage) =
             let getCount u1 u2 =
                 1N
-                |> ValueUnit.create u2
+                |> ValueUnit.createSingle u2
                 |> ValueUnit.convertTo u1
                 |> ValueUnit.get
                 |> fst
