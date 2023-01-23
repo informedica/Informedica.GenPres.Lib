@@ -3,8 +3,6 @@ namespace Informedica.GenForm.Lib
 
 module Filter =
 
-    open Informedica.GenCore.Lib.Types.GenForm
-
 
     let filter =
         {

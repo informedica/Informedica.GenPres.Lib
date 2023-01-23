@@ -10,7 +10,6 @@ module OrderVariable =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenCore.Lib
-    open Informedica.GenCore.Lib.Types.GenOrder
     open Informedica.GenSolver.Lib
     open Informedica.GenUnits.Lib
 

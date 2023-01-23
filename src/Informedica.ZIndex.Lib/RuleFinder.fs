@@ -4,8 +4,6 @@ namespace Informedica.ZIndex.Lib
 module RuleFinder =
 
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.ZIndex
-
 
     type MinMax = RuleMinMax
 

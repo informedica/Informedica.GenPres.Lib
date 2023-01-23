@@ -10,8 +10,6 @@ module Utils =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.ZIndex
-    open Informedica.ZForm.Lib.DoseRule.ShapeDosage
     open Informedica.ZForm.Lib.Utils
     open Informedica.ZIndex.Lib
 

@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="MinMax.fs" />
@@ -15,8 +16,8 @@
     <Compile Include="DoseRule.fs" />
     <Compile Include="SolutionRule.fs" />
     <Compile Include="PrescriptionRule.fs" />
-    <None Include="Scripts\Scripts.fsx" />
     <None Include="Scripts\load.fsx" />
+    <None Include="Scripts\Scripts.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />

@@ -5,7 +5,6 @@ module GenPresProduct =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create nm sh rt ph gps dpn unt sns =

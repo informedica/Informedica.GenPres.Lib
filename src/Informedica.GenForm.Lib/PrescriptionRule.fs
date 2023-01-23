@@ -4,7 +4,6 @@ namespace Informedica.GenForm.Lib
 module PrescriptionRule =
 
     open MathNet.Numerics
-    open Informedica.GenCore.Lib.Types.GenForm
 
 
     let get (pat : Patient) =

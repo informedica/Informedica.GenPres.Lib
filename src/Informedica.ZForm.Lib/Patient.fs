@@ -6,7 +6,6 @@ module Patient =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenCore.Lib
-    open Informedica.GenCore.Lib.Types.ZForm
 
     open Aether
     open Aether.Operators

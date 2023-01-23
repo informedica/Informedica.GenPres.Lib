@@ -6,7 +6,6 @@
 [<AutoOpen>]
 module WrappedString =
 
-    open Informedica.GenCore.Lib.Types.GenOrder
     open Informedica.Utils.Lib.BCL
 
 

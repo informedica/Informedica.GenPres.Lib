@@ -5,8 +5,6 @@
 /// `Informedica.GenUnits.Lib.ValueUnit` library
 module ValueUnit =
 
-    open System
-    open Informedica.GenCore.Lib.Types.ZForm
     open MathNet.Numerics
 
     open Informedica.Utils.Lib

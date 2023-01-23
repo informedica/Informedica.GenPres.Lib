@@ -25,7 +25,6 @@ open System.IO
 open MathNet.Numerics
 
 open Informedica.Utils.Lib
-open Informedica.Utils.Lib.BCL
 open Informedica.GenForm.Lib
 
 

@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Markdown.fs" />
     <Compile Include="Mapping.fs" />

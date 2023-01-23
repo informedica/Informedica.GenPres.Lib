@@ -10,8 +10,6 @@
 open MathNet.Numerics
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
-open Informedica.GenCore.Lib.Types.GenForm
-open Informedica.GenCore.Lib.Types.GenOrder
 open Informedica.GenForm.Lib
 open Informedica.GenUnits.Lib
 open Informedica.GenSolver.Lib
@@ -149,7 +147,7 @@ module Api =
                 else None
             OrderType =
                 match pr.DoseRule.DoseType with
-                | Informedica.GenCore.Lib.Types.GenForm.Continuous -> ContinuousOrder
+                | Informedica.GenForm.Lib.Types.Continuous -> ContinuousOrder
                 | _ when pr.DoseRule.TimeUnit |> String.isNullOrWhiteSpace -> DiscontinuousOrder
                 | _ -> TimedOrder
             Dose = dose

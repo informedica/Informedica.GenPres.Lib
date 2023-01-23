@@ -10,7 +10,6 @@ module MetaVision =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.ZIndex
     open Informedica.ZIndex.Lib
 
 

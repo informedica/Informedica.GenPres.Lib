@@ -7,9 +7,8 @@ module DrugOrder =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
-    open Informedica.GenCore.Lib.Types.GenOrder
 
-    type MinMax = Informedica.GenCore.Lib.Types.GenForm.MinMax
+    type MinMax = Informedica.GenForm.Lib.Types.MinMax
 
     module DoseRule = Informedica.GenForm.Lib.DoseRule
     module DoseLimit = DoseRule.DoseLimit

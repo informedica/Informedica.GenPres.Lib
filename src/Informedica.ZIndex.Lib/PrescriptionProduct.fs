@@ -4,7 +4,6 @@
 module PrescriptionProduct =
 
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create id nm lb qt un ct ps =

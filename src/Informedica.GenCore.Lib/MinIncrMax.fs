@@ -61,7 +61,6 @@ module MinIncrMax =
                     |> Ok
 
 
-
     let validate min incr max =
         match min, incr, max with
         | None, None, None

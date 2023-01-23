@@ -12,8 +12,6 @@ module Dto =
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
     open Informedica.GenCore.Lib
-    open Informedica.GenCore.Lib.Types.ZForm
-
 
     module Dosage = DoseRule.Dosage
     module DoseRange = DoseRule.DoseRange

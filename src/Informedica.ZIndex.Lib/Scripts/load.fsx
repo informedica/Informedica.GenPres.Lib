@@ -9,6 +9,7 @@
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
 #r "../../Informedica.GenCore.Lib/bin/Debug/net6.0/Informedica.GenCore.Lib.dll"
 
+#load "../Types.fs"
 #load "../FilePath.fs"
 #load "../Json.fs"
 #load "../Parser.fs"

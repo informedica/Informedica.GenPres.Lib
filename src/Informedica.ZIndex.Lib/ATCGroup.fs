@@ -5,7 +5,6 @@ module ATCGroup =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create atc1 ang ange atc2 thg thge atc3 ths thse atc4 phg phge atc5 sub sube gen shp rts =

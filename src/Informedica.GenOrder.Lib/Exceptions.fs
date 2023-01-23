@@ -3,8 +3,6 @@ namespace Informedica.GenOrder.Lib
 
 module Exceptions =
 
-        open Informedica.GenCore.Lib.Types.GenOrder
-
 
         /// Equation exception
         exception OrderException of Exceptions.Message

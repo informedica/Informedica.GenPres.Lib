@@ -6,8 +6,6 @@ module TradeProduct =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
-    open Informedica.GenCore.Lib.Types.ZIndex
-
 
     let create id nm lb br cm dn uw rt ps =
         {

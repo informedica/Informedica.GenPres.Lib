@@ -5,7 +5,6 @@ module GenericProduct =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let createSubstance si so sn sq su gi gn gq gu un =

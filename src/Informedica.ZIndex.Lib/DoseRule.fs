@@ -10,7 +10,6 @@ module DoseRule =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
     type MinMax = RuleMinMax
     type Frequency = RuleFrequency

@@ -13,7 +13,6 @@ module Order =
     open Informedica.GenUnits.Lib
     open WrappedString
 
-    open Informedica.GenCore.Lib.Types.GenOrder
 
 
     /// Utility functions to

@@ -4,7 +4,6 @@ namespace Informedica.ZIndex.Lib
 module ConsumerProduct =
 
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create id nm lb qt ct br =

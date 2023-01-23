@@ -4,7 +4,6 @@
 module Substance =
 
     open Informedica.Utils.Lib
-    open Informedica.GenCore.Lib.Types.ZIndex
 
 
     let create id nm ms mr =

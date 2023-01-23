@@ -1,7 +1,5 @@
 namespace Informedica.GenForm.Lib
 
-open Informedica.GenCore.Lib.Types.GenForm
-
 
 module Gender =
 

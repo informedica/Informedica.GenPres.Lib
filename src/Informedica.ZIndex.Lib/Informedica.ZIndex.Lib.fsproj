@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="FilePath.fs" />
     <Compile Include="Json.fs" />
     <Compile Include="Parser.fs" />

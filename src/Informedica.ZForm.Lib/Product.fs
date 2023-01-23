@@ -3,9 +3,6 @@
 module Product =
 
 
-    open Informedica.GenCore.Lib.Types.ZForm
-
-
     let empty =
         {
             Name = ""

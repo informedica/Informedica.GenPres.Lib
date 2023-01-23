@@ -6,11 +6,10 @@ module Types =
 
     open MathNet.Numerics
 
-
-    type Location =
+    type VenousAccess =
         | PVL
         | CVL
-        | AnyLocation
+        | AnyAccess
 
 
     type Gender = Male | Female | AnyGender
@@ -80,7 +79,7 @@ module Types =
             Route : string
             DoseType: DoseType
             Department : string
-            Location : Location
+            Location : VenousAccess
             DiluentVolume : BigRational
             ExpansionVolume : BigRational option
             Diluents : string []
@@ -117,7 +116,7 @@ module Types =
             BSA : MinMax
             GestAge : MinMax
             PMAge : MinMax
-            Location : Location
+            Location : VenousAccess
         }
 
 
@@ -131,8 +130,28 @@ module Types =
             Height : BigRational option
             GestAge : BigRational option
             PMAge : BigRational option
-            Location : Location
+            Location : VenousAccess
         }
+        static member Gender_ =
+            (fun (p : Patient) -> p.Gender), (fun g (p : Patient) -> { p with Gender = g})
+
+        static member Age_ =
+            (fun (p : Patient) -> p.Age), (fun a (p : Patient) -> { p with Age = a})
+
+        static member Weight_ =
+            (fun (p : Patient) -> p.Weight), (fun w (p : Patient) -> { p with Weight = w})
+
+        static member Height_ =
+            (fun (p : Patient) -> p.Height), (fun b (p : Patient) -> { p with Height = b})
+
+        static member GestAge_ =
+            (fun (p : Patient) -> p.GestAge), (fun a (p : Patient) -> { p with GestAge = a})
+
+        static member PMAge_ =
+            (fun (p : Patient) -> p.PMAge), (fun a (p : Patient) -> { p with PMAge = a})
+
+        static member Department_ =
+            (fun (p : Patient) -> p.Department), (fun d (p : Patient) -> { p with Department = d})
 
 
     type DoseRule =
@@ -174,7 +193,7 @@ module Types =
             Route : string
             DoseType : DoseType
             Department : string
-            Location : Location
+            Location : VenousAccess
             Age : MinMax
             Weight : MinMax
             Dose : MinMax
@@ -203,7 +222,7 @@ module Types =
             PMAge : BigRational option
             DoseType : DoseType
             Dose : BigRational option
-            Location : Location
+            Location : VenousAccess
         }
 
 

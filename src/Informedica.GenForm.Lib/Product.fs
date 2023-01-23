@@ -8,8 +8,9 @@ module Product =
     open MathNet.Numerics
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.ZIndex.Lib
-    open Informedica.GenCore.Lib.Types.GenForm
+
+    module GenPresProduct = Informedica.ZIndex.Lib.GenPresProduct
+    module ATCGroup = Informedica.ZIndex.Lib.ATCGroup
 
 
     [<AutoOpen>]

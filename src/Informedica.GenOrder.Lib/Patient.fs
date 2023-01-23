@@ -6,10 +6,9 @@ module Patient =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.GenForm.Lib
-    open Informedica.GenCore.Lib.Types.GenOrder
 
-    type Patient = Informedica.GenCore.Lib.Types.GenForm.Patient
-    type Access = Informedica.GenCore.Lib.Types.GenForm.VenousAccess
+    type Patient = Informedica.GenForm.Lib.Types.Patient
+    type Access = Informedica.GenForm.Lib.Types.VenousAccess
 
     let patient : Patient =
         {

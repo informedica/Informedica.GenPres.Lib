@@ -6,7 +6,7 @@ module Names =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
-    open Informedica.GenCore.Lib.Types.ZIndex.Names
+    open Types.Names
 
     let mapItem = function
         | Shape -> 6

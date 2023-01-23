@@ -8,7 +8,6 @@ module Solver =
 
     open Informedica.Utils.Lib
     open Informedica.GenUnits.Lib
-    open Informedica.GenCore.Lib.Types.GenOrder
     open Informedica.GenSolver.Lib.Types
 
     module Variable = Informedica.GenSolver.Lib.Variable

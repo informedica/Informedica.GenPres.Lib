@@ -6,7 +6,6 @@ module SolutionRule =
     open MathNet.Numerics
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.GenForm
 
 
     [<AutoOpen>]

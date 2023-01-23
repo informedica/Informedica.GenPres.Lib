@@ -4,7 +4,6 @@
 module Route =
 
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib.Types.ZIndex
     open Informedica.ZIndex.Lib
 
 
