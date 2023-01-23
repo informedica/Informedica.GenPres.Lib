@@ -1,6 +1,5 @@
 namespace Informedica.GenUnits.Lib
 
-open System
 open MathNet.Numerics
 
 
@@ -1204,7 +1203,7 @@ module ValueUnit =
     let toString brf loc verb vu =
         let v, u = vu |> get
 
-        $"{v |> Array.map brf |> Array.toString} {Units.toString loc verb u}"
+        $"{v |> Array.map brf |> Array.toReadableString} {Units.toString loc verb u}"
 
 
     let toStringDutchShort = toString BigRational.toString Units.Dutch Units.Short
@@ -1227,7 +1226,7 @@ module ValueUnit =
             v
             |> Array.map BigRational.toDecimal
             |> Array.map (Decimal.fixPrecision prec)
-            |> Array.toString
+            |> Array.toReadableString
 
         let us =
             u

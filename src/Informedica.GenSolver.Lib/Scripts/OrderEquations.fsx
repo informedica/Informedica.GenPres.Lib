@@ -21,6 +21,10 @@ module Maximum = ValueRange.Maximum
 module Increment = ValueRange.Increment
 module ValueSet = ValueRange.ValueSet
 
+open Informedica.Utils.Lib
+
+
+
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 
@@ -347,35 +351,5 @@ gentaEqs
 |> setValues "ord_adj" [1N]
 |> printEqs
 |> ignore
-
-
-// gentamicin_dos_tot <1N..1000N> = gentamicin_dos_tot_adj <5N..7N> * ord_adj [1]
-// gentamicin_dos_tot <5N..7N> = gentamicin_dos_qty <1N..1000N> * pres_freq [1]
-// gentamicin_dos_qty <5N..7N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_qty <1/40N..100N>
-// genta_sol_dos_tot <1/40N..100N> = genta_sol_dos_qty <1/8N..7/10N> * pres_freq [1]
-// orb_dos_tot <1/2N..500N] = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..19999/40N>
-// genta_sol_dos_tot <1/8N..7/10N> = genta_sol_orb_cnc <1/40N..7/25N> * orb_dos_tot <1/2N..500N]
-// orb_dos_tot <1/2N..28N> = genta_sol_dos_tot <1/8N..7/10N> + saline_dos_tot <9/25N..3999/8N>
-// saline_dos_tot <9/25N..223/8N> = saline_dos_qty <9/25N..3999/8N> * pres_freq [1]
-// saline_dos_qty <9/25N..223/8N> = saline_dos_rte <9/25N..39959/40N> * pres_time [1/2N..1N]
-// orb_dos_rte [1N..999N] = genta_sol_dos_rte <1/40N..999/5N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..1998N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5111/20N>
-// gentamicin_dos_rte <1N..5111/10N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..999/5N>
-// orb_dos_rte [1N..5111/20N> = genta_sol_dos_rte <1/40N..5111/100N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..5111/10N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..5343/50N>
-// gentamicin_dos_rte <1N..5343/25N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5111/100N>
-// orb_dos_rte [1N..5343/50N> = genta_sol_dos_rte <1/40N..5343/250N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..5343/25N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..38561/500N>
-// gentamicin_dos_rte <1N..38561/250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..5343/250N>
-// orb_dos_rte [1N..38561/500N> = genta_sol_dos_rte <1/40N..38561/2500N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..38561/250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..44484/625N>
-// gentamicin_dos_rte <1N..88968/625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..38561/2500N>
-// orb_dos_rte [1N..44484/625N> = genta_sol_dos_rte <1/40N..44484/3125N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..88968/625N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..874811/12500N>
-// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..44484/3125N>
-// orb_dos_rte [1N..874811/12500N> = genta_sol_dos_rte <1/40N..874811/62500N> + saline_dos_rte <9/25N..223/4N>
-// gentamicin_dos_rte <1N..874811/6250N> = gentamicin_orb_cnc <1N..2N> * orb_dos_rte [1N..2179593/31250N>
-// gentamicin_dos_rte <1N..2179593/15625N> = gentamicin_cmp_cnc [10, 40] * genta_sol_dos_rte <1/40N..874811/62500N>
-// orb_dos_rte [1N..2179593/31250N> = genta_sol_dos_rte <1/40N..2179593/156250N> + saline_dos_rte <9/25N..223/4N>
 
 

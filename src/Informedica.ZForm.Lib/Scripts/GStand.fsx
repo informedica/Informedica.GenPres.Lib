@@ -14,15 +14,17 @@ let config =
         Config.IsRate = false
         Config.SubstanceUnit = None
         Config.TimeUnit = None
-
     }
 
 
-GStand.createDoseRules config None None None (Some 00161527) "" "" ""
+let path = $"{__SOURCE_DIRECTORY__}/gstand.md"
+
+
+GStand.createDoseRules config None None None None "paracetamol" "" ""
 |> Seq.map (fun dr ->
     dr
     |> DoseRule.toString true
 )
-|> fun s -> System.IO.File.WriteAllText("gstand.md", s |> String.concat "\n")
+|> fun s -> System.IO.File.WriteAllText(path, s |> String.concat "\n")
 
 

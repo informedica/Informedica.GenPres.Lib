@@ -577,77 +577,11 @@ module GStand =
             |> Seq.append (seq { yield d })
 
 
-    let createDoseRules (cfg : CreateConfig) age wght bsa gpk gen shp rte =
 
-        GPP.filter cfg.UseAll gen shp rte
-        |> Seq.filter (fun gpp ->
-            match gpk with
-            | None -> true
-            | Some id ->
-                gpp.GenericProducts
-                |> Seq.exists (fun gp -> gp.Id = id)
-        )
-        |> Seq.collect (fun gpp ->
-            gpp
-            |> getATCGroups gpk
-            |> Seq.map (fun atc ->
-                (atc.Generic,
-                    atc.ATC5,
-                    atc.TherapeuticMainGroup,
-                    atc.TherapeuticSubGroup,
-                    atc.PharmacologicalGroup,
-                    atc.Substance) ,
-                gpp
-            )
-        )
-        |> groupByFst
-        |> Seq.map ((fun (k, v) ->
-            let gen, atc, tg, tsg, pg, sg = k
-            // create empty dose rule
-            DoseRule.create gen [] atc tg tsg pg sg [] , v)
-            >> ((fun (dr, gpps) ->
-                dr
-                |> DoseRule.Optics.setSynonyms (gpps |> Seq.collect getTradeNames |> Seq.toList) ,
-                gpps
-                |> Seq.collect (fun (gpp : ZIndex.GenPresProduct) ->
-                    gpp.Routes
-                    |> Seq.filter (fun r -> rte |> String.isNullOrWhiteSpace || r |> String.equalsCapInsens rte)
-                    |> Seq.collect (fun r ->
-                        RF.createFilter age wght bsa gpk gpp.Name gpp.Shape r
-                        |> RF.find cfg.UseAll
-                        |> getPatients cfg
-                        |> Seq.sortBy (fun (pat, _, _) -> pat.Age.Min, pat.Weight.Min)
-                        |> Seq.collect (fun (pat, sds, dsrs) ->
-                            let gps = dsrs |> Seq.collect (fun dr -> dr.GenericProduct |> Seq.map (fun gp -> gp.Id, gp.Name))
-                            let tps = dsrs |> Seq.collect (fun dr -> dr.TradeProduct |> Seq.map (fun tp   -> tp.Id, tp.Name))
 
-                            sds
-                            |> Seq.map (fun (ind, sds) -> ind, (r, (gpp.Shape, gps, tps, pat, sds)))
-                        )
-                    )
-                )
-                |> groupByFst // group by indications
-                |> Seq.map (fun (k, v) ->
-                    k,
-                    v
-                    |> groupByFst // group by route
-                    |> Seq.map (fun (k, v) ->
-                        k,
-                        v
-                        |> Seq.map (fun (shp, gps, tps, pat, sds) -> shp, gps, tps, pat, sds)
-                        |> Seq.groupBy (fun (shp, gps, tps, _, _)  -> (shp, gps, tps)) // group by shape and products
-                        |> Seq.sortBy (fst >> (fun (shp, _, _) -> shp))
-                        |> Seq.map (fun (k, v) ->
-                            k,
-                            v
-                            |> Seq.map (fun (_, _, _, pat, sds) -> pat, sds)
-                            |> groupByFst // group by patient
-                        )
-                    )
-                )
-            )
-            // add indications, route, shape, patient and dosages
-            >> (fun (dr, inds) ->
+    // add indications, route, shape, patient and dosages
+    let addIndicationsRoutesShapePatientDosages =
+        fun (dr, inds) ->
             inds
             |> Seq.fold (fun acc ind ->
                 let ind, rts = ind
@@ -716,4 +650,80 @@ module GStand =
                         ) dr
                     ) dr
                 ) dr
-            ) dr)))
+            ) dr
+
+
+    let foldDoseRules rte age wght bsa gpk cfg =
+        (fun (dr, gpps) ->
+            dr
+            |> DoseRule.Optics.setSynonyms (gpps |> Seq.collect getTradeNames |> Seq.toList) ,
+            gpps
+            |> Seq.collect (fun (gpp : ZIndex.GenPresProduct) ->
+                printfn $"{gpp.Name}: routes{gpp.Routes}"
+                gpp.Routes
+                |> Seq.filter (fun r -> rte |> String.isNullOrWhiteSpace || r |> String.equalsCapInsens rte)
+                |> Seq.collect (fun r ->
+                    RF.createFilter age wght bsa gpk gpp.Name gpp.Shape r
+                    |> RF.find cfg.UseAll
+                    |> getPatients cfg
+                    |> Seq.sortBy (fun (pat, _, _) -> pat.Age.Min, pat.Weight.Min)
+                    |> Seq.collect (fun (pat, sds, dsrs) ->
+                        let gps = dsrs |> Seq.collect (fun dr -> dr.GenericProduct |> Seq.map (fun gp -> gp.Id, gp.Name))
+                        let tps = dsrs |> Seq.collect (fun dr -> dr.TradeProduct |> Seq.map (fun tp   -> tp.Id, tp.Name))
+
+                        sds
+                        |> Seq.map (fun (ind, sds) -> ind, (r, (gpp.Shape, gps, tps, pat, sds)))
+                    )
+                )
+            )
+            |> groupByFst // group by indications
+            |> Seq.map (fun (k, v) ->
+                k,
+                v
+                |> groupByFst // group by route
+                |> Seq.map (fun (k, v) ->
+                    k,
+                    v
+                    |> Seq.map (fun (shp, gps, tps, pat, sds) -> shp, gps, tps, pat, sds)
+                    |> Seq.groupBy (fun (shp, gps, tps, _, _)  -> (shp, gps, tps)) // group by shape and products
+                    |> Seq.sortBy (fst >> (fun (shp, _, _) -> shp))
+                    |> Seq.map (fun (k, v) ->
+                        k,
+                        v
+                        |> Seq.map (fun (_, _, _, pat, sds) -> pat, sds)
+                        |> groupByFst // group by patient
+                    )
+                )
+            )
+        ) >> addIndicationsRoutesShapePatientDosages
+
+
+    let createDoseRules (cfg : CreateConfig) age wght bsa gpk gen shp rte =
+
+        GPP.filter cfg.UseAll gen shp rte
+        |> Seq.filter (fun gpp ->
+            match gpk with
+            | None -> true
+            | Some id ->
+                gpp.GenericProducts
+                |> Seq.exists (fun gp -> gp.Id = id)
+        )
+        |> Seq.collect (fun gpp ->
+            gpp
+            |> getATCGroups gpk
+            |> Seq.map (fun atc ->
+                (atc.Generic,
+                    atc.ATC5,
+                    atc.TherapeuticMainGroup,
+                    atc.TherapeuticSubGroup,
+                    atc.PharmacologicalGroup,
+                    atc.Substance) ,
+                gpp
+            )
+        )
+        |> groupByFst
+        |> Seq.map ((fun (k, v) ->
+            let gen, atc, tg, tsg, pg, sg = k
+            // create empty dose rule
+            DoseRule.create gen [] atc tg tsg pg sg [] , v)
+            >> (foldDoseRules rte age wght bsa gpk cfg))

@@ -2,131 +2,13 @@
 #load "load.fsx"
 
 
-open Aether  
+open Aether
 open Aether.Optics
 
-
+open Informedica.GenUnits.Lib
+open Informedica.GenCore.Lib
+open Informedica.GenCore.Lib.Types.ZForm
 open Informedica.ZForm.Lib
-
-
-module MinMaxTests =
-
-    module MinMax = MinMax.Optics
-
-    let mmToStr = MinMax.toString "van" "tot"
-
-    let v1, v2 = 
-        ValueUnit.valueUnitFromGStandUnitString 10. "milligram" |> Option.get ,
-        ValueUnit.valueUnitFromGStandUnitString 20. "milligram" |> Option.get
-        
-    let incl1, incl2 =
-        v1 |> MinMax.inclusive, 
-        v2 |> MinMax.inclusive
-
-    let v3, v4 = 
-        ValueUnit.valueUnitFromGStandUnitString 30. "milligram" |> Option.get ,
-        ValueUnit.valueUnitFromGStandUnitString 40. "milligram" |> Option.get
-        
-    let incl3, incl4 =
-        v3 |> MinMax.inclusive, 
-        v4 |> MinMax.inclusive
-
-
-    let toString () =
-        MinMax.empty
-        |> MinMax.setMin (ValueUnit.valueUnitFromGStandUnitString 1. "milligram"  |> Option.get |> MinMax.Inclusive)
-        |> MinMax.setMax (ValueUnit.valueUnitFromGStandUnitString 10. "milligram" |> Option.get |> MinMax.Inclusive)
-        |> mmToStr
-        
-        
-    let a1, a2 =
-        0.1 |> ValueUnit.ageInMo |> Option.bind (MinMax.Inclusive >> Some) |> Option.get ,
-        0.1 |> ValueUnit.ageInYr |> Option.bind (MinMax.Exclusive >> Some) |> Option.get
-        
-        
-    let ageToString () =
-        MinMax.empty
-        |> MinMax.setMin a1
-        |> MinMax.setMax a2
-        |> MinMax.ageToString
-
-
-    let valueComp () =
-
-        printfn "%A < %A = %A" incl1 incl2 (MinMax.valueST incl1 incl2)
-        printfn "%A < %A = %A" incl1 incl1 (MinMax.valueST incl1 incl1)
-        printfn "%A <= %A = %A" incl1 incl2 (MinMax.valueSTE incl1 incl2)
-        printfn "%A <= %A = %A" incl1 incl1 (MinMax.valueSTE incl1 incl1)
-        printfn ""
-        printfn "%A > %A = %A" incl1 incl2 (MinMax.valueLT incl1 incl2)
-        printfn "%A > %A = %A" incl1 incl1 (MinMax.valueLT incl1 incl1)
-        printfn "%A >= %A = %A" incl1 incl2 (MinMax.valueLTE incl1 incl2)
-        printfn "%A >= %A = %A" incl1 incl1 (MinMax.valueLTE incl1 incl1)
-
-
-    // ToDo handle None cases correctly?
-    let testFold () =
-        let mms = 
-            [
-                MinMax.empty
-                MinMax.empty |> MinMax.setMin incl1
-                MinMax.empty |> MinMax.setMin incl2
-                MinMax.empty |> MinMax.setMax incl3
-                MinMax.empty |> MinMax.setMax incl4
-                MinMax.empty |> MinMax.setMin incl1 |> MinMax.setMax incl3
-                MinMax.empty |> MinMax.setMin incl2 |> MinMax.setMax incl3
-                MinMax.empty |> MinMax.setMin incl3 |> MinMax.setMax incl3
-                MinMax.empty |> MinMax.setMin incl4 |> MinMax.setMax incl4
-            ]
-
-        mms
-        |> MinMax.foldMaximize
-        |> mmToStr
-        |> printfn "Maximized:\n%s"
-
-
-        mms
-        |> MinMax.foldMinimize
-        |> mmToStr
-        |> printfn "Minimized:\n%s"
-
-
-    let inRange () =
-        let mm1 = MinMax.empty
-        let mm2 = 
-            MinMax.empty
-            |> MinMax.setMin incl1
-        let mm3 = 
-            MinMax.empty
-            |> MinMax.setMax incl4
-        let mm4 =
-            MinMax.empty
-            |> MinMax.setMin incl2
-            |> MinMax.setMax incl3
-
-        let test v mm =
-            printfn "%A in range: %A = %A" (v |> MinMax.valueToString) (mm |> mmToStr) (MinMax.inRange v mm)
-
-
-        [
-            (incl1, mm1)
-            (incl2, mm1)
-            (incl3, mm1)
-            (incl4, mm1)
-            (incl1, mm2)
-            (incl2, mm2)
-            (incl3, mm2)
-            (incl4, mm2)
-            (incl1, mm3)
-            (incl2, mm3)
-            (incl3, mm3)
-            (incl4, mm3)
-            (incl1, mm4)
-            (incl2, mm4)
-            (incl3, mm4)
-            (incl4, mm4)
-        ]
-        |> List.iter (fun (v, mm) -> test v mm)
 
 
 
@@ -147,35 +29,35 @@ module DoseRangeTests =
 
     let toString () =
         DoseRange.empty
-        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 10. "milligram")
-        |> setMaxAbsDose (ValueUnit.valueUnitFromGStandUnitString 100. "milligram")
+        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
+        |> setMaxAbsDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
         |> drToStr
 
     let toRateString () =
         DoseRange.empty
-        |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 10. "milligram")
-        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 100. "milligram")
-        |> DoseRange.toString (Some ValueUnit.Units.hour)        
+        |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
+        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
+        |> DoseRange.toString (Some ValueUnit.Units.hour)
 
     let toRatePerKgString () =
         DoseRange.empty
-        |> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001 "milligram")
-        |> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1. "milligram")
+        |> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
+        |> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
         |> DoseRange.convertTo (ValueUnit.Units.mcg)
-        |> DoseRange.toString (Some ValueUnit.Units.hour)        
+        |> DoseRange.toString (Some ValueUnit.Units.hour)
 
     let convert () =
         DoseRange.empty
-        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 1. "milligram")
-        |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 0.001 "milligram")
+        |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
+        |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
         |> DoseRange.convertTo (ValueUnit.Units.mcg)
         |> drToStr
-        
+
 
 
 
 module DosageTests =
-    
+
     module Dosage = DoseRule.Dosage
 
     let setNormMinStartDose = Optic.set Dosage.Optics.inclMinNormStartDosagePrism
@@ -192,25 +74,25 @@ module DosageTests =
 
     let toString () =
         Dosage.empty
-        |> setNormMinStartDose (ValueUnit.valueUnitFromGStandUnitString 10. "milligram")
-        |> setAbsMaxStartDose (ValueUnit.valueUnitFromGStandUnitString 1. "gram")
-        |> setNormMinSingleDose (ValueUnit.valueUnitFromGStandUnitString 10. "milligram")
-        |> setAbsMaxSingleDose (ValueUnit.valueUnitFromGStandUnitString 1. "gram")
+        |> setNormMinStartDose (ValueUnit.valueUnitFromGStandUnitString 10.m "milligram")
+        |> setAbsMaxStartDose (ValueUnit.valueUnitFromGStandUnitString 1.m "gram")
+        |> setNormMinSingleDose (ValueUnit.valueUnitFromGStandUnitString 10.m "milligram")
+        |> setAbsMaxSingleDose (ValueUnit.valueUnitFromGStandUnitString 1.m "gram")
         |> Dosage.toString true
 
-    
+
     let convert () =
         Dosage.empty
-        |> setNormMinSingleDose (ValueUnit.valueUnitFromGStandUnitString 0.01 "milligram")
-        |> setNormMaxSingleDose (ValueUnit.valueUnitFromGStandUnitString 1. "milligram")
+        |> setNormMinSingleDose (ValueUnit.valueUnitFromGStandUnitString 0.01m "milligram")
+        |> setNormMaxSingleDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
         |> Dosage.convertSubstanceUnitTo (ValueUnit.Units.mcg)
         |> Dosage.toString false
-        
+
 
     let convertRate () =
         Dosage.empty
-        |> setNormMinRateDose (ValueUnit.valueUnitFromGStandUnitString 0.01 "milligram")
-        |> setNormMaxRateDose (ValueUnit.valueUnitFromGStandUnitString 1. "milligram")
+        |> setNormMinRateDose (ValueUnit.valueUnitFromGStandUnitString 0.01m "milligram")
+        |> setNormMaxRateDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
         |> setRateUnit (ValueUnit.Units.hour)
         |> Dosage.convertSubstanceUnitTo (ValueUnit.Units.mcg)
         |> Dosage.convertRateUnitTo (ValueUnit.Units.min)
@@ -222,19 +104,17 @@ module PatientTests =
 
     module Patient = Patient.Optics
 
-    type Patient = Patient.Patient
-    
     let toString () =
         Patient.empty
-        |> Patient.setInclMinGestAge (28.  |> ValueUnit.ageInWk)
-        |> Patient.setExclMaxGestAge (33.  |> ValueUnit.ageInWk)
-        |> Patient.setExclMinAge (1. |> ValueUnit.ageInMo)
-        |> Patient.setInclMaxAge (120. |> ValueUnit.ageInWk)
-        |> Patient.setInclMinWeight (0.15  |> ValueUnit.weightInKg)
-        |> Patient.setInclMaxWeight (4.00  |> ValueUnit.weightInKg)
-        |> Patient.setInclMinBSA (0.15  |> ValueUnit.bsaInM2)
-        |> Patient.setInclMaxBSA (1.00  |> ValueUnit.bsaInM2)
-        |> (fun p -> p |> (Optic.set Patient.Gender_) Patient.Male)
+        |> Patient.setInclMinGestAge (28.m  |> ValueUnit.ageInWk |> Some)
+        |> Patient.setExclMaxGestAge (33.m  |> ValueUnit.ageInWk |> Some)
+        |> Patient.setExclMinAge (1.m |> ValueUnit.ageInMo |> Some)
+        |> Patient.setInclMaxAge (120.m |> ValueUnit.ageInWk |> Some)
+        |> Patient.setInclMinWeight (0.15m  |> ValueUnit.weightInKg |> Some)
+        |> Patient.setInclMaxWeight (4.00m  |> ValueUnit.weightInKg |> Some)
+        |> Patient.setInclMinBSA (0.15m  |> ValueUnit.bsaInM2 |> Some)
+        |> Patient.setInclMaxBSA (1.00m  |> ValueUnit.bsaInM2 |> Some)
+        |> (fun p -> p |> (Optic.set Patient.Gender_) Gender.Male)
         |> Patient.toString
 
 
@@ -246,8 +126,8 @@ module GStandTests =
     open Informedica.Utils.Lib.BCL
 
     module Dosage = DoseRule.Dosage
-    
-    module RF = Informedica.ZIndex.Lib.RuleFinder 
+
+    module RF = Informedica.ZIndex.Lib.RuleFinder
     module DR = Informedica.ZIndex.Lib.DoseRule
     module GPP = Informedica.ZIndex.Lib.GenPresProduct
 
@@ -258,8 +138,8 @@ module GStandTests =
     let createWithCfg cfg = GStand.createDoseRules cfg None None None None
 
     let createDoseRules = createWithCfg cfg
-    
-    let createCont su tu = 
+
+    let createCont su tu =
         let cfg = { cfg with IsRate = true ; SubstanceUnit = su ; TimeUnit = tu }
         GStand.createDoseRules cfg None None None None
 
@@ -271,7 +151,7 @@ Synoniemen: {synonym}
 
 ### _ATC code_: {atc}
 
-### _Therapeutische groep_: {thergroup} 
+### _Therapeutische groep_: {thergroup}
 
 ### _Therapeutische subgroep_: {thersub}
 
@@ -295,7 +175,7 @@ Synoniemen: {synonym}
 
     let mdShapeText = """
   * _Vorm_: {shape}
-  * _Producten_: 
+  * _Producten_:
   * {products}
 """
 
@@ -309,7 +189,7 @@ Synoniemen: {synonym}
 """
 
 
-    let mdConfig = 
+    let mdConfig =
         {
             DoseRule.mdConfig with
                 MainText = mdText
@@ -324,10 +204,10 @@ Synoniemen: {synonym}
     let toStr = DoseRule.toStringWithConfig mdConfig false
 
 
-    let printDoseRules rs = 
+    let printDoseRules rs =
         rs
-        |> Seq.iter (fun dr -> 
-            dr 
+        |> Seq.iter (fun dr ->
+            dr
             |> toStr
             |> Markdown.toBrowser
 
@@ -352,14 +232,14 @@ Synoniemen: {synonym}
         createDoseRules "clonidine" "" "oraal"
         |> printDoseRules
 
-        GStand.createDoseRules cfg (Some 0.) (Some 12.) None None "paracetamol" "" "oraal"
+        GStand.createDoseRules cfg (Some 0.m) (Some 12.m) None None "paracetamol" "" "oraal"
         |> printDoseRules
 
-        GStand.createDoseRules cfg (Some 100.) None (None) (Some 167541) "" "" ""
+        GStand.createDoseRules cfg (Some 100.m) None (None) (Some 167541) "" "" ""
         |> printDoseRules
         |> (printfn "%A")
-         
-        GStand.createDoseRules cfg (Some 0.) (Some 1.5) None None "gentamicine" "" "intraveneus"
+
+        GStand.createDoseRules cfg (Some 0.m) (Some 1.5m) None None "gentamicine" "" "intraveneus"
         |> printDoseRules
 
         createWithCfg cfgmcg "fentanyl" "" "intraveneus"
@@ -375,31 +255,31 @@ Synoniemen: {synonym}
         RF.createFilter None None None None "paracetamol" "" ""
         |> RF.find true
         |> getSubstanceDoses cfg
-        |> Seq.iter (fun (inds, sd) -> 
+        |> Seq.iter (fun (inds, sd) ->
             printfn "Indication %s" (inds |> String.concat ", ")
             printfn "%s" (sd |> Dosage.toString true)
         )
- 
+
 
         RF.createFilter None None None None "gentamicine" "" ""
         |> RF.find true
         |> getPatients cfg
-        |> Seq.iter (fun (pat, sds, _) -> 
+        |> Seq.iter (fun (pat, sds, _) ->
             printfn "%s" (pat |> Patient.toString)
             sds
-            |> Seq.iter (fun (inds, sd) -> 
+            |> Seq.iter (fun (inds, sd) ->
             printfn "Indication %s" (inds |> String.concat ", ")
             printfn "%s" (sd |> Dosage.toString true)
             )
         )
 
 
-        GStand.createDoseRules cfg (Some 2.) (Some 4.) None None "paracetamol" "" "oraal"
+        GStand.createDoseRules cfg (Some 2.m) (Some 4.m) None None "paracetamol" "" "oraal"
         |> printDoseRules
 
         DR.get ()
-        |> Seq.filter (fun dr -> 
-            dr.Freq.Frequency = 1. && 
+        |> Seq.filter (fun dr ->
+            dr.Freq.Frequency = 1.m &&
             dr.Freq.Time = "per uur" &&
             dr.Routes = [|"intraveneus"|]
         )
@@ -411,11 +291,11 @@ Synoniemen: {synonym}
 
         DR.get ()
         |> Seq.filter (fun dr ->
-            dr.GenericProduct 
+            dr.GenericProduct
             |> Seq.map (fun gp -> gp.Name)
             |> Seq.exists (String.startsWithCapsInsens "salbutamol")
         )
-        //|> Seq.collect (fun dr -> 
+        //|> Seq.collect (fun dr ->
         //    dr.GenericProduct
         //    |> Seq.map (fun gp -> gp.Name, dr.Routes)
         //)
@@ -425,12 +305,12 @@ Synoniemen: {synonym}
 
         DR.get ()
         |> Seq.filter (fun dr ->
-            dr.GenericProduct 
+            dr.GenericProduct
             |> Seq.map (fun gp -> gp.Name)
             |> Seq.exists (String.startsWithCapsInsens "fentanyl") &&
             dr.Freq.Time |> String.startsWithCapsInsens "eenmalig"
         )
-        //|> Seq.collect (fun dr -> 
+        //|> Seq.collect (fun dr ->
         //    dr.GenericProduct
         //    |> Seq.map (fun gp -> gp.Name, dr.Routes)
         //)
@@ -440,11 +320,11 @@ Synoniemen: {synonym}
 
         DR.get ()
         |> Seq.filter (fun dr ->
-            dr.GenericProduct 
+            dr.GenericProduct
             |> Seq.map (fun gp -> gp.Name)
-            |> Seq.exists (String.startsWithCapsInsens "fentanyl") 
+            |> Seq.exists (String.startsWithCapsInsens "fentanyl")
         )
-        //|> Seq.collect (fun dr -> 
+        //|> Seq.collect (fun dr ->
         //    dr.GenericProduct
         //    |> Seq.map (fun gp -> gp.Name, dr.Routes)
         //)
@@ -455,8 +335,8 @@ Synoniemen: {synonym}
 
         GPP.get false
         |> Seq.filter (fun gpp -> gpp.Name |> String.equalsCapInsens "paracetamol")
-        |> Seq.iter (fun gpp -> 
-            gpp 
+        |> Seq.iter (fun gpp ->
+            gpp
             |> (printfn "%A")
         )
 
@@ -467,8 +347,8 @@ Synoniemen: {synonym}
         |> Seq.iter (printfn "%s")
 
         GPP.get true
-        |> Seq.filter (fun gpp -> 
-            gpp.Route |> Seq.exists (fun r -> r |> String.equalsCapInsens "parenteraal")
+        |> Seq.filter (fun gpp ->
+            gpp.Routes |> Seq.exists (fun r -> r |> String.equalsCapInsens "parenteraal")
         )
         |> Seq.distinct
         |> Seq.sort
@@ -482,14 +362,14 @@ Synoniemen: {synonym}
         printfn "DoseRule Routes"
         DR.routes ()
         |> Seq.filter (fun r ->
-            
+
             GPP.getRoutes ()
-            |> Seq.exists (fun r' -> r = r') 
+            |> Seq.exists (fun r' -> r = r')
             |> not
         )
         |> Seq.sort
         |> Seq.iter (printfn "|%s|")
-        printfn ""        
+        printfn ""
         printfn "GenPresProduct Routes"
         GPP.getRoutes ()
         |> Seq.filter (fun r ->
@@ -501,9 +381,8 @@ Synoniemen: {synonym}
         |> Seq.iter (printfn "|%s|")
 
 
-    GStand.createDoseRules cfg (Some 1.1) (Some 5.) None None "gentamicine" "" "intraveneus"
+    GStand.createDoseRules cfg (Some 1.1m) (Some 5.m) None None "gentamicine" "" "intraveneus"
     |> printDoseRules
 
-    
-    
-    
+
+

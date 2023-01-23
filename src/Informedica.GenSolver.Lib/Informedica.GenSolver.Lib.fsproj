@@ -24,7 +24,6 @@
         <None Include="Scripts\DependencySolution.fsx" />
         <None Include="Scripts\OrderEquations.fsx" />
         <None Include="Scripts\Tests.fsx" />
-        <None Include="Scripts\Variable.fsx" />
         <None Include="Scripts\Tests2.fsx" />
     </ItemGroup>
     <ItemGroup>

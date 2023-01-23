@@ -19,6 +19,8 @@ module Maximum = ValueRange.Maximum
 module Increment = ValueRange.Increment
 module ValueSet = ValueRange.ValueSet
 
+open Informedica.Utils.Lib
+
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -55,6 +57,7 @@ module Solve =
         try
             eqs
             |> Api.solve true Solver.sortQue logger (n |> Name.createExc) p
+            |> Result.get
         with
         | :? Exceptions.SolverException as e ->
             printfn $"{e.Data0}"
@@ -361,7 +364,7 @@ testList "test setting min and max to abcdef eqs" [
         with
         | :? Exceptions.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverTooManyLoops (n, xs) ->
+            | [Exceptions.SolverTooManyLoops (n, xs)] ->
                 printfn "ran into a loop with:"
                 xs
                 |> printEqs
@@ -454,7 +457,7 @@ testList "can set any var of compA or qty or cnc of compB" [
         with
         | :? Exceptions.SolverException as e ->
             match e.Data0 with
-            | Exceptions.SolverTooManyLoops (n, xs) ->
+            | [Exceptions.SolverTooManyLoops (n, xs)] ->
                 vars
                 |> String.concat ", "
                 |> printfn "ran into a loop with:%s\n"

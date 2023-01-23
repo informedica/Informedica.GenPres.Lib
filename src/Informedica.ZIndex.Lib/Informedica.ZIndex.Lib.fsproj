@@ -23,9 +23,9 @@
     <Compile Include="DoseRule.fs" />
     <Compile Include="ATCGroup.fs" />
     <Compile Include="RuleFinder.fs" />
+    <None Include="Scripts\load.fsx" />
     <None Include="Scripts\loadGenCode.fsx" />
     <None Include="Scripts/GenCode.fsx" />
-    <None Include="Scripts\load.fsx" />
     <None Include="Scripts/Script.fsx" />
   </ItemGroup>
   <ItemGroup>

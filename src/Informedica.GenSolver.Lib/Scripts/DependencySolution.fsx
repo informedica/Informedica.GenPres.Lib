@@ -22,6 +22,8 @@ module Maximum = ValueRange.Maximum
 module Increment = ValueRange.Increment
 module ValueSet = ValueRange.ValueSet
 
+open Informedica.Utils.Lib
+
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -58,6 +60,7 @@ module Solve =
         try
             eqs
             |> Api.solve true Solver.sortQue logger (n |> Name.createExc) p
+            |> Result.get
         with
         | :? Exceptions.SolverException as e ->
             printfn $"{e.Data0}"
@@ -165,6 +168,7 @@ let calcFail eqs n =
 
 calcFail failEqs 30N
 
+
 for i in [5N..30N] do
     printfn $"trying {i}"
     calcFail failEqs i
@@ -251,3 +255,4 @@ maxEqs
 |> solveMaxIncl "d" 10N
 |> solveValues "d" [2N]
 |> printEqs
+

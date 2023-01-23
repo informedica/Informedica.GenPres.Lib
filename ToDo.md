@@ -17,8 +17,8 @@
 * [ ] Add cache management
 * [ ] Identify situations with undetermined dose counts (if they exist)
 * [ ] GenSolver able to detect min max calculation problems from initial equation set
-* [ ] Detect should have solution rule, but has no solution rule
-* [ ] Detect should have reconstitution but has no reconstitution
+* [ ] Detect "should have solution rule", but has no solution rule
+* [ ] Detect "should have reconstitution", but has no reconstitution
 * [ ] Solve incompatible max quantity with adjusted dose quantities
 * [ ] Need more testing code for solver lib
 * [ ] Add unrecognized units
@@ -32,7 +32,7 @@
 * [ ] Mathematically investigate whether increment calc works with addition and/or subtraction
 * [ ] Maybe add abs max to constraints
 * [ ] Rewrite GStand.fs using anonymous records and split functions
-
+* [ ] Split Optics modules in Optics and AutoOpen SetGet
 
 
 
