@@ -2,7 +2,6 @@
 #load "../../../scripts/Expecto.fsx"
 #load "load.fsx"
 #load "../MinIncrMax.fs"
-#load "../MinMax.fs"
 
 
 
@@ -11,12 +10,59 @@ module Tests =
     open Expecto
     open Expecto.Flip
 
+    open MathNet.Numerics
+
     open Informedica.GenUnits.Lib
     open Informedica.GenCore.Lib
+
+    open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
 
     module MinIncrMaxTests =
+
+        module Calculator = MinIncrMax.Calculator
+
+        let maxMultipleOf incr min =
+            let b, br = min
+            if b then br |> BigRational.maxInclMultipleOf incr
+            else
+                br |> BigRational.maxExclMultipleOf incr
+
+
+        let minMultipleOf incr min =
+            let b, br = min
+            if b then br |> BigRational.minInclMultipleOf incr
+            else
+                br |> BigRational.minExclMultipleOf incr
+
+
+        let minGTmax (maxIncl, max) (minIncl, min) =
+            if minIncl && maxIncl then min > max
+            else
+                min >= max
+
+
+        let calcIncrement brs =
+                brs
+                |> Set.filter ((<) 0N)
+                |> Set.removeBigRationalMultiples
+                |> fun brs1 ->
+                    if brs1 |> Set.isEmpty then
+                        $"No valid increments {brs}"
+                        |> MinIncrMax.Errors.NoValidIncrement
+                        |> Error
+                    else
+                        brs1
+                        |> Ok
+
+        let validate =
+            Calculator.validate
+                calcIncrement
+                minMultipleOf
+                maxMultipleOf
+                minGTmax
+
 
         [<Tests>]
         let tests = testList "MinIncrMax.validate" [
@@ -30,12 +76,12 @@ module Tests =
                 let incr = incr |> Set.map BigRational.fromInt |> Some
 
                 try
-                    MinIncrMax.validate min incr max
+                    validate min incr max
                     |> function
                     | Error _ -> ()
                     | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
-                        MinIncrMax.toString toBrStr min incr max
+                        Calculator.toString toBrStr min incr max
                         |> printfn "Pass: %s"
                     true
                 with
@@ -53,12 +99,12 @@ module Tests =
                 let incr = incr |> Set.map BigRational.fromInt |> Some
 
                 try
-                    MinIncrMax.validate min incr max
+                    validate min incr max
                     |> function
                     | Error _ -> ()
                     | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
-                        MinIncrMax.toStringNL toBrStr min incr max
+                        Calculator.toStringNL toBrStr min incr max
                         |> printfn "Pass: %s"
                     true
                 with
@@ -68,7 +114,7 @@ module Tests =
 
             fun min incr max ->
                 try
-                    MinIncrMax.validate min incr max
+                    Calculator.validate min incr max
                     |> ignore
                     true
                 with
@@ -77,7 +123,7 @@ module Tests =
 
 
             fun min incr max ->
-                MinIncrMax.validate min incr max
+                validate min incr max
                 |> function
                 | Ok (Some min, _, Some max) ->
                     let min = min |> snd
@@ -91,9 +137,9 @@ module Tests =
 
     module MinMaxTests =
 
-        module MinMax = MinMax.Optics
+        module MinMax = MinIncrMax.Optics
 
-        let mmToStr = MinMax.toString "van" "tot"
+        let mmToStr = MinIncrMax.toString "van" "tot"
 
 
         let createValueUnit (d : decimal) u =
@@ -111,22 +157,22 @@ module Tests =
             createValueUnit 20.m "mg[Mass]" |> Option.get
 
         let incl1, incl2 =
-            v1 |> MinMax.inclusive,
-            v2 |> MinMax.inclusive
+            v1 |> MinIncrMax.inclusive,
+            v2 |> MinIncrMax.inclusive
 
         let v3, v4 =
             createValueUnit 30.m "mg[Mass]" |> Option.get ,
             createValueUnit 40.m "mg[Mass]" |> Option.get
 
         let incl3, incl4 =
-            v3 |> MinMax.inclusive,
-            v4 |> MinMax.inclusive
+            v3 |> MinIncrMax.inclusive,
+            v4 |> MinIncrMax.inclusive
 
 
         let toString () =
-            MinMax.empty
-            |> MinMax.setMin (createValueUnit 1.m "mg[Mass]"  |> Option.get |> MinMax.Inclusive)
-            |> MinMax.setMax (createValueUnit 10.m "mg[Mass]" |> Option.get |> MinMax.Inclusive)
+            MinIncrMax.empty
+            |> MinMax.setMin (createValueUnit 1.m "mg[Mass]"  |> Option.get |> MinIncrMax.Inclusive)
+            |> MinMax.setMax (createValueUnit 10.m "mg[Mass]" |> Option.get |> MinIncrMax.Inclusive)
             |> mmToStr
 
 
@@ -143,27 +189,27 @@ module Tests =
 
 
         let a1, a2 =
-            0.1m |> ageInMo |> MinMax.Inclusive,
-            0.1m |> ageInYr |> MinMax.Exclusive
+            0.1m |> ageInMo |> MinIncrMax.Inclusive,
+            0.1m |> ageInYr |> MinIncrMax.Exclusive
 
 
         let ageToString () =
-            MinMax.empty
+            MinIncrMax.empty
             |> MinMax.setMin a1
             |> MinMax.setMax a2
-            |> MinMax.ageToString
+            |> MinIncrMax.ageToString
 
 
         let valueComp () =
             [
-                 $"%A{incl1} < %A{incl2} = %A{MinMax.valueST incl1 incl2}"
-                 $"%A{incl1} < %A{incl1} = %A{MinMax.valueST incl1 incl1}"
-                 $"%A{incl1} <= %A{incl2} = %A{MinMax.valueSTE incl1 incl2}"
-                 $"%A{incl1} <= %A{incl1} = %A{MinMax.valueSTE incl1 incl1}"
-                 $"%A{incl1} > %A{incl2} = %A{MinMax.valueLT incl1 incl2}"
-                 $"%A{incl1} > %A{incl1} = %A{MinMax.valueLT incl1 incl1}"
-                 $"%A{incl1} >= %A{incl2} = %A{MinMax.valueLTE incl1 incl2}"
-                 $"%A{incl1} >= %A{incl1} = %A{MinMax.valueLTE incl1 incl1}"
+                 $"%A{incl1} < %A{incl2} = %A{MinIncrMax.valueST incl1 incl2}"
+                 $"%A{incl1} < %A{incl1} = %A{MinIncrMax.valueST incl1 incl1}"
+                 $"%A{incl1} <= %A{incl2} = %A{MinIncrMax.valueSTE incl1 incl2}"
+                 $"%A{incl1} <= %A{incl1} = %A{MinIncrMax.valueSTE incl1 incl1}"
+                 $"%A{incl1} > %A{incl2} = %A{MinIncrMax.valueGT incl1 incl2}"
+                 $"%A{incl1} > %A{incl1} = %A{MinIncrMax.valueGT incl1 incl1}"
+                 $"%A{incl1} >= %A{incl2} = %A{MinIncrMax.valueGTE incl1 incl2}"
+                 $"%A{incl1} >= %A{incl1} = %A{MinIncrMax.valueGTE incl1 incl1}"
             ]
 
 
@@ -172,40 +218,43 @@ module Tests =
         let testFold () =
             let mms =
                 [
-                    MinMax.empty
-                    MinMax.empty |> MinMax.setMin incl1
-                    MinMax.empty |> MinMax.setMin incl2
-                    MinMax.empty |> MinMax.setMax incl3
-                    MinMax.empty |> MinMax.setMax incl4
-                    MinMax.empty |> MinMax.setMin incl1 |> MinMax.setMax incl3
-                    MinMax.empty |> MinMax.setMin incl2 |> MinMax.setMax incl3
-                    MinMax.empty |> MinMax.setMin incl3 |> MinMax.setMax incl3
-                    MinMax.empty |> MinMax.setMin incl4 |> MinMax.setMax incl4
+                    MinIncrMax.empty
+                    MinIncrMax.empty |> MinMax.setMin incl1
+                    MinIncrMax.empty |> MinMax.setMin incl2
+                    MinIncrMax.empty |> MinMax.setMax incl3
+                    MinIncrMax.empty |> MinMax.setMax incl4
+                    MinIncrMax.empty |> MinMax.setMin incl1 |> MinMax.setMax incl3
+                    MinIncrMax.empty |> MinMax.setMin incl2 |> MinMax.setMax incl3
+                    MinIncrMax.empty |> MinMax.setMin incl3 |> MinMax.setMax incl3
+                    MinIncrMax.empty |> MinMax.setMin incl4 |> MinMax.setMax incl4
                 ]
 
             mms
-            |> MinMax.foldMaximize
+            |> List.iter (fun mm -> printfn $"""{mm |> MinIncrMax.toString "from" "to"}""" )
+
+            mms
+            |> MinIncrMax.foldMaximize
             |> mmToStr,
             mms
-            |> MinMax.foldMinimize
+            |> MinIncrMax.foldMinimize
             |> mmToStr
 
 
         let inRange () =
-            let mm1 = MinMax.empty
+            let mm1 = MinIncrMax.empty
             let mm2 =
-                MinMax.empty
+                MinIncrMax.empty
                 |> MinMax.setMin incl1
             let mm3 =
-                MinMax.empty
+                MinIncrMax.empty
                 |> MinMax.setMax incl4
             let mm4 =
-                MinMax.empty
+                MinIncrMax.empty
                 |> MinMax.setMin incl2
                 |> MinMax.setMax incl3
 
             let test v mm =
-                $"%s{v |> MinMax.valueToString} in range: %s{mm |> mmToStr} = %A{MinMax.inRange v mm}"
+                $"%s{v |> MinIncrMax.valueToString} in range: %s{mm |> mmToStr} = %A{MinIncrMax.inRange v mm}"
 
 
             [
@@ -230,6 +279,11 @@ module Tests =
 
 
         let tests = testList "MinMax" [
+            test "minGTmax" {
+                incl2 |> MinIncrMax.minGTmax incl1
+                |> Expect.isTrue $"{incl2} > {incl1}"
+            }
+
             test "toString" {
                 toString()
                 |> Expect.equal "should equal" "1 mg - 10 mg"

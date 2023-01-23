@@ -54,7 +54,7 @@ let oneMg = "4000 mg" |> parse |> Option.get
 let onePerDay = "1 x / day" |> parse |> Option.get
 
 oneMg * onePerDay
-|> ValueUnit.toBase
+|> ValueUnit.toBaseValue
 
 
 

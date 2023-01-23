@@ -9,7 +9,7 @@ module Types =
         open Informedica.GenUnits.Lib
 
         type Route = Informedica.ZIndex.Lib.Types.Route.Route
-        type MinMax = Informedica.GenCore.Lib.MinMax.MinMax
+        type MinMax = Informedica.GenCore.Lib.MinIncrMax.MinIncrMax
 
 
         /// A product is a medical substance or

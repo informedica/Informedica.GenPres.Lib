@@ -82,8 +82,8 @@ module GStand =
         | h::tail ->
             if tail |> List.forall (fun mm -> mm.Weight = h.Weight) then h.Weight
             else DR.minmax
-        |> mapMinMax ((Option.map ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.inclMinLens))
-                     ((Option.map ValueUnit.weightInKg) >> (Optic.set MinMax.Optics.exclMaxLens))
+        |> mapMinMax ((Option.map ValueUnit.weightInKg) >> (Optic.set MinIncrMax.Optics.inclMinLens))
+                     ((Option.map ValueUnit.weightInKg) >> (Optic.set MinIncrMax.Optics.exclMaxLens))
 
 
     // Get the min max bsa if there is one min bsa or max bsa
@@ -95,8 +95,8 @@ module GStand =
         | h::tail ->
             if tail |> List.forall (fun mm -> mm.BSA = h.Weight) then h.BSA
             else DR.minmax
-        |> mapMinMax ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.inclMinLens))
-                     ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinMax.Optics.exclMaxLens))
+        |> mapMinMax ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinIncrMax.Optics.inclMinLens))
+                     ((Option.map ValueUnit.bsaInM2) >> (Optic.set MinIncrMax.Optics.exclMaxLens))
 
 
     /// Make sure that a GSTand time string
@@ -177,8 +177,8 @@ module GStand =
 
         let fr = mapFreq gstdsr.Freq
 
-        let setMin = Optic.set MinMax.Optics.inclMinLens
-        let setMax = Optic.set MinMax.Optics.exclMaxLens
+        let setMin = Optic.set MinIncrMax.Optics.inclMinLens
+        let setMax = Optic.set MinIncrMax.Optics.exclMaxLens
 
         // ToDo remove n and mapping
         let toVu _ _ v =
@@ -194,7 +194,7 @@ module GStand =
                 vu * x |> Some
 
         let minmax n mapping (mm : DR.MinMax) =
-            MinMax.empty
+            MinIncrMax.empty
             |> setMin (mm.Min |> Option.bind (toVu n mapping))
             |> setMax (mm.Max |> Option.bind (toVu n mapping))
 
@@ -218,9 +218,9 @@ module GStand =
         let fold (mm : MinMax) (mm_ : MinMax) =
             match mm.Min, mm.Min with
             | Some m, None
-            | None, Some m -> [ mm |> MinMax.setMin ( Some m); mm_ |> MinMax.setMin (Some m) ]
+            | None, Some m -> [ mm |> MinIncrMax.setMin ( Some m); mm_ |> MinIncrMax.setMin (Some m) ]
             | _ -> [ mm; mm_ ]
-            |> MinMax.foldMaximize
+            |> MinIncrMax.foldMaximize
 
         drs
         |> Seq.collect (fun dr ->
@@ -274,16 +274,16 @@ module GStand =
                 let absM2 = fold absM2 absM2_
 
                 rts, inds, frs, gstdsrs, norm, abs, normKg, absKg, normM2, absM2
-            ) ([], [], [], [], MinMax.empty, MinMax.empty, MinMax.empty, MinMax.empty, MinMax.empty, MinMax.empty))
+            ) ([], [], [], [], MinIncrMax.empty, MinIncrMax.empty, MinIncrMax.empty, MinIncrMax.empty, MinIncrMax.empty, MinIncrMax.empty))
         >> ((fun (k, (rts, inds, frs, gstdsrs, norm, abs, normKg, absKg, normM2, absM2)) ->
-            let w = MinMax.empty |> calcWeightMinMax gstdsrs
-            let b = MinMax.empty |> calcBSAMinMax gstdsrs
+            let w = MinIncrMax.empty |> calcWeightMinMax gstdsrs
+            let b = MinIncrMax.empty |> calcBSAMinMax gstdsrs
 
             // if weight or bsa is known the adjusted or unadjusted doses can be calculated
             let calcNoneAndAdjusted (c : MinMax) (un : MinMax) (adj : MinMax) =
                 // remove the adjust unit by making it a count
                 let c =
-                    c |> MinMax.withUnit ValueUnit.Units.Count.times
+                    c |> MinIncrMax.withUnit ValueUnit.Units.Count.times
 
                 let calc op x1 x2 y =
                     match y with

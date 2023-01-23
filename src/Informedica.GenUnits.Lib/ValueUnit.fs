@@ -493,6 +493,7 @@ module ValueUnit =
 
     let withUnitSingle u v = [|v|] |> withUnit u
 
+
     let withValue v u = create u v
 
 
@@ -523,13 +524,27 @@ module ValueUnit =
     let valueToBase u v = v |> Multipliers.toBase (u |> Multipliers.getMultiplier)
 
 
-    let toBase (ValueUnit (v, u)) = v |> Array.map (valueToBase u)
+    let toBaseValue (ValueUnit (v, u)) = v |> Array.map (valueToBase u)
 
 
     let valueToUnit u v = v |> Multipliers.toUnit (u |> Multipliers.getMultiplier)
 
 
-    let toUnit (ValueUnit (v, u)) = v |> Array.map (valueToUnit u)
+    let toUnitValue (ValueUnit (v, u)) = v |> Array.map (valueToUnit u)
+
+
+    let toBase vu =
+        let v, u = vu |> get
+        v
+        |> Array.map (valueToBase u)
+        |> create u
+
+
+    let toUnit vu =
+        let v, u = vu |> get
+        v
+        |> Array.map (valueToUnit u)
+        |> create u
 
 
     let count = 1N |> Times |> Count
@@ -734,9 +749,9 @@ module ValueUnit =
             |> simpl
             |> (fun (b, u') ->
                 vu
-                |> toBase
+                |> toBaseValue
                 |> create (if b then u' else u)
-                |> toUnit
+                |> toUnitValue
                 |> create (if b then u' else u)
             )
 
@@ -747,8 +762,8 @@ module ValueUnit =
         let (ValueUnit (_, u2)) = vu2
         // calculate value in base
         let v =
-            let vs1 = vu1 |> toBase
-            let vs2 = vu2 |> toBase
+            let vs1 = vu1 |> toBaseValue
+            let vs2 = vu2 |> toBaseValue
             Array.allPairs vs1 vs2
             |> Array.map (fun (v1, v2) -> v1 |> op <| v2)
         // calculate new combi unit
@@ -765,19 +780,21 @@ module ValueUnit =
         v
         |> create u
         // calculate to the new combiunit
-        |> toUnit
+        |> toUnitValue
         // recreate again to final value unit
         |> create u
         |> fun vu -> if b then vu |> simplify else vu
 
 
     let cmp cp vu1 vu2 =
-        let vs1 = vu1 |> toBase
-        let vs2 = vu2 |> toBase
-        Array.allPairs vs1 vs2
-        |> Array.forall (fun (v1, v2)  ->
-            v1 |> cp <| v2
-        )
+        if vu1 |> eqsGroup vu2 |> not then false
+        else
+            let vs1 = vu1 |> toBaseValue
+            let vs2 = vu2 |> toBaseValue
+            Array.allPairs vs1 vs2
+            |> Array.forall (fun (v1, v2)  ->
+                v1 |> cp <| v2
+            )
 
 
     let eq = cmp (=)
@@ -800,9 +817,9 @@ module ValueUnit =
         if u = u_ then vu
         else
             vu
-            |> toBase
+            |> toBaseValue
             |> create u
-            |> toUnit
+            |> toUnitValue
             |> create u
 
 

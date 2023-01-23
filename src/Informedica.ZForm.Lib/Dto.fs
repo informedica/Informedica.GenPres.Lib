@@ -24,8 +24,8 @@ module Dto =
     module ATC = Informedica.ZIndex.Lib.ATCGroup
 
 
-    let (>?) = MinMax.valueOptLT
-    let (<?) = MinMax.valueOptST
+    let (>?) = MinIncrMax.valueOptLT
+    let (<?) = MinIncrMax.valueOptST
 
 
     [<CLIMutable>]

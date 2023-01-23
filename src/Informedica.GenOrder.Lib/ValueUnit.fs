@@ -16,7 +16,7 @@ module ValueUnit =
 
     let valueToBase u v =
         create u v
-        |> toBase
+        |> toBaseValue
 
 
     let unitToString =

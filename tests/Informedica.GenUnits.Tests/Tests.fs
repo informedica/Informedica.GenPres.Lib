@@ -47,7 +47,7 @@ module Tests =
     [<Tests>]
     let unitTests =
 
-        let toBase = toBase >> (Array.map BigRational.toDecimal) >> Array.head
+        let toBase = toBaseValue >> (Array.map BigRational.toDecimal) >> Array.head
 
         testList "Unit" [
             test "base value of 400 mg " {
@@ -86,9 +86,9 @@ module Tests =
                     |> get
                     |> fun (_, u) ->
                         mg400
-                        |> ValueUnit.toBase
+                        |> ValueUnit.toBaseValue
                         |> create u
-                        |> toUnit
+                        |> toUnitValue
                         |> create u
                 Expect.equal "" vu mg400
             }
@@ -101,9 +101,9 @@ module Tests =
                     |> get
                     |> fun (_, u) ->
                         vu1
-                        |> ValueUnit.toBase
+                        |> ValueUnit.toBaseValue
                         |> create u
-                        |> toUnit
+                        |> toUnitValue
                         |> create u
                 Expect.equal "" vu1 vu2
             }
@@ -119,9 +119,9 @@ module Tests =
                     |> get
                     |> fun (_, u) ->
                         vu1
-                        |> ValueUnit.toBase
+                        |> ValueUnit.toBaseValue
                         |> create u
-                        |> toUnit
+                        |> toUnitValue
                         |> create u
                 Expect.equal "" vu1 vu2
             }
@@ -167,22 +167,22 @@ module Tests =
         testList "Calculation" [
 
             test "3 times 3 = 9" {
-                times3 * times3 |> toBase = [|9N|]
+                times3 * times3 |> toBaseValue = [|9N|]
                  |> Expect.isTrue ""
             }
 
             test "3 divided by 3 = 1" {
-             times3 / times3 |> toBase = [|1N|]
+             times3 / times3 |> toBaseValue = [|1N|]
              |> Expect.isTrue  ""
             }
 
             test "3 plus 3 = 6" {
-             times3 + times3 |> toBase = [|6N|]
+             times3 + times3 |> toBaseValue = [|6N|]
              |> Expect.isTrue ""
             }
 
             test "3 minus 3 = 0" {
-             times3 - times3 |> toBase = [|0N|]
+             times3 - times3 |> toBaseValue = [|0N|]
              |> Expect.isTrue ""
             }
 
@@ -298,3 +298,4 @@ module Tests =
             comparisonTests
             unitTests
         ]
+
