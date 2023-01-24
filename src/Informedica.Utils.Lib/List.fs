@@ -183,3 +183,13 @@ module List =
                     [ x ] |> List.append xs
             )
             []
+
+
+    let distinct xs = xs |> Seq.ofList |> Seq.distinct |> Seq.toList
+
+
+    let replaceOrAdd pred x xs =
+        if xs |> List.exists pred then
+            xs |> replace pred x
+        else
+            x :: xs

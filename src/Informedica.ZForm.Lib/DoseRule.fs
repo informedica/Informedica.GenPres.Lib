@@ -160,7 +160,7 @@ module DoseRule =
                 DoseRange.NormBSA_ >-> fst_ >-> MinMax.exclMaxLens
 
 
-            let minAbsLens = DoseRange.Abs_ >-> MinMax.Min_
+            let minAbsLens = DoseRange.Abs_ >-> MinMax.min_
 
 
             let inclMinAbsLens =

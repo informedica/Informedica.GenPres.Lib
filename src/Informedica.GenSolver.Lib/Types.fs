@@ -11,12 +11,14 @@ module rec Types =
     /// a null string
     type Name = Name of string
 
+
     /// The minimal value in
     /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Minimum =
         | MinIncl of BigRational
         | MinExcl of BigRational
+
 
     /// The maximum value in
     /// a `ValueRange`. Can be inclusive
@@ -30,6 +32,7 @@ module rec Types =
 
 
     type Increment = Increment of BigRational Set
+
 
     /// `ValueRange` represents a domain of
     /// rational numbers. A `ValueRange` can be either

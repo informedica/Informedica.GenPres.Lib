@@ -13,6 +13,7 @@ module Variable =
 
     module Name =
 
+        open Informedica.Utils.Lib
         open Informedica.Utils.Lib.BCL
 
         /// Create with continuation with **succ** function
@@ -45,6 +46,7 @@ module Variable =
     /// Functions and types to create and handle `ValueRange`.
     module ValueRange =
 
+        open Informedica.Utils.Lib
         open Informedica.Utils.Lib.BCL
 
 
@@ -455,6 +457,8 @@ module Variable =
                 | ValsProp vs -> vs |> ValueSet.toString exact
 
 
+        open Informedica.Utils.Lib
+
         let map fMin fMax fMinMax fIncr fMinIncr fIncrMax fMinIncrMax fValueSet vr =
             match vr with
             | Unrestricted -> vr
@@ -838,7 +842,7 @@ module Variable =
                 Option.none
                 Option.none
                 (snd >> Some)
-                (Tuple.thdOf3 >> Some)
+                (Tuple.thrdOf3 >> Some)
                 ValueSet.getMax
 
         /// Get an optional `ValueSet` in a `ValueRange`
@@ -1682,6 +1686,8 @@ module Variable =
     /// Handle the creation of a `Variable` from a `Dto` and
     /// vice versa.
     module Dto =
+
+        open Informedica.Utils.Lib
 
         /// The `Dto` representation of a `Variable`
         type Dto =

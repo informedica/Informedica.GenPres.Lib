@@ -1,40 +1,21 @@
 ﻿namespace Informedica.GenCore.Lib
 
+open Informedica.GenUnits.Lib
 
 
-module ValueUnit =
 
+/// Range with min, incr and/or max
+type MinIncrMax =
+    {
+        Min : Limit option
+        Incr : LimitIncr option
+        Max : Limit option
+    }
 
-    open Informedica.GenUnits.Lib
-    open ValueUnit
+/// Can be either `Inclusive` or `Exclusive`
+and Limit = Inclusive of ValueUnit | Exclusive of ValueUnit
 
-
-    let applyToValue fValue vu =
-        let u = vu |> getUnit
-        vu
-        |> getValue
-        |> fValue
-        |> create u
-
-
-    let applyToValues fArr fValue vu =
-        let u = vu |> getUnit
-        vu
-        |> getValue
-        |> fArr fValue
-        |> create u
-
-    let filterValues = applyToValues Array.filter
-
-
-    let mapValues = applyToValues Array.map
-
-
-    let validate fValid errMsg vu =
-        if vu |> getValue |> fValid then vu |> Ok
-        else
-            errMsg
-            |> Error
+and LimitIncr = LimitIncr of ValueUnit
 
 
 
@@ -48,7 +29,6 @@ module MinIncrMax =
 
     open MathNet.Numerics
     open Aether
-    open Informedica.GenUnits.Lib
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
@@ -59,14 +39,21 @@ module MinIncrMax =
 
         type Msg<'TLimit, 'TIncr> =
             | MinLargerThanMax of min: 'TLimit * max: 'TLimit
-            | NoValidIncrement of incr: 'TIncr
-
+            | NoValidLimitIncr of incr: 'TIncr
+            | DifferentUnitGroup of MinIncrMax
 
         let toString minToStr incrToStr maxToStr = function
             | MinLargerThanMax (min, max) ->
                 $"{min |> minToStr} > {max |> maxToStr}"
-            | NoValidIncrement incr ->
+            | NoValidLimitIncr incr ->
                 incr |> incrToStr
+            | DifferentUnitGroup mim ->
+                let minS, incrS, maxS =
+                    mim.Min |> minToStr,
+                    mim.Incr |> incrToStr,
+                    mim.Max |> maxToStr
+
+                $"different unit groups in {minS}, {incrS} {maxS}"
 
 
 
@@ -171,6 +158,7 @@ module MinIncrMax =
             toString_ st ste gt gte dotsL dotsR dotsM brToStr min incr max
 
 
+
     let (<?) = ValueUnit.st
     let (>?) = ValueUnit.gt
     let (<=?) = ValueUnit.ste
@@ -178,17 +166,11 @@ module MinIncrMax =
     let (>>=) l r = ValueUnit.convertTo r l
 
 
-    /// Range with min and/or max
-    type MinIncrMax =
-        {
-            Min : Limit option
-            Incr : Increment option
-            Max : Limit option
-        }
-
-    /// Can be either `Inclusive` or `Exclusive`
-    and Limit = Inclusive of ValueUnit | Exclusive of ValueUnit
-    and Increment = Increment of ValueUnit
+    let limitToString isMin lim =
+        let s = if isMin then "Min" else "Max"
+        match lim with
+        | Inclusive vu -> $"{s} Incl {vu |> ValueUnit.toStringPrec 3}"
+        | Exclusive vu -> $"{s} Excl {vu |> ValueUnit.toStringPrec 3}"
 
 
     let inclusive v = v |> Inclusive
@@ -197,7 +179,7 @@ module MinIncrMax =
     let exclusive v = v |> Exclusive
 
 
-    let getIncrement (Increment incr) = incr
+    let getLimitIncr (LimitIncr incr) = incr
 
 
     let isInclusive = function
@@ -205,15 +187,36 @@ module MinIncrMax =
         | Exclusive _ -> false
 
 
+    let zeroLimit =
+        1N
+        |> Times |> Count
+        |> ValueUnit.zero
+        |> Inclusive
 
-    let inline applyValue1 fIncl fExcl v1 =
-            match v1 with
-            | Inclusive vu1 -> vu1 |> fIncl |> Inclusive
-            | Exclusive vu1 -> vu1 |> fExcl |> Exclusive
+
+    let oneLimit =
+        1N
+        |> Times |> Count
+        |> ValueUnit.one
+        |> Inclusive
 
 
-    let inline applyValue2 fInclIncl fInclExcl fExclIncl fExclExcl v1 v2 =
-            match v1, v2 with
+    let inline mapLimit fIncl fExcl lim =
+            match lim with
+            | Inclusive vu -> vu |> fIncl
+            | Exclusive vu -> vu |> fExcl
+
+
+    let limitGetValueUnit = mapLimit id id
+
+
+    let inline applyLimit fIncl fExcl =
+            mapLimit (fIncl >> Inclusive) (fExcl >> Exclusive)
+
+
+
+    let inline map2Limit fInclIncl fInclExcl fExclIncl fExclExcl lim1 lim2 =
+            match lim1, lim2 with
             | Inclusive vu1, Inclusive vu2 -> vu1 |> fInclIncl <| vu2
             | Inclusive vu1, Exclusive vu2 -> vu1 |> fInclExcl <| vu2
             | Exclusive vu1, Inclusive vu2 -> vu1 |> fExclIncl <| vu2
@@ -222,50 +225,220 @@ module MinIncrMax =
 
     /// Check whether v1 > v2 using
     /// inclusive and exclusive logic
-    let valueGT = applyValue2 (>?) (>=?) (>?) (>?)
+    let limitGT isMin1 isMin2 =
+        match isMin1, isMin2 with
+        // min > min
+        | true, true   ->
+            let fInclIncl = (>?)  // [1 > [1 = false
+            let fInclExcl = (>?)  // [1 > <1 = false
+            let fExclIncl = (>=?) // <1 > [1 = true
+            let fExclExcl = (>?)  // <1 > <1 = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+        // max > min
+        | false, true  ->
+            let fInclIncl = (>?) // 1] > [1 = false
+            let fInclExcl = (>?) // 1] > <1 = false
+            let fExclIncl = (>?) // 1> > [1 = false
+            let fExclExcl = (>?) // 1> > <1 = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // min > max
+        | true, false  ->
+            let fInclIncl = (>?)  // [1 > 1] = false
+            let fInclExcl = (>=?) // [1 > 1> = true
+            let fExclIncl = (>=?) // <1 > 1] = true
+            let fExclExcl = (>=?)  // <1 > 1> = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // max > max
+        | false, false ->
+            let fInclIncl = (>?)  // 1] > 1] = false
+            let fInclExcl = (>=?) // 1] > 1> = true
+            let fExclIncl = (>?)  // 1> > 1] = false
+            let fExclExcl = (>?)  // 1> > 1> = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        |> fun (fInclIncl, fInclExcl, fExclIncl, fExclExcl) ->
+            map2Limit fInclIncl fInclExcl fExclIncl fExclExcl
 
 
     /// Check whether v1 < v2 using
     /// inclusive and exclusive logic
-    let valueST = applyValue2 (<?) (<?) (<=?) (<?)
+    let limitST isMin1 isMin2 =
+        match isMin1, isMin2 with
+        // min < min
+        | true, true   ->
+            let fInclIncl = (<?)  // [1 < [1 = false
+            let fInclExcl = (<=?) // [1 < <1 = true
+            let fExclIncl = (<?)  // <1 < [1 = false
+            let fExclExcl = (<?)  // <1 < <1 = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+        // max < min
+        | false, true  ->
+            let fInclIncl = (<?)  // 1] < [1 = false
+            let fInclExcl = (<=?) // 1] < <1 = true
+            let fExclIncl = (<=?) // 1> < [1 = true
+            let fExclExcl = (<=?) // 1> < <1 = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // min < max
+        | true, false  ->
+            let fInclIncl = (<?) // [1 < 1] = false
+            let fInclExcl = (<?) // [1 < 1> = false
+            let fExclIncl = (<?) // <1 < 1] = false
+            let fExclExcl = (<?) // <1 < 1> = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // max < max
+        | false, false ->
+            let fInclIncl = (<?)  // 1] < 1] = false
+            let fInclExcl = (<?)  // 1] < 1> = false
+            let fExclIncl = (<=?) // 1> < 1] = true
+            let fExclExcl = (<?)  // 1> < 1> = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        |> fun (fInclIncl, fInclExcl, fExclIncl, fExclExcl) ->
+            map2Limit fInclIncl fInclExcl fExclIncl fExclExcl
 
 
     /// Check whether v1 >= v2 using
     /// inclusive and exclusive logic
-    let valueGTE = applyValue2 (>=?) (>=?) (>=?) (>=?)
+    let limitGTE isMin1 isMin2 =
+        match isMin1, isMin2 with
+        // min >= min
+        | true, true   ->
+            let fInclIncl = (>=?) // [1 >= [1 = true
+            let fInclExcl = (>?)  // [1 >= <1 = false
+            let fExclIncl = (>=?) // <1 >= [1 = true
+            let fExclExcl = (>=?) // <1 >= <1 = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+        // max >= min
+        | false, true  ->
+            let fInclIncl = (>=?) // 1] >= [1 = true
+            let fInclExcl = (>?)  // 1] >= <1 = false
+            let fExclIncl = (>?)  // 1> >= [1 = false
+            let fExclExcl = (>?)  // 1> >= <1 = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // min >= max
+        | true, false  ->
+            let fInclIncl = (>=?) // [1 >= 1] = true
+            let fInclExcl = (>=?) // [1 >= 1> = true
+            let fExclIncl = (>=?) // <1 >= 1] = true
+            let fExclExcl = (>=?) // <1 >= 1> = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // max >= max
+        | false, false ->
+            let fInclIncl = (>=?) // 1] >= 1] = true
+            let fInclExcl = (>=?) // 1] >= 1> = true
+            let fExclIncl = (>?)  // 1> >= 1] = false
+            let fExclExcl = (>=?) // 1> >= 1> = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        |> fun (fInclIncl, fInclExcl, fExclIncl, fExclExcl) ->
+            map2Limit fInclIncl fInclExcl fExclIncl fExclExcl
 
 
     /// Check whether v1 <= v2 using
     /// inclusive and exclusive logic
-    let valueSTE = applyValue2 (<=?) (<=?) (<=?) (<=?)
+    let limitSTE isMin1 isMin2 =
+        match isMin1, isMin2 with
+        // min <= min
+        | true, true   ->
+            let fInclIncl = (<=?) // [1 <= [1 = true
+            let fInclExcl = (<=?) // [1 <= <1 = true
+            let fExclIncl = (<?)  // <1 <= [1 = false
+            let fExclExcl = (<=?) // <1 <= <1 = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+        // max <= min
+        | false, true  ->
+            let fInclIncl = (<=?) // 1] <= [1 = true
+            let fInclExcl = (<?)  // 1] <= <1 = true
+            let fExclIncl = (<?)  // 1> <= [1 = false
+            let fExclExcl = (<?)  // 1> <= <1 = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // min <= max
+        | true, false  ->
+            let fInclIncl = (<=?) // [1 <= 1] = true
+            let fInclExcl = (<?)  // [1 <= 1> = false
+            let fExclIncl = (<?)  // <1 <= 1] = false
+            let fExclExcl = (<?)  // <1 <= 1> = false
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        // max <= max
+        | false, false ->
+            let fInclIncl = (<=?) // 1] <= 1] = true
+            let fInclExcl = (<?)  // 1] <= 1> = false
+            let fExclIncl = (<=?) // 1> <= 1] = true
+            let fExclExcl = (<=?) // 1> <= 1> = true
+
+            fInclIncl, fInclExcl, fExclIncl, fExclExcl
+
+        |> fun (fInclIncl, fInclExcl, fExclIncl, fExclExcl) ->
+            map2Limit fInclIncl fInclExcl fExclIncl fExclExcl
+
+
+    let limitEq =
+        let returnFalse _ _ = false
+        map2Limit (=?) returnFalse returnFalse returnFalse
 
 
     /// Calculate the comparison of 2
     /// optional `Value` types `v1` and `v2`.
     let compOpt comp nn sn ns v1 v2 =
         match v1, v2 with
-        | None, None -> nn
+        | None, None   -> nn
         | Some _, None -> sn
         | None, Some _ -> ns
         | Some v1, Some v2 -> comp v1 v2
 
 
-    let valueOptLT = compOpt valueGT false true false
+    let limitOptLT isMin1 isMin2 = compOpt (limitGT  isMin1 isMin2) false true false
 
 
-    let valueOptST = compOpt valueST false false true
+    let limitOptST isMin1 isMin2 = compOpt (limitST  isMin1 isMin2) false false true
 
 
-    let valueOptLTE = compOpt valueGTE false true false
+    let limitOptLTE isMin1 isMin2 = compOpt (limitGTE  isMin1 isMin2) false true false
 
 
-    let valueOptSTE = compOpt valueSTE false false true
+    let limitOptSTE isMin1 isMin2 = compOpt (limitSTE isMin1 isMin2) false false true
 
 
-    let minGTmax min max = min |> valueGT max
+    let minGTmax min max = min |> limitGT false true max
 
 
-    let limitToMultipleOf inclMultOf exclMultOf (Increment incr) min =
+    let cmpToStr cp =
+        let z = zeroLimit
+        let o = oneLimit
+
+        match cp with
+        | _ when (z |> cp <| z) && not (z |> cp <| o) && not (o |> cp <| z) -> "="
+        | _ when (z |> cp <| z) && (z |> cp <| o) && not (o |> cp <| z) -> "<="
+        | _ when (z |> cp <| z) && not (z |> cp <| o) && (o |> cp <| z) -> ">="
+        | _ when not (z |> cp <| z) && (z |> cp <| o) && not (o |> cp <| z) -> "<"
+        | _ when not (z |> cp <| z) && not (z |> cp <| o) && (o |> cp <| z) -> ">"
+        | _ -> "unknown comparison"
+
+
+    let limitToMultipleOf inclMultOf exclMultOf (LimitIncr incr) min =
         let brs =
             incr |> ValueUnit.toBaseValue |> Set.ofArray
 
@@ -289,20 +462,20 @@ module MinIncrMax =
         limitToMultipleOf BigRational.maxInclMultipleOf BigRational.maxExclMultipleOf
 
 
-    let calcIncrement (Increment vu) =
+    let calcLimitIncr (LimitIncr vu) =
         vu
         |> ValueUnit.filterValues (fun br -> br >= 0N)
         |> ValueUnit.applyToValue (Set.ofArray >> Set.removeBigRationalMultiples >> Set.toArray)
-        |> Increment
+        |> LimitIncr
 
 
-    let validateIncrement (Increment vu) =
+    let validateLimitIncr (LimitIncr vu) =
         if vu |> ValueUnit.getValue |> Array.isEmpty then
             vu
-            |> Increment
-            |> Errors.NoValidIncrement
+            |> LimitIncr
+            |> Errors.NoValidLimitIncr
             |> Error
-        else vu |> Increment |> Ok
+        else vu |> LimitIncr |> Ok
 
 
     let create min incr max =
@@ -313,16 +486,32 @@ module MinIncrMax =
         }
 
 
-    let validate { Min = min; Incr = incr; Max = max }=
-        Calculator.validate
-            (calcIncrement >> validateIncrement)
-            minToMultipleOf
-            maxToMultipleOf
-            minGTmax
-            min
-            incr
-            max
-        |> Result.map (fun (min, incr, max) -> create min incr max)
+    let validate { Min = min; Incr = incr; Max = max } =
+        let getGroup = limitGetValueUnit >> ValueUnit.getGroup
+
+        [
+            min |> Option.map getGroup
+            max |> Option.map getGroup
+            incr |> Option.map (getLimitIncr >> ValueUnit.getGroup)
+        ]
+        |> List.choose id
+        |> List.distinct
+        |> List.length
+        |> fun n ->
+            if n > 1 then
+                { Min = min; Incr = incr; Max = max }
+                |> Errors.DifferentUnitGroup
+                |> Error
+            else
+                Calculator.validate
+                    (calcLimitIncr >> validateLimitIncr)
+                    minToMultipleOf
+                    maxToMultipleOf
+                    minGTmax
+                    min
+                    incr
+                    max
+                |> Result.map (fun (min, incr, max) -> create min incr max)
 
 
     let empty = create None None None
@@ -334,7 +523,7 @@ module MinIncrMax =
     let one u =
         {
             Min = 1N |> ValueUnit.createSingle u |> inclusive |> Some
-            Incr = 1N |> ValueUnit.createSingle u |> Increment |> Some
+            Incr = 1N |> ValueUnit.createSingle u |> LimitIncr |> Some
             Max = 1N |> ValueUnit.createSingle u |> inclusive |> Some
         }
 
@@ -425,12 +614,12 @@ module MinIncrMax =
 
     /// Calculate the smallest range from
     /// a list of `MinMax` values.
-    let foldMinimize = foldCond valueGT
+    let foldMinimize = foldCond (limitGT true false)
 
 
     /// Calculate the largest range from
     /// a list of `MinMax` values.
-    let foldMaximize = foldCond valueST
+    let foldMaximize = foldCond (limitST true false)
 
 
     /// Check whether a value `v` is in
@@ -438,15 +627,25 @@ module MinIncrMax =
     let inRange v (mm : MinIncrMax) =
         match mm.Min, mm.Max with
         | None, None -> true
-        | Some v_, None -> valueGTE v v_
-        | None, Some v_ -> valueSTE v v_
-        | Some v1, Some v2 ->
-            (valueGTE v v1) && (valueSTE v v2)
+        | Some min, None ->
+            match min with
+            | Inclusive vu -> v >=? vu
+            | Exclusive vu -> v >? vu
+        | None, Some max ->
+            match max with
+            | Inclusive vu -> v <=? vu
+            | Exclusive vu -> v <? vu
+        | Some min, Some max ->
+            match min, max with
+            | Inclusive vuMin, Inclusive vuMax -> v >=? vuMin && v <=? vuMax
+            | Exclusive vuMin, Inclusive vuMax -> v >? vuMin && v <=? vuMax
+            | Inclusive vuMin, Exclusive vuMax -> v >=? vuMin && v <? vuMax
+            | Exclusive vuMin, Exclusive vuMax -> v >? vuMin && v <? vuMax
 
 
     /// perform a calculation `op` to
     /// 2 values `v1` and `v2`.
-    let calcValue op v1 v2 =
+    let calcLimit op v1 v2 =
         match v1, v2 with
         | Inclusive v1, Inclusive v2 -> v1 |> op <| v2 |> Inclusive
         | Exclusive v1, Exclusive v2 -> v1 |> op <| v2 |> Exclusive
@@ -473,7 +672,7 @@ module MinIncrMax =
     /// in a `MinMax` `mm` to unit `u`.
     let convertTo u (mm : MinIncrMax) =
         let convert =
-            applyValue1 (ValueUnit.convertTo u) (ValueUnit.convertTo u)
+            applyLimit (ValueUnit.convertTo u) (ValueUnit.convertTo u)
             >> Some
         {
             Min =
@@ -482,7 +681,7 @@ module MinIncrMax =
                 | Some v -> v |> convert
             Incr =
                 mm.Incr
-                |> Option.map (getIncrement >> (ValueUnit.convertTo u) >> Increment)
+                |> Option.map (getLimitIncr >> (ValueUnit.convertTo u) >> LimitIncr)
 
             Max =
                 match mm.Max with
@@ -496,7 +695,7 @@ module MinIncrMax =
     let withUnit u (mm : MinIncrMax) =
         let f = fun vu -> vu |> ValueUnit.getValue |> ValueUnit.create u
         let convert =
-            applyValue1 f f
+            applyLimit f f
             >> Some
         {
             Min =
@@ -505,7 +704,7 @@ module MinIncrMax =
                 | Some v -> v |> convert
             Incr =
                 mm.Incr
-                |> Option.map (getIncrement >> f >> Increment)
+                |> Option.map (getLimitIncr >> f >> LimitIncr)
             Max =
                 match mm.Max with
                 | None -> None
@@ -542,39 +741,25 @@ module MinIncrMax =
                 | Exclusive _ -> x |> Exclusive
             )
 
-        static member (*) (v1, v2) = calcValue (*) v1 v2
-
-        static member (/) (v1, v2) = calcValue (/) v1 v2
-
-
-    /// Extension methods for the `MinMax` type
-    /// to enable lenses.
-    type MinIncrMax with
-
-        static member Min_ :
-            (MinIncrMax -> Limit Option) * (Limit -> MinIncrMax -> MinIncrMax) =
-            (fun mm -> mm.Min),
-            (fun v mm -> mm |> setMin (Some v))
-
-        static member Max_ :
-            (MinIncrMax -> Limit Option) * (Limit -> MinIncrMax -> MinIncrMax) =
-            (fun mm -> mm.Max),
-            (fun v mm -> mm |> setMax (Some v))
-
-
-        static member (*) (mm1, mm2) = calc (*) mm1 mm2
-
-        static member (/) (mm1, mm2) = calc (/) mm1 mm2
 
     /// Contains the lenses for the `Value` and
     /// the `MinMax` type.
     module Optics =
 
 
-        let getMin = Optic.get MinIncrMax.Min_
+        let min_ =
+            (fun mm -> mm.Min),
+            (fun v mm -> mm |> setMin (Some v))
+
+        let max_ =
+            (fun mm -> mm.Max),
+            (fun v mm -> mm |> setMax (Some v))
 
 
-        let setMin = Optic.set MinIncrMax.Min_
+        let getMin = Optic.get min_
+
+
+        let setMin = Optic.set min_
 
 
         let inclMinLens =
@@ -607,10 +792,10 @@ module MinIncrMax =
             )
 
 
-        let getMax = Optic.get MinIncrMax.Max_
+        let getMax = Optic.get max_
 
 
-        let setMax = Optic.set MinIncrMax.Max_
+        let setMax = Optic.set max_
 
 
         let inclMaxLens =
@@ -764,15 +949,11 @@ module MinIncrMax =
 
 
 
-    let valueToString = function
-        | Inclusive vu -> $"incl %s{vu |> ValueUnit.toStringPrec 2}"
-        | Exclusive vu -> $"excl %s{vu |> ValueUnit.toStringPrec 2}"
-
 
     /// Turn a `MinMax` to a string with
     /// `mins` and `maxs` as annotations
     /// for resp. the min and max value.
-    let toString mins maxs { Min = min; Max = max } =
+    let toString minInclStr minExclStr maxInclStr maxExclStr { Min = min; Max = max } =
         let vuToStr vu =
             let milliGram = ValueUnit.Units.Mass.milliGram
             let gram = ValueUnit.Units.Mass.gram
@@ -796,16 +977,16 @@ module MinIncrMax =
         let minToString min =
             match min with
             | Inclusive vu ->
-                vu |> vuToStr |> sprintf "%s"
+                $"{minInclStr}{vu |> vuToStr}"
             | Exclusive vu ->
-                vu |> vuToStr |> sprintf "%s"
+                $"{minExclStr}{vu |> vuToStr}"
 
         let maxToString min =
             match min with
             | Inclusive vu ->
-                vu |> vuToStr |> sprintf "%s"
+                $"{maxInclStr}{vu |> vuToStr}"
             | Exclusive vu ->
-                vu |> vuToStr |> sprintf "%s"
+                $"{maxExclStr}{vu |> vuToStr}"
 
         match min, max with
         | None, None -> ""
@@ -813,10 +994,8 @@ module MinIncrMax =
             $"%s{min_ |> minToString} - %s{max_ |> maxToString}"
         | Some min_, None ->
             (min_ |> minToString)
-            |> sprintf "%s %s" mins
         | None, Some max_ ->
             (max_ |> maxToString)
-            |> sprintf "%s %s" maxs
 
 
     let ageToString { Min = min; Max = max } =
@@ -831,9 +1010,9 @@ module MinIncrMax =
                 | _ when vu <? oneMo -> vu >>= ValueUnit.Units.Time.week
                 | _ when vu <? oneYr -> vu >>= ValueUnit.Units.Time.month
                 | _ -> vu >>= ValueUnit.Units.Time.year
-            Option.bind (applyValue1 c c >> Some)
+            Option.bind (applyLimit c c >> Some)
 
-        { Min = min |> convert; Incr = None; Max = max |> convert } |> toString "van" "tot"
+        { Min = min |> convert; Incr = None; Max = max |> convert } |> toString "from (incl) " "from (excl) " "to (incl) " "to (excl) "
 
 
 
@@ -841,52 +1020,26 @@ module MinIncrMax =
 
         let convert =
             let c vu = vu >>= ValueUnit.Units.Time.week
-            Option.bind (applyValue1 c c >> Some)
+            Option.bind (applyLimit c c >> Some)
 
         { Min = min |> convert; Incr = None;  Max = max |> convert } |> toString "van" "tot"
 
 
-    module Tests =
 
-        let tests () =
-            let (|>!) x f =
-                x |> printfn  "%A"
-                f x
+/// Extension methods for the `Limit` type
+type Limit with
 
-            // Create dto and there and back again
-            let dto = Dto.dto ()
-            dto
-            |> Dto.fromDto
-            |>! ignore
 
-            // Add min and max to dto and there and back again
-            dto.Min.Value <- [|1m|]
-            dto.Min.Unit <- "mg"
-            dto.Min.Group <- "mass"
-            dto.HasMin <- true
-            dto.MinIncl <- false
-            dto.Max.Value <- [|2m|]
-            dto.Max.Unit <- "g"
-            dto.Max.Group <- "mass"
-            dto.HasMax <- true
-            dto
-            |>! Dto.fromDto
-            |>! Option.bind (Dto.toDto >> Some)
-            |>! Option.bind (Dto.fromDto >> Some)
-            |>! ignore
+    static member (*) (v1, v2) = MinIncrMax.calcLimit (*) v1 v2
 
-            // Add min > and max to dto and there and back again
-            dto.Min.Value <- [|1m|]
-            dto.Min.Unit <- "g"
-            dto.Min.Group <- "mass"
-            dto.HasMin <- true
-            dto.MinIncl <- false
-            dto.Max.Value <- [|1m|]
-            dto.Max.Unit <- "mg"
-            dto.Max.Group <- "mass"
-            dto.HasMax <- true
-            dto
-            |>! Dto.fromDto
-            |>! Option.bind (Dto.toDto >> Some)
-            |>! Option.bind (Dto.fromDto >> Some)
-            |>! ignore
+    static member (/) (v1, v2) = MinIncrMax.calcLimit (/) v1 v2
+
+
+
+/// Extension methods for the `MinMax` type
+type MinIncrMax with
+
+
+    static member (*) (mm1, mm2) = MinIncrMax.calc (*) mm1 mm2
+
+    static member (/) (mm1, mm2) = MinIncrMax.calc (/) mm1 mm2

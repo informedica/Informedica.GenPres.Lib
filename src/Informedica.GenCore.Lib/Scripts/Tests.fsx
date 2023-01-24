@@ -1,8 +1,8 @@
 
 #load "../../../scripts/Expecto.fsx"
 #load "load.fsx"
-#load "../MinIncrMax.fs"
 
+#load "../MinIncrMax.fs"
 
 
 module Tests =
@@ -50,7 +50,7 @@ module Tests =
                 |> fun brs1 ->
                     if brs1 |> Set.isEmpty then
                         $"No valid increments {brs}"
-                        |> MinIncrMax.Errors.NoValidIncrement
+                        |> MinIncrMax.Errors.NoValidLimitIncr
                         |> Error
                     else
                         brs1
@@ -82,7 +82,7 @@ module Tests =
                     | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
                         Calculator.toString toBrStr min incr max
-                        |> printfn "Pass: %s"
+                        |> ignore //printfn "Pass: %s"
                     true
                 with
                 | _ -> false
@@ -105,7 +105,7 @@ module Tests =
                     | Ok (min, incr, max) ->
                         let toBrStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
                         Calculator.toStringNL toBrStr min incr max
-                        |> printfn "Pass: %s"
+                        |> ignore // printfn "Pass: %s"
                     true
                 with
                 | _ -> false
@@ -139,7 +139,7 @@ module Tests =
 
         module MinMax = MinIncrMax.Optics
 
-        let mmToStr = MinIncrMax.toString "van" "tot"
+        let mmToStr = MinIncrMax.toString "van (incl) " "van (incl) " "tot (incl) " "tot (excl) "
 
 
         let createValueUnit (d : decimal) u =
@@ -152,27 +152,31 @@ module Tests =
                 | Some v  -> ValueUnit.createSingle u v |> Some
 
 
-        let v1, v2 =
+        let mg10, mg20 =
             createValueUnit 10.m "mg[Mass]" |> Option.get ,
             createValueUnit 20.m "mg[Mass]" |> Option.get
 
-        let incl1, incl2 =
-            v1 |> MinIncrMax.inclusive,
-            v2 |> MinIncrMax.inclusive
+        let mgIncl10, mgIncl20 =
+            mg10 |> MinIncrMax.inclusive,
+            mg20 |> MinIncrMax.inclusive
 
-        let v3, v4 =
+        let mgExcl10, mgExcl20 =
+            mg10 |> MinIncrMax.exclusive,
+            mg20 |> MinIncrMax.exclusive
+
+        let mg30, mg40 =
             createValueUnit 30.m "mg[Mass]" |> Option.get ,
             createValueUnit 40.m "mg[Mass]" |> Option.get
 
-        let incl3, incl4 =
-            v3 |> MinIncrMax.inclusive,
-            v4 |> MinIncrMax.inclusive
+        let mgIncl30, mgIncl40 =
+            mg30 |> MinIncrMax.inclusive,
+            mg40 |> MinIncrMax.inclusive
 
 
         let toString () =
             MinIncrMax.empty
-            |> MinMax.setMin (createValueUnit 1.m "mg[Mass]"  |> Option.get |> MinIncrMax.Inclusive)
-            |> MinMax.setMax (createValueUnit 10.m "mg[Mass]" |> Option.get |> MinIncrMax.Inclusive)
+            |> MinMax.setMin (createValueUnit 1.m "mg[Mass]"  |> Option.get |> Inclusive)
+            |> MinMax.setMax (createValueUnit 10.m "mg[Mass]" |> Option.get |> Inclusive)
             |> mmToStr
 
 
@@ -189,29 +193,44 @@ module Tests =
 
 
         let a1, a2 =
-            0.1m |> ageInMo |> MinIncrMax.Inclusive,
-            0.1m |> ageInYr |> MinIncrMax.Exclusive
+            0.1m |> ageInMo |> Inclusive,
+            0.1m |> ageInYr |> Exclusive
 
 
-        let ageToString () =
+        let ageRange =
             MinIncrMax.empty
             |> MinMax.setMin a1
             |> MinMax.setMax a2
-            |> MinIncrMax.ageToString
 
 
-        let valueComp () =
+        let valueComp =
+
             [
-                 $"%A{incl1} < %A{incl2} = %A{MinIncrMax.valueST incl1 incl2}"
-                 $"%A{incl1} < %A{incl1} = %A{MinIncrMax.valueST incl1 incl1}"
-                 $"%A{incl1} <= %A{incl2} = %A{MinIncrMax.valueSTE incl1 incl2}"
-                 $"%A{incl1} <= %A{incl1} = %A{MinIncrMax.valueSTE incl1 incl1}"
-                 $"%A{incl1} > %A{incl2} = %A{MinIncrMax.valueGT incl1 incl2}"
-                 $"%A{incl1} > %A{incl1} = %A{MinIncrMax.valueGT incl1 incl1}"
-                 $"%A{incl1} >= %A{incl2} = %A{MinIncrMax.valueGTE incl1 incl2}"
-                 $"%A{incl1} >= %A{incl1} = %A{MinIncrMax.valueGTE incl1 incl1}"
-            ]
+                 mgIncl10, mgIncl10, MinIncrMax.limitEq, true
+                 mgIncl10, mgIncl20, MinIncrMax.limitEq, false
+                 mgIncl10, mgIncl20, MinIncrMax.limitST true false, true
+                 mgIncl10, mgIncl10, MinIncrMax.limitST true false, false
+                 mgIncl10, mgIncl20, MinIncrMax.limitSTE true false, true
+                 mgIncl10, mgIncl10, MinIncrMax.limitSTE true false, true
+                 mgIncl10, mgIncl20, MinIncrMax.limitGT true false, false
+                 mgIncl10, mgIncl10, MinIncrMax.limitGT true false, false
+                 mgIncl10, mgIncl20, MinIncrMax.limitGTE true false, false
+                 mgIncl10, mgIncl10, MinIncrMax.limitGTE true false, true
 
+                 mgExcl10, mgExcl10, MinIncrMax.limitEq, false
+                 mgExcl10, mgExcl20, MinIncrMax.limitST true false, true
+                 mgExcl10, mgExcl10, MinIncrMax.limitST true false, false
+                 mgExcl10, mgExcl20, MinIncrMax.limitSTE true false, true
+                 mgExcl10, mgExcl10, MinIncrMax.limitSTE true false, false //Min Excl 10 mg <= Max Excl 10 mg
+                 mgExcl10, mgExcl20, MinIncrMax.limitGT true false, false
+                 mgExcl10, mgExcl10, MinIncrMax.limitGT true false, true //Min Excl 10 mg > Max Excl 10 mg
+                 mgExcl10, mgExcl20, MinIncrMax.limitGTE true false, false
+                 mgExcl10, mgExcl10, MinIncrMax.limitGTE true false, true
+
+                 mgIncl10, mgExcl10, MinIncrMax.limitEq, false
+                 mgIncl10, mgExcl10, MinIncrMax.limitGT true false, true //Min Incl 10 mg > Max Excl 10 mg
+                 mgIncl10, mgExcl10, MinIncrMax.limitST true false, false //Min Incl 10 mg < Max Excl 10 mg
+            ]
 
 
         // ToDo handle None cases correctly?
@@ -219,14 +238,14 @@ module Tests =
             let mms =
                 [
                     MinIncrMax.empty
-                    MinIncrMax.empty |> MinMax.setMin incl1
-                    MinIncrMax.empty |> MinMax.setMin incl2
-                    MinIncrMax.empty |> MinMax.setMax incl3
-                    MinIncrMax.empty |> MinMax.setMax incl4
-                    MinIncrMax.empty |> MinMax.setMin incl1 |> MinMax.setMax incl3
-                    MinIncrMax.empty |> MinMax.setMin incl2 |> MinMax.setMax incl3
-                    MinIncrMax.empty |> MinMax.setMin incl3 |> MinMax.setMax incl3
-                    MinIncrMax.empty |> MinMax.setMin incl4 |> MinMax.setMax incl4
+                    MinIncrMax.empty |> MinMax.setMin mgIncl10
+                    MinIncrMax.empty |> MinMax.setMin mgIncl20
+                    MinIncrMax.empty |> MinMax.setMax mgIncl30
+                    MinIncrMax.empty |> MinMax.setMax mgIncl40
+                    MinIncrMax.empty |> MinMax.setMin mgIncl10 |> MinMax.setMax mgIncl30
+                    MinIncrMax.empty |> MinMax.setMin mgIncl20 |> MinMax.setMax mgIncl30
+                    MinIncrMax.empty |> MinMax.setMin mgIncl30 |> MinMax.setMax mgIncl30
+                    MinIncrMax.empty |> MinMax.setMin mgIncl40 |> MinMax.setMax mgIncl40
                 ]
 
             mms
@@ -240,110 +259,164 @@ module Tests =
             |> mmToStr
 
 
-        let inRange () =
+        let inRange =
             let mm1 = MinIncrMax.empty
             let mm2 =
                 MinIncrMax.empty
-                |> MinMax.setMin incl1
+                |> MinMax.setMin mgIncl10
             let mm3 =
                 MinIncrMax.empty
-                |> MinMax.setMax incl4
+                |> MinMax.setMax mgIncl40
             let mm4 =
                 MinIncrMax.empty
-                |> MinMax.setMin incl2
-                |> MinMax.setMax incl3
-
-            let test v mm =
-                $"%s{v |> MinIncrMax.valueToString} in range: %s{mm |> mmToStr} = %A{MinIncrMax.inRange v mm}"
-
+                |> MinMax.setMin mgIncl20
+                |> MinMax.setMax mgIncl30
 
             [
-                (incl1, mm1)
-                (incl2, mm1)
-                (incl3, mm1)
-                (incl4, mm1)
-                (incl1, mm2)
-                (incl2, mm2)
-                (incl3, mm2)
-                (incl4, mm2)
-                (incl1, mm3)
-                (incl2, mm3)
-                (incl3, mm3)
-                (incl4, mm3)
-                (incl1, mm4)
-                (incl2, mm4)
-                (incl3, mm4)
-                (incl4, mm4)
+                (mg10, mm1, true)
+                (mg20, mm1,true)
+                (mg30, mm1, true)
+                (mg40, mm1, true)
+                (mg10, mm2, true)
+                (mg20, mm2, true)
+                (mg30, mm2, true)
+                (mg40, mm2, true)
+                (mg10, mm3, true)
+                (mg20, mm3, true)
+                (mg30, mm3, true)
+                (mg40, mm3, true)
+                (mg10, mm4, false)
+                (mg20, mm4, true)
+                (mg30, mm4, true)
+                (mg40, mm4, false)
             ]
-            |> List.map (fun (v, mm) -> test v mm)
 
 
         let tests = testList "MinMax" [
             test "minGTmax" {
-                incl2 |> MinIncrMax.minGTmax incl1
-                |> Expect.isTrue $"{incl2} > {incl1}"
+                mgIncl20 |> MinIncrMax.minGTmax mgIncl10
+                |> Expect.isTrue $"{mgIncl20} > {mgIncl10}"
             }
 
             test "toString" {
                 toString()
-                |> Expect.equal "should equal" "1 mg - 10 mg"
+                |> Expect.equal "should equal" "van (incl) 1 mg - tot (incl) 10 mg"
             }
 
             test "ageToString" {
-                ageToString()
-                |> Expect.equal "should equal" "3.0 dag - 1.2 mnd"
+                ageRange
+                |> MinIncrMax.ageToString
+                |> Expect.equal "should equal" "from (incl) 3.0 dag - to (excl) 1.2 mnd"
             }
 
-            test "valueComparison" {
-                valueComp ()
-                |> Expect.equal "should equal" [
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) < Inclusive (ValueUnit ([|20N|], Mass (MilliGram 1N))) = true";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) < Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) = false";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) <= Inclusive (ValueUnit ([|20N|], Mass (MilliGram 1N))) = true";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) <= Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) = true";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) > Inclusive (ValueUnit ([|20N|], Mass (MilliGram 1N))) = false";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) > Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) = false";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) >= Inclusive (ValueUnit ([|20N|], Mass (MilliGram 1N))) = false";
-                    "Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) >= Inclusive (ValueUnit ([|10N|], Mass (MilliGram 1N))) = true"
-                ]
-            }
+            testList "Validate" [
+                test "cannot set have limits with different unit groups" {
+                    { ageRange with
+                        Max = Some mgIncl10
+                    }
+                    |> MinIncrMax.validate
+                    |> function
+                        | Ok mm -> false |> Expect.isTrue $"{mm |> mmToStr} is not valid!"
+                        | Error msg ->
+                            true
+                            |> Expect.isTrue $"{msg}"
+                }
+            ]
+
+            testList "valueComparison" [
+
+                for v1, v2, cp, exp in valueComp do
+                    test $"comparing {v1 |> MinIncrMax.limitToString true} {cp |> MinIncrMax.cmpToStr} {v2 |> MinIncrMax.limitToString false}" {
+                        v1 |> cp <| v2
+                        |> Expect.equal $"should be {exp}" exp
+                    }
+            ]
 
             test "minimize, maximize" {
                 testFold ()
-                |> Expect.equal "should equal" ("10 mg - 40 mg", "30 mg - 30 mg")
+                |> Expect.equal "should equal" ("van (incl) 10 mg - tot (incl) 40 mg", "van (incl) 30 mg - tot (incl) 30 mg")
             }
 
-            test "in range" {
-                inRange ()
-                |> Expect.equal "should equal" [
-                    "incl 10 mg in range:  = true"
-                    "incl 20 mg in range:  = true";
-                    "incl 30 mg in range:  = true"
-                    "incl 40 mg in range:  = true";
-                    "incl 10 mg in range: van 10 mg = true";
-                    "incl 20 mg in range: van 10 mg = true";
-                    "incl 30 mg in range: van 10 mg = true";
-                    "incl 40 mg in range: van 10 mg = true";
-                    "incl 10 mg in range: tot 40 mg = true";
-                    "incl 20 mg in range: tot 40 mg = true";
-                    "incl 30 mg in range: tot 40 mg = true";
-                    "incl 40 mg in range: tot 40 mg = true";
-                    "incl 10 mg in range: 20 mg - 30 mg = false";
-                    "incl 20 mg in range: 20 mg - 30 mg = true";
-                    "incl 30 mg in range: 20 mg - 30 mg = true";
-                    "incl 40 mg in range: 20 mg - 30 mg = false"
-                ]
-            }
+            testList "in range" [
+                for v, mm, b in inRange do
+                    test $"%s{v |> ValueUnit.toStringPrec 0} in range: %s{mm |> mmToStr} = %A{MinIncrMax.inRange v mm}" {
+                        MinIncrMax.inRange v mm
+                        |> Expect.equal $"should be {b}" b
+                    }
+            ]
         ]
 
+    module DtoTests =
+
+        module Dto = MinIncrMax.Dto
+
+        let (|>!) x f =
+            x |> printfn  "%A"
+            f x
+
+        let dto () =
+            Dto.dto ()
+
+        let tests  =
+            testList "Dto" [
+                test "MinIncrMax from Dto is the same as empty" {
+                    dto ()
+                    |> Dto.fromDto
+                    |> function
+                        | Some mm ->
+                            mm
+                            |> Expect.equal "should be an empty mm" MinIncrMax.empty
+                        | None -> false |> Expect.isTrue "could not create an empty dto"
+                }
+
+                test "MinIncrMax dto setting min and max" {
+                    // Add min and max to dto and there and back again
+                    let dto = dto ()
+                    dto.Min.Value <- [|1m|]
+                    dto.Min.Unit <- "mg"
+                    dto.Min.Group <- "mass"
+                    dto.HasMin <- true
+                    dto.MinIncl <- false
+                    dto.Max.Value <- [|2m|]
+                    dto.Max.Unit <- "g"
+                    dto.Max.Group <- "mass"
+                    dto.HasMax <- true
+                    dto
+                    |>! Dto.fromDto
+                    |>! function
+                        | Some _ -> true |> Expect.isTrue "can create dto with min and max"
+                        | None -> false |> Expect.isTrue "cannot set min and max"
+                }
+
+                test "MinIncrMax that is not valid will not return from dto" {
+                    let dto = dto ()
+
+                    dto.Min.Value <- [|1m|]
+                    dto.Min.Unit <- "g"
+                    dto.Min.Group <- "mass"
+                    dto.HasMin <- true
+                    dto.MinIncl <- false
+                    dto.Max.Value <- [|1m|]
+                    dto.Max.Unit <- "mg"
+                    dto.Max.Group <- "mass"
+                    dto.HasMax <- true
+                    dto
+                    |>! Dto.fromDto
+                    |>! Option.bind (Dto.toDto >> Some)
+                    |> function
+                        | Some _ -> false |> Expect.isTrue "can create dto with min and max"
+                        | None -> true |> Expect.isTrue "cannot set min > than max"
+                }
+            ]
 
 
 open Expecto
 
 
 testList "GenCore" [
-//    Tests.MinIncrMaxTests.tests
+    Tests.MinIncrMaxTests.tests
     Tests.MinMaxTests.tests
+    Tests.DtoTests.tests
 ]
 |> Expecto.run
 

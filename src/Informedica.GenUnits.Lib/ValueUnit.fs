@@ -518,6 +518,9 @@ module ValueUnit =
     let getUnit (ValueUnit (_,u )) = u
 
 
+    let getGroup = getUnit >> Group.unitToGroup
+
+
     let isCountUnit = Group.eqsGroup (1N |> Times |> Count)
 
 
@@ -545,6 +548,12 @@ module ValueUnit =
         v
         |> Array.map (valueToUnit u)
         |> create u
+
+
+    let zero u = [|0N|] |> create u
+
+
+    let one u = [|1N|] |> create u
 
 
     let count = 1N |> Times |> Count
@@ -797,6 +806,35 @@ module ValueUnit =
             )
 
 
+    let applyToValue fValue vu =
+        let u = vu |> getUnit
+        vu
+        |> getValue
+        |> fValue
+        |> create u
+
+
+    let applyToValues fArr fValue vu =
+        let u = vu |> getUnit
+        vu
+        |> getValue
+        |> fArr fValue
+        |> create u
+
+    let filterValues = applyToValues Array.filter
+
+
+    let mapValues = applyToValues Array.map
+
+
+    let validate fValid errMsg vu =
+        if vu |> getValue |> fValid then vu |> Ok
+        else
+            errMsg
+            |> Error
+
+
+
     let eq = cmp (=)
 
 
@@ -810,6 +848,19 @@ module ValueUnit =
 
 
     let ste = cmp (<=)
+
+
+    let cmpToStr cp =
+        let z = 1N |> Times |> Count |> zero
+        let o = 1N |> Times |> Count |> one
+
+        match cp with
+        | _ when (z |> cp <| z) && not (z |> cp <| o) && not (o |> cp <| z) -> "="
+        | _ when (z |> cp <| z) && (z |> cp <| o) && not (o |> cp <| z) -> "<="
+        | _ when (z |> cp <| z) && not (z |> cp <| o) && (o |> cp <| z) -> ">="
+        | _ when not (z |> cp <| z) && (z |> cp <| o) && not (o |> cp <| z) -> "<"
+        | _ when not (z |> cp <| z) && not (z |> cp <| o) && (o |> cp <| z) -> ">"
+        | _ -> "unknown comparison"
 
 
     let convertTo u vu =

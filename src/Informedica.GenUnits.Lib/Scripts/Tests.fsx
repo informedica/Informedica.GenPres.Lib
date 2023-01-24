@@ -142,6 +142,34 @@ module Tests =
                 ml50 * times100  =? l5
                 |> Expect.isTrue ""
             }
+
+            testList "comparison to string" [
+                test "is equal" {
+                    eq |> cmpToStr
+                    |> Expect.equal "should be =" "="
+                }
+
+                test "is equal or greater than" {
+                    gte |> cmpToStr
+                    |> Expect.equal "should be >=" ">="
+                }
+
+                test "is greater" {
+                    gt |> cmpToStr
+                    |> Expect.equal "should be >" ">"
+                }
+
+                test "is equal or smaller than" {
+                    ste |> cmpToStr
+                    |> Expect.equal "should be <=" "<="
+                }
+
+                test "is smaller than" {
+                    st |> cmpToStr
+                    |> Expect.equal "should be <" "<"
+                }
+
+            ]
         ]
 
 

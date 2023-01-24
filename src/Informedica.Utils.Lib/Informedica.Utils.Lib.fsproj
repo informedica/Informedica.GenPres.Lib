@@ -11,6 +11,7 @@
     <Compile Include="Memoization.fs" />
     <Compile Include="Reflection.fs" />
     <Compile Include="NullCheck.fs" />
+    <Compile Include="BCL\Boolean.fs" />
     <Compile Include="BCL\Char.fs" />
     <Compile Include="BCL\String.fs" />
     <Compile Include="BCL\Int32.fs" />

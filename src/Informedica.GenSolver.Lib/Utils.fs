@@ -15,7 +15,7 @@ module Utils =
         let MAX_BIGINT = 999999999999999999999999999999999999999999999999I
 
 
-
+    (*
     /// Helper functions for `BigRational`
     [<RequireQualifiedAccess>]
     module BigRational =
@@ -87,72 +87,8 @@ module Utils =
 
         let minExclMultipleOf = calcMinOrMaxToMultiple false false
 
-
-    [<RequireQualifiedAccess>]
-    module Tuple =
+        *)
 
 
-        let fstOf3 (one, _, _) = one
-
-
-        let sndOf3 (_, two, _) = two
-
-
-        let thdOf3 (_, _, three) = three
-
-
-    /// Helper functions for `Option`
-    [<RequireQualifiedAccess>]
-    module Option =
-
-        let none _ = None
-
-
-
-    [<RequireQualifiedAccess>]
-    module Boolean =
-
-        let returnFalse _ = false
-
-        let returnTrue _ = true
-
-
-    [<RequireQualifiedAccess>]
-    module Set =
-
-        open Informedica.Utils.Lib.BCL
-
-        let removeBigRationalMultiples xs =
-            if xs |> Set.isEmpty then xs
-            else
-                xs
-                |> Set.fold (fun acc x1 ->
-                    acc
-                    |> Set.filter (fun x2 ->
-                        x1 = x2 ||
-                        x2 |> BigRational.isMultiple x1 |> not
-                    )
-                ) xs
-
-
-
-    /// Helper functions for `List`
-    [<RequireQualifiedAccess>]
-    module List =
-
-        /// Replace an element in a list
-        /// when the `pred` function returns `true`.
-        let replace pred x xs =
-            xs |> List.map (fun a -> if pred a then x else a)
-
-
-        let distinct xs = xs |> Seq.ofList |> Seq.distinct |> Seq.toList
-
-
-        let replaceOrAdd pred x xs =
-            if xs |> List.exists pred then
-                xs |> replace pred x
-            else
-                x :: xs
 
 
