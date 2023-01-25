@@ -17,4 +17,20 @@ GenPresProduct.get true
 |> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| NEO |] }//[| UMCU; ICC; ICK;  NEO |] }
 
 
+GenPresProduct.get true
+|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| ICK |] }
+
+
+GenPresProduct.get true
+|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| ICC |] }
+
+
+GenPresProduct.get true
+|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| UMCU; ICC; ICK;  NEO |] }
+
+
+
+GenPresProduct.get true
+|> MetaVision.createImport { MetaVision.config with IncludeAssortment = [| |] }
+
 

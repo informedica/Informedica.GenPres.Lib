@@ -116,9 +116,315 @@ module Units =
         |> Array.exists (String.equalsCapInsens u)
 
 
+
 module Data =
 
+
     open Informedica.Utils.Lib.BCL
+
+
+    let scriptATCMedicationGroups = """
+BEGIN TRANSACTION
+DECLARE @SETNAME as varchar(max) 
+DECLARE @GROUPNAME as varchar(max)
+DECLARE @SETID as integer
+DECLARE @GROUPID as integer
+
+--CIRCULATIE
+SELECT @SETNAME = 'Circulatie'
+SELECT @GROUPNAME = 'Circulatie'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroupsSets (SetName, LastUpdateGUID) VALUES (@SETNAME,NEWID())
+END
+
+SELECT @SETID = (SELECT TOP 1 SetID FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+ATCCode LIKE 'C01A%' 
+OR ATCCode LIKE '%, C01A%' 
+Or ATCCode Like 'C01B%' 
+OR ATCCode LIKE '%, C01B%' 
+OR ATCCode LIKE 'C01C%' 
+OR ATCCode LIKE '%, C01C%' 
+OR ATCCode LIKE 'C02%'  
+OR ATCCode LIKE '%, C02%' 
+OR ATCCode LIKE 'C03%'  
+OR ATCCode LIKE '%, C03%' 
+OR ATCCode LIKE 'C04A%'  
+OR ATCCode LIKE '%, C04A%' 
+OR ATCCode LIKE 'C07%'  
+OR ATCCode LIKE '%, C07%' 
+OR ATCCode LIKE 'C08%'  
+OR ATCCode LIKE '%, C08%' 
+OR ATCCode LIKE 'C09%'  
+OR ATCCode LIKE '%, C09%' 
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--NEUROLOGIE
+SELECT @SETNAME = 'Neurologie'
+SELECT @GROUPNAME = 'Neurologie'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroupsSets (SetName, LastUpdateGUID) VALUES (@SETNAME,NEWID())
+END
+
+SELECT @SETID = (SELECT TOP 1 SetID FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+ATCCode LIKE 'N01%' 
+OR ATCCode LIKE '%, N01%' 
+Or ATCCode Like 'N02%' 
+OR ATCCode LIKE '%, N02%' 
+OR ATCCode LIKE 'N03%' 
+OR ATCCode LIKE '%, N03%' 
+OR ATCCode LIKE 'N04%'  
+OR ATCCode LIKE '%, N04%'
+OR ATCCode LIKE 'N05%' 
+OR ATCCode LIKE '%, N05%' 
+OR ATCCode LIKE 'N06%'  
+OR ATCCode LIKE '%, N06%' 
+OR ATCCode LIKE 'N07%' 
+OR ATCCode LIKE '%, N07%' 
+OR ATCCode LIKE 'M03%' 
+OR ATCCode LIKE '%, M03%' 
+OR ATCCode LIKE '%V03AB15%'
+OR ATCCode LIKE '%V03AB19%'
+OR ATCCode LIKE '%V03AB25%' 
+OR ATCCode LIKE '%V03AB35%'
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--INFECTIE
+SELECT @SETNAME = 'Infectie'
+SELECT @GROUPNAME = 'Infectie'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroupsSets (SetName, LastUpdateGUID) VALUES (@SETNAME,NEWID())
+END
+
+SELECT @SETID = (SELECT TOP 1 SetID FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN(
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+ATCCode LIKE 'J01%' 
+OR ATCCode LIKE '%, J01%' 
+Or ATCCode Like 'J02%' 
+OR ATCCode LIKE '%, J02%' 
+OR ATCCode LIKE 'J04%' 
+OR ATCCode LIKE '%, J04%' 
+OR ATCCode LIKE 'J05%'  
+OR ATCCode LIKE '%, J05%' 
+OR ATCCode LIKE 'J06%'  
+OR ATCCode LIKE '%, J06%' 
+OR ATCCode LIKE 'P01%' 
+OR ATCCode LIKE '%, P01%' 
+OR ATCCode LIKE 'P02%' 
+OR ATCCode LIKE '%, P02%'
+OR ATCCode LIKE 'P03%' 
+OR ATCCode LIKE '%, P03%'
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--Medicatie en Parenteralia en Voeding
+SELECT @SETNAME = 'Medicatie en Parenteralia en Voeding'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroupsSets (SetName, LastUpdateGUID) VALUES (@SETNAME,NEWID())
+END
+SELECT @SETID = (SELECT TOP 1 SetID FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+
+--Medicatie
+SELECT @GROUPNAME = 'Medicatie'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME AND SetID= @SETID)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+NOT ', ' + ATCCode + ', ' LIKE '%, voeding, %' 
+AND NOT ', ' + ATCCode + ', '  LIKE '%, parenteraal, %'
+AND NOT ', ' + ATCCode + ', '   LIKE '%, B05BA%, %'
+AND NOT (', ' + ATCCode + ', '  LIKE '%, B05BB%, %' AND NOT (ParameterName LIKE '%kaliumchloride%' OR ParameterName LIKE '%natriumwaterstofcarbonaat%'))
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--Voeding
+SELECT @GROUPNAME = 'Voeding'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME AND SetID= @SETID)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+', ' + ATCCode + ', ' LIKE '%, voeding, %' 
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--Parenteraal
+SELECT @GROUPNAME = 'Parenteraal'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME AND SetID= @SETID)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+', ' + ATCCode + ', ' LIKE '%, parenteraal, %'
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--Vocht
+SELECT @GROUPNAME = 'Vocht'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME AND SetID= @SETID)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+ParameterID IN( 
+SELECT OM.MedicationID 
+FROM Orders_Medications OM 
+WHERE 
+', ' + ATCCode + ', '   LIKE '%, B05BA%, %'
+OR (', ' + ATCCode + ', '  LIKE '%, B05BB%, %' AND NOT (ParameterName LIKE '%kaliumchloride%' OR ParameterName LIKE '%natriumwaterstofcarbonaat%'))
+) 
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+--MEDICATIE TBD
+SELECT @SETNAME = 'Medicatie TBD'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+BEGIN
+INSERT INTO Orders_MedicationGroupsSets (SetName, LastUpdateGUID) VALUES (@SETNAME,NEWID())
+END
+SELECT @SETID = (SELECT TOP 1 SetID FROM Orders_MedicationGroupsSets WHERE SetName = @SETNAME)
+
+SELECT @GROUPNAME = 'TBD'
+IF NOT EXISTS (SELECT * FROM Orders_MedicationGroups WHERE GroupName = @GROUPNAME AND SetID= @SETID)
+BEGIN
+INSERT INTO Orders_MedicationGroups (SetID, GroupID, GroupName, TextColor, Color) VALUES (
+@SETID,
+COALESCE((SELECT MAX(GroupID) FROM Orders_MedicationGroups WHERE SetID = @SETID)+1,1),
+@GROUPNAME,0,0)
+END
+
+SELECT @GROUPID  =(SELECT TOP 1 GroupID FROM Orders_MedicationGroups WHERE SetID=@SETID AND GroupName = @GROUPNAME)
+INSERT INTO Orders_MedicationGroupParameters (SetID, GroupID, ParameterID) SELECT
+@SETID,
+@GROUPID,
+ParameterID
+FROM Parameters WHERE 
+(
+ParameterName LIKE 'tacro%'
+OR ParameterName LIKE 'acenoc%'
+OR ParameterName LIKE 'fenpro%'
+OR ParameterName LIKE 'ciclos%'
+)
+AND
+ParameterID NOT IN (SELECT ParameterID FROM Orders_MedicationGroupParameters WHERE SetID=@SETID AND GroupID=@GROUPID)
+
+
+
+ROLLBACK
+"""
 
 
     let excludeShapes =

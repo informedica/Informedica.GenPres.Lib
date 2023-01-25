@@ -1083,6 +1083,9 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
             config.Products
         |> ignore
 
+        printfn "creating ATC medication groups"
+        Data.scriptATCMedicationGroups
+        |> File.writeTextToFile "data/output/InsertATCMedicationGroups.sql"
 
         printfn "creating G-Standard medications"
         createMedications
@@ -1095,5 +1098,4 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
             config.Brands
             config.Products
 //            config.OrderTemplates
-
 
