@@ -262,7 +262,7 @@ module DoseRule =
                     nb / (nub |> MinIncrMax.one) |> optRate ,
                     ab / (aub |> MinIncrMax.one) |> optRate
 
-            let mmToStr = MinIncrMax.toString "van" "tot"
+            let mmToStr = MinIncrMax.toString "van " "van " "tot " "tot "
 
             norm
             |> mmToStr

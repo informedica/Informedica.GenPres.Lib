@@ -8,6 +8,7 @@
     <Compile Include="MinIncrMax.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Tests.fsx" />
+    <None Include="Scripts\Scripts.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Informedica.GenSolver.Lib\Informedica.GenSolver.Lib.fsproj" />

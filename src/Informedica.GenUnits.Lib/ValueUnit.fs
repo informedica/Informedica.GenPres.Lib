@@ -1372,6 +1372,30 @@ module ValueUnit =
             else failwith <| $"Cannot parse string %s{s}"
 
 
+    module Operators =
+
+        let (*) vu1 vu2 = calc true (*) vu1 vu2
+
+        let (/) vu1 vu2 = calc true (/) vu1 vu2
+
+        let (+) vu1 vu2 = calc true (+) vu1 vu2
+
+        let (-) vu1 vu2 = calc true (-) vu1 vu2
+
+        let (=?) vu1 vu2 = cmp (=) vu1 vu2
+
+        let (>?) vu1 vu2 = cmp (>) vu1 vu2
+
+        let (<?) vu1 vu2 = cmp (<) vu1 vu2
+
+        let (>=?) vu1 vu2 = cmp (>=) vu1 vu2
+
+        let (<=?) vu1 vu2 = cmp (<=) vu1 vu2
+
+        let (==>) vu u = vu |> convertTo u
+
+
+
     module Dto =
 
 

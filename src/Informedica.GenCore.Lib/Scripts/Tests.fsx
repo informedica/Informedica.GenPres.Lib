@@ -1,4 +1,12 @@
 
+
+#r "nuget: MathNet.Numerics.FSharp"
+#r "nuget: Expecto"
+#r "nuget: Expecto.FsCheck"
+#r "nuget: Unquote"
+
+
+
 #load "../../../scripts/Expecto.fsx"
 #load "load.fsx"
 
@@ -50,7 +58,7 @@ module Tests =
                 |> fun brs1 ->
                     if brs1 |> Set.isEmpty then
                         $"No valid increments {brs}"
-                        |> MinIncrMax.Errors.NoValidLimitIncr
+                        |> Errors.NoValidLimitIncr
                         |> Error
                     else
                         brs1
@@ -157,20 +165,20 @@ module Tests =
             createValueUnit 20.m "mg[Mass]" |> Option.get
 
         let mgIncl10, mgIncl20 =
-            mg10 |> MinIncrMax.inclusive,
-            mg20 |> MinIncrMax.inclusive
+            mg10 |> Limit.inclusive,
+            mg20 |> Limit.inclusive
 
         let mgExcl10, mgExcl20 =
-            mg10 |> MinIncrMax.exclusive,
-            mg20 |> MinIncrMax.exclusive
+            mg10 |> Limit.exclusive,
+            mg20 |> Limit.exclusive
 
         let mg30, mg40 =
             createValueUnit 30.m "mg[Mass]" |> Option.get ,
             createValueUnit 40.m "mg[Mass]" |> Option.get
 
         let mgIncl30, mgIncl40 =
-            mg30 |> MinIncrMax.inclusive,
-            mg40 |> MinIncrMax.inclusive
+            mg30 |> Limit.inclusive,
+            mg40 |> Limit.inclusive
 
 
         let toString () =
@@ -206,30 +214,30 @@ module Tests =
         let valueComp =
 
             [
-                 mgIncl10, mgIncl10, MinIncrMax.limitEq, true
-                 mgIncl10, mgIncl20, MinIncrMax.limitEq, false
-                 mgIncl10, mgIncl20, MinIncrMax.limitST true false, true
-                 mgIncl10, mgIncl10, MinIncrMax.limitST true false, false
-                 mgIncl10, mgIncl20, MinIncrMax.limitSTE true false, true
-                 mgIncl10, mgIncl10, MinIncrMax.limitSTE true false, true
-                 mgIncl10, mgIncl20, MinIncrMax.limitGT true false, false
-                 mgIncl10, mgIncl10, MinIncrMax.limitGT true false, false
-                 mgIncl10, mgIncl20, MinIncrMax.limitGTE true false, false
-                 mgIncl10, mgIncl10, MinIncrMax.limitGTE true false, true
+                 mgIncl10, mgIncl10, Limit.eq, true
+                 mgIncl10, mgIncl20, Limit.eq, false
+                 mgIncl10, mgIncl20, Limit.st true false, true
+                 mgIncl10, mgIncl10, Limit.st true false, false
+                 mgIncl10, mgIncl20, Limit.ste true false, true
+                 mgIncl10, mgIncl10, Limit.ste true false, true
+                 mgIncl10, mgIncl20, Limit.gt true false, false
+                 mgIncl10, mgIncl10, Limit.gt true false, false
+                 mgIncl10, mgIncl20, Limit.gte true false, false
+                 mgIncl10, mgIncl10, Limit.gte true false, true
 
-                 mgExcl10, mgExcl10, MinIncrMax.limitEq, false
-                 mgExcl10, mgExcl20, MinIncrMax.limitST true false, true
-                 mgExcl10, mgExcl10, MinIncrMax.limitST true false, false
-                 mgExcl10, mgExcl20, MinIncrMax.limitSTE true false, true
-                 mgExcl10, mgExcl10, MinIncrMax.limitSTE true false, false //Min Excl 10 mg <= Max Excl 10 mg
-                 mgExcl10, mgExcl20, MinIncrMax.limitGT true false, false
-                 mgExcl10, mgExcl10, MinIncrMax.limitGT true false, true //Min Excl 10 mg > Max Excl 10 mg
-                 mgExcl10, mgExcl20, MinIncrMax.limitGTE true false, false
-                 mgExcl10, mgExcl10, MinIncrMax.limitGTE true false, true
+                 mgExcl10, mgExcl10, Limit.eq, false
+                 mgExcl10, mgExcl20, Limit.st true false, true
+                 mgExcl10, mgExcl10, Limit.st true false, false
+                 mgExcl10, mgExcl20, Limit.ste true false, true
+                 mgExcl10, mgExcl10, Limit.ste true false, false //Min Excl 10 mg <= Max Excl 10 mg
+                 mgExcl10, mgExcl20, Limit.gt true false, false
+                 mgExcl10, mgExcl10, Limit.gt true false, true //Min Excl 10 mg > Max Excl 10 mg
+                 mgExcl10, mgExcl20, Limit.gte true false, false
+                 mgExcl10, mgExcl10, Limit.gte true false, true
 
-                 mgIncl10, mgExcl10, MinIncrMax.limitEq, false
-                 mgIncl10, mgExcl10, MinIncrMax.limitGT true false, true //Min Incl 10 mg > Max Excl 10 mg
-                 mgIncl10, mgExcl10, MinIncrMax.limitST true false, false //Min Incl 10 mg < Max Excl 10 mg
+                 mgIncl10, mgExcl10, Limit.eq, false
+                 mgIncl10, mgExcl10, Limit.gt true false, true //Min Incl 10 mg > Max Excl 10 mg
+                 mgIncl10, mgExcl10, Limit.st true false, false //Min Incl 10 mg < Max Excl 10 mg
             ]
 
 
@@ -294,7 +302,7 @@ module Tests =
 
         let tests = testList "MinMax" [
             test "minGTmax" {
-                mgIncl20 |> MinIncrMax.minGTmax mgIncl10
+                mgIncl20 |> Limit.minGTmax mgIncl10
                 |> Expect.isTrue $"{mgIncl20} > {mgIncl10}"
             }
 
@@ -306,7 +314,7 @@ module Tests =
             test "ageToString" {
                 ageRange
                 |> MinIncrMax.ageToString
-                |> Expect.equal "should equal" "from (incl) 3.0 dag - to (excl) 1.2 mnd"
+                |> Expect.equal "should equal" "van 3.0 dag - tot 1.2 mnd"
             }
 
             testList "Validate" [
@@ -326,7 +334,7 @@ module Tests =
             testList "valueComparison" [
 
                 for v1, v2, cp, exp in valueComp do
-                    test $"comparing {v1 |> MinIncrMax.limitToString true} {cp |> MinIncrMax.cmpToStr} {v2 |> MinIncrMax.limitToString false}" {
+                    test $"comparing {v1 |> Limit.toString true} {cp |> Limit.cmpToStr} {v2 |> Limit.toString false}" {
                         v1 |> cp <| v2
                         |> Expect.equal $"should be {exp}" exp
                     }
