@@ -200,15 +200,15 @@ module Tests =
         let ageInYr =  (fun n -> fromDecimal n ValueUnit.Units.Time.year)
 
 
-        let a1, a2 =
-            0.1m |> ageInMo |> Inclusive,
-            0.1m |> ageInYr |> Exclusive
+        let ageInclOneMo, ageExclOneYr =
+            1m |> ageInMo |> Inclusive,
+            1m |> ageInYr |> Exclusive
 
 
         let ageRange =
             MinIncrMax.empty
-            |> MinMax.setMin a1
-            |> MinMax.setMax a2
+            |> MinMax.setMin ageInclOneMo
+            |> MinMax.setMax ageExclOneYr
 
 
         let valueComp =
@@ -238,6 +238,13 @@ module Tests =
                  mgIncl10, mgExcl10, Limit.eq, false
                  mgIncl10, mgExcl10, Limit.gt true false, true //Min Incl 10 mg > Max Excl 10 mg
                  mgIncl10, mgExcl10, Limit.st true false, false //Min Incl 10 mg < Max Excl 10 mg
+
+                 ageInclOneMo, ageExclOneYr, Limit.eq, false
+                 ageInclOneMo, ageExclOneYr, Limit.st true false, true
+                 ageInclOneMo, ageExclOneYr, Limit.ste true false, true
+                 ageInclOneMo, ageExclOneYr, Limit.gt true false, false
+                 ageInclOneMo, ageExclOneYr, Limit.gte true false, false
+
             ]
 
 
@@ -314,7 +321,7 @@ module Tests =
             test "ageToString" {
                 ageRange
                 |> MinIncrMax.ageToString
-                |> Expect.equal "should equal" "van 3.0 dag - tot 1.2 mnd"
+                |> Expect.equal "should equal" "van 1 mnd - tot 1 jr"
             }
 
             testList "Validate" [
