@@ -19,6 +19,7 @@ module Minimum = ValueRange.Minimum
 module Maximum = ValueRange.Maximum
 module ValueSet = ValueRange.ValueSet
 
+open Informedica.Utils.Lib
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -40,6 +41,7 @@ module Solve =
         let n = n |> Name.createExc
         try
             Api.solve true Solver.sortQue logger n p eqs
+            |> Result.get
         with
         | _ ->
             procss $"cannot set {n |> Name.toString} with {p}"
@@ -271,7 +273,6 @@ open Solve
 
 
 
-
 let gentaEqs =
     {
         Components =
@@ -382,6 +383,7 @@ let examplEqs =
             ]
     }
     |> createEqs
+
 
 examplEqs
 |> printEqs

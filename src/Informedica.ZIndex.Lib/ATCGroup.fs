@@ -1,31 +1,11 @@
 namespace Informedica.ZIndex.Lib
 
+
 module ATCGroup =
 
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
 
-    type ATCGroup =
-        {
-            ATC1 : string
-            AnatomicalGroup : string
-            AnatomicalGroupEng : string
-            ATC2 : string
-            TherapeuticMainGroup : string
-            TherapeuticMainGroupEng : string
-            ATC3 : string
-            TherapeuticSubGroup : string
-            TherapeuticSubGroupEng : string
-            ATC4 : string
-            PharmacologicalGroup : string
-            PharmacologicalGroupEng : string
-            ATC5 : string
-            Substance : string
-            SubstanceEng : string
-            Generic : string
-            Shape : string
-            Routes : string
-        }
 
     let create atc1 ang ange atc2 thg thge atc3 ths thse atc4 phg phge atc5 sub sube gen shp rts =
         {
@@ -49,7 +29,9 @@ module ATCGroup =
             Routes = rts
         }
 
+
     let empty = create "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+
 
     let parse gpks =
         query {
@@ -160,7 +142,8 @@ module ATCGroup =
         |> Seq.toArray
         |> Array.distinct
 
-    let _get all =
+
+    let _get () =
         if FilePath.groupCache |> File.exists then
             FilePath.groupCache
             |> Json.getCache
@@ -170,13 +153,16 @@ module ATCGroup =
             grps |> Json.cache FilePath.groupCache
             grps
 
+
     let get : unit -> ATCGroup [] = Memoization.memoize _get
+
 
     let findByATC5 all atc =
         get all
         |> Array.filter (fun g ->
             g.ATC5 |> String.equalsCapInsens atc
         )
+
 
     let load () = get () |> ignore
 

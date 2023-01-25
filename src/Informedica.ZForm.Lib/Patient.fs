@@ -5,22 +5,10 @@ module Patient =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+    open Informedica.GenCore.Lib
 
     open Aether
     open Aether.Operators
-
-    type MinMax = MinMax.MinMax
-
-
-    type Patient =
-        {
-            GestAge : MinMax
-            Age : MinMax
-            Weight : MinMax
-            BSA : MinMax
-            Gender : Gender
-        }
-    and Gender = Male | Female | Undetermined
 
 
     let create ga age wght bsa gend =
@@ -33,36 +21,15 @@ module Patient =
         }
 
 
-    let empty = create MinMax.empty MinMax.empty MinMax.empty MinMax.empty Undetermined
-
-
-    type Patient with
-
-        static member GestAge_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.GestAge), (fun a p -> { p with GestAge = a })
-
-        static member Age_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.Age), (fun a p -> { p with Age = a })
-
-        static member Weight_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.Weight), (fun w p -> { p with Weight = w })
-
-        static member BSA_ :
-            (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
-            (fun p -> p.BSA), (fun b p -> { p with BSA = b })
-
-        static member Gender_ :
-            (Patient -> Gender) * (Gender -> Patient -> Patient) =
-            (fun p -> p.Gender), (fun g p -> { p with Gender = g })
-
+    let empty = create MinIncrMax.empty MinIncrMax.empty MinIncrMax.empty MinIncrMax.empty Undetermined
 
 
     module Optics =
 
-        module MinMax = MinMax.Optics
+        module MinMax = MinIncrMax.Optics
+
+
+        let setGender = Optic.set Patient.Gender_
 
 
         let inclMinGestAge =
@@ -189,7 +156,7 @@ module Patient =
         | _  -> Undetermined
 
 
-    let toString ({ GestAge = ga; Age = age; Weight = wght; BSA = bsa; Gender = gen }) =
+    let toString { GestAge = ga; Age = age; Weight = wght; BSA = bsa; Gender = gen } =
         let (>+) sl sr =
             let l, s = sr
 
@@ -199,11 +166,11 @@ module Patient =
             if s |> String.isNullOrWhiteSpace then sl
             else sl + (if sl = "" then " " else  ", ") + l + s
 
-        let mmToStr = MinMax.toString "van" "tot"
+        let mmToStr = MinIncrMax.toString "van" "van" "tot" "tot"
 
         ""
-        >+ ("Zwangerschapsduur: ", ga |> MinMax.gestAgeToString)
-        >+ ("Leeftijd: ", age |> MinMax.ageToString)
+        >+ ("Zwangerschapsduur: ", ga |> MinIncrMax.gestAgeToString)
+        >+ ("Leeftijd: ", age |> MinIncrMax.ageToString)
         >+ ("Gewicht: ", wght |> mmToStr)
         >+ ("BSA: ", bsa |> mmToStr)
         >+ ("Geslacht: ", gen |> genderToString)
@@ -213,10 +180,10 @@ module Patient =
     module Dto =
 
         type Dto () =
-            member val GestAge = MinMax.Dto.dto() with get ,set
-            member val Age = MinMax.Dto.dto () with get ,set
-            member val Weight = MinMax.Dto.dto () with get ,set
-            member val BSA = MinMax.Dto.dto () with get ,set
+            member val GestAge = MinIncrMax.Dto.dto() with get ,set
+            member val Age = MinIncrMax.Dto.dto () with get ,set
+            member val Weight = MinIncrMax.Dto.dto () with get ,set
+            member val BSA = MinIncrMax.Dto.dto () with get ,set
             member val Gender = "" with get, set
 
 
@@ -225,20 +192,20 @@ module Patient =
         let toDto { GestAge = gestAge; Age = age; Weight = wght; BSA = bsa; Gender = gnd } =
             let dto = dto ()
 
-            dto.GestAge <- gestAge |> MinMax.Dto.toDto
-            dto.Age <- age |> MinMax.Dto.toDto
-            dto.Weight <- wght |> MinMax.Dto.toDto
-            dto.BSA <- bsa |> MinMax.Dto.toDto
+            dto.GestAge <- gestAge |> MinIncrMax.Dto.toDto
+            dto.Age <- age |> MinIncrMax.Dto.toDto
+            dto.Weight <- wght |> MinIncrMax.Dto.toDto
+            dto.BSA <- bsa |> MinIncrMax.Dto.toDto
             dto.Gender <- gnd |> genderToString
 
             dto
 
 
         let fromDto (dto : Dto) =
-            let gestAge = dto.GestAge |> MinMax.Dto.fromDto
-            let age = dto.Age |> MinMax.Dto.fromDto
-            let wght = dto.Weight |> MinMax.Dto.fromDto
-            let bsa = dto.BSA |> MinMax.Dto.fromDto
+            let gestAge = dto.GestAge |> MinIncrMax.Dto.fromDto
+            let age = dto.Age |> MinIncrMax.Dto.fromDto
+            let wght = dto.Weight |> MinIncrMax.Dto.fromDto
+            let bsa = dto.BSA |> MinIncrMax.Dto.fromDto
             let gnd = dto.Gender |> stringToGender
 
             match gestAge, age, wght, bsa with
@@ -269,7 +236,7 @@ module Patient =
             |>! ignore
 
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- [|1m|]
             dto.Age.Min.Unit <- "maand"
             dto.Age.Min.Group <- "Time"
             dto.Age.Min.Language <- "dutch"
@@ -277,7 +244,7 @@ module Patient =
             dto.Age.MinIncl <- true
 
             dto.Age
-            |> MinMax.Dto.fromDto
+            |> MinIncrMax.Dto.fromDto
             |>! ignore
 
             dto
@@ -287,7 +254,7 @@ module Patient =
             // group defaults to general when no unit can be found in group
             // ToDo: need to fix this behaviour
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- [|1m|]
             dto.Age.Min.Unit <- "m"
             dto.Age.Min.Group <- "Time"
             dto.Age.Min.Language <- "dutch"
@@ -295,13 +262,13 @@ module Patient =
             dto.Age.MinIncl <- true
 
             dto.Age
-            |> MinMax.Dto.fromDto
+            |> MinIncrMax.Dto.fromDto
             |>! ignore
 
             // need to check for the correct units
             // ToDo!!
             dto.Age.HasMin <- true
-            dto.Age.Min.Value <- 1.
+            dto.Age.Min.Value <- [|1m|]
             dto.Age.Min.Unit <- "g"
             dto.Age.Min.Group <- "Mass"
             dto.Age.Min.Language <- "dutch"
@@ -309,5 +276,5 @@ module Patient =
             dto.Age.MinIncl <- true
 
             dto.Age
-            |> MinMax.Dto.fromDto
+            |> MinIncrMax.Dto.fromDto
             |>! ignore

@@ -12,11 +12,8 @@ module MinMax =
     open MathNet.Numerics
 
     open Aether
-    open Aether.Operators
-
 
     module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-
 
     type ValueUnit = ValueUnit.ValueUnit
 
@@ -115,7 +112,7 @@ module MinMax =
     /// Check whether a `MinMax` is valid in the
     /// sense that the lower limit never can exceed
     /// the upper limit.
-    let isValid ({ Min = min; Max = max }) =
+    let isValid { Min = min; Max = max } =
         match min, max with
         | None, None -> true
         | Some _, None | None, Some _ -> true
@@ -556,8 +553,8 @@ module MinMax =
             vu
             |> (fun vu ->
                 match vu |> ValueUnit.get with
-                | (v, u) when v >= 1000N && u = milliGram -> vu |> convertTo gram
-                | (v, u) when v >= 1000N && u = milliGramPerDay -> vu |> convertTo gramPerDay
+                | v, u when v >= 1000N && u = milliGram -> vu |> convertTo gram
+                | v, u when v >= 1000N && u = milliGramPerDay -> vu |> convertTo gramPerDay
                 | _ -> vu
             )
             |> ValueUnit.toStringPrec 2
@@ -579,7 +576,7 @@ module MinMax =
         match min, max with
         | None, None -> ""
         | Some min_, Some max_ ->
-            sprintf "%s - %s" (min_ |> minToString) (max_ |> maxToString)
+            $"%s{min_ |> minToString} - %s{max_ |> maxToString}"
         | Some min_, None ->
             (min_ |> minToString)
             |> sprintf "%s %s" mins
@@ -629,12 +626,12 @@ module MinMax =
             |>! ignore
 
             // Add min and max to dto and there and back again
-            dto.Min.Value <- 1.
+            dto.Min.Value <- 1m
             dto.Min.Unit <- "mg"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2.
+            dto.Max.Value <- 2m
             dto.Max.Unit <- "g"
             dto.Max.Group <- "mass"
             dto.HasMax <- true
@@ -645,12 +642,12 @@ module MinMax =
             |>! ignore
 
             // Add min > and max to dto and there and back again
-            dto.Min.Value <- 1.
+            dto.Min.Value <- 1m
             dto.Min.Unit <- "g"
             dto.Min.Group <- "mass"
             dto.HasMin <- true
             dto.MinIncl <- false
-            dto.Max.Value <- 2.
+            dto.Max.Value <- 2m
             dto.Max.Unit <- "mg"
             dto.Max.Group <- "mass"
             dto.HasMax <- true

@@ -10,7 +10,6 @@ module DrugOrder =
 
     type MinMax = Informedica.GenForm.Lib.Types.MinMax
 
-
     module DoseRule = Informedica.GenForm.Lib.DoseRule
     module DoseLimit = DoseRule.DoseLimit
     module MinMax = Informedica.GenForm.Lib.MinMax
@@ -87,7 +86,7 @@ module DrugOrder =
         else
             ValueUnit.Units.units
             |> List.filter (fun ud ->
-                ud.Group <> ValueUnit.Group.WeightGroup
+                ud.Group <> Group.WeightGroup
             )
             |> List.tryFind (fun ud ->
                 [

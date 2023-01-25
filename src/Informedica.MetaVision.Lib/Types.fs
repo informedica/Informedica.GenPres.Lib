@@ -63,10 +63,10 @@ module Types =
             DoseForm : string
             Routes : string
             Format : string
-            IncrementValue : float
+            IncrementValue : decimal
             DefaultUnit : string
             IsUnknownStrength : string
-            StrengthLEFT : float
+            StrengthLEFT : decimal
             StrengthLEFTUnit : string
             StrengthRIGHT : string
             StrengthRIGHTUnit : string
@@ -83,7 +83,7 @@ module Types =
         {
             ComplexMedictionName : string
             IngredientName : string
-            Concentration : float
+            Concentration : decimal
             ConcentrationUnit : string
             In : string
             InUnit : string
@@ -99,7 +99,7 @@ module Types =
                 ATC  : string
                 Status : MedicationStatus
                 Format  : string
-                IncrementValue : float
+                IncrementValue : decimal
                 CodeSnippetName  : string
                 Frequencies  : string
                 DoseForms : string
@@ -119,7 +119,7 @@ module Types =
             }
 
 
-    
+
     type OrderingStyle =
         | NoInfusedOver
         | SpecifyInfuseOver
@@ -141,12 +141,12 @@ module Types =
                 LockerTemplate  : string
                 ComponentMedicationName  : string
                 ComponentProductName  : string
-                ComponentQuantityVolumeValue : float
+                ComponentQuantityVolumeValue : decimal
                 ComponentQuantityVolumeUnit  : string
                 ComponentConcentrationMassUnit  : string
                 ComponentConcentrationVolumeUnit  : string
                 ComponentDrugInDiluentDiluentMedicationName : string
-                ComponentDrugInDiluentVolumeValue : float option
+                ComponentDrugInDiluentVolumeValue : decimal option
                 ComponentDrugInDiluentVolumeUnit : string
                 TotalVolumeUnit  : string
                 StartMethod  : string

@@ -20,7 +20,7 @@ module Filter =
             PMAge = None
             DoseType = AnyDoseType
             Dose = None
-            Location = AnyLocation
+            Location = AnyAccess
         }
 
 

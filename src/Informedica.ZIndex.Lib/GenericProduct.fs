@@ -7,33 +7,6 @@ module GenericProduct =
     open Informedica.Utils.Lib.BCL
 
 
-    type GenericProduct =
-        {
-            Id : int
-            Name : string
-            Label : string
-            ATC : string
-            ATCName : string
-            Shape : string
-            Route : string []
-            Substances : Substance []
-            PrescriptionProducts : PrescriptionProduct.PrescriptionProduct []
-        }
-    and Substance =
-        {
-            SubstanceId : int
-            SortOrder : int
-            SubstanceName : string
-            SubstanceQuantity : float
-            SubstanceUnit : string
-            GenericId : int
-            GenericName : string
-            GenericQuantity : float
-            GenericUnit : string
-            ShapeUnit : string
-        }
-
-
     let createSubstance si so sn sq su gi gn gq gu un =
         {
             SubstanceId = si

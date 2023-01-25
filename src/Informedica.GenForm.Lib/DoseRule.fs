@@ -437,7 +437,7 @@ module DoseRule =
                             BSA = (r.MinBSA, r.MaxBSA) |> MinMax.fromTuple
                             GestAge = (r.MinGestAge, r.MaxGestAge) |> MinMax.fromTuple
                             PMAge = (r.MinPMAge, r.MaxPMAge) |> MinMax.fromTuple
-                            Location = AnyLocation
+                            Location = AnyAccess
                         }
                     AdjustUnit = r.AdjustUnit
                     DoseType = r.DoseType

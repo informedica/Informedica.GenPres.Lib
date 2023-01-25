@@ -24,6 +24,7 @@ open Informedica.GenSolver.Lib
 
 module Minimum = Informedica.GenSolver.Lib.Variable.ValueRange.Minimum
 module Maximum = Informedica.GenSolver.Lib.Variable.ValueRange.Maximum
+module MinMaxCalculator = Variable.ValueRange.MinMaxCalculator
 
 
 /// Create the necessary test generators
@@ -141,252 +142,6 @@ module Generators =
 
 
 
-/// Functions to calculate the `Minimum`
-/// and `Maximum` in a `ValueRange`.
-/// I.e. what happens when you mult, div, add or subtr
-/// a `Range`, for example:
-/// <1N..3N> * <4N..5N> = <4N..15N>
-module MinMaxCalcultor =
-
-    /// Exceptions that a MinMaxCalculator function can raise.
-    module Exceptions =
-
-        type Message = | NotAValidOperator
-
-        exception MinMaxCalculatorException of Message
-
-        let raiseExc m = m |> MinMaxCalculatorException |> raise
-
-
-    /// Calculate **x1** and **x2** with operator **op**
-    /// and use **incl1** and **inc2** to determine whether
-    /// the result is inclusive. Use constructor **c** to
-    /// create the optional result.
-    let calc c op (x1, incl1) (x2, incl2) =
-        let opIsMultOrDiv = (op |> BigRational.opIsMult || op |> BigRational.opIsDiv)
-
-        let incl =
-            match incl1, incl2 with
-            | true, true -> true
-            | _ -> false
-
-        match x1, x2 with
-        | Some v, _  when opIsMultOrDiv && v = 0N ->
-            0N |> c incl1 |> Some
-        | Some v, _
-        | _, Some v when op |> BigRational.opIsMult && v = 0N ->
-            0N |> c incl |> Some
-        | Some _, None when op |> BigRational.opIsDiv ->
-            0N |> c incl |> Some
-        | Some (v1), Some (v2) ->
-            if op |> BigRational.opIsDiv && v2 = 0N then None
-            else
-                v1 |> op <| v2 |> c incl |> Some
-        | _ -> None
-
-
-    /// Calculate an optional `Minimum`
-    let calcMin = calc Minimum.create
-
-
-    /// Calculate an optional `Maximum`
-    let calcMax = calc Maximum.create
-
-
-    let minimize min1 min2 =
-        match min1, min2 with
-        | None,    None     -> None
-        | Some _,  None
-        | None,    Some _   -> None
-        | Some m1, Some m2 ->
-            if m1 |> Minimum.minSTmin m2 then m1
-            else m2
-            |> Some
-
-
-    let maximize max1 max2 =
-        match max1, max2 with
-        | None,    None     -> None
-        | Some _,  None
-        | None,    Some _   -> None
-        | Some m1, Some m2 ->
-            if m1 |> Maximum.maxGTmax m2 then m1
-            else m2
-            |> Some
-
-
-    /// Match a min, max tuple **min**, **max**
-    /// to:
-    ///
-    /// * `PP`: both positive
-    /// * `NN`: both negative
-    /// * `NP`: one negative, the other positive
-    let (|PP|NN|NP|NZ|ZP|) (min, max) =
-        match min, max with
-        | Some min, _         when min > 0N             -> PP
-        | _,        Some max  when max < 0N             -> NN
-        | Some min, Some max  when min < 0N && max > 0N -> NP
-        | None,     Some max  when max > 0N             -> NP
-        | Some min, None      when min < 0N             -> NP
-        | None,     None                                -> NP
-        | _,        Some max  when max = 0N             -> NZ
-        | Some min, _         when min = 0N             -> ZP
-        // failing cases
-        | Some min, Some max when min = 0N && max = 0N  ->
-            $"{min} = {max} = 0" |> failwith
-        | Some min, Some max when min >= 0N && max < 0N ->
-            $"{min} > {max}" |> failwith
-        | _ -> $"could not handle {min} {max}" |> failwith
-
-
-    /// Calculate `Minimum` option and
-    /// `Maximum` option for addition of
-    /// (**min1**, **max1**) and (**min2**, **max2)
-    let addition min1 max1 min2 max2 =
-        let min = calcMin (+) min1 min2
-        let max = calcMax (+) max1 max2
-        min, max
-
-
-    /// Calculate `Minimum` option and
-    /// `Maximum` option for subtraction of
-    /// (**min1**, **max1**) and (**min2**, **max2)
-    let subtraction min1 max1 min2 max2 =
-        let min = calcMin (-) min1 max2
-        let max = calcMax (-) max1 min2
-        min, max
-
-
-    /// Calculate `Minimum` option and
-    /// `Maximum` option for multiplication of
-    /// (**min1**, **max1**) and (**min2**, **max2)
-    let multiplication min1 max1 min2 max2 =
-        match ((min1 |> fst), (max1 |> fst)), ((min2 |> fst), (max2 |> fst)) with
-        | PP, PP ->  // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
-        | PP, ZP ->  // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
-        | PP, NN -> // min = max1 * min2, max = min1 * max2
-            calcMin (*) max1 min2, calcMax (*) min1 max2
-        | PP, NZ -> // min = max1 * min2, max = min1 * max2
-            calcMin (*) max1 min2, calcMax (*) min1 max2
-        | PP, NP -> // min = min1 * min2, max = max1 * max2
-            calcMin (*) max1 min2, calcMax (*) max1 max2
-
-        | ZP, PP ->  // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
-        | ZP, ZP ->  // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
-        | ZP, NN -> // min = max1 * min2, max = min1 * max2
-            calcMin (*) max1 min2, calcMax (*) min1 max2
-        | ZP, NZ -> // min = max1 * min2, max = min1 * max2
-            calcMin (*) max1 min2, calcMax (*) min1 max2
-        | ZP, NP -> // min = min1 * min2, max = max1 * max2
-            calcMin (*) min1 min2, calcMax (*) max1 max2
-
-        | NN, PP -> // min = min1 * max2, max = max1 * min2
-            calcMin (*) min1 max2, calcMax (*) max1 min2
-        | NN, ZP -> // min = min1 * max2, max = max1 * min2
-            calcMin (*) min1 max2, calcMax (*) max1 min2
-        | NN, NN -> // min = max1 * max2, max = min1 * min2
-            calcMin (*) max1 max2, calcMax (*) min1 min2
-        | NN, NZ -> // min = max1 * max2, max = min1 * min2
-            calcMin (*) max1 max2, calcMax (*) min1 min2
-        | NN, NP -> // min = min1 * max2, max = min1 * min2
-            calcMin (*) min1 max2, calcMax (*) min1 min2
-
-        | NZ, PP -> // min = min1 * max2, max = max1 * min2
-            calcMin (*) min1 max2, calcMax (*) max1 min2
-        | NZ, ZP -> // min = min1 * max2, max = max1 * min2
-            calcMin (*) min1 max2, calcMax (*) max1 min2
-        | NZ, NN -> // min = max1 * max2, max = min1 * min2
-            calcMin (*) max1 max2, calcMax (*) min1 min2
-        | NZ, NZ -> // min = max1 * max2, max = min1 * min2
-            calcMin (*) max1 max2, calcMax (*) min1 min2
-        | NZ, NP -> // min = min1 * max2, max = min1 * min2
-            calcMin (*) min1 max2, calcMax (*) min1 min2
-
-        | NP, PP -> // min = min1 * max2, max = max1 * max2
-            calcMin (*) min1 max2, calcMax (*) max1 max2
-        | NP, ZP -> // min = min1 * max2, max = max1 * max2
-            calcMin (*) min1 max2, calcMax (*) max1 max2
-        | NP, NN -> // min = max1 * min2, max = min1 * min2
-            calcMin (*) max1 min2, calcMax (*) min1 min2
-        | NP, NZ -> // min = max1 * min2, max = min1 * min2
-            minimize (calcMin (*) min1 max2) (calcMin (*) min2 max1),
-            maximize (calcMax (*) max1 max2) (calcMax (*) min1 min2)
-        | NP, NP -> // min = min1 * max2, max = max1 * max2
-            minimize (calcMin (*) min1 max2) (calcMin (*) min2 max1),
-            maximize (calcMax (*) max1 max2) (calcMax (*) min1 min2)
-
-
-    /// Calculate `Minimum` option and
-    /// `Maximum` option for division of
-    /// (**min1**, **max1**) and (**min2**, **max2)
-    let division min1 max1 min2 max2 =
-        match (min1 |> fst, max1 |> fst), (min2 |> fst, max2 |> fst) with
-        | PP, PP -> // min = min1 / max2, max =	max1 / min2
-            calcMin (/) min1 max2, calcMax (/) max1 min2
-        | PP, NN -> // min = max1 / max2	, max = min1 / min2
-            calcMin (/) max1 max2, calcMax (/) min1 min2
-        | PP, ZP ->
-            calcMin (/) min1 max2, calcMax (/) max1 min2
-
-        | ZP, PP -> // min = min1 / max2, max =	max1 / min2
-            calcMin (/) min1 max2, calcMax (/) max1 min2
-        | ZP, NN -> // min = max1 / max2	, max = min1 / min2
-            calcMin (/) max1 max2, calcMax (/) min1 min2
-        | ZP, ZP ->
-            calcMin (/) min1 max2, calcMax (/) max1 min2
-
-        | NN, PP -> // min = min1 / min2, max = max1 / max2
-            calcMin (/) min1 min2, calcMax (/) max1 max2
-        | NN, NN -> // min = max1 / min2	, max = min1 / max2
-            calcMin (/) max1 min2, calcMax (/) min1 max2
-        | NN, NZ ->
-            calcMin (/) max1 min2, calcMax (/) min1 max2
-        | NN, ZP ->
-            calcMin (/) min1 min2, calcMax (/) max1 max2
-
-        | NZ, PP -> // min = min1 / min2, max = max1 / max2
-            calcMin (/) min1 min2, calcMax (/) max1 max2
-        | NZ, NN -> // min = max1 / min2	, max = min1 / max2
-            calcMin (/) max1 min2, calcMax (/) min1 max2
-        | NZ, NZ ->
-            calcMin (/) max1 min2, calcMax (/) min2 max2
-
-        | NP, PP -> // min = min1 / min2, max = max1 / min2
-            calcMin (/) min1 min2, calcMax (/) max1 min2
-        | NP, NN -> // min = max1 / max2, max = min1 / max2
-            calcMin (/) max1 max2, calcMax (/) min1 max2
-        // division by range containing zero
-        | NN, NP
-        | PP, NP
-        | NP, NP
-        | NZ, NP
-        | ZP, NP
-
-//        | NN, ZP
-        | NP, ZP
-        | NZ, ZP
-
-        | PP, NZ
-        | NP, NZ
-        | ZP, NZ -> None, None
-
-
-    /// Match the right minmax calcultion
-    /// according to the operand
-    let calcMinMax = function
-        | BigRational.Mult  -> multiplication
-        | BigRational.Div   -> division
-        | BigRational.Add   -> addition
-        | BigRational.Subtr -> subtraction
-        //| BigRational.NoMatch ->
-        //    Exceptions.NotAValidOperator
-        //    |> Exceptions.raiseExc
-
-
 
 open MathNet.Numerics
 open Informedica.Utils.Lib.BCL
@@ -449,7 +204,7 @@ let testCalc s op =
     |> List.map (fun ((min1, max1), (min2, max2)) ->
         (min1, max1),
         (min2, max2),
-        MinMaxCalcultor.calcMinMax op min1 max1 min2 max2
+        MinMaxCalculator.calcMinMax op min1 max1 min2 max2
     )
     |> List.map (fun (r1, r2, r) ->
         let minToStr min =
@@ -485,7 +240,7 @@ testCalc "*" (*)
 testCalc "*" (*)
 
 
-open MinMaxCalcultor
+open MinMaxCalculator
 
 let testMatch () =
     minMax1

@@ -31,10 +31,7 @@ module Zindex =
     open Informedica.Utils.Lib.BCL
     open Informedica.Utils.Lib
 
-    
 
-
-    
     /// <summary>
     /// <para> Tabel: BST004T: Bestand 004 Artikelen </para>
     /// <para> --------------- </para>
@@ -56,7 +53,7 @@ module Zindex =
                 HPKODE : int
                 ATNMNR : int
                 VPDLOM : int
-                VPDLHV : float
+                VPDLHV : decimal
             }
 
 
@@ -67,7 +64,7 @@ module Zindex =
                 HPKODE = hpkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 ATNMNR = atnmnr |> ((Parser.parseValue "N" "") >> Int32.parse)
                 VPDLOM = vpdlom |> ((Parser.parseValue "N" "") >> Int32.parse)
-                VPDLHV = vpdlhv |> ((Parser.parseValue "N" "(6,2)") >> Double.parse)
+                VPDLHV = vpdlhv |> ((Parser.parseValue "N" "(6,2)") >> Decimal.parse)
             }
 
 
@@ -81,10 +78,10 @@ module Zindex =
 
         let records : unit -> BST004T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST020T: Bestand 020 Namen </para>
     /// <para> --------------- </para>
@@ -131,10 +128,10 @@ module Zindex =
 
         let records : unit -> BST020T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST031T: Bestand 031 Handelsproducten </para>
     /// <para> --------------- </para>
@@ -164,7 +161,7 @@ module Zindex =
                 HPNAMN : int
                 MSNAAM : string
                 FSNAAM : string
-                HPSGEW : float
+                HPSGEW : decimal
                 GRP001 : int
                 GRP002 : int
                 GRP003 : int
@@ -182,7 +179,7 @@ module Zindex =
                 HPNAMN = hpnamn |> ((Parser.parseValue "N" "") >> Int32.parse)
                 MSNAAM = msnaam |> String.trim
                 FSNAAM = fsnaam |> String.trim
-                HPSGEW = hpsgew |> ((Parser.parseValue "N" "(2,5)") >> Double.parse)
+                HPSGEW = hpsgew |> ((Parser.parseValue "N" "(2,5)") >> Decimal.parse)
                 GRP001 = grp001 |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GRP002 = grp002 |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GRP003 = grp003 |> ((Parser.parseValue "N" "") >> Int32.parse)
@@ -202,10 +199,10 @@ module Zindex =
 
         let records : unit -> BST031T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST050T: Bestand 050 Voorschrijfproducten (PRK) </para>
     /// <para> --------------- </para>
@@ -243,10 +240,10 @@ module Zindex =
 
         let records : unit -> BST050T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST051T: Bestand 051 Voorschrijfpr. geneesmiddel identific. </para>
     /// <para> --------------- </para>
@@ -268,7 +265,7 @@ module Zindex =
                 GPKODE : int
                 HPEMBT : int
                 XPEHHV : int
-                HPGALG : float
+                HPGALG : decimal
             }
 
 
@@ -279,7 +276,7 @@ module Zindex =
                 GPKODE = gpkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 HPEMBT = hpembt |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
-                HPGALG = hpgalg |> ((Parser.parseValue "N" "(5,2)") >> Double.parse)
+                HPGALG = hpgalg |> ((Parser.parseValue "N" "(5,2)") >> Decimal.parse)
             }
 
 
@@ -293,10 +290,10 @@ module Zindex =
 
         let records : unit -> BST051T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST200T: Bestand 200 Relatie tussen ZI-nummer / HIBC </para>
     /// <para> --------------- </para>
@@ -340,10 +337,10 @@ module Zindex =
 
         let records : unit -> BST200T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST360T: Bestand 360 t-tabel (tijdseenheid) </para>
     /// <para> --------------- </para>
@@ -381,10 +378,10 @@ module Zindex =
 
         let records : unit -> BST360T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST380T: Bestand 380 ICPC - 1 </para>
     /// <para> --------------- </para>
@@ -422,10 +419,10 @@ module Zindex =
 
         let records : unit -> BST380T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST640T: Bestand 640 Doseringen Basis-Algemeen </para>
     /// <para> --------------- </para>
@@ -466,10 +463,10 @@ module Zindex =
 
         let records : unit -> BST640T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST641T: Bestand 641 Doseringen Basis-Artikelkeuze </para>
     /// <para> --------------- </para>
@@ -519,10 +516,10 @@ module Zindex =
 
         let records : unit -> BST641T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST642T: Bestand 642 Doseringen Uitzonderingen op Basis </para>
     /// <para> --------------- </para>
@@ -578,10 +575,10 @@ module Zindex =
 
         let records : unit -> BST642T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST643T: Bestand 643 Categorieen </para>
     /// <para> --------------- </para>
@@ -608,13 +605,13 @@ module Zindex =
                 MUTKOD : int
                 GPDCAT : int
                 GPDID2 : int
-                GPDLFM : float
-                GPDLFX : float
-                GPDKGM : float
-                GPDKGX : float
-                GPDM2M : float
-                GPDM2X : float
-                GPDFAA : float
+                GPDLFM : decimal
+                GPDLFX : decimal
+                GPDKGM : decimal
+                GPDKGX : decimal
+                GPDM2M : decimal
+                GPDM2X : decimal
+                GPDFAA : decimal
                 GPDFEE : int
                 GPDDEN : string
                 GPDDNR : int
@@ -626,13 +623,13 @@ module Zindex =
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDCAT = gpdcat |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDID2 = gpdid2 |> ((Parser.parseValue "N" "") >> Int32.parse)
-                GPDLFM = gpdlfm |> ((Parser.parseValue "N" "(4,2)") >> Double.parse)
-                GPDLFX = gpdlfx |> ((Parser.parseValue "N" "(4,2)") >> Double.parse)
-                GPDKGM = gpdkgm |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDKGX = gpdkgx |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDM2M = gpdm2m |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDM2X = gpdm2x |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDFAA = gpdfaa |> ((Parser.parseValue "N" "(2,2)") >> Double.parse)
+                GPDLFM = gpdlfm |> ((Parser.parseValue "N" "(4,2)") >> Decimal.parse)
+                GPDLFX = gpdlfx |> ((Parser.parseValue "N" "(4,2)") >> Decimal.parse)
+                GPDKGM = gpdkgm |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDKGX = gpdkgx |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDM2M = gpdm2m |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDM2X = gpdm2x |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDFAA = gpdfaa |> ((Parser.parseValue "N" "(2,2)") >> Decimal.parse)
                 GPDFEE = gpdfee |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDDEN = gpdden |> String.trim
                 GPDDNR = gpddnr |> ((Parser.parseValue "N" "") >> Int32.parse)
@@ -649,10 +646,10 @@ module Zindex =
 
         let records : unit -> BST643T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST649T: Bestand 649 Dosisgegevens - Nieuw per 01/11/2016 </para>
     /// <para> --------------- </para>
@@ -679,18 +676,18 @@ module Zindex =
             {
                 MUTKOD : int
                 GPDDNR : int
-                GPNRMMIN : float
-                GPNRMMAX : float
-                GPABSMIN : float
-                GPABSMAX : float
-                GPNRMMINK : float
-                GPNRMMAXK : float
-                GPABSMINK : float
-                GPABSMAXK : float
-                GPNRMMINM : float
-                GPNRMMAXM : float
-                GPABSMINM : float
-                GPABSMAXM : float
+                GPNRMMIN : decimal
+                GPNRMMAX : decimal
+                GPABSMIN : decimal
+                GPABSMAX : decimal
+                GPNRMMINK : decimal
+                GPNRMMAXK : decimal
+                GPABSMINK : decimal
+                GPABSMAXK : decimal
+                GPNRMMINM : decimal
+                GPNRMMAXM : decimal
+                GPABSMINM : decimal
+                GPABSMAXM : decimal
             }
 
 
@@ -698,18 +695,18 @@ module Zindex =
             {
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDDNR = gpddnr |> ((Parser.parseValue "N" "") >> Int32.parse)
-                GPNRMMIN = gpnrmmin |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAX = gpnrmmax |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMIN = gpabsmin |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAX = gpabsmax |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMINK = gpnrmmink |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAXK = gpnrmmaxk |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMINK = gpabsmink |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAXK = gpabsmaxk |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMINM = gpnrmminm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAXM = gpnrmmaxm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMINM = gpabsminm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAXM = gpabsmaxm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
+                GPNRMMIN = gpnrmmin |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAX = gpnrmmax |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMIN = gpabsmin |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAX = gpabsmax |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMINK = gpnrmmink |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAXK = gpnrmmaxk |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMINK = gpabsmink |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAXK = gpabsmaxk |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMINM = gpnrmminm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAXM = gpnrmmaxm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMINM = gpabsminm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAXM = gpabsmaxm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
             }
 
 
@@ -723,10 +720,10 @@ module Zindex =
 
         let records : unit -> BST649T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST701T: Bestand 701 Ingegeven samenstellingen </para>
     /// <para> --------------- </para>
@@ -753,7 +750,7 @@ module Zindex =
                 GNVOLG : int
                 GNMWHS : string
                 GNGNK : int
-                GNMINH : float
+                GNMINH : decimal
                 THMINE : int
                 XNMINE : int
                 GNSTAM : int
@@ -769,7 +766,7 @@ module Zindex =
                 GNVOLG = gnvolg |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNMWHS = gnmwhs |> String.trim
                 GNGNK = gngnk |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
-                GNMINH = gnminh |> ((Parser.parseValue "N" "(9,3)") >> Double.parse)
+                GNMINH = gnminh |> ((Parser.parseValue "N" "(9,3)") >> Decimal.parse)
                 THMINE = thmine |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XNMINE = xnmine |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNSTAM = gnstam |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
@@ -788,10 +785,10 @@ module Zindex =
 
         let records : unit -> BST701T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST711T: Bestand 711 Generieke producten </para>
     /// <para> --------------- </para>
@@ -838,7 +835,7 @@ module Zindex =
                 GPMLCI = gpmlci |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPMLCT = gpmlct |> ((Parser.parseValue "N" "") >> Int32.parse)
                 SPKODE = spkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
 
@@ -853,10 +850,10 @@ module Zindex =
 
         let records : unit -> BST711T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST715T: Bestand 715 Generieke samenstellingen </para>
     /// <para> --------------- </para>
@@ -878,7 +875,7 @@ module Zindex =
                 GNMWHS : string
                 GSKODE : int
                 GNNKPK : int
-                GNMOMH : float
+                GNMOMH : decimal
                 XNMOME : int
                 XPEHHV : int
             }
@@ -890,7 +887,7 @@ module Zindex =
                 GNMWHS = gnmwhs |> String.trim
                 GSKODE = gskode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 GNNKPK = gnnkpk |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
-                GNMOMH = gnmomh |> ((Parser.parseValue "N" "(9,3)") >> Double.parse)
+                GNMOMH = gnmomh |> ((Parser.parseValue "N" "(9,3)") >> Decimal.parse)
                 XNMOME = xnmome |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
@@ -906,10 +903,10 @@ module Zindex =
 
         let records : unit -> BST715T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST720T: Bestand 720 Superprodukten </para>
     /// <para> --------------- </para>
@@ -947,10 +944,10 @@ module Zindex =
 
         let records : unit -> BST720T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST725T: Bestand 725 Stamnaam + stamtoedieningsweg </para>
     /// <para> --------------- </para>
@@ -991,10 +988,10 @@ module Zindex =
 
         let records : unit -> BST725T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST750T: Bestand 750 Generieke namen </para>
     /// <para> --------------- </para>
@@ -1030,10 +1027,10 @@ module Zindex =
                 GNSTKD : int
                 GNCAS : int
                 GNFORM : string
-                GNMOLE : float
+                GNMOLE : decimal
                 GNMOLI : string
-                GNMOLS : float
-                GNSGEW : float
+                GNMOLS : decimal
+                GNSGEW : decimal
                 GNVOOR : string
             }
 
@@ -1050,10 +1047,10 @@ module Zindex =
                 GNSTKD = gnstkd |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNCAS = gncas |> ((Parser.parseValue "N" "(8+1)") >> Int32.parse)
                 GNFORM = gnform |> String.trim
-                GNMOLE = gnmole |> ((Parser.parseValue "N" "(8,4)") >> Double.parse)
+                GNMOLE = gnmole |> ((Parser.parseValue "N" "(8,4)") >> Decimal.parse)
                 GNMOLI = gnmoli |> String.trim
-                GNMOLS = gnmols |> ((Parser.parseValue "N" "(8,4)") >> Double.parse)
-                GNSGEW = gnsgew |> ((Parser.parseValue "N" "(2,5)") >> Double.parse)
+                GNMOLS = gnmols |> ((Parser.parseValue "N" "(8,4)") >> Decimal.parse)
+                GNSGEW = gnsgew |> ((Parser.parseValue "N" "(2,5)") >> Decimal.parse)
                 GNVOOR = gnvoor |> String.trim
             }
 
@@ -1068,10 +1065,10 @@ module Zindex =
 
         let records : unit -> BST750T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST760T: Bestand 760 Enkelvoudige toedieningswegen HPK </para>
     /// <para> --------------- </para>
@@ -1109,10 +1106,10 @@ module Zindex =
 
         let records : unit -> BST760T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST801T: Bestand 801 ATC codes </para>
     /// <para> --------------- </para>
@@ -1139,7 +1136,7 @@ module Zindex =
         let create mutkod atcode atoms atomse atkind  =
             {
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
-                ATCODE = atcode 
+                ATCODE = atcode
                 ATOMS = atoms |> String.trim
                 ATOMSE = atomse |> String.trim
                 ATKIND = atkind |> String.trim
@@ -1156,10 +1153,10 @@ module Zindex =
 
         let records : unit -> BST801T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST902T: Bestand 902 Thesauri totaal </para>
     /// <para> --------------- </para>
@@ -1203,10 +1200,10 @@ module Zindex =
 
         let records : unit -> BST902T [] = Memoization.memoize _records
 
-    
 
 
-    
+
+
     /// <summary>
     /// <para> Tabel: BST921T: Bestand 921 Tekstblokken ASCII (vervangt 920) </para>
     /// <para> --------------- </para>
@@ -1262,6 +1259,5 @@ module Zindex =
 
         let records : unit -> BST921T [] = Memoization.memoize _records
 
-    
 
-    
+

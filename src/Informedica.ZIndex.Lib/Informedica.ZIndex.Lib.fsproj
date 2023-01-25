@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="FilePath.fs" />
     <Compile Include="Json.fs" />
     <Compile Include="Parser.fs" />
@@ -23,12 +24,13 @@
     <Compile Include="DoseRule.fs" />
     <Compile Include="ATCGroup.fs" />
     <Compile Include="RuleFinder.fs" />
+    <None Include="Scripts\load.fsx" />
     <None Include="Scripts\loadGenCode.fsx" />
     <None Include="Scripts/GenCode.fsx" />
-    <None Include="Scripts\load.fsx" />
     <None Include="Scripts/Script.fsx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Informedica.GenCore.Lib\Informedica.GenCore.Lib.fsproj" />
     <ProjectReference Include="..\Informedica.Utils.Lib\Informedica.Utils.Lib.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

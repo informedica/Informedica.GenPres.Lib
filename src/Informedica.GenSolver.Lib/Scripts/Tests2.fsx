@@ -141,8 +141,12 @@ module Generators =
 
 module Tests =
 
+
     open MathNet.Numerics
     open Expecto
+
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
 
 
     module UtilsTests =
@@ -862,7 +866,7 @@ Variable.ValueRange.MinMaxCalculator.calcMinMax
 
 //start calculating: [1]_prs_tme [3600..> =
 //[vancomycine.poeder voor oplossing voor infusie]_dos_qty <0..> /
-//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18> 
+//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18>
 
 
 let varA = Variable.Dto.createNew "a" |> Variable.Dto.setMin (Some 0N) false |> Variable.Dto.fromDto
@@ -882,4 +886,4 @@ Equation.createProductEqExc (varA, [varB; varC])
 
 //start calculating: [1]_prs_tme [3600..> =
 //[vancomycine.poeder voor oplossing voor infusie]_dos_qty <0..> /
-//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18> 
+//[vancomycine.poeder voor oplossing voor infusie]_dos_rte <0..5/18>

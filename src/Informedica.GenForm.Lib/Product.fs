@@ -8,7 +8,9 @@ module Product =
     open MathNet.Numerics
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.ZIndex.Lib
+
+    module GenPresProduct = Informedica.ZIndex.Lib.GenPresProduct
+    module ATCGroup = Informedica.ZIndex.Lib.ATCGroup
 
 
     [<AutoOpen>]
@@ -36,14 +38,14 @@ module Product =
         let toString = function
             | PVL -> "PVL"
             | CVL -> "CVL"
-            | AnyLocation -> ""
+            | AnyAccess -> ""
 
 
         let fromString s =
             match s with
             | _ when s |> String.equalsCapInsens "PVL" -> PVL
             | _ when s |> String.equalsCapInsens "CVL" -> CVL
-            | _ -> AnyLocation
+            | _ -> AnyAccess
 
 
 
@@ -122,7 +124,7 @@ module Product =
                             match get "CVL", get "PVL" with
                             | s1, _ when s1 |> String.isNullOrWhiteSpace |> not -> CVL
                             | _, s2 when s2 |> String.isNullOrWhiteSpace |> not -> PVL
-                            | _ -> AnyLocation
+                            | _ -> AnyAccess
                         DoseType = get "DoseType" |> DoseType.fromString
                         Dep = get "Dep"
                         DiluentVol = get "DiluentVol" |> toBrOpt
@@ -145,7 +147,7 @@ module Product =
             [|
                 fun (r : Reconstitution) -> r.Route |> eqs filter.Route
                 fun (r : Reconstitution) ->
-                    if filter.Location = AnyLocation then true
+                    if filter.Location = AnyAccess then true
                     else
                         match filter.DoseType with
                         | AnyDoseType -> true
@@ -153,8 +155,8 @@ module Product =
                 fun (r : Reconstitution) -> r.Department |> eqs filter.Department
                 fun (r : Reconstitution) ->
                     match r.Location, filter.Location with
-                    | AnyLocation, _
-                    | _, AnyLocation -> true
+                    | AnyAccess, _
+                    | _, AnyAccess -> true
                     | _ -> r.Location = filter.Location
             |]
             |> Array.fold (fun (acc : Reconstitution[]) pred ->
@@ -326,7 +328,7 @@ module Product =
                         |> Array.collect (fun gp ->
                             gp.PrescriptionProducts
                             |> Array.map (fun pp -> pp.Quantity)
-                            |> Array.choose BigRational.fromFloat
+                            |> Array.map BigRational.fromDecimal
                         )
                         |> Array.filter (fun br -> br > 0N)
                         |> Array.distinct
@@ -373,7 +375,8 @@ module Product =
                                     |> String.toLower
                                 Quantity =
                                     s.SubstanceQuantity
-                                    |> BigRational.fromFloat
+                                    |> BigRational.fromDecimal
+                                    |> Some
                                 Unit =
                                     s.SubstanceUnit
                                     |> Mapping.mapUnit
@@ -420,7 +423,7 @@ module Product =
                 (rte |> String.isNullOrWhiteSpace || r.Route |> String.equalsCapInsens rte) &&
                 (r.DoseType = AnyDoseType || r.DoseType = dtp) &&
                 (dep |> String.isNullOrWhiteSpace || r.Department |> String.equalsCapInsens dep) &&
-                (r.Location = AnyLocation || r.Location = loc)
+                (r.Location = AnyAccess || r.Location = loc)
             )
             |> Array.map (fun r ->
                 { prod with

@@ -5,6 +5,7 @@ framework: auto-detect
 nuget Expecto
 nuget Expecto.FsCheck
 nuget FParsec
+nuget FsToolkit.ErrorHandling
 nuget MathNet.Numerics.FSharp
 nuget Microsoft.Net.Test.Sdk
 nuget Unquote

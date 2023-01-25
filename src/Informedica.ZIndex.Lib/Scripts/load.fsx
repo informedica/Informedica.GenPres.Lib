@@ -7,7 +7,9 @@
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.GenCore.Lib/bin/Debug/net6.0/Informedica.GenCore.Lib.dll"
 
+#load "../Types.fs"
 #load "../FilePath.fs"
 #load "../Json.fs"
 #load "../Parser.fs"
@@ -28,6 +30,7 @@
 
 open System
 open Informedica.Utils.Lib
+
 
 let zindexPath = __SOURCE_DIRECTORY__ |> Path.combineWith "../../../"
 

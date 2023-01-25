@@ -7,13 +7,14 @@
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.GenCore.Lib/bin/Debug/net6.0/Informedica.GenCore.Lib.dll"
 #r "../../Informedica.ZIndex.Lib/bin/Debug/net6.0/Informedica.ZIndex.Lib.dll"
 
+#load "../Types.fs"
 #load "../Utils.fs"
 #load "../Markdown.fs"
 #load "../Mapping.fs"
 #load "../ValueUnit.fs"
-#load "../MinMax.fs"
 #load "../ValueUnit.fs"
 #load "../Route.fs"
 #load "../Product.fs"

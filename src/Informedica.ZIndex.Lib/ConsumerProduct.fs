@@ -5,15 +5,6 @@ module ConsumerProduct =
 
     open Informedica.Utils.Lib
 
-    type ConsumerProduct =
-        {
-            Id : int
-            Name : string
-            Label : string
-            Quantity : float
-            Container : string
-            BarCodes : string []
-        }
 
     let create id nm lb qt ct br =
         {
@@ -24,6 +15,7 @@ module ConsumerProduct =
             Container = ct
             BarCodes = br
         }
+
 
     let _get id =
         Zindex.BST004T.records ()
@@ -39,11 +31,12 @@ module ConsumerProduct =
             let br =
                 Zindex.BST200T.records ()
                 |> Array.filter (fun b ->
-                    b.ATKODE = r.ATKODE 
+                    b.ATKODE = r.ATKODE
                 )
                 |> Array.map (fun b -> b.BARCOD)
 
             create r.ATKODE nm lb r.VPDLHV ct br
         )
+
 
     let get : int -> ConsumerProduct [] = Memoization.memoize _get

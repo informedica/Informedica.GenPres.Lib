@@ -6,21 +6,7 @@ module Names =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
-
-    type Name = Full | Short | Memo | Label
-
-
-    type Length = TwentyFive | Fifty
-
-
-    type Item =
-        | Shape
-        | Route
-        | GenericUnit
-        | ShapeUnit
-        | PrescriptionContainer
-        | ConsumerContainer
-
+    open Types.Names
 
     let mapItem = function
         | Shape -> 6

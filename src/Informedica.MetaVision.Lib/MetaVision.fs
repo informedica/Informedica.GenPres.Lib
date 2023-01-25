@@ -10,16 +10,7 @@ module MetaVision =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.ZForm.Lib.DoseRule.ShapeDosage
     open Informedica.ZIndex.Lib
-
-
-
-    type GenPresProduct = GenPresProduct.GenPresProduct
-
-
-    type GenericProduct = GenericProduct.GenericProduct
-
 
 
     module Frequency =
@@ -130,7 +121,7 @@ module MetaVision =
             let rts =
                 GenPresProduct.get true
                 |> Array.filter (fun gpp -> gpp.Shape |> String.equalsCapInsens s)
-                |> Array.collect (fun gpp -> gpp.Route)
+                |> Array.collect (fun gpp -> gpp.Routes)
                 |> Array.collect (String.splitAt ',')
                 |> Array.filter (mapRoute >> String.isNullOrWhiteSpace >> not)
                 |> Array.distinct
@@ -317,7 +308,7 @@ module MetaVision =
                                     Medication = m
                                     Product = p.ProductName
                                     DiluentName = p.DiluentName
-                                    DiluentVolume = Some 1.
+                                    DiluentVolume = Some 1m
                                     Route = r
                                 |}
                             )
@@ -378,11 +369,11 @@ module MetaVision =
                 ComponentQuantityVolumeValue =
                     if m.Unit = Constants.keer ||
                        m.Unit = Constants.druppel ||
-                       m.Unit = Constants.dosis then 1.
+                       m.Unit = Constants.dosis then 1m
                     else
                         match m.ComplexMedications |> Array.tryHead with
                         | Some cm -> cm.Concentration
-                        | None -> 0.
+                        | None -> 0m
                 ComponentQuantityVolumeUnit =
                     if m.Unit = Constants.keer ||
                        m.Unit = Constants.dosis ||
@@ -418,7 +409,7 @@ module MetaVision =
                 AvailableInRT = Constants.TRUE
             }
         )
-        |> Array.filter (fun r -> r.ComponentQuantityVolumeValue > 0.)
+        |> Array.filter (fun r -> r.ComponentQuantityVolumeValue > 0m)
         |> Array.map (fun r ->
             [|
                 "OrderTemplateName", r.OrderTemplateName
@@ -434,14 +425,14 @@ module MetaVision =
                 "OrderTemplateName", r.OrderTemplateName
                 "ComponentMedicationName", r.ComponentMedicationName
                 "ComponentProductName", r.ComponentProductName
-                "ComponentQuantityVolumeValue", $"{r.ComponentQuantityVolumeValue |> Double.toStringNumberNLWithoutTrailingZeros}"
+                "ComponentQuantityVolumeValue", $"{r.ComponentQuantityVolumeValue |> Decimal.toStringNumberNLWithoutTrailingZeros}"
                 "ComponentQuantityVolumeUnit", r.ComponentQuantityVolumeUnit
                 "ComponentConcentrationMassUnit", r.ComponentConcentrationMassUnit
                 "ComponentConcentrationVolumeUnit", r.ComponentConcentrationVolumeUnit
                 "ComponentDrugInDiluentDiluentMedicationName", r.ComponentDrugInDiluentDiluentMedicationName
                 "ComponentDrugInDiluentVolumeValue",
                     r.ComponentDrugInDiluentVolumeValue
-                    |> Option.map Double.toStringNumberNLWithoutTrailingZeros
+                    |> Option.map Decimal.toStringNumberNLWithoutTrailingZeros
                     |> Option.defaultValue ""
                 "ComponentDrugInDiluentVolumeUnit", r.ComponentDrugInDiluentVolumeUnit
                 "TotalVolumeUnit", r.TotalVolumeUnit
@@ -543,7 +534,7 @@ module MetaVision =
                         if un = Constants.keer || un = Constants.druppel || un = Constants.dosis then Constants.``1,234``
                         else
                             Constants.``1,234.56``
-                    IncrementValue = 0.1
+                    IncrementValue = 0.1m
                     CodeSnippetName = $"{Constants.``GPK-``}{gp.Id} {System.Guid.NewGuid().ToString()}"
                     Frequencies =
                         let freqs = drs |> getFrequencies (gp.Shape |> shapeIsInfuseOver)
@@ -630,7 +621,7 @@ module MetaVision =
                                     {
                                         ComplexMedictionName = name
                                         IngredientName = su
-                                        Concentration = 1.
+                                        Concentration = 1m
                                         ConcentrationUnit = su
                                         In = ""
                                         InUnit = ""
@@ -724,7 +715,7 @@ module MetaVision =
             [|
                 "ComplexMedicationName", r.ComplexMedictionName
                 "IngredientName", r.IngredientName
-                "Concentration", $"{r.Concentration |> Double.toStringNumberNLWithoutTrailingZeros}"
+                "Concentration", $"{r.Concentration |> Decimal.toStringNumberNLWithoutTrailingZeros}"
                 "ConcentrationUnit", r.ConcentrationUnit
                 "In", r.In
                 "InUnit",r.InUnit
@@ -747,10 +738,10 @@ module MetaVision =
                 "Routes", p.Routes
                 "Status", $"{Active}"
                 "Format", p.Format
-                "IncrementValue", p.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros
+                "IncrementValue", p.IncrementValue |> Decimal.toStringNumberNLWithoutTrailingZeros
                 "DefaultUnit", p.DefaultUnit
                 "IsUnknownStrength", p.IsUnknownStrength
-                "StrengthLEFT", p.StrengthLEFT |> Double.toStringNumberNLWithoutTrailingZeros
+                "StrengthLEFT", p.StrengthLEFT |> Decimal.toStringNumberNLWithoutTrailingZeros
                 "StrengthLEFTUnit", p.StrengthLEFTUnit
                 "StrengthRIGHT", p.StrengthRIGHT
                 "StrengthRIGHTUnit", p.StrengthRIGHTUnit
@@ -775,7 +766,7 @@ module MetaVision =
                 "ATCCode", m.ATC
                 "Status", $"{m.Status}"
                 "Format", m.Format
-                "IncrementValue", $"{m.IncrementValue |> Double.toStringNumberNLWithoutTrailingZeros}"
+                "IncrementValue", $"{m.IncrementValue |> Decimal.toStringNumberNLWithoutTrailingZeros}"
                 "CodeSnippetName", m.CodeSnippetName
                 "Frequencies", m.Frequencies
                 "DoseForms", m.DoseForms
@@ -1068,7 +1059,6 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
         printfn "creating dose forms"
         rts
         |> createDoseForms config.ImportFile fstFile "DoseForms"
-        |> ignore
 
         printfn "creating non G-Standard medications"
         Array.empty
@@ -1081,7 +1071,6 @@ insert into dbo.Orders_ClassificationSystemMedications (ClassificationSystemID, 
             config.ComplexMedications
             config.Brands
             config.Products
-        |> ignore
 
         printfn "creating ATC medication groups"
         Data.scriptATCMedicationGroups

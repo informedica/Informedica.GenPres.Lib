@@ -6,24 +6,23 @@
     <OtherFlags>$(OtherFlags) --warnon:1182 </OtherFlags>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Markdown.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="ValueUnit.fs" />
-    <Compile Include="MinMax.fs" />
     <Compile Include="Route.fs" />
     <Compile Include="Product.fs" />
     <Compile Include="Patient.fs" />
     <Compile Include="DoseRule.fs" />
     <Compile Include="GStand.fs" />
     <Compile Include="Dto.fs" />
+    <None Include="Scripts\load.fsx" />
+    <None Include="Scripts\loadDLL.fsx" />
     <None Include="Scripts\GStand.fsx" />
     <None Include="Scripts\GenForm3.fsx" />
     <None Include="Scripts\Dto.fsx" />
     <None Include="Scripts\Scripts.fsx" />
-    <None Include="Scripts\load.fsx" />
-    <None Include="Scripts\MetaVision.fsx" />
-    <None Include="Scripts\load2.fsx" />
     <None Include="Scripts\Dto.fsx" />
   </ItemGroup>
   <ItemGroup>

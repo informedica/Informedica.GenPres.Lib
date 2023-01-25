@@ -31,7 +31,7 @@ module Double =
 
     /// Get the double value of a string
     /// using `InvariantCulture`
-    let parse s = Double.Parse(s, Globalization.CultureInfo.InvariantCulture)
+    let parse s = Double.Parse(s, CultureInfo.InvariantCulture)
 
 
     /// Get a `float Option` from a string
@@ -79,25 +79,25 @@ module Double =
                 // chech whether the string is of type "1E-05"
                 if(s.Contains "E") then
                     let k = s.IndexOf("E")+2 // get the index of the number after the "-"
-                    let h = s.[k..] |> int // get int 5
+                    let h = s[k..] |> int // get int 5
                     let p = h + n - 1  // precision is 5 + n -1
                     p
                 else
                 let s = s.Split([|'.'|])
                 // calculate number of remaining decimal digits (after '.')
-                let p = n - (if s.[0] = "0" then 0 else s.[0].Length)
+                let p = n - (if s[0] = "0" then 0 else s[0].Length)
                 let p = if p < 0 then 0 else p
                 //printfn $"parse int: {s.[0]}"
-                if (int s.[0]) > 0 then // s.[0] |> int64 > 0L if (*)
+                if (int s[0]) > 0 then // s.[0] |> int64 > 0L if (*)
                     p
                 else
                     // calculate the the first occurance of a non-zero decimal digit
-                    let c = (s.[1] |> String.countFirstChar '0')
+                    let c = (s[1] |> String.countFirstChar '0')
                     c + p
         with
         | e ->
-            printfn "cannot get precision %i for %f" n f
-            printfn "catching error %A" e
+            printfn $"cannot get precision %i{n} for %f{f}"
+            printfn $"catching error %A{e}"
             printfn "returning 1 as default value"
             1
 

@@ -1,24 +1,17 @@
 namespace Informedica.MetaVision.Lib
 
 
-open ClosedXML.Excel
-
-open Informedica.Utils.Lib
-open Informedica.Utils.Lib.BCL
-open Informedica.ZForm.Lib.DoseRule.ShapeDosage
-open Informedica.ZForm.Lib.Utils
-open Informedica.ZIndex.Lib
-
 
 
 [<AutoOpen>]
 module Utils =
 
+    open ClosedXML.Excel
 
-    type GenPresProduct = GenPresProduct.GenPresProduct
-
-
-    type GenericProduct = GenericProduct.GenericProduct
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
+    open Informedica.ZForm.Lib.Utils
+    open Informedica.ZIndex.Lib
 
 
 
@@ -311,7 +304,7 @@ module Utils =
         |> Array.distinct
 
 
-    let getFrequencies isInfusedOver (drs : DoseRule.DoseRule []) =
+    let getFrequencies isInfusedOver (drs : DoseRule []) =
         drs
         |> Array.map (fun dr -> $"{dr.Freq.Frequency} {dr.Freq.Time}")
         |> Array.distinct
@@ -326,7 +319,7 @@ module Utils =
         |> String.concat ";"
 
 
-    let getDoseUnit (drs: DoseRule.DoseRule[]) =
+    let getDoseUnit (drs: DoseRule[]) =
         drs
         |> Array.fold(fun acc dr ->
             match acc with
@@ -344,7 +337,7 @@ module Utils =
             xs[3] = rte &&
             xs[5] = dep
         )
-        |> Option.map (fun xs -> xs[8] |> Double.tryParse, xs[9])
+        |> Option.map (fun xs -> xs[8] |> Decimal.tryParse, xs[9])
         |> Option.filter (fun (n, _) -> n |> Option.isSome)
         |> Option.map (fun (n, s) -> n |> Option.get, s)
 

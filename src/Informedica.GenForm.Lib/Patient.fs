@@ -80,8 +80,8 @@ module PatientCategory =
             fun (p: PatientCategory) -> filter |> Gender.filter p.Gender
             fun (p: PatientCategory) ->
                 match p.Location, filter.Location with
-                | AnyLocation, _
-                | _, AnyLocation -> true
+                | AnyAccess, _
+                | _, AnyAccess -> true
                 | _ -> p.Location = filter.Location
         |])
         ||> Array.fold(fun acc pred ->
@@ -218,7 +218,7 @@ module Patient =
             Height = None
             GestAge = None
             PMAge = None
-            Location = AnyLocation
+            Location = AnyAccess
         }
 
 

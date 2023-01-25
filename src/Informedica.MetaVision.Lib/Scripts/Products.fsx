@@ -9,7 +9,6 @@
 #load "../MetaVision.fs"
 
 
-open DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage
 open Informedica.Utils.Lib.BCL
 open Informedica.ZIndex.Lib
 open Informedica.MetaVision.Lib
@@ -38,6 +37,6 @@ prods
 prods
 |> Array.filter (fun p ->
     p.Name
-    |> String.contains "LOPINAVIR" 
+    |> String.contains "LOPINAVIR"
 )
 

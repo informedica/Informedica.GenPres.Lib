@@ -1,111 +1,30 @@
 namespace Informedica.ZIndex.Lib
 
+
 module RuleFinder =
 
     open Informedica.Utils.Lib.BCL
 
-    // ARTI/LESION
-    // * AURICULAIR
-    // * CUTAAN
-    // DENTAAL
-    // ENDOCERVIC
-    // * ENDOTR.PULM
-    // * ENDOTRACHEOPULMONAIR
-    // * EPIDURAAL
-    // EPIDURAAL, INTRATHECAAL, PERINEURAAL
-    // EXTRACORPORAAL
-    // * GASTR-ENTER
-    // * IM
-    // * INHALATIE
-    // INTRA-ART.
-    // INTRA-ARTERIEEL
-    // INTRA-ARTICULAIR
-    // INTRA-OCUL.
-    // INTRA-UTERIEN
-    // INTRABURSAAL
-    // INTRACARDIAAL
-    // INTRACAVERNEUS
-    // INTRACORONAIR
-    // * INTRADERMAAL
-    // INTRALAESIONAAL
-    // INTRALYMFATISCH
-    // * INTRAMUSCULAIR
-    // INTRAMUSCULAIR, INTRAVENEUS
-    // INTRAMUSCULAIR, SUBCUTAAN
-    // INTRAOSSAAL
-    // INTRAPERITONEAAL
-    // INTRAPLEURAAL
-    // INTRATHECAAL
-    // * INTRAVENEUS
-    // INTRAVENEUS, SUBCUTAAN
-    // * INTRAVESIC.
-    // * INTRAVESICAAL
-    // INTRAVITR.
-    // INTRAVITREAAL
-    // * IV
-    // * LOKAAL
-    // * NASAAL
-    // * NEUS
-    // NIET GESPEC
-    // NVT
-    // OOG
-    // * OOR
-    // * ORAAL
-    // ORAAL/RECT
-    // * OROMUCOSAAL
-    // PAR./ORAAL
-    // PAR/UTERIEN
-    // PAR/VESICAL
-    // PARABULBAIR
-    // PARENT/RECT
-    // PARENTERAAL
-    // PERI-ARTICULAIR
-    // PERIBULBAIR
-    // PERINEURAAL
-    // PERITONEAAL
-    // * RECTAAL
-    // RETROBULBAIR
-    // SUBCONJUNCTIVAAL
-    // * SUBCUTAAN
-    // SUBLINGUAAL
-    // * TRANSDERMAAL
-    // TRANSDERML
-    // URETHRAAL
-    // UTERIEN
-    // VAGINAAL
+    type MinMax = RuleMinMax
 
-    type Route =
-        | AUR // AURICULAIR OOR
-        | CUT // CUTAAN TRANSDERMAAL TRANSDERML LOKAAL
-        | ENDOTR // ENDOTR.PULM ENDOTRACHEOPULMONAIR
-        | EPIDUR // EPIDURAAL
-        | IM // INTRAMUSCULAIR IM
-        | INH // INHALATIE
-        | INTRAVESIC // INTRAVESIC. INTRAVESICAAL
-        | IV // INTRAVENEUS IV
-        | NASAL // NASAAL NEUS
-        | ORAL // ORAAL GASTR-ENTER OROMUCOSAAL
-        | OROMUCOSAL //OROMUCOSAAL
-        | RECTAL // RECTAAL
-        | SUBCUT // INTRADERMAAL SUBCUTAAN
-        | NoRoute
 
     let routeMapping =
         [
-            (AUR, ["AURICULAIR"; "OOR"])
-            (CUT, [ "CUTAAN"; "TRANSDERMAAL"; "TRANSDERML"; "LOKAAL"])
-            (ENDOTR, ["ENDOTR.PULM"; "ENDOTRACHEOPULMONAIR"])
-            (EPIDUR, ["EPIDURAAL"])
-            (IM, ["INTRAMUSCULAIR"; "IM"])
-            (INH, ["INHALATIE"; "INH"])
-            (INTRAVESIC, ["INTRAVESIC."; "INTRAVESICAAL"])
-            (IV, ["INTRAVENEUS"; "IV"])
-            (NASAL, ["NASAAL"; "NEUS"])
-            (ORAL, ["ORAAL"; "GASTR-ENTER"; "OR"])
-            (OROMUCOSAL, ["OROMUCOSAAL"])
-            (RECTAL, ["RECTAAL"; "RECT"])
-            (SUBCUT, ["SUBCUTAAN"; "SC"])
+            (Route.AUR, ["AURICULAIR"; "OOR"])
+            (Route.CUT, [ "CUTAAN"; "TRANSDERMAAL"; "TRANSDERML"; "LOKAAL"])
+            (Route.ENDOTR, ["ENDOTR.PULM"; "ENDOTRACHEOPULMONAIR"])
+            (Route.EPIDUR, ["EPIDURAAL"])
+            (Route.IM, ["INTRAMUSCULAIR"; "IM"])
+            (Route.INH, ["INHALATIE"; "INH"])
+            (Route.INTRAVESIC, ["INTRAVESIC."; "INTRAVESICAAL"])
+            (Route.IV, ["INTRAVENEUS"; "IV"])
+            (Route.NASAL, ["NASAAL"; "NEUS"])
+            (Route.ORAL, ["ORAAL"; "GASTR-ENTER"; "OR"])
+            (Route.OROMUCOSAL, ["OROMUCOSAAL"])
+            (Route.RECTAL, ["RECTAAL"; "RECT"])
+            (Route.SUBCUT, ["SUBCUTAAN"; "SC"])
         ]
+
 
     let createRoute s =
         let m =
@@ -116,22 +35,27 @@ module RuleFinder =
             )
         match m with
         | Some (r, _) -> r
-        | _ -> NoRoute
+        | _ -> Route.NoRoute
+
 
     let eqsRoute r rs =
-        if r = NoRoute then true
+        if r = Route.NoRoute then true
         else
             rs
             |> Array.map createRoute
             |> Array.exists ((=) r)
 
-    type AgeInMo = float Option
 
-    type WeightInKg = float Option
+    type AgeInMo = decimal Option
 
-    type BSAInM2 = float Option
 
-    let inRange n { DoseRule.Min = min; DoseRule.Max = max } =
+    type WeightInKg = decimal Option
+
+
+    type BSAInM2 = decimal Option
+
+
+    let inRange n { Min = min; Max = max } =
         if n |> Option.isNone then true
         else
             let n = n |> Option.get
@@ -141,12 +65,14 @@ module RuleFinder =
             | None, Some max -> n <= max
             | Some min, Some max -> n >= min && n <= max
 
+
     type PatientFilter =
         {
             Age: AgeInMo
             Weight: WeightInKg
             BSA: BSAInM2
         }
+
 
     type ProductFilter =
         | GPKRoute of (int * string)
@@ -192,9 +118,11 @@ module RuleFinder =
             Product = prod
         }
 
+
     let createGPKRouteFilter gpk rte = createFilter None None None gpk "" "" rte
 
-    let find all { Patient = pat; Product = prod } =
+
+    let find all { Filter.Patient = pat; Product = prod } =
         let r =
             match prod with
             | GPKRoute (_, route)   -> route
@@ -222,40 +150,6 @@ module RuleFinder =
             |> Array.distinct
         )
 
-    // stuk
-    // ml
-    // dosis
-    // g
-    // mg
-    // ug
-    // milj. IE
-    // IE
-    // E
-    type RuleResult =
-        {
-            Product: GenPresProduct.GenPresProduct
-            DoseRules: string []
-            Doses: FreqDose []
-        }
-    and FreqDose =
-        {
-            /// The frequency of the dose rule
-            Freq: DoseRule.Frequency
-            /// The optional min/max values of a 'normal dose range'
-            NormDose: DoseRule.MinMax
-            /// The optional min/max values of the 'absolute dose range'
-            AbsDose: DoseRule.MinMax
-            /// The optional min/max values of a 'normal dose range' per kg
-            NormKg: DoseRule.MinMax
-            /// The optional min/max values of the 'absolute dose range' per kg
-            AbsKg: DoseRule.MinMax
-            /// The optional min/max values of a 'normal dose range' per m2
-            NormM2: DoseRule.MinMax
-            /// The optional min/max values of the 'absolute dose range' per m2
-            AbsM2: DoseRule.MinMax
-            /// The unit in which the doses are measured
-            Unit: string
-        }
 
     let createResult gpp drs ds =
         {
@@ -263,6 +157,7 @@ module RuleFinder =
             DoseRules = drs
             Doses = ds
         }
+
 
     let createFreqDose freq norm abs normKg absKg normM2 absM2 un =
         {
@@ -277,10 +172,10 @@ module RuleFinder =
         }
 
 
-    let convertToResult (drs : DoseRule.DoseRule  []) =
+    let convertToResult (drs : DoseRule  []) =
 
         // Get the min max weight if there is one min weight or max weight
-        let wghtMinMax (drs : DoseRule.DoseRule []) =
+        let wghtMinMax (drs : DoseRule []) =
 
             match drs |> Array.toList with
             | [] -> DoseRule.minmax
@@ -290,7 +185,7 @@ module RuleFinder =
                 else DoseRule.minmax
 
         // Get the min max weight if there is one min weight or max weight
-        let bsaMinMax (drs : DoseRule.DoseRule []) =
+        let bsaMinMax (drs : DoseRule []) =
 
             match drs |> Array.toList with
             | [] -> DoseRule.minmax
@@ -317,24 +212,24 @@ module RuleFinder =
                         match acc with
                         | Some gpp' -> if gpp' = gpp then acc else None
                         | None -> None
-                    ) (Some gpps.[0])
+                    ) (Some gpps[0])
             )
 
         match gpp with
         | Some gpp' ->
-            let multMinMax f n { DoseRule.Min = min; DoseRule.Max = max } =
+            let multMinMax f n { Min = min; Max = max } =
                 let m = f * n
 
                 let mn, mx =
                     match min, max with
-                    | None, None           -> (0., 0.)
-                    | Some min', None      -> (min' * m, 0.)
-                    | None, Some max'      -> (0., max' * m )
+                    | None, None           -> (0m, 0m)
+                    | Some min', None      -> (min' * m, 0m)
+                    | None, Some max'      -> (0m, max' * m )
                     | Some min', Some max' -> (min' * m, max' * m)
 
                 DoseRule.createMinMax mn mx
 
-            let gpks (dr : DoseRule.DoseRule) =
+            let gpks (dr : DoseRule) =
                 dr.GenericProduct
                 |> Array.map (fun gp -> gp.Id)
                 |> Array.toList
@@ -375,9 +270,9 @@ module RuleFinder =
             let absM2 = calcDose DoseRule.Optics.getAbsM2
 
             let calcNoneAndAdjusted
-                (calcAdj   : DoseRule.DoseRule [] -> DoseRule.MinMax)
-                (calcNorm  : DoseRule.DoseRule [] -> DoseRule.MinMax)
-                (calcPerKg : DoseRule.DoseRule [] -> DoseRule.MinMax) drs =
+                (calcAdj   : DoseRule [] -> MinMax)
+                (calcNorm  : DoseRule [] -> MinMax)
+                (calcPerKg : DoseRule [] -> MinMax) drs =
 
                 let wght  = drs |> calcAdj
                 let norm  = drs |> calcNorm

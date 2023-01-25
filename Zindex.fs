@@ -56,7 +56,7 @@ module Zindex =
                 HPKODE : int
                 ATNMNR : int
                 VPDLOM : int
-                VPDLHV : float
+                VPDLHV : decimal
             }
 
 
@@ -67,7 +67,7 @@ module Zindex =
                 HPKODE = hpkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 ATNMNR = atnmnr |> ((Parser.parseValue "N" "") >> Int32.parse)
                 VPDLOM = vpdlom |> ((Parser.parseValue "N" "") >> Int32.parse)
-                VPDLHV = vpdlhv |> ((Parser.parseValue "N" "(6,2)") >> Double.parse)
+                VPDLHV = vpdlhv |> ((Parser.parseValue "N" "(6,2)") >> Decimal.parse)
             }
 
 
@@ -164,7 +164,7 @@ module Zindex =
                 HPNAMN : int
                 MSNAAM : string
                 FSNAAM : string
-                HPSGEW : float
+                HPSGEW : decimal
                 GRP001 : int
                 GRP002 : int
                 GRP003 : int
@@ -182,7 +182,7 @@ module Zindex =
                 HPNAMN = hpnamn |> ((Parser.parseValue "N" "") >> Int32.parse)
                 MSNAAM = msnaam |> String.trim
                 FSNAAM = fsnaam |> String.trim
-                HPSGEW = hpsgew |> ((Parser.parseValue "N" "(2,5)") >> Double.parse)
+                HPSGEW = hpsgew |> ((Parser.parseValue "N" "(2,5)") >> Decimal.parse)
                 GRP001 = grp001 |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GRP002 = grp002 |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GRP003 = grp003 |> ((Parser.parseValue "N" "") >> Int32.parse)
@@ -268,7 +268,7 @@ module Zindex =
                 GPKODE : int
                 HPEMBT : int
                 XPEHHV : int
-                HPGALG : float
+                HPGALG : decimal
             }
 
 
@@ -279,7 +279,7 @@ module Zindex =
                 GPKODE = gpkode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 HPEMBT = hpembt |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
-                HPGALG = hpgalg |> ((Parser.parseValue "N" "(5,2)") >> Double.parse)
+                HPGALG = hpgalg |> ((Parser.parseValue "N" "(5,2)") >> Decimal.parse)
             }
 
 
@@ -608,13 +608,13 @@ module Zindex =
                 MUTKOD : int
                 GPDCAT : int
                 GPDID2 : int
-                GPDLFM : float
-                GPDLFX : float
-                GPDKGM : float
-                GPDKGX : float
-                GPDM2M : float
-                GPDM2X : float
-                GPDFAA : float
+                GPDLFM : decimal
+                GPDLFX : decimal
+                GPDKGM : decimal
+                GPDKGX : decimal
+                GPDM2M : decimal
+                GPDM2X : decimal
+                GPDFAA : decimal
                 GPDFEE : int
                 GPDDEN : string
                 GPDDNR : int
@@ -626,13 +626,13 @@ module Zindex =
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDCAT = gpdcat |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDID2 = gpdid2 |> ((Parser.parseValue "N" "") >> Int32.parse)
-                GPDLFM = gpdlfm |> ((Parser.parseValue "N" "(4,2)") >> Double.parse)
-                GPDLFX = gpdlfx |> ((Parser.parseValue "N" "(4,2)") >> Double.parse)
-                GPDKGM = gpdkgm |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDKGX = gpdkgx |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDM2M = gpdm2m |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDM2X = gpdm2x |> ((Parser.parseValue "N" "(3,3)") >> Double.parse)
-                GPDFAA = gpdfaa |> ((Parser.parseValue "N" "(2,2)") >> Double.parse)
+                GPDLFM = gpdlfm |> ((Parser.parseValue "N" "(4,2)") >> Decimal.parse)
+                GPDLFX = gpdlfx |> ((Parser.parseValue "N" "(4,2)") >> Decimal.parse)
+                GPDKGM = gpdkgm |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDKGX = gpdkgx |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDM2M = gpdm2m |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDM2X = gpdm2x |> ((Parser.parseValue "N" "(3,3)") >> Decimal.parse)
+                GPDFAA = gpdfaa |> ((Parser.parseValue "N" "(2,2)") >> Decimal.parse)
                 GPDFEE = gpdfee |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDDEN = gpdden |> String.trim
                 GPDDNR = gpddnr |> ((Parser.parseValue "N" "") >> Int32.parse)
@@ -679,18 +679,18 @@ module Zindex =
             {
                 MUTKOD : int
                 GPDDNR : int
-                GPNRMMIN : float
-                GPNRMMAX : float
-                GPABSMIN : float
-                GPABSMAX : float
-                GPNRMMINK : float
-                GPNRMMAXK : float
-                GPABSMINK : float
-                GPABSMAXK : float
-                GPNRMMINM : float
-                GPNRMMAXM : float
-                GPABSMINM : float
-                GPABSMAXM : float
+                GPNRMMIN : decimal
+                GPNRMMAX : decimal
+                GPABSMIN : decimal
+                GPABSMAX : decimal
+                GPNRMMINK : decimal
+                GPNRMMAXK : decimal
+                GPABSMINK : decimal
+                GPABSMAXK : decimal
+                GPNRMMINM : decimal
+                GPNRMMAXM : decimal
+                GPABSMINM : decimal
+                GPABSMAXM : decimal
             }
 
 
@@ -698,18 +698,18 @@ module Zindex =
             {
                 MUTKOD = mutkod |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GPDDNR = gpddnr |> ((Parser.parseValue "N" "") >> Int32.parse)
-                GPNRMMIN = gpnrmmin |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAX = gpnrmmax |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMIN = gpabsmin |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAX = gpabsmax |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMINK = gpnrmmink |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAXK = gpnrmmaxk |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMINK = gpabsmink |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAXK = gpabsmaxk |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMINM = gpnrmminm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPNRMMAXM = gpnrmmaxm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMINM = gpabsminm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
-                GPABSMAXM = gpabsmaxm |> ((Parser.parseValue "N" "(8,3)") >> Double.parse)
+                GPNRMMIN = gpnrmmin |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAX = gpnrmmax |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMIN = gpabsmin |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAX = gpabsmax |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMINK = gpnrmmink |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAXK = gpnrmmaxk |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMINK = gpabsmink |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAXK = gpabsmaxk |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMINM = gpnrmminm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPNRMMAXM = gpnrmmaxm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMINM = gpabsminm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
+                GPABSMAXM = gpabsmaxm |> ((Parser.parseValue "N" "(8,3)") >> Decimal.parse)
             }
 
 
@@ -753,7 +753,7 @@ module Zindex =
                 GNVOLG : int
                 GNMWHS : string
                 GNGNK : int
-                GNMINH : float
+                GNMINH : decimal
                 THMINE : int
                 XNMINE : int
                 GNSTAM : int
@@ -769,7 +769,7 @@ module Zindex =
                 GNVOLG = gnvolg |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNMWHS = gnmwhs |> String.trim
                 GNGNK = gngnk |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
-                GNMINH = gnminh |> ((Parser.parseValue "N" "(9,3)") >> Double.parse)
+                GNMINH = gnminh |> ((Parser.parseValue "N" "(9,3)") >> Decimal.parse)
                 THMINE = thmine |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XNMINE = xnmine |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNSTAM = gnstam |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
@@ -878,7 +878,7 @@ module Zindex =
                 GNMWHS : string
                 GSKODE : int
                 GNNKPK : int
-                GNMOMH : float
+                GNMOMH : decimal
                 XNMOME : int
                 XPEHHV : int
             }
@@ -890,7 +890,7 @@ module Zindex =
                 GNMWHS = gnmwhs |> String.trim
                 GSKODE = gskode |> ((Parser.parseValue "N" "(7+1)") >> Int32.parse)
                 GNNKPK = gnnkpk |> ((Parser.parseValue "N" "(5+1)") >> Int32.parse)
-                GNMOMH = gnmomh |> ((Parser.parseValue "N" "(9,3)") >> Double.parse)
+                GNMOMH = gnmomh |> ((Parser.parseValue "N" "(9,3)") >> Decimal.parse)
                 XNMOME = xnmome |> ((Parser.parseValue "N" "") >> Int32.parse)
                 XPEHHV = xpehhv |> ((Parser.parseValue "N" "") >> Int32.parse)
             }
@@ -1030,10 +1030,10 @@ module Zindex =
                 GNSTKD : int
                 GNCAS : int
                 GNFORM : string
-                GNMOLE : float
+                GNMOLE : decimal
                 GNMOLI : string
-                GNMOLS : float
-                GNSGEW : float
+                GNMOLS : decimal
+                GNSGEW : decimal
                 GNVOOR : string
             }
 
@@ -1050,10 +1050,10 @@ module Zindex =
                 GNSTKD = gnstkd |> ((Parser.parseValue "N" "") >> Int32.parse)
                 GNCAS = gncas |> ((Parser.parseValue "N" "(8+1)") >> Int32.parse)
                 GNFORM = gnform |> String.trim
-                GNMOLE = gnmole |> ((Parser.parseValue "N" "(8,4)") >> Double.parse)
+                GNMOLE = gnmole |> ((Parser.parseValue "N" "(8,4)") >> Decimal.parse)
                 GNMOLI = gnmoli |> String.trim
-                GNMOLS = gnmols |> ((Parser.parseValue "N" "(8,4)") >> Double.parse)
-                GNSGEW = gnsgew |> ((Parser.parseValue "N" "(2,5)") >> Double.parse)
+                GNMOLS = gnmols |> ((Parser.parseValue "N" "(8,4)") >> Decimal.parse)
+                GNSGEW = gnsgew |> ((Parser.parseValue "N" "(2,5)") >> Decimal.parse)
                 GNVOOR = gnvoor |> String.trim
             }
 

@@ -10,3 +10,5 @@ open Informedica.Utils.Lib.BCL
 
 BigRational.gcd 12N 6N
 
+[||] |> Array.toReadableString
+

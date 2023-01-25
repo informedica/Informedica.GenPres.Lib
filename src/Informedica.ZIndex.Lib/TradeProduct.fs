@@ -7,20 +7,6 @@ module TradeProduct =
     open Informedica.Utils.Lib.BCL
 
 
-    type TradeProduct =
-        {
-            Id: int
-            Name : string
-            Label : string
-            Brand : string
-            Company : string
-            Denominator : int
-            UnitWeight : float
-            Route : string []
-            ConsumerProducts : ConsumerProduct.ConsumerProduct []
-        }
-
-
     let create id nm lb br cm dn uw rt ps =
         {
             Id = id

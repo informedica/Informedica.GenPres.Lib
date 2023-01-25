@@ -5,14 +5,17 @@
 
 open System.Collections.Generic
 
+
 open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 open Informedica.ZIndex.Lib
 
+
 // File
 File.exists <| FilePath.GStandPath + "BST000T"
 
-//Json.clearCache ()
+
+Json.clearCache ()
 // Load all
 printfn "Loading GenPresProduct ..."
 GenPresProduct.load true
@@ -25,7 +28,7 @@ DoseRule.load ()
 // Print log genericproducts
 let logGenericProducts () =
     printfn "Start ..."
-    let _log = new List<string>()
+    let _log = List<string>()
     let logf s =
         _log.Add(s)
     GenericProduct.getWithLog logf [] |> ignore
@@ -61,8 +64,8 @@ GenPresProduct.get true
 
 // GenPres product
 GenPresProduct.get true
-|> Seq.sortBy (fun gpp -> gpp.Name, gpp.Shape, gpp.Route)
-|> Seq.map (fun gpp -> $"""{gpp.Name}, {gpp.Shape}, {gpp.Route |> String.concat "/"}""")
+|> Seq.sortBy (fun gpp -> gpp.Name, gpp.Shape, gpp.Routes)
+|> Seq.map (fun gpp -> $"""{gpp.Name}, {gpp.Shape}, {gpp.Routes |> String.concat "/"}""")
 |> Seq.take 200
 |> Seq.iter (fun n -> printfn "%s" n)
 
@@ -165,7 +168,7 @@ DoseRule.frequencies ()
 DoseRule.get()
 |> Array.filter (fun dr ->
     dr.Freq.Time |> String.equalsCapInsens "per dag" &&
-    dr.Freq.Frequency > 24.
+    dr.Freq.Frequency > 24m
 )
 |> Array.iter (fun dr -> dr |> DoseRule.toString ", " |> (printfn "%s"))
 
@@ -181,7 +184,7 @@ GenPresProduct.filter true "amoxiciline" "" "iv"
 
 // Get alle names and route
 GenPresProduct.get true
-|> Array.map (fun gpp -> gpp.Name, gpp.Route)
+|> Array.map (fun gpp -> gpp.Name, gpp.Routes)
 |> Array.sort
 |> Array.distinct
 |> Array.collect (fun (nm, rts) ->
@@ -193,7 +196,7 @@ GenPresProduct.get true
 )
 
 // Get all dose rules for age 12 months weight 10 kg paracetamol rect
-RuleFinder.createFilter (Some 12.) (Some 10.) None None "paracetamol" "" ""
+RuleFinder.createFilter (Some 12m) (Some 10m) None None "paracetamol" "" ""
 |> RuleFinder.find true
 |> Array.map (fun r -> DoseRule.toString ", " r |> printfn "%s"; r)
 |> RuleFinder.convertToResult
@@ -201,7 +204,7 @@ RuleFinder.createFilter (Some 12.) (Some 10.) None None "paracetamol" "" ""
 
 DoseRule.get ()
 |> Array.filter (fun dr ->
-    dr.Freq.Time = "eenmalig" && dr.Freq.Frequency > 1.0
+    dr.Freq.Time = "eenmalig" && dr.Freq.Frequency > 1.0m
 )
 |> Array.iter (fun dr ->
     dr
@@ -217,7 +220,7 @@ GenPresProduct.get true
     if dbls |> Array.length > 1 then
         dbls
         |> Array.iter (fun gpp__ ->
-            printfn "%s %s %s" gpp__.Name gpp__.Shape (gpp__.Route |> String.concat "/")
+            printfn "%s %s %s" gpp__.Name gpp__.Shape (gpp__.Routes |> String.concat "/")
         )
 )
 
@@ -289,7 +292,7 @@ DoseRule.get ()
 DoseRule.get ()
 |> Array.filter (fun dr ->
     dr.Freq.Time |> String.contains "eenmalig" &&
-    dr.Freq.Frequency > 1.
+    dr.Freq.Frequency > 1.0m
 )
 |> Array.map (DoseRule.toString ", ")
 |> Array.iter (printfn "%s")
@@ -415,7 +418,7 @@ GenPresProduct.get true
 |> Array.iter (fun dro ->
     match dro with
     | Some dr ->
-        printfn "%s %s" dr.Product.Name (dr.Product.Route |> String.concat "/")
+        printfn "%s %s" dr.Product.Name (dr.Product.Routes |> String.concat "/")
         dr.DoseRules |> Array.iter (printfn "%s")
         dr.Doses
         |> Array.iter (fun d ->
@@ -442,7 +445,7 @@ GenPresProduct.get true
 |> Array.collect (fun dro ->
     match dro with
     | Some dr ->
-        dr.Product.Route
+        dr.Product.Routes
     | None -> Array.empty
 )
 |> Array.distinct
@@ -574,16 +577,16 @@ GenPresProduct.get true
                         gp.PrescriptionProducts
                         |> Array.fold (fun acc pp ->
                             if pp.Quantity <> acc then pp.Quantity else acc
-                        ) 1.0
-                        |> fun v -> if v <= 0. then 1. else v
+                        ) 1.0m
+                        |> fun v -> if v <= 0m then 1m else v
                     ShapeVol = ""
                     ShapeUnit = gpp.Unit
                     Substance = s.SubstanceName
                     SubstanceQuantity = s.SubstanceQuantity
                     SubstanceUnit = s.SubstanceUnit
-                    MultipleQuantity = 0.
+                    MultipleQuantity = 0m
                     MultipleUnit = ""
-                    Divisible = 1
+                    Divisible = 1m
                 |}
             )
         )
@@ -610,7 +613,7 @@ GenPresProduct.get true
         r.Substance |> String.toLower |> strToStr
         r.SubstanceQuantity |> strToStr
         r.SubstanceUnit |> String.toLower |> strToStr
-        r.SubstanceQuantity / (r.Divisible |> float) |> numToStr
+        r.SubstanceQuantity / (r.Divisible |> decimal) |> numToStr
         r.SubstanceUnit
         r.Divisible |> numToStr
     ]
@@ -649,7 +652,7 @@ GenPresProduct.get true
 // route shape
 GenPresProduct.get true
 |> Array.collect (fun gpp ->
-    gpp.Route
+    gpp.Routes
     |> Array.map (fun r ->
         r |> String.toLower,
         gpp.Shape |> String.toLower

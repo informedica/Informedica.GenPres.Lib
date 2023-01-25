@@ -87,7 +87,7 @@ module SolutionRule =
                         else
                             if r.PVL = "x" then PVL
                             else
-                                AnyLocation
+                                AnyAccess
                     Age = (r.MinAge, r.MaxAge) |> MinMax.fromTuple
                     Weight = (r.MinWeight, r.MaxWeight) |> MinMax.fromTuple
                     Dose = (r.MinDose, r.MaxDose) |> MinMax.fromTuple
@@ -170,7 +170,7 @@ module SolutionRule =
                 match sr.Location with
                 | CVL -> "###### centraal: \n* "
                 | PVL -> "###### perifeer: \n* "
-                | AnyLocation -> "* "
+                | AnyAccess -> "* "
 
             let qs =
                 if limit.Quantities |> Array.isEmpty then

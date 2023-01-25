@@ -5,16 +5,6 @@ module PrescriptionProduct =
 
     open Informedica.Utils.Lib
 
-    type PrescriptionProduct =
-        {
-            Id : int
-            Name : string
-            Label  : string
-            Quantity : float
-            Unit : string
-            Container : string
-            TradeProducts : TradeProduct.TradeProduct []
-        }
 
     let create id nm lb qt un ct ps =
         {
@@ -26,6 +16,7 @@ module PrescriptionProduct =
             Container = ct
             TradeProducts = ps
         }
+
 
     let _get id =
         Zindex.BST051T.records ()
@@ -49,5 +40,6 @@ module PrescriptionProduct =
 
             create r.PRKODE nm lb r.HPGALG un ct ps
         )
+
 
     let get : int -> PrescriptionProduct [] = Memoization.memoize _get

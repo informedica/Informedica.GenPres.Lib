@@ -95,3 +95,101 @@ module List =
         match xs |> List.filter (fun xs -> xs |> List.exists pred) with
         | [] -> None
         | xs::_ -> xs |> List.find pred |> Some
+
+
+    let tryFindRest pred xs =
+        let rec find x xs notx =
+            match xs with
+            | [] -> x, notx
+            | h::tail ->
+                if h |> pred then find (Some h) tail notx
+                else find x tail ([h] |> List.append notx)
+
+        find None xs []
+
+
+    let inline toString2 xs =
+        xs
+        |> toString
+        |> String.replace "[" ""
+        |> String.replace "]" ""
+        |> String.replace ";" ","
+
+
+    let headTail xs =
+        match xs with
+        | [] -> (None, None)
+        | h::tail ->
+            match tail |> List.rev with
+            | []   -> (Some h, None)
+            | t::_ -> (Some h, Some t)
+
+
+    let inline isConsecutive zero diff xs =
+        match xs with
+        | []  | [_] -> false
+        | _ ->
+            xs
+            |> List.sort
+            |> List.fold (fun acc x ->
+                let isC, prev = acc
+
+                if prev = zero then (true, x)
+                else
+                    (x - prev = diff && isC, x)
+
+            ) (true, zero)
+            |> fst
+
+
+    let countByList xs1 xs2 =
+        xs2
+        |> List.append xs1
+        |> List.countBy id
+        |> List.map (fun (k, v) -> k, v - 1)
+        |> List.sortBy (fun (k, _) ->
+            try
+                xs1 |> List.findIndex ((=) k)
+            with
+            | _ ->
+                xs1 |> String.concat ", "
+                |> sprintf "countByList couldn't find %s in %s" k
+                |> failwith
+        )
+
+    let inline findNearestMax n ns =
+        match ns with
+        | [] -> n
+        | _ ->
+            let n =
+                if n > (ns |> List.max) then
+                    ns |> List.max
+                else
+                    n
+
+            ns
+            |> List.sort
+            |> List.rev
+            |> List.fold (fun x a -> if (a - x) < (n - x) then x else a) n
+
+
+    let removeDuplicates xs =
+        xs
+        |> List.fold
+            (fun xs x ->
+                if xs |> List.exists ((=) x) then
+                    xs
+                else
+                    [ x ] |> List.append xs
+            )
+            []
+
+
+    let distinct xs = xs |> Seq.ofList |> Seq.distinct |> Seq.toList
+
+
+    let replaceOrAdd pred x xs =
+        if xs |> List.exists pred then
+            xs |> replace pred x
+        else
+            x :: xs

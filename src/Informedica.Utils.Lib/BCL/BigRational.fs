@@ -1,5 +1,6 @@
 namespace Informedica.Utils.Lib.BCL
 
+
 /// Helper functions for `BigRational`
 [<RequireQualifiedAccess>]
 module BigRational =

@@ -21,14 +21,14 @@ module Json =
         |> serialize
         |> File.writeTextToFile p
 
-    let clearCache c =
+    let clearCache () =
         File.Delete(FilePath.groupCache)
         File.Delete(FilePath.substanceCache)
         File.Delete(FilePath.productCache)
         File.Delete(FilePath.ruleCache)
 
     let getCache<'T> p =
-        printfn "Reading cache: %s" p
+        printfn $"Reading cache: %s{p}"
         File.readAllLines p
         |> String.concat ""
         |> deSerialize<'T>

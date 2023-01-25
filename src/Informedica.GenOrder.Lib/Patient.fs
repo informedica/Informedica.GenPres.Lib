@@ -7,6 +7,9 @@ module Patient =
     open Informedica.Utils.Lib.BCL
     open Informedica.GenForm.Lib
 
+    type Patient = Informedica.GenForm.Lib.Types.Patient
+    type Access = Informedica.GenForm.Lib.Types.VenousAccess
+
     let patient : Patient =
         {
             Department = ""
@@ -17,32 +20,8 @@ module Patient =
             Height = None
             GestAge = None
             PMAge = None
-            Location = AnyLocation
+            Location = Access.AnyAccess
         }
-
-
-    type Patient with
-
-        static member Gender_ =
-            (fun (p : Patient) -> p.Gender), (fun g (p : Patient) -> { p with Gender = g})
-
-        static member Age_ =
-            (fun (p : Patient) -> p.Age), (fun a (p : Patient) -> { p with Age = a})
-
-        static member Weight_ =
-            (fun (p : Patient) -> p.Weight), (fun w (p : Patient) -> { p with Weight = w})
-
-        static member Height_ =
-            (fun (p : Patient) -> p.Height), (fun b (p : Patient) -> { p with Height = b})
-
-        static member GestAge_ =
-            (fun (p : Patient) -> p.GestAge), (fun a (p : Patient) -> { p with GestAge = a})
-
-        static member PMAge_ =
-            (fun (p : Patient) -> p.PMAge), (fun a (p : Patient) -> { p with PMAge = a})
-
-        static member Department_ =
-            (fun (p : Patient) -> p.Department), (fun d (p : Patient) -> { p with Department = d})
 
 
     [<AutoOpen>]
