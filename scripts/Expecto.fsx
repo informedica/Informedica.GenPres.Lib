@@ -50,7 +50,7 @@ module Generators =
             arbitrary = [
                 typeof<BigRGenerator>
             ]
-            maxTest = 1000
+            maxTest = 10000
         }
 
 

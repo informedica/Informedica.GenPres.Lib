@@ -1,3 +1,5 @@
+#load "../../../scripts/Expecto.fsx"
+
 
 #load "load.fsx"
 
@@ -608,6 +610,32 @@ module Tests =
 
             ]
 
+    module DateTime =
+
+        let tests =
+            testList "Age" [
+
+                fun dt1 dt2 ->
+                    let dt1 = DateTime.date dt1
+                    let dt2 = DateTime.date dt2
+                    let dtFirst, dtLast = if dt1 < dt2 then dt1, dt2 else dt2, dt1
+
+                    let y, m, w, d = DateTime.age dtLast dtFirst
+                    dtFirst
+                    |> DateTime.addYears y
+                    |> DateTime.addMonths m
+                    |> DateTime.addWeeks w
+                    |> DateTime.addDays d
+                    |> fun dt ->
+                        if dt = dtLast then true
+                        else
+                            printfn $"age {dt} should be last {dtLast} (first {dtFirst})"
+                            false
+
+                |> Generators.testProp $"calc age and back to date"
+                
+            ]
+
 
     module List =
 
@@ -878,16 +906,19 @@ module Tests =
 
 
 
-
-testList "Tests" [
+[
     Tests.testHelloWorld
     Tests.String.tests
     Tests.Double.tests
     Tests.BigRational.tests
+    Tests.DateTime.tests
     Tests.List.tests
     Tests.Reflection.tests
     Tests.Csv.tests
 ]
+//|> List.skip 4
+//|> List.take 1
+|> testList "Tests"
 |> Expecto.run
 
 

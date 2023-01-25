@@ -1,16 +1,16 @@
-﻿
-type Test = { Number : int }
 
-module Test =
+#load "load.fsx"
 
-    module Operators =
-
-        let (<?) (t1: Test) (t2: Test) = t1.Number < t2.Number
+#load "../Measures.fs"
+#load "../Calculations.fs"
+#load "../MinIncrMax.fs"
 
 
-let t1 = { Number = 1 }
-let t2 = { Number = 2 }
+open Informedica.GenCore.Lib
 
-open Test.Operators
+open System
 
-t1 <? t2
+
+Calculations.Age.actAge (DateTime(1965, 12, 7)) DateTime.Now
+
+

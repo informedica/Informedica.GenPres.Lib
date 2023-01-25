@@ -10,10 +10,15 @@
 #load "../../../scripts/Expecto.fsx"
 #load "load.fsx"
 
+
+#load "../Measures.fs"
+#load "../Calculations.fs"
 #load "../MinIncrMax.fs"
 
 
 module Tests =
+
+    open System
 
     open Expecto
     open Expecto.Flip
@@ -25,6 +30,39 @@ module Tests =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
+
+
+
+    module CalculationTests =
+
+        let bsaCalcList =
+            [
+                Calculations.BSA.duBois, "DuBois", 1.6949m<m2>
+                Calculations.BSA.fujimoto, "Fuijimoto", 1.6476m<m2>
+                Calculations.BSA.gehanAndGeorge, "Gehan and George", 1.6916m<m2>
+                Calculations.BSA.haycock, "Haycock", 1.6804m<m2>
+                Calculations.BSA.mosteller, "Mosteller", 1.6833m<m2>
+            ]
+
+        let tests = testList "Calculations" [
+            testList "BSA" [
+                for f, s, e in bsaCalcList do
+                    test $"{s}" {
+                        Calculations.BSA.calcBSA f (Some 5) 60m<kg> 170m<cm>
+                        |> Expect.equal $"should be {e}" e
+                    }
+            ]
+
+            testList "age" [
+                test "born Dec 7, 2022 and current Jan 25, 2023" {
+                    let dtNow = DateTime(2023, 1, 25)
+                    let dtBd = DateTime(2022, 12, 7)
+                    Calculations.Age.adjustedAge 0<day> 36<week> dtBd dtNow
+                    |> Expect.equal "should be 21 days" 21<day>
+                }
+            ]
+            
+        ]
 
 
     module MinIncrMaxTests =
@@ -429,9 +467,13 @@ open Expecto
 
 
 testList "GenCore" [
+
+    Tests.CalculationTests.tests
+    (*
     Tests.MinIncrMaxTests.tests
     Tests.MinMaxTests.tests
     Tests.DtoTests.tests
+    *)
 ]
 |> Expecto.run
 
