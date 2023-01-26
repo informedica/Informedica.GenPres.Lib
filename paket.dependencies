@@ -9,6 +9,7 @@ nuget FsToolkit.ErrorHandling
 nuget MathNet.Numerics.FSharp
 nuget Microsoft.Net.Test.Sdk
 nuget Unquote
+nuget Validus
 nuget YoloDev.Expecto.TestSdk
 nuget Markdig
 nuget Aether

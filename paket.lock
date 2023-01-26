@@ -67,6 +67,8 @@ NUGET
     System.Runtime.CompilerServices.Unsafe (6.0)
     Unquote (6.1)
       FSharp.Core (>= 4.7.2)
+    Validus (4.1.2)
+      FSharp.Core (>= 4.5.2)
     XLParser (1.6.1)
       Irony.NetCore (>= 1.0.11)
       NETStandard.Library (>= 1.6.1)

@@ -3,10 +3,9 @@ namespace Informedica.GenCore.Lib
 open System
 
 open MathNet.Numerics
-open Aether
 open Informedica.GenUnits.Lib
 
-(*
+
 
 type VenousAccess =
     | Peripheral
@@ -26,7 +25,7 @@ type EnteralAccess =
 type Gender = Male | Female | AnyGender | UnknownGender
 
 
-type Age =
+type AgeValue =
     {
         Years: int<year> option
         Months: int<month> option
@@ -35,7 +34,12 @@ type Age =
     }
 
 
-type BirthDate = { Year : int; Month : int option; Day : int option }
+type YearMonthDay = { Year : int; Month : int option; Day : int option }
+
+
+type PatientAge =
+    | AgeValue of AgeValue
+    | BirthDate of YearMonthDay
 
 
 type WeightValue = | Kilogram of decimal<kg> | Gram of int<gram>
@@ -73,7 +77,7 @@ type Patient =
         Department : string option
         Diagnoses : string []
         Gender : Gender
-        Age : Age
+        Age : PatientAge
         Weight : Weight
         Height : Height
         GestationalAge : AgeWeeksDays option
@@ -84,7 +88,21 @@ and AgeWeeksDays = { Weeks: int<week>; Days : int<week> }
 
 
 
-module Age =
+type PatientCategory =
+    {
+        Department : string option
+        Diagnoses : string []
+        Gender : Gender
+        Age : MinIncrMax
+        Weight : MinIncrMax
+        BSA : MinIncrMax
+        GestAge : MinIncrMax
+        PMAge : MinIncrMax
+        Location : VenousAccess
+    }
+
+
+module AgeValue =
 
 
     let create years months weeks days =
@@ -95,14 +113,153 @@ module Age =
             Days = days
         }
 
+    let get { Years = y; Months = m; Weeks = w; Days = d} =
+        y, m, w, d
+
 
     let zero = create None None None None
 
 
-    let fromBirthDate bd now =
-        let y, m, w, d = now |> Calculations.Age.actAge bd
-        y, m, w, d
+    module Optics =
 
+        let years =
+            (fun (a: AgeValue) -> a.Years),
+            (fun y a -> { a with Years = y })
+
+        let months =
+            (fun (a: AgeValue) -> a.Months),
+            (fun m a -> { a with Months = m })
+
+        let weeks =
+            (fun (a: AgeValue) -> a.Weeks),
+            (fun w (a: AgeValue) -> { a with Weeks = w })
+
+        let days =
+            (fun (a: AgeValue) -> a.Days),
+            (fun d (a: AgeValue) -> { a with Days = d })
+            
+        let intYears =
+            (fun y -> y |> Option.map int |> Option.defaultValue 0),
+            (fun i -> i |> Conversions.yearFromInt |> Some)
+
+        let intMonths =
+            (fun y -> y |> Option.map int |> Option.defaultValue 0),
+            (fun i -> i |> Conversions.monthFromInt |> Some)
+
+        let intWeeks =
+            (fun y -> y |> Option.map int |> Option.defaultValue 0),
+            (fun i -> i |> Conversions.weekFromInt |> Some)
+
+        let intDays =
+            (fun d -> d |> Option.map int |> Option.defaultValue 0),
+            (fun i -> i |> Conversions.dayFromInt |> Some)
+
+
+
+    [<AutoOpen>]
+    module SetGet =
+
+        open Aether
+        open Aether.Operators
+
+
+        let getYears = Optic.get Optics.years
+
+        let setYears = Optic.set Optics.years
+
+        let getMonths = Optic.get Optics.months
+
+        let setMonths = Optic.set Optics.months
+
+        let getWeeks = Optic.get Optics.weeks
+
+        let setWeeks = Optic.set Optics.weeks
+
+        let getDays = Optic.get Optics.days
+
+        let setDays = Optic.set Optics.days
+
+        let setIntYears = Optics.years >-> Optics.intYears |> Optic.set 
+
+
+
+    let fromBirthDate bd now =
+        let y, m, w, d = now |> Calculations.Age.fromBirthData bd
+        create (Some y) (Some m) (Some w) (Some d)
+
+
+
+    module Validation =
+
+        open Validus
+
+        let [<Literal>] maxYear = 120<year>
+
+
+        let mapOpt f validator =
+            fun s x ->
+                validator s x
+                |> Result.map (Option.map f)
+
+        let yearValidator =
+            let m = int maxYear
+            Check.optional (Check.Int.between 0 m)
+            |> mapOpt Conversions.yearFromInt
+
+
+        let monthValidator =
+            Check.optional (Check.Int.between 0 12)
+            |> mapOpt Conversions.monthFromInt
+
+
+        let weekValidator =
+            Check.optional (Check.Int.between 0 56)
+            |> mapOpt Conversions.weekFromInt
+
+
+        let dayValidator =
+            Check.optional (Check.Int.between 0 7)
+            |> mapOpt Conversions.dayFromInt
+
+
+
+    module Dto =
+
+        open Validus
+
+        type Dto () =
+            member val Years : int option = None with get, set
+            member val Months : int option = None with get, set
+            member val Weeks : int option = None with get, set
+            member val Days : int option = None with get, set
+
+
+        let dto () = Dto ()
+
+
+        let fromDto (dto : Dto) =
+            validate {
+                let! y = Validation.yearValidator "Years" dto.Years
+                let! m = Validation.monthValidator "Months" dto.Months
+                let! w = Validation.weekValidator "Weeks" dto.Weeks
+                let! d = Validation.dayValidator "Days" dto.Days
+                return create y m w d
+            }
+
+
+        let toDto (a : AgeValue) =
+            let dto = dto ()
+            dto.Years <- a.Years |> Option.map int
+            dto.Months <- a.Months |> Option.map int
+            dto.Weeks <- a.Weeks |> Option.map int
+            dto.Days <- a.Days |> Option.map int
+
+            dto
+
+
+
+
+(*
 
 module Gender =
 

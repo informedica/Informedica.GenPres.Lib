@@ -11,8 +11,16 @@ module Calculations =
 
     module Age =
 
+        let yearsMonthsWeeksDaysToDays y (m : int<month>) w d =
+            let dy, dm, dw =
+                y |> Conversions.intYearsToDays,
+                m |> int |> (*) 30 |> Conversions.dayFromInt,
+                w |> Conversions.weeksToDays
 
-        let actAge bd dt =
+            d + dy + dm + dw
+
+
+        let fromBirthData bd dt =
             let y, m, w, d = DateTime.age bd dt
             y |> Conversions.yearFromInt,
             m |> Conversions.monthFromInt,

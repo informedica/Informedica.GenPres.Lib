@@ -3,3 +3,4 @@ FSharp.Core
 MathNet.Numerics.FSharp
 Aether
 FsToolkit.ErrorHandling
+Validus

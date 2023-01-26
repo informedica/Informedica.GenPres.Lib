@@ -26,6 +26,29 @@ module Measures =
 
 
 
+module Constants =
+
+    
+
+    let [<Literal>] fullTerm = 40<week>
+
+
+    let [<Literal>] premature = 37<week>
+
+
+    let [<Literal>] daysInWeek = 7
+
+
+    let [<Literal>] weeksInYear = 52
+
+
+    let [<Literal>] monthsInYear = 12
+
+
+    let [<Literal>] daysInYear = 365
+
+
+
 module Conversions =
 
 
@@ -67,9 +90,9 @@ module Conversions =
 
     let meterFromDecimal x : decimal<m> = x |> fromDec 1m<m>
 
-        
+
     let weeksToDays (weeks: int<week>) =
-        weeks * 7
+        weeks * Constants.daysInWeek
         |> int
         |> dayFromInt
 
@@ -77,6 +100,18 @@ module Conversions =
     let daysToWeeks (days: int<day>) =
         (int days) / 7 |> weekFromInt,
         (int days) % 7 |> weekFromInt
+
+
+    let intYearsToDays (years : int<year>) =
+        years * Constants.daysInYear
+        |> int
+        |> dayFromInt
+
+
+    let decYearsToDays (years : decimal<year>) =
+        years * (decimal Constants.daysInYear)
+        |> decimal |> int
+        |> dayFromInt
 
 
     let kgToGram (kg : decimal<kg>) =
@@ -89,13 +124,4 @@ module Conversions =
         |> kgFromDecimal
 
 
-
-module Constants =
-
-    
-
-    let [<Literal>] fullTerm = 40<week>
-
-
-    let [<Literal>] premature = 37<week>
 
