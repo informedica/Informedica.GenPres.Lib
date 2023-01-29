@@ -12,8 +12,13 @@
 
 
 #load "../Measures.fs"
+#load "../Aether.fs"
+#load "../Validus.fs"
 #load "../Calculations.fs"
 #load "../MinIncrMax.fs"
+#load "../Patient.fs"
+
+
 
 
 module Tests =
@@ -44,6 +49,7 @@ module Tests =
                 Calculations.BSA.mosteller, "Mosteller", 1.6833m<m2>
             ]
 
+
         let tests = testList "Calculations" [
             testList "BSA" [
                 for f, s, e in bsaCalcList do
@@ -61,8 +67,9 @@ module Tests =
                     |> Expect.equal "should be 21 days" 21<day>
                 }
             ]
-            
+
         ]
+
 
 
     module MinIncrMaxTests =
@@ -110,7 +117,7 @@ module Tests =
                 minGTmax
 
 
-        [<Tests>]
+
         let tests = testList "MinIncrMax.validate" [
             fun min incr max ->
                 let min =
@@ -302,9 +309,6 @@ module Tests =
                 ]
 
             mms
-            |> List.iter (fun mm -> printfn $"""{mm |> MinIncrMax.toString "from" "to"}""" )
-
-            mms
             |> MinIncrMax.foldMaximize
             |> mmToStr,
             mms
@@ -343,6 +347,7 @@ module Tests =
                 (mg30, mm4, true)
                 (mg40, mm4, false)
             ]
+
 
 
         let tests = testList "MinMax" [
@@ -399,81 +404,522 @@ module Tests =
             ]
         ]
 
-    module DtoTests =
 
-        module Dto = MinIncrMax.Dto
+        module DtoTests =
 
-        let (|>!) x f =
-            x |> printfn  "%A"
-            f x
+            module Dto = MinIncrMax.Dto
 
-        let dto () =
-            Dto.dto ()
+            let dto () =
+                Dto.dto ()
 
-        let tests  =
-            testList "Dto" [
-                test "MinIncrMax from Dto is the same as empty" {
-                    dto ()
-                    |> Dto.fromDto
-                    |> function
-                        | Some mm ->
-                            mm
-                            |> Expect.equal "should be an empty mm" MinIncrMax.empty
-                        | None -> false |> Expect.isTrue "could not create an empty dto"
-                }
 
-                test "MinIncrMax dto setting min and max" {
-                    // Add min and max to dto and there and back again
-                    let dto = dto ()
-                    dto.Min.Value <- [|1m|]
-                    dto.Min.Unit <- "mg"
-                    dto.Min.Group <- "mass"
-                    dto.HasMin <- true
-                    dto.MinIncl <- false
-                    dto.Max.Value <- [|2m|]
-                    dto.Max.Unit <- "g"
-                    dto.Max.Group <- "mass"
-                    dto.HasMax <- true
-                    dto
-                    |>! Dto.fromDto
-                    |>! function
-                        | Some _ -> true |> Expect.isTrue "can create dto with min and max"
-                        | None -> false |> Expect.isTrue "cannot set min and max"
-                }
 
-                test "MinIncrMax that is not valid will not return from dto" {
-                    let dto = dto ()
+            let tests  =
+                testList "Dto" [
+                    test "MinIncrMax from Dto is the same as empty" {
+                        dto ()
+                        |> Dto.fromDto
+                        |> function
+                            | Some mm ->
+                                mm
+                                |> Expect.equal "should be an empty mm" MinIncrMax.empty
+                            | None -> false |> Expect.isTrue "could not create an empty dto"
+                    }
 
-                    dto.Min.Value <- [|1m|]
-                    dto.Min.Unit <- "g"
-                    dto.Min.Group <- "mass"
-                    dto.HasMin <- true
-                    dto.MinIncl <- false
-                    dto.Max.Value <- [|1m|]
-                    dto.Max.Unit <- "mg"
-                    dto.Max.Group <- "mass"
-                    dto.HasMax <- true
-                    dto
-                    |>! Dto.fromDto
-                    |>! Option.bind (Dto.toDto >> Some)
-                    |> function
-                        | Some _ -> false |> Expect.isTrue "can create dto with min and max"
-                        | None -> true |> Expect.isTrue "cannot set min > than max"
+                    test "MinIncrMax dto setting min and max" {
+                        // Add min and max to dto and there and back again
+                        let dto = dto ()
+                        dto.Min.Value <- [|1m|]
+                        dto.Min.Unit <- "mg"
+                        dto.Min.Group <- "mass"
+                        dto.HasMin <- true
+                        dto.MinIncl <- false
+                        dto.Max.Value <- [|2m|]
+                        dto.Max.Unit <- "g"
+                        dto.Max.Group <- "mass"
+                        dto.HasMax <- true
+                        dto
+                        |> Dto.fromDto
+                        |> function
+                            | Some _ -> true |> Expect.isTrue "can create dto with min and max"
+                            | None -> false |> Expect.isTrue "cannot set min and max"
+                    }
+
+                    test "MinIncrMax that is not valid will not return from dto" {
+                        let dto = dto ()
+
+                        dto.Min.Value <- [|1m|]
+                        dto.Min.Unit <- "g"
+                        dto.Min.Group <- "mass"
+                        dto.HasMin <- true
+                        dto.MinIncl <- false
+                        dto.Max.Value <- [|1m|]
+                        dto.Max.Unit <- "mg"
+                        dto.Max.Group <- "mass"
+                        dto.HasMax <- true
+                        dto
+                        |> Dto.fromDto
+                        |> Option.bind (Dto.toDto >> Some)
+                        |> function
+                            | Some _ -> false |> Expect.isTrue "can create dto with min and max"
+                            | None -> true |> Expect.isTrue "cannot set min > than max"
+                    }
+                ]
+
+
+
+    module PatientTests =
+
+        open FsCheck
+
+
+        module DepartmentTests =
+
+            let deps =
+                [
+                    (fun _ -> Department.any)
+                    (fun _ -> Department.unknown)
+                    Department.adultICU
+                    Department.pediatricICU
+                    Department.neonatalICU
+                    Department.adultDepartment
+                    Department.pediatricDepartment
+                ]
+
+            let tests = testList "Department" [
+                let noName = ""
+                let name = "Test"
+
+                for f in deps do
+                    test $"can create without a name {noName |> f}" {
+                        let s =
+                            noName
+                            |> f
+                            |> Department.toString
+                        s
+                        |> Department.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+
+                for f in deps do
+                    test $"can create with a name {name |> f}" {
+                        let s =
+                            name
+                            |> f
+                            |> Department.toString
+                        s
+                        |> Department.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+
+            ]
+
+
+        module EnteralAccessTests =
+
+            let enteralAccessGenerator n = 
+                Arb.generate<EnteralAccess>
+                |> Gen.sample 0 10
+
+            let samples = 
+                enteralAccessGenerator 10
+                |> List.mapi (fun i ea -> i, if ea = UnknownEnteral then "" else $"{ea}" |> String.toLower)
+
+            let tests = testList "EnteralAccess" [
+                for i, ea in samples do
+                    test $"{i} can create enteral access {ea}" {
+                        ea
+                        |> EnteralAccess.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+            
+                test "cannot create enteral access from xxx" {
+                    "xxx"
+                    |> EnteralAccess.fromString
+                    |> Expect.isError "should not be ok"
                 }
             ]
+
+
+        module VenousAccessTests =
+
+            let venousAccessGenerator n = 
+                Arb.generate<VenousAccess>
+                |> Gen.sample 0 10
+
+            let samples = 
+                venousAccessGenerator 10
+                |> List.mapi (fun i ea -> i, if ea = UnknownVenous then "" else $"{ea}" |> String.toLower)
+
+            let tests = testList "venousAccess" [
+                for i, va in samples do
+                    test $"{i} can create venous access {va}" {
+                        va
+                        |> VenousAccess.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+            
+                test "cannot create venous access from xxx" {
+                    "xxx"
+                    |> VenousAccess.fromString
+                    |> Expect.isError "should not be ok"
+                }
+            ]
+
+        module AgeTests =
+
+
+
+            let tests =
+                testList "AgeTests" [
+                    fun x ->
+                        let dto = AgeValue.Dto.dto ()
+                        dto.Years <- Some x
+
+                        dto
+                        |> AgeValue.Dto.fromDto
+                        |> function
+                            | Ok a ->
+                                a.Years.Value <= AgeValue.Validation.maxYear &&
+                                a.Years.Value >= 0<year>
+                            | Error _ -> true
+                    |> Generators.testProp "years should never be > 120 years"
+
+                    fun x ->
+                        let dto = AgeValue.Dto.dto ()
+                        dto.Months <- Some x
+
+                        dto
+                        |> AgeValue.Dto.fromDto
+                        |> function
+                            | Ok a ->
+                                a.Months.Value <= 11<month> &&
+                                a.Months.Value >= 0<month>
+                            | Error _ -> true
+                    |> Generators.testProp "months should never be > 11"
+
+                    fun x ->
+                        let dto = AgeValue.Dto.dto ()
+                        dto.Weeks <- Some x
+
+                        dto
+                        |> AgeValue.Dto.fromDto
+                        |> function
+                            | Ok a ->
+                                a.Weeks.Value <= 4<week> &&
+                                a.Weeks.Value >= 0<week>
+                            | Error _ -> true
+                    |> Generators.testProp "weeks should never be > 4"
+
+                    fun x ->
+                        let dto = AgeValue.Dto.dto ()
+                        dto.Days <- Some x
+
+                        dto
+                        |> AgeValue.Dto.fromDto
+                        |> function
+                            | Ok a ->
+                                a.Days.Value <= 6<day> &&
+                                a.Days.Value >= 0<day>
+                            | Error _ -> true
+                    |> Generators.testProp "days should never be > 6"
+
+
+                    fun y m w d ->
+                        let dto = AgeValue.Dto.dto ()
+                        dto.Days <- Some d
+                        dto.Weeks <- Some w
+                        dto.Months <- Some m
+                        dto.Years <- Some y
+
+                        dto
+                        |> AgeValue.Dto.fromDto
+                        |> function
+                            | Ok a ->
+                                let y, m, w, d = a |> AgeValue.get
+                                Calculations.Age.yearsMonthsWeeksToDaysOpt y m w d
+                                |> fun n -> n <= (Constants.daysInYear * 120 |> Conversions.dayFromInt)
+                            | Error _ -> true
+                    |> Generators.testProp "should never be > 120 years"
+                ]
+
+        module BirthDateTests =
+            open FsCheck
+
+
+            let intGenerator s n =
+                Gen.sample s n Arb.generate<int>
+
+
+            let tests = testList "BirthDate" [
+                test "should always return a valid date" {
+                    let ys = intGenerator 2200 100
+                    let ms = intGenerator 20 100
+                    let ds = intGenerator 40 100
+
+                    try
+                        [
+                            for y in ys do
+                                for m in ms do
+                                    for d in ds do
+                                        let dto = BirthDate.Dto.dto ()
+                                        dto.Year <- y
+                                        dto.Month <- Some m
+                                        dto.Day <- Some d
+
+                                        dto
+                        ]
+                        |> List.forall (fun dto ->
+                            match dto |> BirthDate.Dto.fromDto with
+                            | Ok ymd ->
+                                try
+                                    let y = ymd.Year |> int
+                                    let m = ymd.Month |> Option.defaultValue 1<month> |> int
+                                    let d = ymd.Day |> Option.defaultValue 1<day> |> int
+                                    DateTime(y, m, d) |> ignore
+                                    true
+                                with
+                                | _ ->
+                                    printfn $"cannot create datetime with {dto.Year}-{dto.Month}-{dto.Day}"
+                                    false
+                            | Error _ -> true
+
+                        )
+                    with
+                    | _ -> true
+                    |> Expect.isTrue "should never fail"
+                }
+
+                fun (dto : BirthDate.Dto.Dto) ->
+                    let y =
+                        intGenerator 2200 1
+                        |> List.filter (fun x -> x >= 1900)
+                    dto.Year <- y |> List.tryHead |> Option.defaultValue 2000
+
+                    dto
+                    |> BirthDate.Dto.fromDto
+                    |> function
+                        | Ok ymd1 ->
+
+                            ymd1
+                            |> BirthDate.Dto.toDto
+                            |> BirthDate.Dto.fromDto
+                            |>function
+                                | Ok ymd2 -> ymd2 = ymd1
+                                | Error _ -> false
+                        | Error _ ->
+                            true
+                |> testProperty "there and back again"
+
+                test "birthDay cannot be from person older than 120" {
+                    let dto = BirthDate.Dto.dto ()
+                    dto.Year <- (DateTime.Now |> DateTime.addYears -121).Year
+
+                    dto
+                    |> BirthDate.Dto.fromDto
+                    |> function
+                        | Ok ymd -> $"birthdate is too long ago: {ymd.Year}"
+                        | Error _ -> ""
+                    |> Expect.equal "should be an empty string" ""
+                }
+            ]
+
+
+        module WeightTests =
+
+            let tests = testList "Weight" [
+
+                test "value cannot exceed 300 kg" {
+                    let dto = WeightValue.Dto.dto ()
+                    dto.Weight <- 500m
+                    dto.WeightInKg <- true
+
+                    dto
+                    |> WeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "value cannot be less than 200 g" {
+                    let dto = WeightValue.Dto.dto ()
+                    dto.Weight <- 50m
+                    dto.WeightInKg <- false
+
+                    dto
+                    |> WeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "a weight at date cannot be in the future" {
+                    let dto = WeightAtDate.Dto.dto ()
+
+                    dto.WeightValue.Weight <- 10m
+                    dto.DateTime <- DateTime.Now.AddDays(7)
+
+                    dto
+                    |> WeightAtDate.Dto.fromDto
+                    |> function
+                    | Ok _ -> false
+                    | Error _ -> true
+                    |> Expect.isTrue "should not be in the future"
+                }
+
+            ]
+
+        module HeightTests =
+
+            let tests = testList "Height" [
+
+                test "value cannot exceed 3 m" {
+                    let dto = HeightValue.Dto.dto ()
+                    dto.Height <- 5m
+                    dto.HeightInMeter <- true
+
+                    dto
+                    |> HeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "value cannot be less than 20 cm" {
+                    let dto = HeightValue.Dto.dto ()
+                    dto.Height <- 10m
+                    dto.HeightInMeter <- false
+
+                    dto
+                    |> HeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+            ]
+
+        module AgeWeekDaysTests =
+
+            open AgeWeeksDays.Operators
+
+
+            let tests = testList "AgeWeekDays" [
+                test "weeks cannot exceed 52" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 53
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "doesn't exceed 52"
+                }
+
+                test "weeks cannot be less than 20" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 19
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "not less than 20"
+                }
+
+
+                test "days cannot exceed 6" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 37
+                    dto.Days <- 7
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "doesn't exceed 6"
+                }
+
+                test "preterm < fullterm" {
+                    AgeWeeksDays.preterm <? AgeWeeksDays.fullTerm
+                    |> Expect.isTrue "preturm should be < fullterm"
+                }
+
+                test "fullterm >= fullterm" {
+                    AgeWeeksDays.fullTerm >=? AgeWeeksDays.fullTerm
+                    |> Expect.isTrue "fullterm should be >= fullterm"
+                }
+
+                test "preterm <= preterm" {
+                    AgeWeeksDays.preterm <=? AgeWeeksDays.preterm
+                    |> Expect.isTrue "preturm should be <= preterm"
+                }
+
+            ]
+
+        let tests = testList "Patient tests" [
+
+            test "unknown patient" {
+                Patient.unknown
+                |> Patient.Dto.toDto
+                |> Patient.Dto.fromDto
+                |> function
+                    | Ok pat -> pat = Patient.unknown
+                    | Error errs ->
+                        printfn $"{errs}"
+                        false
+                |> Expect.isTrue "there and back again"
+            }
+
+            test "newborn patient" {
+                Patient.newBorn
+                |> Patient.Dto.toDto
+                |> Patient.Dto.fromDto
+                |> function
+                    | Ok pat -> pat = Patient.newBorn
+                    | Error errs ->
+                        printfn $"{errs}"
+                        false
+                |> Expect.isTrue "there and back again"
+            }
+
+
+        ]
+
+
+    [<Tests>]
+    let tests =
+
+        [
+            CalculationTests.tests
+            MinIncrMaxTests.tests
+            MinMaxTests.tests
+            MinMaxTests.DtoTests.tests
+            PatientTests.AgeTests.tests
+            PatientTests.BirthDateTests.tests
+            PatientTests.WeightTests.tests
+            PatientTests.HeightTests.tests
+            PatientTests.AgeWeekDaysTests.tests
+            PatientTests.EnteralAccessTests.tests
+            PatientTests.VenousAccessTests.tests
+            PatientTests.DepartmentTests.tests
+            PatientTests.tests
+        ]
+        |> List.skip 4
+//        |> List.take 1
+        |> testList "GenCore"
 
 
 open Expecto
 
 
-testList "GenCore" [
-
-    Tests.CalculationTests.tests
-    (*
-    Tests.MinIncrMaxTests.tests
-    Tests.MinMaxTests.tests
-    Tests.DtoTests.tests
-    *)
-]
+Tests.tests
 |> Expecto.run
 

@@ -19,8 +19,8 @@ and Limit = Inclusive of ValueUnit | Exclusive of ValueUnit
 and LimitIncr = LimitIncr of ValueUnit
 
 
-
 module Errors =
+
 
     type Msg<'TLimit, 'TIncr> =
         | MinLargerThanMax of min: 'TLimit * max: 'TLimit
@@ -698,6 +698,7 @@ module MinIncrMax =
                 | None -> None
                 | Some v -> v |> convert
         }
+
 
 
     /// Set the units of the `ValueUnit` values

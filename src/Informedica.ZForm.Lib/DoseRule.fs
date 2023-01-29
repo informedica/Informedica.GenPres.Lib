@@ -13,7 +13,8 @@ module DoseRule =
     open Informedica.GenUnits.Lib
 
     module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-
+    module Patient = Informedica.ZForm.Lib.Patient
+    
 
     /// Models a medication dose range with lower and upper limits
     /// * Norm : the 'normal' non adjusted upper and lower limits

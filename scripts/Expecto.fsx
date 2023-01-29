@@ -38,6 +38,13 @@ module Generators =
         }
 
 
+    let chooseFromList xs =
+        gen {
+           let! i = Gen.choose (0, List.length xs - 1)
+           return xs |> List.item i
+        }
+
+
     type BigRGenerator () =
         static member BigRational () =
             { new Arbitrary<BigRational>() with

@@ -28,28 +28,29 @@ module Measures =
 
 module Constants =
 
-    
 
     let [<Literal>] fullTerm = 40<week>
 
-
     let [<Literal>] premature = 37<week>
-
 
     let [<Literal>] daysInWeek = 7
 
-
     let [<Literal>] weeksInYear = 52
-
 
     let [<Literal>] monthsInYear = 12
 
-
     let [<Literal>] daysInYear = 365
+
+    let [<Literal>] kilo = 1000
+
+    let [<Literal>] centi = 100
+
 
 
 
 module Conversions =
+
+    open System
 
 
     let fromInt (one: int<_>) x = x * one
@@ -91,6 +92,11 @@ module Conversions =
     let meterFromDecimal x : decimal<m> = x |> fromDec 1m<m>
 
 
+    let kilo = decimal Constants.kilo
+
+    let centi = decimal Constants.centi
+
+
     let weeksToDays (weeks: int<week>) =
         weeks * Constants.daysInWeek
         |> int
@@ -98,8 +104,8 @@ module Conversions =
 
 
     let daysToWeeks (days: int<day>) =
-        (int days) / 7 |> weekFromInt,
-        (int days) % 7 |> weekFromInt
+        (int days) / Constants.daysInWeek |> weekFromInt,
+        (int days) % Constants.daysInWeek |> dayFromInt
 
 
     let intYearsToDays (years : int<year>) =
@@ -114,14 +120,54 @@ module Conversions =
         |> dayFromInt
 
 
-    let kgToGram (kg : decimal<kg>) =
-        (decimal kg / 1000m)
+    let deckgToDecGram (kg : decimal<kg>) =
+        (decimal kg * kilo)
         |> gramFromDecimal
 
 
-    let gramToKg (gram : int<gram>) =
-        (decimal gram) / 1000m
+    let intGramToDecKg (gram : int<gram>) =
+        (decimal gram) / kilo
         |> kgFromDecimal
+
+
+    let decKgToIntGram (kg : decimal<kg>) =
+        kg
+        |> deckgToDecGram
+        |> decimal
+        |> int
+        |> gramFromInt
+
+
+    let decMtoDecCm (m : decimal<m>) =
+        m * centi
+        |> decimal
+        |> cmFromDecimal
+
+
+    let decMtoIntCm (m : decimal<m>) =
+        m * centi
+        |> decimal
+        |> int
+        |> cmFromInt
+
+    
+    let inline intToString u1 u2 x =
+        let x = int x
+        match x with
+        | _ when x |> abs = 0 -> $"{x} {u1}"
+        | _ when x |> abs = 1 -> $"{x} {u1}"
+        | _ when x |> abs > 1 -> $"{x} {u2}"
+        | _ -> ""
+
+
+    let yearToString u1 u2 (y : int<year>) = intToString u1 u2 y 
+
+    let monthToString u1 u2 (m : int<month>) = intToString u1 u2 m
+
+    let weekToString u1 u2 (w : int<week>) = intToString u1 u2 w
+
+    let dayToString u1 u2 (d : int<day>) = intToString u1 u2 d
+
 
 
 

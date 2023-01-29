@@ -6,6 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Measures.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="Aether.fs" />
+    <Compile Include="Validus.fs" />
     <Compile Include="Calculations.fs" />
     <Compile Include="MinIncrMax.fs" />
     <Compile Include="Patient.fs" />

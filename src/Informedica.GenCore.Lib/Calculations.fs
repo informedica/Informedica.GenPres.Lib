@@ -20,12 +20,35 @@ module Calculations =
             d + dy + dm + dw
 
 
-        let fromBirthData bd dt =
+        let yearsMonthsWeeksToDaysOpt y m w d =
+            let y, m, w, d =
+                y |> Option.defaultValue 0<year>,
+                m |> Option.defaultValue 0<month>,
+                w |> Option.defaultValue 0<week>,
+                d |> Option.defaultValue 0<day>
+
+            yearsMonthsWeeksDaysToDays y m w d
+
+
+        let fromBirthDate bd dt =
             let y, m, w, d = DateTime.age bd dt
             y |> Conversions.yearFromInt,
             m |> Conversions.monthFromInt,
             w |> Conversions.weekFromInt,
             d |> Conversions.dayFromInt
+
+
+        let toBirthDate dt (ys : int<year>) (ms : int<month>) (ws : int<week>) (ds : int<day>) =
+            let ys = int ys * -1
+            let ms = int ms * -1
+            let ws = int ws * -1
+            let ds = int ds * -1
+
+            dt 
+            |> DateTime.addYears ys
+            |> DateTime.addMonths ms
+            |> DateTime.addWeeks ws
+            |> DateTime.addDays ds
 
 
         let adjustedAge (gestDays: int<day>) (gestWeeks: int<week>) dtBirth dtNow =
@@ -37,6 +60,40 @@ module Calculations =
         let postMenstrualAge (actAge: int<day>) (gestWeeks: int<week>) (gestDays: int<day>) =
             (gestWeeks |> Conversions.weeksToDays) + gestDays + actAge
             |> Conversions.daysToWeeks
+
+
+        let ageToString yrs mos wks dys =
+            let yToStr = Conversions.yearToString "year" "years"
+            let mToStr = Conversions.monthToString "month" "months"
+            let wToStr = Conversions.weekToString "week" "weeks"
+            let dToStr = Conversions.dayToString "day" "days"
+
+            [
+                yrs |> Option.map yToStr 
+                mos |> Option.map mToStr 
+                wks |> Option.map wToStr 
+                dys |> Option.map dToStr 
+            ]
+            |> List.choose id
+            |> List.filter String.notEmpty
+            |> String.concat ", "
+
+
+        let ageToStringNL yrs mos wks dys =
+            let yToStr = Conversions.yearToString "jaar" "jaar"
+            let mToStr = Conversions.monthToString "maand" "maanden"
+            let wToStr = Conversions.weekToString "week" "weeken"
+            let dToStr = Conversions.dayToString "dag" "dagen"
+
+            [
+                yrs |> Option.map yToStr 
+                mos |> Option.map mToStr 
+                wks |> Option.map wToStr 
+                dys |> Option.map dToStr 
+            ]
+            |> List.choose id
+            |> List.filter String.notEmpty
+            |> String.concat ", "
 
 
 
