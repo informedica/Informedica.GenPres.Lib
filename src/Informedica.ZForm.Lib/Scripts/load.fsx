@@ -18,7 +18,7 @@
 #load "../ValueUnit.fs"
 #load "../Route.fs"
 #load "../Product.fs"
-#load "../Patient.fs"
+#load "../PatientCategory.fs"
 #load "../DoseRule.fs"
 #load "../GStand.fs"
 #load "../Dto.fs"

@@ -380,31 +380,31 @@ module GStand =
 
 
     let getPatients (cfg : CreateConfig) (drs : ZIndexTypes.DoseRule seq) =
-        let map = mapMinMax<Patient>
+        let map = mapMinMax<PatientCategory>
 
         let ageInMo = Option.map ValueUnit.ageInMo
 
         let wghtKg = Option.map ValueUnit.weightInKg
 
         let mapAge =
-            map (ageInMo >> Patient.Optics.setInclMinAge)
-                (ageInMo >> Patient.Optics.setExclMaxAge)
+            map (ageInMo >> PatientCategory.Optics.setInclMinAge)
+                (ageInMo >> PatientCategory.Optics.setExclMaxAge)
 
         let mapWght =
-            map (wghtKg >> Patient.Optics.setInclMinWeight)
-                (wghtKg >> Patient.Optics.setInclMaxWeight)
+            map (wghtKg >> PatientCategory.Optics.setInclMinWeight)
+                (wghtKg >> PatientCategory.Optics.setInclMaxWeight)
 
         let mapGender s =
             match s with
             | _ when s = "man" -> Male
             | _ when s = "vrouw" -> Female
             | _ -> Undetermined
-            |> Patient.Optics.setGender //(Optic.set Patient.Gender_)
+            |> PatientCategory.Optics.setGender //(Optic.set Patient.Gender_)
 
         drs
         |> Seq.map (fun dr ->
             (dr.Indication ,
-             Patient.empty
+             PatientCategory.empty
              |> mapAge dr.Age
              |> mapWght dr.Weight
              |> mapGender dr.Gender) , dr
@@ -576,8 +576,6 @@ module GStand =
         | _ ->
             ds
             |> Seq.append (seq { yield d })
-
-
 
 
     // add indications, route, shape, patient and dosages

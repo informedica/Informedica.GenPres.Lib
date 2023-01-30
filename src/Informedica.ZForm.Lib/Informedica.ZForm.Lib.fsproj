@@ -13,7 +13,7 @@
     <Compile Include="ValueUnit.fs" />
     <Compile Include="Route.fs" />
     <Compile Include="Product.fs" />
-    <Compile Include="Patient.fs" />
+    <Compile Include="PatientCategory.fs" />
     <Compile Include="DoseRule.fs" />
     <Compile Include="GStand.fs" />
     <Compile Include="Dto.fs" />

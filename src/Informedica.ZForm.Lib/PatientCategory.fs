@@ -1,7 +1,7 @@
 ﻿namespace Informedica.ZForm.Lib
 
 
-module Patient =
+module PatientCategory =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
@@ -29,116 +29,116 @@ module Patient =
         module MinMax = MinIncrMax.Optics
 
 
-        let setGender = Optic.set Patient.Gender_
+        let setGender = Optic.set PatientCategory.Gender_
 
 
         let inclMinGestAge =
-            Patient.GestAge_ >-> MinMax.inclMinLens
+            PatientCategory.GestAge_ >-> MinMax.inclMinLens
 
 
         let setInclMinGestAge = Optic.set inclMinGestAge
 
 
         let exclMinGestAge =
-            Patient.GestAge_ >-> MinMax.exclMinLens
+            PatientCategory.GestAge_ >-> MinMax.exclMinLens
 
 
         let setExclMinGestAge = Optic.set exclMinGestAge
 
 
         let inclMaxGestAge =
-            Patient.GestAge_ >-> MinMax.inclMaxLens
+            PatientCategory.GestAge_ >-> MinMax.inclMaxLens
 
 
         let setInclMaxGestAge = Optic.set inclMaxGestAge
 
 
         let exclMaxGestAge =
-            Patient.GestAge_ >-> MinMax.exclMaxLens
+            PatientCategory.GestAge_ >-> MinMax.exclMaxLens
 
 
         let setExclMaxGestAge = Optic.set exclMaxGestAge
 
 
         let inclMinAge =
-            Patient.Age_ >-> MinMax.inclMinLens
+            PatientCategory.Age_ >-> MinMax.inclMinLens
 
 
         let setInclMinAge = Optic.set inclMinAge
 
 
         let exclMinAge =
-            Patient.Age_ >-> MinMax.exclMinLens
+            PatientCategory.Age_ >-> MinMax.exclMinLens
 
 
         let setExclMinAge = Optic.set exclMinAge
 
 
         let inclMaxAge =
-            Patient.Age_ >-> MinMax.inclMaxLens
+            PatientCategory.Age_ >-> MinMax.inclMaxLens
 
 
         let setInclMaxAge = Optic.set inclMaxAge
 
 
         let exclMaxAge =
-            Patient.Age_ >-> MinMax.exclMaxLens
+            PatientCategory.Age_ >-> MinMax.exclMaxLens
 
 
         let setExclMaxAge = Optic.set exclMaxAge
 
 
         let inclMinWeight =
-            Patient.Weight_ >-> MinMax.inclMinLens
+            PatientCategory.Weight_ >-> MinMax.inclMinLens
 
 
         let setInclMinWeight = Optic.set inclMinWeight
 
 
         let exclMinWeight =
-            Patient.Weight_ >-> MinMax.exclMinLens
+            PatientCategory.Weight_ >-> MinMax.exclMinLens
 
 
         let setExclMinWeight = Optic.set exclMinWeight
 
 
         let inclMaxWeight =
-            Patient.Weight_ >-> MinMax.inclMaxLens
+            PatientCategory.Weight_ >-> MinMax.inclMaxLens
 
 
         let setInclMaxWeight = Optic.set inclMaxWeight
 
 
         let exclMaxWeight =
-            Patient.Weight_ >-> MinMax.exclMaxLens
+            PatientCategory.Weight_ >-> MinMax.exclMaxLens
 
 
         let setExclMaxWeight = Optic.set exclMaxWeight
 
 
         let inclMinBSA =
-            Patient.BSA_ >-> MinMax.inclMinLens
+            PatientCategory.BSA_ >-> MinMax.inclMinLens
 
 
         let setInclMinBSA = Optic.set inclMinBSA
 
 
         let exclMinBSA =
-            Patient.BSA_ >-> MinMax.exclMinLens
+            PatientCategory.BSA_ >-> MinMax.exclMinLens
 
 
         let setExclMinBSA = Optic.set exclMinBSA
 
 
         let inclMaxBSA =
-            Patient.BSA_ >-> MinMax.inclMaxLens
+            PatientCategory.BSA_ >-> MinMax.inclMaxLens
 
 
         let setInclMaxBSA = Optic.set inclMaxBSA
 
 
         let exclMaxBSA =
-            Patient.BSA_ >-> MinMax.exclMaxLens
+            PatientCategory.BSA_ >-> MinMax.exclMaxLens
 
 
         let setExclMaxBSA = Optic.set exclMaxBSA

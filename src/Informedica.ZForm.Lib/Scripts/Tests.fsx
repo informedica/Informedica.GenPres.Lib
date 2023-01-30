@@ -68,7 +68,7 @@ module Tests =
 
     module PatientTests =
 
-        open Patient
+        open PatientCategory
 
         let processDto f dto =
             dto |> f
@@ -119,7 +119,7 @@ module Tests =
                 |> function
                 | None -> "false"
                 | Some p -> 
-                    p |> Patient.toString
+                    p |> PatientCategory.toString
                 |> Expect.equal "should be an empty string" ""    
             }
 
@@ -130,7 +130,7 @@ module Tests =
                 |> function
                 | None -> "false"
                 | Some p -> 
-                    p |> Patient.toString
+                    p |> PatientCategory.toString
                 |> Expect.equal "should be 'Leeftijd: van 1 mnd'" "Leeftijd: van 1 mnd"    
             }
 
@@ -141,7 +141,7 @@ module Tests =
                 |> function
                 | None -> "false"
                 | Some p -> 
-                    p |> Patient.toString
+                    p |> PatientCategory.toString
                 |> Expect.equal "should be an empty string" ""    
             }
 
@@ -152,7 +152,7 @@ module Tests =
                 |> function
                 | None -> "false"
                 | Some p -> 
-                    p |> Patient.toString
+                    p |> PatientCategory.toString
                 |> Expect.equal "should be an empty string" ""    
             }
 

@@ -13,7 +13,7 @@ module DoseRule =
     open Informedica.GenUnits.Lib
 
     module ValueUnit = Informedica.GenUnits.Lib.ValueUnit
-    module Patient = Informedica.ZForm.Lib.Patient
+    module PatientCategory = Informedica.ZForm.Lib.PatientCategory
     
 
     /// Models a medication dose range with lower and upper limits
@@ -1130,7 +1130,7 @@ module DoseRule =
 
             type Dto () =
                     // The patient group the doserules applies
-                    member val Patient = Patient.Dto.dto () with get, set
+                    member val Patient = PatientCategory.Dto.dto () with get, set
                     // List of shapes that have a dosage
                     member val ShapeDosage = Dosage.Dto.dto () with get, set
                     // List of substances that have a dosage
@@ -1141,7 +1141,7 @@ module DoseRule =
             let fromDto (dto : Dto) =
                 match
                     dto.Patient
-                    |> Patient.Dto.fromDto with
+                    |> PatientCategory.Dto.fromDto with
                 | None -> None
                 | Some p ->
                     p
@@ -1154,7 +1154,7 @@ module DoseRule =
             let toDto (pd : PatientDosage) =
                 let dto = dto ()
 
-                dto.Patient <- pd.Patient |> Patient.Dto.toDto
+                dto.Patient <- pd.Patient |> PatientCategory.Dto.toDto
                 dto.ShapeDosage <- pd.ShapeDosage |> Dosage.Dto.toDto
                 dto.SubstanceDosages <-
                     pd.SubstanceDosages
@@ -1554,7 +1554,7 @@ module DoseRule =
 
     module Optics =
 
-        module Patient = Patient.Optics
+        module Patient = PatientCategory.Optics
         module Dosage = Dosage.Optics
 
 
@@ -1881,7 +1881,7 @@ Synoniemen: {synonym}
 
                             let s =
                                 (config.PatientText
-                                 |> String.replace "{patient}" (pd.Patient |> Patient.toString)) +
+                                 |> String.replace "{patient}" (pd.Patient |> PatientCategory.toString)) +
                                 ("{dosage}"
                                  |> String.replace "{dosage}" (pd.ShapeDosage |> Dosage.toString printRules))
 

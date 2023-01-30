@@ -59,7 +59,7 @@ module Types =
             }
 
 
-        type Patient =
+        type PatientCategory =
             {
                 GestAge : MinMax
                 Age : MinMax
@@ -69,23 +69,23 @@ module Types =
             }
 
             static member GestAge_ :
-                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (PatientCategory -> MinMax) * (MinMax -> PatientCategory -> PatientCategory) =
                 (fun p -> p.GestAge), (fun a p -> { p with GestAge = a })
 
             static member Age_ :
-                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (PatientCategory -> MinMax) * (MinMax -> PatientCategory -> PatientCategory) =
                 (fun p -> p.Age), (fun a p -> { p with Age = a })
 
             static member Weight_ :
-                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (PatientCategory -> MinMax) * (MinMax -> PatientCategory -> PatientCategory) =
                 (fun p -> p.Weight), (fun w p -> { p with Weight = w })
 
             static member BSA_ :
-                (Patient -> MinMax) * (MinMax -> Patient -> Patient) =
+                (PatientCategory -> MinMax) * (MinMax -> PatientCategory -> PatientCategory) =
                 (fun p -> p.BSA), (fun b p -> { p with BSA = b })
 
             static member Gender_ :
-                (Patient -> Gender) * (Gender -> Patient -> Patient) =
+                (PatientCategory -> Gender) * (Gender -> PatientCategory -> PatientCategory) =
                 (fun p -> p.Gender), (fun g p -> { p with Gender = g })
 
         and Gender = Male | Female | Undetermined
@@ -219,14 +219,14 @@ module Types =
         type PatientDosage =
             {
                 // The patient group the doserules applies
-                Patient : Patient
+                Patient : PatientCategory
                 // List of shapes that have a dosage
                 ShapeDosage : Dosage
                 // List of substances that have a dosage
                 SubstanceDosages : Dosage list
             }
             static member Patient_ :
-                (PatientDosage -> Patient) * (Patient -> PatientDosage -> PatientDosage) =
+                (PatientDosage -> PatientCategory) * (PatientCategory -> PatientDosage -> PatientDosage) =
                 (fun pd -> pd.Patient) ,
                 (fun pat pd -> { pd with Patient = pat })
 
