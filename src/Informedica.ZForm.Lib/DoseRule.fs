@@ -9,7 +9,7 @@ module DoseRule =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Ranges
     open Informedica.GenUnits.Lib
 
     module ValueUnit = Informedica.GenUnits.Lib.ValueUnit

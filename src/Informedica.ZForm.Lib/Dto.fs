@@ -11,7 +11,7 @@ module Dto =
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
-    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Ranges
 
     module Dosage = DoseRule.Dosage
     module DoseRange = DoseRule.DoseRange

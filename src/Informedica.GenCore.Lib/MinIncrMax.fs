@@ -1,4 +1,4 @@
-namespace Informedica.GenCore.Lib
+namespace Informedica.GenCore.Lib.Ranges
 
 
 open Informedica.GenUnits.Lib

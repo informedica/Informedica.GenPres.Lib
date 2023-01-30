@@ -5,7 +5,7 @@ module Patient =
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
-    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Ranges
 
     open Aether
     open Aether.Operators

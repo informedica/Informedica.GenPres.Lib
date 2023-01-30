@@ -12,7 +12,7 @@ module GStand =
     open DoseRule
 
     open Informedica.GenUnits.Lib
-    open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Ranges
 
 
     module GPP = Informedica.ZIndex.Lib.GenPresProduct
