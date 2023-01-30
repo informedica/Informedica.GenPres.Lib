@@ -1006,33 +1006,6 @@ module MinIncrMax =
         | None, Some max_ ->
             (max_ |> maxToString)
 
-    //ToDo move to use case lib
-    let ageToString { Min = min; Max = max } =
-        let oneWk = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.week
-        let oneMo = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.month
-        let oneYr = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.year
-
-        let convert =
-            let c vu =
-                match vu with
-                | _ when vu <? oneWk -> vu >>= ValueUnit.Units.Time.day
-                | _ when vu <? oneMo -> vu >>= ValueUnit.Units.Time.week
-                | _ when vu <? oneYr -> vu >>= ValueUnit.Units.Time.month
-                | _ -> vu >>= ValueUnit.Units.Time.year
-            Option.bind (Limit.apply c c >> Some)
-
-        { Min = min |> convert; Incr = None; Max = max |> convert } |> toString "van " "van " "tot " "tot "
-
-
-    //ToDo move to use case lib
-    let gestAgeToString { Min = min; Max = max } =
-
-        let convert =
-            let c vu = vu >>= ValueUnit.Units.Time.week
-            Option.bind (Limit.apply c c >> Some)
-
-        { Min = min |> convert; Incr = None;  Max = max |> convert } |> toString "van " "van " "tot " "tot "
-
 
 
 /// Extension methods for the `Limit` type

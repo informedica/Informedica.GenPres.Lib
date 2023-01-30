@@ -356,43 +356,6 @@ module DoseRule =
                 }
 
 
-        module DoseRangeTests =
-
-            let (|>!) x f =
-                printfn $"%A{x}"
-                x |> f
-
-            let tests () =
-                let dto = Dto.dto ()
-
-                dto.Norm.HasMin <- true
-                dto.Norm.Min.Value <- [|1m|]
-                dto.Norm.Min.Unit <- "mg"
-                dto.Norm.Min.Group <- "mass"
-
-                dto.Norm.HasMax <- true
-                dto.Norm.Max.Value <- [|10m|]
-                dto.Norm.Max.Unit <- "mg"
-                dto.Norm.Max.Group <- "mass"
-
-                dto.NormWeight.HasMin <- true
-                dto.NormWeight.Min.Value <- [|0.01m|]
-                dto.NormWeight.Min.Unit <- "mg"
-                dto.NormWeight.Min.Group <- "mass"
-                dto.NormWeightUnit <- "kg"
-
-                dto.NormWeight.HasMax <- true
-                dto.NormWeight.Max.Value <- [|1m|]
-                dto.NormWeight.Max.Unit <- "mg"
-                dto.NormWeight.Max.Group <- "mass"
-                dto.NormWeightUnit <- "kg"
-
-                dto
-                |>! Dto.fromDto
-                |>! Dto.toDto
-                |>! Dto.fromDto
-                |>! ignore
-
 
     /// Models a drug dosage. For each combination
     /// of a drug, indication there is one dosage.
@@ -1995,18 +1958,3 @@ Synoniemen: {synonym}
             |> List.map IndicationDosage.Dto.fromDto
             |> create gen syn atc thg sub ggp gsg
 
-
-    module DoseRuleTests =
-
-        let (|>!) x f =
-            printfn $"%A{x}"
-            x |> f
-
-        let test () =
-
-            let dto = Dto.dto ()
-
-
-            dto
-            |>! Dto.fromDto
-            |>! ignore

@@ -32,6 +32,8 @@ module Tests =
 
     open Informedica.GenUnits.Lib
     open Informedica.GenCore.Lib
+    open Informedica.GenCore.Lib.Ranges
+    open Informedica.GenCore.Lib.Patients
 
     open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
@@ -359,12 +361,6 @@ module Tests =
             test "toString" {
                 toString()
                 |> Expect.equal "should equal" "van (incl) 1 mg - tot (incl) 10 mg"
-            }
-
-            test "ageToString" {
-                ageRange
-                |> MinIncrMax.ageToString
-                |> Expect.equal "should equal" "van 1 mnd - tot 1 jr"
             }
 
             testList "Validate" [
@@ -879,11 +875,15 @@ module Tests =
             }
 
             test "newborn patient" {
-                Patient.newBorn
+                let newBorn =
+                    NewBorn
+                    |> Patient.fromAgeType UnknownGender DateTime.Now
+                
+                newBorn
                 |> Patient.Dto.toDto
                 |> Patient.Dto.fromDto
                 |> function
-                    | Ok pat -> pat = Patient.newBorn
+                    | Ok pat -> pat = newBorn
                     | Error errs ->
                         printfn $"{errs}"
                         false

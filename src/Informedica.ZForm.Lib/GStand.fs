@@ -213,6 +213,63 @@ module GStand =
          gstdsr)
 
 
+    let getDosage cfg =
+        (fun ((n, _, _), _, inds, frs, gstdsrs, dr)  ->
+
+                let tu =
+                    match frs with
+                    | fr::_ ->
+                        match fr |> ValueUnit.get |> snd with
+                        | Unit.CombiUnit(_, OpPer, tu) -> tu
+                        | _ -> Unit.NoUnit
+                    | _ -> Unit.NoUnit
+
+                inds ,
+                DoseRule.Dosage.empty
+                |> Dosage.Optics.setName n
+                |> Dosage.Optics.setRules (gstdsrs |> List.map (DR.toString2 >> GStandRule))
+                |> (fun ds ->
+                    match tu with
+                    | _ when tu = Unit.NoUnit || (tu |> ValueUnit.isCountUnit) ->
+                        ds
+                        |> (Optic.set Dosage.StartDosage_ dr)
+
+                    | _ when cfg.IsRate &&
+                            frs |> List.length = 1 &&
+                            tu = ValueUnit.Units.Time.hour ->
+
+                        ds
+                        |> (Optic.set Dosage.RateDosage_ (dr, tu))
+                        |> (fun ds ->
+                            match cfg.TimeUnit with
+                            | Some u ->
+                                ds
+                                |> Dosage.convertRateUnitTo u
+                            | None -> ds
+                        )
+
+                    | _  ->
+                        let frs =
+                            let fr =
+                                frs
+                                |> List.collect (ValueUnit.getValue >> Array.toList)
+                                |> List.sort
+                            Dosage.createFrequency fr tu None
+
+                        ds
+                        |> (Optic.set Dosage.TotalDosage_ (dr, frs))
+                    // Perform unit conversion
+                    |> (fun ds ->
+                        match cfg.SubstanceUnit with
+                        | Some u ->
+                            ds
+                            |> Dosage.convertSubstanceUnitTo u
+                        | None -> ds
+
+                    )
+                ))
+
+
     let getSubstanceDoses (cfg : CreateConfig) (drs : ZIndexTypes.DoseRule seq) =
         // fold maximize with preservation of min
         let fold (mm : MinMax) (mm_ : MinMax) =
@@ -319,60 +376,7 @@ module GStand =
                 (calcNoneAndAdjusted w abs  absKg |> fst)
                 (calcNoneAndAdjusted w abs  absKg |> snd, ValueUnit.Units.Weight.kiloGram)
                 (calcNoneAndAdjusted b abs  absM2 |> snd, ValueUnit.Units.BSA.M2))
-        >> (fun ((n, _, _), rts, inds, frs, gstdsrs, dr)  ->
-
-            let tu =
-                match frs with
-                | fr::_ ->
-                    match fr |> ValueUnit.get |> snd with
-                    | Unit.CombiUnit(_, OpPer, tu) -> tu
-                    | _ -> Unit.NoUnit
-                | _ -> Unit.NoUnit
-
-            inds ,
-            DoseRule.Dosage.empty
-            |> Dosage.Optics.setName n
-            |> Dosage.Optics.setRules (gstdsrs |> List.map (DR.toString2 >> GStandRule))
-            |> (fun ds ->
-                match tu with
-                | _ when tu = Unit.NoUnit || (tu |> ValueUnit.isCountUnit) ->
-                    ds
-                    |> (Optic.set Dosage.StartDosage_ dr)
-
-                | _ when cfg.IsRate &&
-                         frs |> List.length = 1 &&
-                         tu = ValueUnit.Units.Time.hour ->
-
-                    ds
-                    |> (Optic.set Dosage.RateDosage_ (dr, tu))
-                    |> (fun ds ->
-                        match cfg.TimeUnit with
-                        | Some u ->
-                            ds
-                            |> Dosage.convertRateUnitTo u
-                        | None -> ds
-                    )
-
-                | _  ->
-                    let frs =
-                        let fr =
-                            frs
-                            |> List.collect (ValueUnit.getValue >> Array.toList)
-                            |> List.sort
-                        Dosage.createFrequency fr tu None
-
-                    ds
-                    |> (Optic.set Dosage.TotalDosage_ (dr, frs))
-                // Perform unit conversion
-                |> (fun ds ->
-                    match cfg.SubstanceUnit with
-                    | Some u ->
-                        ds
-                        |> Dosage.convertSubstanceUnitTo u
-                    | None -> ds
-
-                )
-            ))))
+        >> getDosage cfg))
 
 
     let getPatients (cfg : CreateConfig) (drs : ZIndexTypes.DoseRule seq) =
@@ -577,77 +581,76 @@ module GStand =
 
 
     // add indications, route, shape, patient and dosages
-    let addIndicationsRoutesShapePatientDosages =
-        fun (dr, inds) ->
-            inds
-            |> Seq.fold (fun acc ind ->
-                let ind, rts = ind
+    let addIndicationsRoutesShapePatientDosages (dr, inds) =
+        inds
+        |> Seq.fold (fun acc ind ->
+            let ind, rts = ind
+
+            let dr =
+                acc
+                |> DoseRule.addIndications ind
+
+            rts
+            |> Seq.fold (fun acc rt ->
+                let r, shps = rt
 
                 let dr =
                     acc
-                    |> DoseRule.addIndications ind
+                    |> DoseRule.Optics.addRoute ind r
 
-                rts
-                |> Seq.fold (fun acc rt ->
-                    let r, shps = rt
+                shps
+                |> Seq.fold (fun acc shp ->
+                    let (shp, gps, tps) , pats = shp
+
+                    let createGP = DoseRule.ShapeDosage.GenericProduct.create
+                    let createTP = DoseRule.ShapeDosage.TradeProduct.create
 
                     let dr =
                         acc
-                        |> DoseRule.Optics.addRoute ind r
+                        |> DoseRule.Optics.addShape ind r [shp]
+                        |> DoseRule.Optics.setGenericProducts
+                            ind r [shp]
+                            (gps
+                                |> Seq.toList
+                                |> List.map (fun (id, nm) -> createGP id nm)
+                                |> List.sortBy (fun gp -> gp.Label))
+                        |> DoseRule.Optics.setTradeProducts
+                            ind r [shp]
+                            (tps
+                                |> Seq.toList
+                                |> List.map (fun (id, nm) -> createTP id nm)
+                                |>  List.sortBy (fun hp -> hp.Label))
 
-                    shps
-                    |> Seq.fold (fun acc shp ->
-                        let (shp, gps, tps) , pats = shp
+                    pats
+                    |> Seq.fold (fun acc pat ->
+                        let pat, sds = pat
 
-                        let createGP = DoseRule.ShapeDosage.GenericProduct.create
-                        let createTP = DoseRule.ShapeDosage.TradeProduct.create
-
-                        let dr =
-                            acc
-                            |> DoseRule.Optics.addShape ind r [shp]
-                            |> DoseRule.Optics.setGenericProducts
-                                ind r [shp]
-                                (gps
-                                 |> Seq.toList
-                                 |> List.map (fun (id, nm) -> createGP id nm)
-                                 |> List.sortBy (fun gp -> gp.Label))
-                            |> DoseRule.Optics.setTradeProducts
-                                ind r [shp]
-                                (tps
-                                 |> Seq.toList
-                                 |> List.map (fun (id, nm) -> createTP id nm)
-                                 |>  List.sortBy (fun hp -> hp.Label))
-
-                        pats
-                        |> Seq.fold (fun acc pat ->
-                            let pat, sds = pat
-
-                            let sds =
-                                sds
-                                |> Seq.fold (fun acc sd ->
-                                    match acc
-                                          |> Seq.toList
-                                          |> List.filter (fun d -> d.Name = sd.Name) with
-                                    | [] -> acc |> Seq.append (seq { yield sd })
+                        let sds =
+                            sds
+                            |> Seq.fold (fun acc sd ->
+                                match acc
+                                        |> Seq.toList
+                                        |> List.filter (fun d -> d.Name = sd.Name) with
+                                | [] -> acc |> Seq.append (seq { yield sd })
+                                | ns ->
+                                    match ns
+                                            |> List.filter (fun d ->
+                                            d |> Dosage.Optics.getFrequencyTimeUnit = (sd |> Dosage.Optics.getFrequencyTimeUnit) ||
+                                            sd |> Dosage.Optics.getFrequencyValues = []
+                                            ) with
+                                    | [] -> acc |> Seq.append (seq {yield sd })
                                     | ns ->
-                                        match ns
-                                              |> List.filter (fun d ->
-                                                d |> Dosage.Optics.getFrequencyTimeUnit = (sd |> Dosage.Optics.getFrequencyTimeUnit) ||
-                                                sd |> Dosage.Optics.getFrequencyValues = []
-                                              ) with
-                                        | [] -> acc |> Seq.append (seq {yield sd })
-                                        | ns ->
-                                            acc |> mergeDosages sd
+                                        acc |> mergeDosages sd
 
-                                ) Seq.empty
+                            ) Seq.empty
 
-                            acc
-                            |> DoseRule.Optics.addPatient ind r [shp] pat
-                            |> DoseRule.Optics.setSubstanceDosages ind r [shp] pat (sds |> Seq.toList)
-                        ) dr
+                        acc
+                        |> DoseRule.Optics.addPatient ind r [shp] pat
+                        |> DoseRule.Optics.setSubstanceDosages ind r [shp] pat (sds |> Seq.toList)
                     ) dr
                 ) dr
             ) dr
+        ) dr
 
 
     let foldDoseRules rte age wght bsa gpk cfg =
@@ -692,7 +695,8 @@ module GStand =
                     )
                 )
             )
-        ) >> addIndicationsRoutesShapePatientDosages
+        ) 
+        >> addIndicationsRoutesShapePatientDosages
 
 
     let createDoseRules (cfg : CreateConfig) age wght bsa gpk gen shp rte =

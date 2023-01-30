@@ -344,11 +344,6 @@ module Tests =
                 |> Expect.equal "should equal" "van (incl) 1 mg - tot (incl) 10 mg"
             }
 
-            test "ageToString" {
-                ageRange
-                |> MinIncrMax.ageToString
-                |> Expect.equal "should equal" "van 1 mnd - tot 1 jr"
-            }
 
             testList "Validate" [
                 test "cannot set have limits with different unit groups" {

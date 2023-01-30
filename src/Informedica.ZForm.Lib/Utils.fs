@@ -9,7 +9,7 @@ module Utils =
     open System.Net.Http
     open Informedica.Utils.Lib.BCL
 
-
+    (*
     module List =
 
         open Informedica.Utils.Lib
@@ -18,7 +18,7 @@ module Utils =
 
 
 
-    module Csv =
+    module Csv_ =
 
 
         type DataType =
@@ -76,9 +76,48 @@ module Utils =
                 s.Split("")
                 |> Array.map (fun s -> s.Trim())
             )
+    *)
+
+    module MinIncrMax =
+
+        open MathNet.Numerics
+        
+        open Informedica.GenUnits.Lib
+        open Informedica.GenCore.Lib.Ranges
+
+
+        //ToDo move to use case lib
+        let ageToString { Min = min; Max = max } =
+            let oneWk = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.week
+            let oneMo = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.month
+            let oneYr = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.year
+
+            let convert =
+                let c vu =
+                    match vu with
+                    | _ when vu <? oneWk -> vu ==> ValueUnit.Units.Time.day
+                    | _ when vu <? oneMo -> vu ==> ValueUnit.Units.Time.week
+                    | _ when vu <? oneYr -> vu ==> ValueUnit.Units.Time.month
+                    | _ -> vu ==> ValueUnit.Units.Time.year
+                Option.bind (Limit.apply c c >> Some)
+
+            { Min = min |> convert; Incr = None; Max = max |> convert } |> MinIncrMax.toString "van " "van " "tot " "tot "
+
+
+        //ToDo move to use case lib
+        let gestAgeToString { Min = min; Max = max } =
+
+            let convert =
+                let c vu = vu ==> ValueUnit.Units.Time.week
+                Option.bind (Limit.apply c c >> Some)
+
+            { Min = min |> convert; Incr = None;  Max = max |> convert } |> MinIncrMax.toString "van " "van " "tot " "tot "
+
 
 
     module Web =
+
+        open Informedica.Utils.Lib
 
         let createUrl sheet id =
             $"https://docs.google.com/spreadsheets/d/{id}/gviz/tq?tqx=out:csv&sheet={sheet}"

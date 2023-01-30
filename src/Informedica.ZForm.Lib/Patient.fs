@@ -180,7 +180,7 @@ module Patient =
     module Dto =
 
         type Dto () =
-            member val GestAge = MinIncrMax.Dto.dto() with get ,set
+            member val GestAge = MinIncrMax.Dto.dto () with get ,set
             member val Age = MinIncrMax.Dto.dto () with get ,set
             member val Weight = MinIncrMax.Dto.dto () with get ,set
             member val BSA = MinIncrMax.Dto.dto () with get ,set
@@ -220,61 +220,4 @@ module Patient =
 
             | _ -> None
 
-    module PatientTests =
 
-        let tests () =
-
-            let (|>!) x f =
-                printfn "result: %A" x
-                x |> f
-
-            let dto = Dto.dto ()
-
-            dto
-            |> Dto.fromDto
-            |>! Option.bind (Dto.toDto >> Some)
-            |>! ignore
-
-            dto.Age.HasMin <- true
-            dto.Age.Min.Value <- [|1m|]
-            dto.Age.Min.Unit <- "maand"
-            dto.Age.Min.Group <- "Time"
-            dto.Age.Min.Language <- "dutch"
-            dto.Age.Min.Short <- true
-            dto.Age.MinIncl <- true
-
-            dto.Age
-            |> MinIncrMax.Dto.fromDto
-            |>! ignore
-
-            dto
-            |> Dto.fromDto
-            |>! ignore
-
-            // group defaults to general when no unit can be found in group
-            // ToDo: need to fix this behaviour
-            dto.Age.HasMin <- true
-            dto.Age.Min.Value <- [|1m|]
-            dto.Age.Min.Unit <- "m"
-            dto.Age.Min.Group <- "Time"
-            dto.Age.Min.Language <- "dutch"
-            dto.Age.Min.Short <- true
-            dto.Age.MinIncl <- true
-
-            dto.Age
-            |> MinIncrMax.Dto.fromDto
-            |>! ignore
-
-            // need to check for the correct units
-            // ToDo!!
-            dto.Age.HasMin <- true
-            dto.Age.Min.Value <- [|1m|]
-            dto.Age.Min.Unit <- "g"
-            dto.Age.Min.Group <- "Mass"
-            dto.Age.Min.Language <- "dutch"
-            dto.Age.Min.Short <- true
-            dto.Age.MinIncl <- true
-
-            dto.Age
-            |> MinIncrMax.Dto.fromDto
-            |>! ignore
