@@ -161,6 +161,9 @@
 # Informedica.GenOrder.Tests
 !/tests/Informedica.GenOrder.Tests/
 !/tests/Informedica.GenOrder.Tests/Scripts/
+# Informedica.GenCore.Tests
+!/tests/Informedica.GenCore.Tests/
+!/tests/Informedica.GenCore.Tests/Scripts/
 
 # Ignore generated documentation files
 /docs/content/**/*.md
