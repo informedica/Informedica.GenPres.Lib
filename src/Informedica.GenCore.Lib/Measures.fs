@@ -5,15 +5,17 @@ namespace Informedica.GenCore.Lib
 module Measures =
 
 
-    [<Measure>] type m2
-
     [<Measure>] type cm
 
     [<Measure>] type m
 
+    [<Measure>] type bsa = m^2
+
     [<Measure>] type kg
 
     [<Measure>] type gram
+
+    [<Measure>] type min
 
     [<Measure>] type day
 
@@ -22,6 +24,20 @@ module Measures =
     [<Measure>] type month
 
     [<Measure>] type year
+
+    [<Measure>] type mg
+
+    [<Measure>] type mL
+
+    [<Measure>] type dL
+
+    [<Measure>] type L
+
+    [<Measure>] type mmol
+
+    [<Measure>] type microMol
+
+    [<Measure>] type normalM2
 
 
 
@@ -45,7 +61,11 @@ module Constants =
 
     let [<Literal>] centi = 100
 
+    let [<Literal>] milli = 1000
 
+    let [<Literal>] micro = 1000000
+
+    let [<Literal>] deci = 10
 
 
 module Conversions =
@@ -53,10 +73,10 @@ module Conversions =
     open System
 
 
-    let fromInt (one: int<_>) x = x * one
+    let fromInt (one: int<_>) (x :int) = x * one
 
 
-    let fromDec (one: decimal<_>) x = x * one
+    let fromDecimal (one: decimal<_>) (x : decimal) = x * one
 
 
     let dayFromInt x : int<day> = x |> fromInt 1<day>
@@ -74,22 +94,31 @@ module Conversions =
     let gramFromInt x : int<gram> = x |> fromInt 1<gram>
 
 
-    let gramFromDecimal x : decimal<gram> = x |> fromDec 1m<gram>
+    let gramFromDecimal x : decimal<gram> = x |> fromDecimal 1m<gram>
 
 
-    let kgFromDecimal x : decimal<kg> = x |> fromDec 1m<kg>
+    let kgFromDecimal x : decimal<kg> = x |> fromDecimal 1m<kg>
 
 
     let cmFromInt x : int<cm> = x |> fromInt 1<cm>
 
 
-    let cmFromDecimal x : decimal<cm> = x |> fromDec 1m<cm>
+    let cmFromDecimal x : decimal<cm> = x |> fromDecimal 1m<cm>
 
 
     let meterFromInt x : int<m> = x |> fromInt 1<m>
 
 
-    let meterFromDecimal x : decimal<m> = x |> fromDec 1m<m>
+    let meterFromDecimal x : decimal<m> = x |> fromDecimal 1m<m>
+
+
+    let deciLiterFromDecimal x : decimal<dL> = x |> fromDecimal 1m<dL>
+
+
+    let milliLiterFromDecimal x : decimal<mL> = x |> fromDecimal 1m<mL>
+
+
+    let literFromDecimal x : decimal<L> = x |> fromDecimal 1m<L> 
 
 
     let kilo = decimal Constants.kilo
@@ -114,13 +143,13 @@ module Conversions =
         |> dayFromInt
 
 
-    let decYearsToDays (years : decimal<year>) =
+    let decimalYearsToIntDays (years : decimal<year>) =
         years * (decimal Constants.daysInYear)
         |> decimal |> int
         |> dayFromInt
 
 
-    let deckgToDecGram (kg : decimal<kg>) =
+    let decimalKgToDecimalGram (kg : decimal<kg>) =
         (decimal kg * kilo)
         |> gramFromDecimal
 
@@ -132,7 +161,7 @@ module Conversions =
 
     let decKgToIntGram (kg : decimal<kg>) =
         kg
-        |> deckgToDecGram
+        |> decimalKgToDecimalGram
         |> decimal
         |> int
         |> gramFromInt
@@ -169,5 +198,40 @@ module Conversions =
     let dayToString u1 u2 (d : int<day>) = intToString u1 u2 d
 
 
+    let milliLiterToLiter (x: decimal<mL>) =
+        x / (Constants.milli |> decimal)
+        |> decimal
+        |> literFromDecimal
 
+
+    let literToMilliLiter (x : decimal<L>) =
+        x * (Constants.milli |> decimal)
+        |> decimal
+        |> milliLiterFromDecimal
+
+
+    let deciLiterToLiter (x: decimal<dL>) =
+        x / (Constants.deci |> decimal)
+        |> decimal
+        |> literFromDecimal
+
+
+    let literToDeciLiter (x : decimal<dL>) =
+        x * (Constants.deci |> decimal)
+        |> decimal
+        |> deciLiterFromDecimal
+
+
+    module Creatinine =
+
+
+        let toMg = 88.42<microMol/L>
+
+        let toMicro = (1./toMg |> float) * (1.<mg/dL>)
+
+
+        let toMicroMolePerLiter (cr : float<mg/dL>) : float<microMol/L> = (cr  |> float) * toMg
+
+        let toMilliGramPerDeciLiter (cr : float<microMol/L>) : float<mg/dL> = (cr  |> float) * toMicro
+    
 

@@ -11,6 +11,7 @@ module Calculations =
 
     module Age =
 
+
         let yearsMonthsWeeksDaysToDays y (m : int<month>) w d =
             let dy, dm, dw =
                 y |> Conversions.intYearsToDays,
@@ -53,8 +54,9 @@ module Calculations =
 
         let adjustedAge (gestDays: int<day>) (gestWeeks: int<week>) dtBirth dtNow =
             let fullTerm = Constants.fullTerm |> Conversions.weeksToDays
-            let age = DateTime.dateDiffDays dtNow dtBirth |> Conversions.dayFromInt
-            age - (fullTerm - (gestDays + (gestWeeks |> Conversions.weeksToDays)))
+            let chronological = DateTime.dateDiffDays dtNow dtBirth |> Conversions.dayFromInt
+            let ageDiff = (fullTerm - (gestDays + (gestWeeks |> Conversions.weeksToDays)))
+            chronological - ageDiff
 
 
         let postMenstrualAge (actAge: int<day>) (gestWeeks: int<week>) (gestDays: int<day>) =
@@ -74,15 +76,13 @@ module Calculations =
                 wks |> Option.map wToStr 
                 dys |> Option.map dToStr 
             ]
-            |> List.choose id
-            |> List.filter String.notEmpty
-            |> String.concat ", "
+            |> List.map (Option.defaultValue "")
 
 
         let ageToStringNL yrs mos wks dys =
             let yToStr = Conversions.yearToString "jaar" "jaar"
             let mToStr = Conversions.monthToString "maand" "maanden"
-            let wToStr = Conversions.weekToString "week" "weeken"
+            let wToStr = Conversions.weekToString "week" "weken"
             let dToStr = Conversions.dayToString "dag" "dagen"
 
             [
@@ -91,7 +91,19 @@ module Calculations =
                 wks |> Option.map wToStr 
                 dys |> Option.map dToStr 
             ]
-            |> List.choose id
+            |> List.map (Option.defaultValue "")
+
+
+        let ageToStringNlShort yrs mos wks dys =
+            ageToStringNL yrs mos wks dys 
+            |> function
+            | [ys; ms; _; _] when ys |> String.notEmpty -> 
+                [ys; ms] 
+            | [_; ms; ws; _] when ms |> String.notEmpty -> 
+                [ms; ws] 
+            | [_; _; ws; ds] when ws |> String.notEmpty -> 
+                [ws; ds] 
+            | xs -> xs
             |> List.filter String.notEmpty
             |> String.concat ", "
 
@@ -124,7 +136,7 @@ module Calculations =
                         |> Decimal.fixPrecision p
                     | None -> x
 
-                x * 1m<m2>
+                x * 1m<bsa>
 
 
         let calcDuBois = calcBSA duBois
@@ -138,6 +150,173 @@ module Calculations =
         let calcFujimoto = calcBSA fujimoto
 
 
+    
+    module Renal =
+
+        
+        type Gender = Male | Female
+
+        
+        type Race = Black | Other
+
+        
+        type Creat = | MicroMole of float<microMol/L> | Milligram of float<mg/dL>
+
+        
+        type Cystatin = MilligramPerLiter of float<mg/L>
 
 
+        type RenalFunction = 
+            | Normal
+            | MildlyDecreased
+            | MildToModeratelyDecreased
+            | ModerateToSeverlyDecreased
+            | SeverelyDecreased
+            | KidneyFailure
+            | InvalidKidneyFunction of string
+
+
+        let normal = 90.<mL/min/normalM2>
+
+        let mild = 60.<mL/min/normalM2>
+
+        let moderate = 45.<mL/min/normalM2>
+
+        let severe = 30.<mL/min/normalM2>
+
+        let failure = 15.<mL/min/normalM2>
+
+
+        let renalFunction eGfr =
+            match eGfr with
+            | _ when eGfr >= normal -> Normal
+            | _ when eGfr >= mild -> MildlyDecreased
+            | _ when eGfr >= moderate -> MildToModeratelyDecreased
+            | _ when eGfr >= severe -> ModerateToSeverlyDecreased
+            | _ when eGfr >= failure -> SeverelyDecreased
+            | _ when eGfr < failure && eGfr >= 0.<mL/min/normalM2> -> KidneyFailure
+            | _ -> $"this {eGfr} is not valid" |> InvalidKidneyFunction
+        
+
+
+        let toMlMinNormBsa x = x * 1.<mL/min/normalM2>
+
+
+        let creatFormula (sCr: float<mg/dL>) (age : float<year>) alpha k a b =
+            let sCr = sCr |> float
+            let age = age |> float
+
+            141. * 
+            (([ sCr / k; 1. ] |> List.min) ** alpha) *
+            (([ sCr / k; 1. ] |> List.max) ** (-1.209)) *
+            (0.993 ** age) * a * b
+            |> toMlMinNormBsa
+
+
+        let calcCreatinine gend race age creat =
+            let sCr = 
+                match creat with
+                | Milligram v -> v
+                | MicroMole v -> v |> Conversions.Creatinine.toMilliGramPerDeciLiter
+            
+            let alpha, k, a =
+                match gend with
+                | Female -> -0.329, 0.7, 1.018
+                | Male -> -0.411, 0.9, 1.
+
+            let b = 
+                match race with
+                | Black -> 1.159
+                | Other -> 1.
+
+            creatFormula sCr age alpha k a b
+
+
+        let cystatinFormula (sCr : float<mg/dL>) (sCy : float<mg/L>) (age : float<year>) alpha k a b =
+            let sCr = sCr |> float
+            let sCy = sCy |> float
+            let age = age |> float
+
+            135. * 
+            (([ sCr / k; 1. ] |> List.min) ** alpha) *
+            (([ sCr / k; 1. ] |> List.max) ** -1.601) *
+            (([ sCy / 0.8; 1. ] |> List.min) ** -0.375) *
+            (([ sCy / 0.8; 1. ] |> List.max) ** -0.711) *
+            (0.995 ** age) * a * b
+            |> toMlMinNormBsa
+
+
+        let calcCystatin gend race age creat cystatin =
+            let sCr = 
+                match creat with
+                | Milligram v -> v
+                | MicroMole v -> v |> Conversions.Creatinine.toMilliGramPerDeciLiter
+            
+            let (MilligramPerLiter sCy) = cystatin
+
+            let alpha, k,  a =
+                match gend with
+                | Female -> -0.248, 0.7, 1.969
+                | Male -> -0.207, 0.9, 1.
+
+            let b = 
+                match race with
+                | Black -> 1.08
+                | Other -> 1.
+
+            cystatinFormula sCr sCy age alpha k a b
+
+
+
+        let cystatinOnlyFormula (sCy : float<mg/L>) (age : float<year>) a =
+            let sCy = sCy |> float
+            let age = age |> float
+
+            133. * 
+            (([ sCy / 0.8; 1. ] |> List.min) ** -0.4999) *
+            (([ sCy / 0.8; 1. ] |> List.max) ** -1.328) * 
+            (0.996 ** age) * a
+            |> toMlMinNormBsa
+
+
+
+        let calcCystatinOnly gend race age cystatin =            
+            let (MilligramPerLiter sCy) = cystatin
+
+            let a =
+                match gend with
+                | Female -> 1.969
+                | Male -> 1.
+
+            cystatinOnlyFormula sCy age a 
+
+
+
+        let mdrdFormula (sCr: float<mg/dL>) (age : float<year>) a b =
+            let sCr = sCr |> float
+            let age = age |> float
+
+            175. * 
+            (sCr ** -1.154) *
+            (age ** -0.203) * a * b
+            |> toMlMinNormBsa
+
+
+        let calcMDRD gend race age creat =
+            let sCr = 
+                match creat with
+                | Milligram v -> v
+                | MicroMole v -> v |> Conversions.Creatinine.toMilliGramPerDeciLiter
+
+            let a =
+                match gend with
+                | Female -> 0.742
+                | Male -> 1.
+
+            let b = 
+                match race with
+                | Black -> 1.212
+                | Other -> 1.
+
+            mdrdFormula sCr age a b
 

@@ -25,11 +25,11 @@ module Tests =
 
         let bsaCalcList =
             [
-                Calculations.BSA.duBois, "DuBois", 1.6949m<m2>
-                Calculations.BSA.fujimoto, "Fuijimoto", 1.6476m<m2>
-                Calculations.BSA.gehanAndGeorge, "Gehan and George", 1.6916m<m2>
-                Calculations.BSA.haycock, "Haycock", 1.6804m<m2>
-                Calculations.BSA.mosteller, "Mosteller", 1.6833m<m2>
+                Calculations.BSA.duBois, "DuBois", 1.6949m<bsa>
+                Calculations.BSA.fujimoto, "Fuijimoto", 1.6476m<bsa>
+                Calculations.BSA.gehanAndGeorge, "Gehan and George", 1.6916m<bsa>
+                Calculations.BSA.haycock, "Haycock", 1.6804m<bsa>
+                Calculations.BSA.mosteller, "Mosteller", 1.6833m<bsa>
             ]
 
 

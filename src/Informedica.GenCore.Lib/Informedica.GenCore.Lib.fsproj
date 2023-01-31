@@ -9,6 +9,7 @@
     <Compile Include="Aether.fs" />
     <Compile Include="Validus.fs" />
     <Compile Include="Calculations.fs" />
+    <Compile Include="ValueUnit.fs" />
     <Compile Include="MinIncrMax.fs" />
     <Compile Include="Patient.fs" />
     <None Include="Scripts\load.fsx" />

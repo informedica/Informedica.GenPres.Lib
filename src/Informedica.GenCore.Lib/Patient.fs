@@ -212,7 +212,7 @@ module AgeValue =
 
 
     let toString (av: AgeValue) =
-        Calculations.Age.ageToStringNL
+        Calculations.Age.ageToStringNlShort
             av.Years
             av.Months
             av.Weeks

@@ -44,11 +44,11 @@ module Tests =
 
         let bsaCalcList =
             [
-                Calculations.BSA.duBois, "DuBois", 1.6949m<m2>
-                Calculations.BSA.fujimoto, "Fuijimoto", 1.6476m<m2>
-                Calculations.BSA.gehanAndGeorge, "Gehan and George", 1.6916m<m2>
-                Calculations.BSA.haycock, "Haycock", 1.6804m<m2>
-                Calculations.BSA.mosteller, "Mosteller", 1.6833m<m2>
+                Calculations.BSA.duBois, "DuBois", 1.6949m<bsa>
+                Calculations.BSA.fujimoto, "Fuijimoto", 1.6476m<bsa>
+                Calculations.BSA.gehanAndGeorge, "Gehan and George", 1.6916m<bsa>
+                Calculations.BSA.haycock, "Haycock", 1.6804m<bsa>
+                Calculations.BSA.mosteller, "Mosteller", 1.6833m<bsa>
             ]
 
 
@@ -70,8 +70,42 @@ module Tests =
                 }
             ]
 
+            testList "renal function" [
+
+                test "renal function using creat" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.MicroMole
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Black
+                    printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCreatinine gend race age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 30.46
+                }
+
+                test "renal function using MDRD" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.MicroMole
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Black
+                    printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcMDRD gend race age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 30.30
+                }
+
+            ]
+
+            
+
         ]
 
+
+        
 
 
     module MinIncrMaxTests =
@@ -912,9 +946,10 @@ module Tests =
             PatientTests.DepartmentTests.tests
             PatientTests.tests
         ]
-        |> List.skip 4
-//        |> List.take 1
+//        |> List.skip 4
+        |> List.take 1
         |> testList "GenCore"
+
 
 
 open Expecto

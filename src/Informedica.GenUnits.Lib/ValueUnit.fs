@@ -524,6 +524,9 @@ module ValueUnit =
     let isCountUnit = Group.eqsGroup (1N |> Times |> Count)
 
 
+    let isSingleValue = getValue >> Array.length >> ((=) 1)
+
+
     let valueToBase u v = v |> Multipliers.toBase (u |> Multipliers.getMultiplier)
 
 
@@ -820,6 +823,7 @@ module ValueUnit =
         |> getValue
         |> fArr fValue
         |> create u
+
 
     let filterValues = applyToValues Array.filter
 
