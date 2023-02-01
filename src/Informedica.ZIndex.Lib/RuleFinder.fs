@@ -66,32 +66,6 @@ module RuleFinder =
             | Some min, Some max -> n >= min && n <= max
 
 
-    type PatientFilter =
-        {
-            Age: AgeInMo
-            Weight: WeightInKg
-            BSA: BSAInM2
-        }
-
-
-    type ProductFilter =
-        | GPKRoute of (int * string)
-        | GenericShapeRoute of GenericShapeRoute
-    and GenericShapeRoute =
-        {
-            Generic: string
-            Shape: string
-            Route: string
-        }
-
-
-    type Filter =
-        {
-            Patient: PatientFilter
-            Product: ProductFilter
-        }
-
-
     let filter =
         {
             Patient = { Age = None; Weight = None; BSA = None }

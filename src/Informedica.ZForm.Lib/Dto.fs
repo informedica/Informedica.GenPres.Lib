@@ -319,7 +319,7 @@ module Dto =
                     dto.RateUnit
                     |> ValueUnit.unitFromAppString
 
-            let cfg : GStand.CreateConfig =
+            let cfg : CreateConfig =
                 {
                     UseAll = true
                     IsRate = dto.IsRate
