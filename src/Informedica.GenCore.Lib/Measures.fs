@@ -224,14 +224,24 @@ module Conversions =
 
     module Creatinine =
 
+        let kMicroMolePerLiter = 88.42<microMol/L>
 
-        let toMg = 88.42<microMol/L>
-
-        let toMicro = (1./toMg |> float) * (1.<mg/dL>)
+        let kMilliGramPerDeciLiter = (1./kMicroMolePerLiter |> float) * (1.<mg/dL>)
 
 
-        let toMicroMolePerLiter (cr : float<mg/dL>) : float<microMol/L> = (cr  |> float) * toMg
+        let toMicroMolePerLiter (cr : float<mg/dL>) : float<microMol/L> = (cr  |> float) * kMicroMolePerLiter
 
-        let toMilliGramPerDeciLiter (cr : float<microMol/L>) : float<mg/dL> = (cr  |> float) * toMicro
+        let toMilliGramPerDeciLiter (cr : float<microMol/L>) : float<mg/dL> = (cr  |> float) * kMilliGramPerDeciLiter
     
 
+    module Urea =
+
+        let kMilliGramPerDeciLiter = 1. / 0.3571 * (1.<mg/dL>)
+
+        let kMilliMolePerLiter = 0.3571 * (1.<mmol/L>)
+
+
+        let toMilliMolePerLiter (urea : float<mg/dL>) = (urea |> float) * kMilliMolePerLiter
+
+
+        let toMilliGramPerDeciLiter (urea : float<mmol/L>) = (urea |> float) * kMilliGramPerDeciLiter

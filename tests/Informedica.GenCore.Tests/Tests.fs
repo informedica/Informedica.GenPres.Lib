@@ -2,6 +2,7 @@ namespace Informedica.GenCore.Tests
 
 
 
+
 module Tests =
 
     open System
@@ -51,8 +52,113 @@ module Tests =
                 }
             ]
 
+            testList "renal function" [
+
+                test "renal function using creat 2009 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Black
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCreatinine09 gend race age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 30.46
+                }
+
+                test "renal function using creat 2021 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCreatinine21 gend age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 28.
+                }
+
+                test "renal function using cystatin creatinine 2012 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Other
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatinCreatinine12 gend race age creat cystatin
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 32.99
+                }
+
+                test "renal function using cystatin creatinine 2021 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatinCreatinine21 gend age creat cystatin
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 36.
+                }
+
+                test "renal function using cystatin only formula" {
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatin12 gend age cystatin
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 43.
+                }
+
+                test "renal function using MDRD" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Black
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcMDRD gend race age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 30.30
+                }
+
+                test "renal function using pediatric Schwartz" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let height = 100.<cm>
+                    Calculations.Renal.calcPediatricScharz height creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 20.171
+                }
+
+                test "renal function using KCID" {
+                    let creat = 
+                        100.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    // printfn $"{100.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    let cyst = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let bun = 15.<mmol/L> |> Calculations.Renal.UreaMilliMolePerLiter
+                    // printfn $"{15.<mmol/L> |> Conversions.Urea.toMilliGramPerDeciLiter}"
+                    let height = 1.<m>
+                    Calculations.Renal.calcPediatricCystatinCreatinineCKID Calculations.Renal.Male height creat cyst bun
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 40.
+                }
+
+            ]
+
         ]
 
+
+        
 
 
     module MinIncrMaxTests =
@@ -344,7 +450,6 @@ module Tests =
                 |> Expect.equal "should equal" "van (incl) 1 mg - tot (incl) 10 mg"
             }
 
-
             testList "Validate" [
                 test "cannot set have limits with different unit groups" {
                     { ageRange with
@@ -448,6 +553,101 @@ module Tests =
 
     module PatientTests =
 
+        open FsCheck
+
+
+        module DepartmentTests =
+
+            let deps =
+                [
+                    (fun _ -> Department.any)
+                    (fun _ -> Department.unknown)
+                    Department.adultICU
+                    Department.pediatricICU
+                    Department.neonatalICU
+                    Department.adultDepartment
+                    Department.pediatricDepartment
+                ]
+
+            let tests = testList "Department" [
+                let noName = ""
+                let name = "Test"
+
+                for f in deps do
+                    test $"can create without a name {noName |> f}" {
+                        let s =
+                            noName
+                            |> f
+                            |> Department.toString
+                        s
+                        |> Department.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+
+                for f in deps do
+                    test $"can create with a name {name |> f}" {
+                        let s =
+                            name
+                            |> f
+                            |> Department.toString
+                        s
+                        |> Department.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+
+            ]
+
+
+        module EnteralAccessTests =
+
+            let enteralAccessGenerator n = 
+                Arb.generate<EnteralAccess>
+                |> Gen.sample 0 10
+
+            let samples = 
+                enteralAccessGenerator 10
+                |> List.mapi (fun i ea -> i, if ea = UnknownEnteral then "" else $"{ea}" |> String.toLower)
+
+            let tests = testList "EnteralAccess" [
+                for i, ea in samples do
+                    test $"{i} can create enteral access {ea}" {
+                        ea
+                        |> EnteralAccess.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+            
+                test "cannot create enteral access from xxx" {
+                    "xxx"
+                    |> EnteralAccess.fromString
+                    |> Expect.isError "should not be ok"
+                }
+            ]
+
+
+        module VenousAccessTests =
+
+            let venousAccessGenerator n = 
+                Arb.generate<VenousAccess>
+                |> Gen.sample 0 10
+
+            let samples = 
+                venousAccessGenerator 10
+                |> List.mapi (fun i ea -> i, if ea = UnknownVenous then "" else $"{ea}" |> String.toLower)
+
+            let tests = testList "venousAccess" [
+                for i, va in samples do
+                    test $"{i} can create venous access {va}" {
+                        va
+                        |> VenousAccess.fromString
+                        |> Expect.isOk "should be ok"
+                    }
+            
+                test "cannot create venous access from xxx" {
+                    "xxx"
+                    |> VenousAccess.fromString
+                    |> Expect.isError "should not be ok"
+                }
+            ]
 
         module AgeTests =
 
@@ -476,10 +676,10 @@ module Tests =
                         |> AgeValue.Dto.fromDto
                         |> function
                             | Ok a ->
-                                a.Months.Value <= 12<month> &&
+                                a.Months.Value <= 11<month> &&
                                 a.Months.Value >= 0<month>
                             | Error _ -> true
-                    |> Generators.testProp "months should never be > 12"
+                    |> Generators.testProp "months should never be > 11"
 
                     fun x ->
                         let dto = AgeValue.Dto.dto ()
@@ -502,10 +702,10 @@ module Tests =
                         |> AgeValue.Dto.fromDto
                         |> function
                             | Ok a ->
-                                a.Days.Value <= 7<day> &&
+                                a.Days.Value <= 6<day> &&
                                 a.Days.Value >= 0<day>
                             | Error _ -> true
-                    |> Generators.testProp "days should never be > 7"
+                    |> Generators.testProp "days should never be > 6"
 
 
                     fun y m w d ->
@@ -526,15 +726,15 @@ module Tests =
                     |> Generators.testProp "should never be > 120 years"
                 ]
 
-        module YearMonthDayTests =
+        module BirthDateTests =
             open FsCheck
-            open Microsoft.VisualBasic.CompilerServices
+
 
             let intGenerator s n =
                 Gen.sample s n Arb.generate<int>
 
 
-            let tests = testList "YearMonthDay" [
+            let tests = testList "BirthDate" [
                 test "should always return a valid date" {
                     let ys = intGenerator 2200 100
                     let ms = intGenerator 20 100
@@ -583,7 +783,6 @@ module Tests =
                     |> BirthDate.Dto.fromDto
                     |> function
                         | Ok ymd1 ->
-                            let s = $"{dto.Year}-{dto.Month |> Option.defaultValue 1}-{dto.Day |> Option.defaultValue 1}"
 
                             ymd1
                             |> BirthDate.Dto.toDto
@@ -594,7 +793,192 @@ module Tests =
                         | Error _ ->
                             true
                 |> testProperty "there and back again"
+
+                test "birthDay cannot be from person older than 120" {
+                    let dto = BirthDate.Dto.dto ()
+                    dto.Year <- (DateTime.Now |> DateTime.addYears -121).Year
+
+                    dto
+                    |> BirthDate.Dto.fromDto
+                    |> function
+                        | Ok ymd -> $"birthdate is too long ago: {ymd.Year}"
+                        | Error _ -> ""
+                    |> Expect.equal "should be an empty string" ""
+                }
             ]
+
+
+        module WeightTests =
+
+            let tests = testList "Weight" [
+
+                test "value cannot exceed 300 kg" {
+                    let dto = WeightValue.Dto.dto ()
+                    dto.Weight <- 500m
+                    dto.WeightInKg <- true
+
+                    dto
+                    |> WeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "value cannot be less than 200 g" {
+                    let dto = WeightValue.Dto.dto ()
+                    dto.Weight <- 50m
+                    dto.WeightInKg <- false
+
+                    dto
+                    |> WeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "a weight at date cannot be in the future" {
+                    let dto = WeightAtDate.Dto.dto ()
+
+                    dto.WeightValue.Weight <- 10m
+                    dto.DateTime <- DateTime.Now.AddDays(7)
+
+                    dto
+                    |> WeightAtDate.Dto.fromDto
+                    |> function
+                    | Ok _ -> false
+                    | Error _ -> true
+                    |> Expect.isTrue "should not be in the future"
+                }
+
+            ]
+
+        module HeightTests =
+
+            let tests = testList "Height" [
+
+                test "value cannot exceed 3 m" {
+                    let dto = HeightValue.Dto.dto ()
+                    dto.Height <- 5m
+                    dto.HeightInMeter <- true
+
+                    dto
+                    |> HeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+                test "value cannot be less than 20 cm" {
+                    let dto = HeightValue.Dto.dto ()
+                    dto.Height <- 10m
+                    dto.HeightInMeter <- false
+
+                    dto
+                    |> HeightValue.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "should not be created"
+                }
+
+            ]
+
+        module AgeWeekDaysTests =
+
+            open AgeWeeksDays.Operators
+
+
+            let tests = testList "AgeWeekDays" [
+                test "weeks cannot exceed 52" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 53
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "doesn't exceed 52"
+                }
+
+                test "weeks cannot be less than 20" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 19
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "not less than 20"
+                }
+
+
+                test "days cannot exceed 6" {
+                    let dto = AgeWeeksDays.Dto.dto ()
+
+                    dto.Weeks <- 37
+                    dto.Days <- 7
+                    dto
+                    |> AgeWeeksDays.Dto.fromDto
+                    |> function
+                        | Ok _ -> false
+                        | Error _ -> true
+                    |> Expect.isTrue "doesn't exceed 6"
+                }
+
+                test "preterm < fullterm" {
+                    AgeWeeksDays.preterm <? AgeWeeksDays.fullTerm
+                    |> Expect.isTrue "preturm should be < fullterm"
+                }
+
+                test "fullterm >= fullterm" {
+                    AgeWeeksDays.fullTerm >=? AgeWeeksDays.fullTerm
+                    |> Expect.isTrue "fullterm should be >= fullterm"
+                }
+
+                test "preterm <= preterm" {
+                    AgeWeeksDays.preterm <=? AgeWeeksDays.preterm
+                    |> Expect.isTrue "preturm should be <= preterm"
+                }
+
+            ]
+
+        let tests = testList "Patient tests" [
+
+            test "unknown patient" {
+                Patient.unknown
+                |> Patient.Dto.toDto
+                |> Patient.Dto.fromDto
+                |> function
+                    | Ok pat -> pat = Patient.unknown
+                    | Error errs ->
+                        printfn $"{errs}"
+                        false
+                |> Expect.isTrue "there and back again"
+            }
+
+            test "newborn patient" {
+                let newBorn =
+                    NewBorn
+                    |> Patient.fromAgeType UnknownGender DateTime.Now
+                
+                newBorn
+                |> Patient.Dto.toDto
+                |> Patient.Dto.fromDto
+                |> function
+                    | Ok pat -> pat = newBorn
+                    | Error errs ->
+                        printfn $"{errs}"
+                        false
+                |> Expect.isTrue "there and back again"
+            }
+
+
+        ]
 
 
     [<Tests>]
@@ -606,8 +990,17 @@ module Tests =
             MinMaxTests.tests
             MinMaxTests.DtoTests.tests
             PatientTests.AgeTests.tests
-            PatientTests.YearMonthDayTests.tests
+            PatientTests.BirthDateTests.tests
+            PatientTests.WeightTests.tests
+            PatientTests.HeightTests.tests
+            PatientTests.AgeWeekDaysTests.tests
+            PatientTests.EnteralAccessTests.tests
+            PatientTests.VenousAccessTests.tests
+            PatientTests.DepartmentTests.tests
+            PatientTests.tests
         ]
-        //|> List.skip 5
+        //|> List.skip 4
         //|> List.take 1
         |> testList "GenCore"
+
+

@@ -18,6 +18,8 @@ module MeasureScripts =
     3.<mg/dL> |> Conversions.Creatinine.toMicroMolePerLiter
               |> Conversions.Creatinine.toMilliGramPerDeciLiter
 
+    1.<mg/dL> |> Conversions.Urea.toMilliMolePerLiter
+    1.<mmol/L> |> Conversions.Urea.toMilliGramPerDeciLiter
 
 
 module PatientScripts =

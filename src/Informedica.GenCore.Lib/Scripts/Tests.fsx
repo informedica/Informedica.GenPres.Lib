@@ -72,35 +72,106 @@ module Tests =
 
             testList "renal function" [
 
-                test "renal function using creat" {
+                test "renal function using creat 2009 formula" {
                     let creat = 
                         181.<microMol/L>
-                        |> Calculations.Renal.MicroMole
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
                     let age = 57.<year>
                     let gend = Calculations.Renal.Female
                     let race = Calculations.Renal.Black
-                    printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
-                    Calculations.Renal.calcCreatinine gend race age creat
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCreatinine09 gend race age creat
                     |> float
                     |> Expect.floatClose "" Accuracy.low 30.46
+                }
+
+                test "renal function using creat 2021 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCreatinine21 gend age creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 28.
+                }
+
+                test "renal function using cystatin creatinine 2012 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    let race = Calculations.Renal.Other
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatinCreatinine12 gend race age creat cystatin
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 32.99
+                }
+
+                test "renal function using cystatin creatinine 2021 formula" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatinCreatinine21 gend age creat cystatin
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 36.
+                }
+
+                test "renal function using cystatin only formula" {
+                    let cystatin = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let age = 57.<year>
+                    let gend = Calculations.Renal.Female
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    Calculations.Renal.calcCystatin12 gend age cystatin
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 43.
                 }
 
                 test "renal function using MDRD" {
                     let creat = 
                         181.<microMol/L>
-                        |> Calculations.Renal.MicroMole
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
                     let age = 57.<year>
                     let gend = Calculations.Renal.Female
                     let race = Calculations.Renal.Black
-                    printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    // printfn $"{181.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
                     Calculations.Renal.calcMDRD gend race age creat
                     |> float
                     |> Expect.floatClose "" Accuracy.low 30.30
                 }
 
-            ]
+                test "renal function using pediatric Schwartz" {
+                    let creat = 
+                        181.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    let height = 100.<cm>
+                    Calculations.Renal.calcPediatricScharz height creat
+                    |> float
+                    |> Expect.floatClose "" Accuracy.low 20.171
+                }
 
-            
+                test "renal function using KCID" {
+                    let creat = 
+                        100.<microMol/L>
+                        |> Calculations.Renal.CreatinineMicroMolePerLiter
+                    // printfn $"{100.<microMol/L> |>  Conversions.Creatinine.toMilliGramPerDeciLiter} mg/dl"
+                    let cyst = 1.5<mg/L> |> Calculations.Renal.CystatinMilligramPerLiter
+                    let bun = 15.<mmol/L> |> Calculations.Renal.UreaMilliMolePerLiter
+                    // printfn $"{15.<mmol/L> |> Conversions.Urea.toMilliGramPerDeciLiter}"
+                    let height = 1.<m>
+                    Calculations.Renal.calcPediatricCystatinCreatinineCKID Calculations.Renal.Male height creat cyst bun
+                    |> float |> Double.fixPrecision 2
+                    |> Expect.floatClose "" Accuracy.low 40.
+                }
+
+            ]
 
         ]
 
@@ -946,8 +1017,8 @@ module Tests =
             PatientTests.DepartmentTests.tests
             PatientTests.tests
         ]
-//        |> List.skip 4
-        |> List.take 1
+        //|> List.skip 4
+        //|> List.take 1
         |> testList "GenCore"
 
 
