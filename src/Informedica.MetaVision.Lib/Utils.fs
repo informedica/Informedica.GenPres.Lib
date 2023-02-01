@@ -14,6 +14,21 @@ module Utils =
     open Informedica.ZIndex.Lib
 
 
+    module Web =
+
+
+        // Constraints spreadsheet
+        //https://docs.google.com/spreadsheets/d/1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g/edit?usp=sharing
+        [<Literal>]
+        let dataUrlId = "1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g"
+
+
+        let download = Web.GoogleSheets.download
+
+
+        let getDataFromSheet sheet = Web.GoogleSheets.getDataFromSheet dataUrlId sheet
+
+
 
     [<RequireQualifiedAccess>]
     module Array =

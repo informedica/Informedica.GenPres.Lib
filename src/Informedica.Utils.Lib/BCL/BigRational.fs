@@ -371,3 +371,10 @@ module BigRational =
     let minInclMultipleOf = calcMinOrMaxToMultiple false true
 
     let minExclMultipleOf = calcMinOrMaxToMultiple false false
+
+
+    let toStringNl (br : BigRational) =
+        if br.Denominator = 1I then
+            br |> BigRational.ToInt32 |> Int32.toStringNumberNL
+        else
+            br |> toFloat |> Double.toStringNumberNLWithoutTrailingZeros

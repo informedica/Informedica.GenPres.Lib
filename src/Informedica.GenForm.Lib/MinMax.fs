@@ -4,6 +4,8 @@ namespace Informedica.GenForm.Lib
 
 module MinMax =
 
+    open Informedica.Utils.Lib.BCL
+
 
     let fromTuple (min, max) =
         {

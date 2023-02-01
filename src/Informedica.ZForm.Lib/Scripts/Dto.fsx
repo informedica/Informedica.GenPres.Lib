@@ -44,9 +44,9 @@ GenPresProduct.get true
 |> Seq.map (fun (gen, id, rt) ->
     printfn "processing %i" id
     {   Dto.dto with
-            AgeInMo = 300.
-            WeightKg = 80.
-            LengthCm = 180.
+            AgeInMo = 300m
+            WeightKg = 80m
+            HeightCm = 180m
             GPK = id
             Route = rt
             IsRate = false
@@ -77,9 +77,9 @@ GenPresProduct.get true
 |> Seq.map (fun (gen, id, rt) ->
     printfn "%s" gen
     {   Dto.dto with
-            AgeInMo = 300.
-            WeightKg = 80.
-            LengthCm = 180.
+            AgeInMo = 300m
+            WeightKg = 80m
+            HeightCm = 180m
             GPK = id
             Route = rt
             IsRate = false
@@ -266,8 +266,8 @@ GenPresProduct.get true
 
 
 { Dto.dto with
-    AgeInMo = 240.
-    WeightKg = 30.
+    AgeInMo = 240m
+    WeightKg = 30m
     GPK = 00161527
 }
 |> Dto.processDto
@@ -283,5 +283,3 @@ RuleFinder.createFilter None None None (Some 00161527) "" "" ""
 |> Array.map DoseRule.toString2
 
 
-
-Mapping.MappingTests.tests ()

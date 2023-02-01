@@ -33,7 +33,7 @@ module Dto =
         {
             AgeInMo : decimal
             WeightKg : decimal
-            HeigthCm : decimal
+            HeightCm : decimal
             BSAInM2 : decimal
             Gender : string
             BirthWeightGram : decimal
@@ -108,7 +108,7 @@ module Dto =
         {
             AgeInMo = 0m
             WeightKg = 0m
-            HeigthCm = 0m
+            HeightCm = 0m
             BSAInM2 = 0m
             Gender = ""
             BirthWeightGram = 0m
@@ -292,12 +292,12 @@ module Dto =
         let dto =
             if dto.BSAInM2 > 0m then dto
             else
-                if dto.HeigthCm > 0m && dto.WeightKg > 0m then
+                if dto.HeightCm > 0m && dto.WeightKg > 0m then
                     {
                         dto with
                             BSAInM2 =
                                 // (w / (l  ** 2.)) |> Some
-                                dto.WeightKg / (((dto.HeigthCm |> float) ** 2.) |> decimal)
+                                dto.WeightKg / (((dto.HeightCm |> float) ** 2.) |> decimal)
                     }
                 else
                     dto

@@ -3,6 +3,7 @@ namespace Informedica.GenForm.Lib
 
 module Mapping =
 
+    open Informedica.Utils.Lib
     open Informedica.Utils.Lib.BCL
 
 

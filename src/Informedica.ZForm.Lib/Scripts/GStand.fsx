@@ -5,15 +5,14 @@
 open Informedica.ZForm.Lib
 
 
-type Config = GStand.CreateConfig
 
 
 let config =
     {
-        Config.UseAll = true
-        Config.IsRate = false
-        Config.SubstanceUnit = None
-        Config.TimeUnit = None
+        UseAll = true
+        IsRate = false
+        SubstanceUnit = None
+        TimeUnit = None
     }
 
 
