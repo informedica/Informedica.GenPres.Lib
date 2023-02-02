@@ -1336,7 +1336,17 @@ module Variable =
 
             match x1, x2 with
             | Unrestricted, Unrestricted -> unrestricted
-            | ValSet s1, ValSet s2 -> ValueSet.calc op s1 s2 |> ValSet
+            | ValSet s1, ValSet s2 -> 
+                let min1, max1 = x1 |> getMin, x1 |> getMax
+                let min2, max2 = x2 |> getMin, x2 |> getMax
+
+                let min, max = calcMinMax min1 max1 min2 max2
+
+                if not onlyMinIncrMax then ValueSet.calc op s1 s2 |> ValSet
+                else
+                    match min, max with
+                    | None, None -> unrestricted
+                    | _ -> create onlyMinIncrMax min None max None
 
             // A set with an increment results in a new set of increment
             // Need to match all scenarios with a valueset and an increment
