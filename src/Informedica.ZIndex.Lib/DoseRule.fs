@@ -216,14 +216,19 @@ module DoseRule =
 
 
     let _getGenericProducts () =
+        (* ToDo check if this is a problem
         GenPresProduct.get true
         |> Array.collect (fun gpp ->
             gpp.GenericProducts
             |> Array.map (fun gp -> gp.Id)
         )
+        // make distinct necessary?
         |> Array.distinct
         |> Array.toList
         |> GenericProduct.get
+        *)
+        
+        GenPresProduct.getGenericProducts ()
         |> Array.map (fun gp ->
             let unt =
                 gp.Substances

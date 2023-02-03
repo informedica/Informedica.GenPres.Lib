@@ -166,3 +166,113 @@ module ATCGroup =
 
     let load () = get () |> ignore
 
+
+    let productCSV (gpps : GenPresProduct[]) =
+            // create product file
+            gpps
+            |> Array.collect (fun gpp ->
+                gpp.GenericProducts
+                |> Array.collect (fun gp ->
+                    gp.Substances
+                    |> Array.collect (fun s ->
+                        gp.ATC
+                        |> findByATC5 ()
+                        |> Array.map (fun atc ->
+                            {|
+                                GPK = gp.Id
+                                ATC = atc.ATC5
+                                MainGroup = atc.AnatomicalGroup
+                                SubGroup = atc.TherapeuticMainGroup
+                                Generic = gpp.Name
+                                TallMan = ""
+                                Synonyms =
+                                    gp.PrescriptionProducts
+                                    |> Array.collect (fun pp ->
+                                        pp.TradeProducts
+                                        |> Array.map (fun tp -> tp.Brand)
+                                    )
+                                    |> Array.filter (String.isNullOrWhiteSpace >> not)
+                                    |> String.concat ";"
+                                Product =
+                                    gp.PrescriptionProducts
+                                    |> Array.collect (fun pp ->
+                                        pp.TradeProducts
+                                        |> Array.map (fun tp -> tp.Label)
+                                    )
+                                    |> Array.tryHead
+                                    |> Option.defaultValue ""
+                                Label = gp.Label
+                                Shape = gpp.Shape
+                                ShapeQuantity =
+                                    gp.PrescriptionProducts
+                                    |> Array.fold (fun acc pp ->
+                                        if pp.Quantity <> acc then pp.Quantity else acc
+                                    ) 1.0m
+                                    |> fun v -> if v <= 0m then 1m else v
+                                ShapeVol = ""
+                                ShapeUnit = gpp.Unit
+                                Substance = s.SubstanceName
+                                SubstanceQuantity = s.SubstanceQuantity
+                                SubstanceUnit = s.SubstanceUnit
+                                MultipleQuantity = 0m
+                                MultipleUnit = ""
+                                Divisible = 1m
+                            |}
+                        )
+                    )
+                )
+            )
+            //|> Array.take 10
+            |> Array.map (fun r ->
+                let strToStr s = $"\"{s}\""
+                let numToStr n = $"{n}"
+                [
+                    r.GPK |> numToStr
+                    r.ATC |> strToStr
+                    r.MainGroup |> strToStr
+                    r.SubGroup |> strToStr
+                    r.Generic |> String.toLower |> strToStr
+                    r.TallMan |> strToStr
+                    r.Synonyms |> strToStr
+                    r.Product |> strToStr
+                    r.Label |> strToStr
+                    r.Shape |> String.toLower |> strToStr
+                    r.ShapeQuantity |> strToStr
+                    r.ShapeVol
+                    r.ShapeUnit |> String.toLower |> strToStr
+                    r.Substance |> String.toLower |> strToStr
+                    r.SubstanceQuantity |> strToStr
+                    r.SubstanceUnit |> String.toLower |> strToStr
+                    r.SubstanceQuantity / (r.Divisible |> decimal) |> numToStr
+                    r.SubstanceUnit
+                    r.Divisible |> numToStr
+                ]
+                |> String.concat "\t"
+
+            )
+            |> Array.distinct
+            |> Array.append [|
+                [
+                    "GPK"
+                    "ATC"
+                    "MainGroup"
+                    "SubGroup"
+                    "Generic"
+                    "TallMan"
+                    "Synonyms"
+                    "Product"
+                    "Label"
+                    "Shape"
+                    "ShapeQuantity"
+                    "ShapeVol"
+                    "ShapeUnit"
+                    "Substance"
+                    "SubstanceQuantity"
+                    "SubstanceUnit"
+                    "MultipleQuantity"
+                    "MultipleUnit"
+                    "Divisible"
+                ]
+                |> String.concat "\t"
+            |]
+            |> String.concat "\n"

@@ -3,6 +3,9 @@
 
 module FilePath =
 
+    open System
+
+
     [<Literal>]
     let data = "./data/"
 

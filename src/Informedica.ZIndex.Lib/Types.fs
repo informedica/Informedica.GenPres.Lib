@@ -115,9 +115,13 @@ module Types =
     type Substance =
         {
             Id : int
+            Pk : int
             Name : string
             Mole : decimal
             MoleReal : decimal
+            Formula : string
+            Unit : string
+            Density : decimal
         }
 
 

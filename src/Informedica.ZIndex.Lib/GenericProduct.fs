@@ -165,3 +165,21 @@ module GenericProduct =
 
 
     let getWithLog = _get
+
+
+    let getBarCodes (gp : GenericProduct) =
+        gp.PrescriptionProducts
+        |> Array.collect (fun pp ->
+            pp.TradeProducts
+            |> Array.collect (fun tp ->
+                tp.ConsumerProducts
+                |> Array.collect (fun cp ->
+                    cp.BarCodes
+                    |> Array.map (fun b -> (gp.Id, b))
+                )
+            )
+        )        
+        |> Array.groupBy fst
+        |> Array.map (fun (gpk, bc) ->
+            gpk, bc |> Array.map snd
+        )

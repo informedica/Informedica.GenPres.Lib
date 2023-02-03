@@ -273,3 +273,43 @@ module GenPresProduct =
                 )
             )
         )
+
+
+    let getGenericProducts () =
+        get true
+        |> Array.collect (fun gpp -> gpp.GenericProducts)
+
+
+    // Find a product
+    let search n =
+        let contains = String.containsCapsInsens
+
+        get true
+        |> Array.filter (fun gpp ->
+            gpp.Name |> contains n ||
+            gpp.GenericProducts
+            |> Array.exists (fun gp ->
+                gp.Name |> contains n ||
+                gp.PrescriptionProducts
+                |> Array.exists (fun pp ->
+                    pp.TradeProducts
+                    |> Array.exists (fun tp ->
+                        tp.Label
+                        |> contains n
+                    )
+                )
+            )
+        )
+
+
+    let routeShapes (gpps : GenPresProduct[]) =
+        // route shape
+        gpps
+        |> Array.collect (fun gpp ->
+            gpp.Routes
+            |> Array.map (fun r ->
+                r,
+                gpp.Shape
+            )
+        )
+        |> Array.distinct

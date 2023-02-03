@@ -426,6 +426,7 @@ let getRule i pat =
     |> Array.item i
 
 
+
 [
     premature
     newBorn
@@ -435,8 +436,8 @@ let getRule i pat =
     teenager
     adult
 ]
-//|> List.skip 1
-//|> List.take 1
+|> List.skip 4
+|> List.take 1
 |> List.iter (fun pat ->
     let n = getN pat
     printfn $"=== Running pat: {pat |> Patient.toString}: {n} ==="
@@ -524,11 +525,4 @@ with
     printfn $"{e.Data0}"
     raise e
 
-
-
-open MathNet.Numerics
-
-1N/36000000N = 1N/4500000000N + 31N/1125000000N
-1N/12000000N = 1N/1500000000N + 31N/375000000N
-13N/9000000N = 13N/1125000000N + 403N/281250000N
 

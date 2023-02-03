@@ -176,3 +176,9 @@ module String =
             let d = d |> removeTrailing ["0"]
             n + "," + d
         | _ -> s
+
+
+    let containsCapsInsens s2 s1 = 
+        let s1 = s1 |> toLower
+        let s2 = s2 |> toLower
+        s1 |> contains s2

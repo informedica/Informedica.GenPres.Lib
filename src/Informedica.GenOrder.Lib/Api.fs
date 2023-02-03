@@ -16,7 +16,18 @@ module Api =
 
     let createProductComponent noSubst freqUnit (doseLimits : DoseLimit []) (ps : Product []) =
         { DrugOrder.productComponent with
-            Name = ps |> tryHead (fun p -> p.Shape)
+            Name =
+                ps
+                |> tryHead (fun p -> p.Shape)
+                |> fun s ->
+                    if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
+                    else s
+            Shape =
+                ps
+                |> tryHead (fun p -> p.Shape)
+                |> fun s ->
+                    if s |> String.isNullOrWhiteSpace then "oplosvloeistof"
+                    else s
             Quantities =
                 ps
                 |> Array.collect (fun p -> p.ShapeQuantities)
@@ -55,18 +66,47 @@ module Api =
         }
 
 
+    let setSolutionLimit (sls : SolutionLimit[]) (items : SubstanceItem list) =
+        items
+        |> List.map (fun item ->
+            match sls |> Array.tryFind (fun sl -> sl.Substance |> String.equalsCapInsens item.Name) with
+            | None -> item
+            | Some sl ->
+                { item with
+                    Solution = Some sl
+                }
+        )
+
+
     let createDrugOrder (pr : PrescriptionRule) =
         let parenteral = Product.Parenteral.get ()
         let au =
             if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
             else pr.DoseRule.AdjustUnit
 
+        let dose =
+            pr.DoseRule.DoseLimits
+            |> Array.filter (fun dl -> dl.Substance |> String.isNullOrWhiteSpace)
+            |> function
+            | [|dl|] -> dl |> Some
+            | _ -> None
+
+        let noSubst =
+            dose
+            |> Option.map (fun d -> d.DoseUnit = "keer")
+            |> Option.defaultValue false
+        //ToDo ??
+        let prods =
+            pr.DoseRule.Products
+            |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+            |> List.singleton
+
         { DrugOrder.drugOrder with
             Id = Guid.NewGuid().ToString()
             Name = pr.DoseRule.Generic
             Products =
                 pr.DoseRule.Products
-                |> createProductComponent false pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+                |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
                 |> List.singleton
             Quantities = []
             Frequencies = pr.DoseRule.Frequencies |> Array.toList
@@ -74,17 +114,19 @@ module Api =
             Unit =
                 pr.DoseRule.Products
                 |> tryHead (fun p -> p.ShapeUnit)
+            Time = pr.DoseRule.Time
             TimeUnit = pr.DoseRule.TimeUnit
             RateUnit = "uur"
             Route = pr.DoseRule.Route
             DoseCount =
-                if pr.DoseRule.Products |> Array.length = 1 then Some 1N
+                if pr.SolutionRule.IsNone then Some 1N
                 else None
             OrderType =
                 match pr.DoseRule.DoseType with
                 | Informedica.GenForm.Lib.Types.Continuous -> ContinuousOrder
                 | _ when pr.DoseRule.TimeUnit |> String.isNullOrWhiteSpace -> DiscontinuousOrder
                 | _ -> TimedOrder
+            Dose = dose
             Adjust =
                 if au = "kg" then
                     pr.Patient.Weight
@@ -92,33 +134,50 @@ module Api =
                 else pr.Patient |> Patient.calcBSA
             AdjustUnit = au
         }
-        |> fun drug ->
+        |> fun dro ->
                 match pr.SolutionRule with
-                | None -> drug
+                | None -> dro
                 | Some sr ->
-                    { drug with
+//                    printfn "found solutionrule"
+                    { dro with
                         Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
                         Products =
-                            match sr.Solutions with
-                            | [|s|] ->
-                                parenteral
-                                |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
-                                |> function
-                                | Some p ->
-                                    [|p|]
-                                    |> createProductComponent true pr.DoseRule.FreqUnit [||]
-                                    |> List.singleton
-                                    |> List.append drug.Products
-                                | None -> drug.Products
-                            | _ -> drug.Products
+                            let ps =
+                                dro.Products
+                                |> List.map (fun p ->
+                                    { p with
+                                        Substances =
+                                            p.Substances
+                                            |> setSolutionLimit sr.SolutionLimits
+                                    }
+                                )
+
+                            let s =
+                                // ugly hack to get default solution
+                                sr.Solutions
+                                |> Array.tryHead
+                                |> Option.defaultValue "x"
+
+                            parenteral
+                            |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
+                            |> function
+                            | Some p ->
+//                                printfn $"adding solution {p.Generic}"
+                                [|p|]
+                                |> createProductComponent true pr.DoseRule.FreqUnit [||]
+                                |> List.singleton
+                                |> List.append ps
+                            | None ->
+                                printfn $"couldn't find {s} in parenterals"
+                                ps
                     }
 
     let evaluate (dr : DrugOrder) =
         dr
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
-        |> Order.solveMinMax false { Log = ignore }
+        |> Order.solveMinMax true { Log = ignore }
 
 
     // print an order list
