@@ -20,15 +20,16 @@ module Tests =
     open Expecto
     open Expecto.Flip
 
+
+    open MathNet.Numerics
+
+    open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
     open Informedica.GenCore.Lib.Ranges
     open Informedica.ZForm.Lib
 
-
     module MinIncrMaxTests =
 
-        open MathNet.Numerics
-
-        open Informedica.Utils.Lib.BCL
         open Informedica.GenUnits.Lib
         open Informedica.GenCore.Lib
         open Informedica.GenCore.Lib.Ranges
@@ -67,6 +68,117 @@ module Tests =
             }
         ]
 
+
+    module MappingTests =
+
+        open Mapping
+
+        let tests = testList "Mapping" [
+
+            test "all units that can be mapped have app, gstand, pedform and valueunit mapping" {
+                // Test all unit mappings
+                [ 
+                    (AppMap, allAppUnits ())
+                    (GStandMap, allGStandUnits ())
+                    (PedFormMap, allPedFormUnits ())
+                    (ValueUnitMap, allValueUnitUnits ()) 
+                ]
+                |> (fun units ->
+                    [ for m1, us1 in units do
+                        for m2, us2 in units do
+                            if m1 = m2 then ()
+                            else
+                                for u1 in us1 do
+                                    for u2 in us2 do
+                                        let s1 = mapUnit m1 m2 u1
+                                        let s2 = mapUnit m2 m1 u2
+                                        if s1 <> "" then [ s1; $"{m1}"; $"{m2}"; u1 ]
+                                        if s2 <> "" then [ s2; $"{m2}"; $"{m1}"; u2 ]
+                    ]
+                )
+                |> List.distinct
+                // except for 'niet van toepassing'
+                |> List.filter (List.head >> String.equalsCapInsens "niet van toepassing" >> not)
+                |> List.sortBy List.head
+                |> List.forall (List.forall String.notEmpty)
+                |> Expect.isTrue "should be true"
+            }
+
+            test "all routes can be mapped" {
+                // Test all route mappings
+                [ 
+                    (AppMap, allAppRoutes ())
+                    (GStandMap, allGStandRoutes ())
+                    (PedFormMap, allPedFormRoutes ()) 
+                ]
+                |> (fun routes ->
+                    printfn "Mapping all routes"
+                    [ for m1, rts1 in routes do
+                        for m2, rts2 in routes do
+                            if m1 = m2 then ()
+                            else
+                                for r1 in rts1 do
+                                    for r2 in rts2 do
+                                        let s1 = mapRoute m1 m2 r1
+                                        let s2 = mapRoute m2 m1 r2
+                                        if s1 <> "" then [ s1; $"{m1}"; $"{m2}"; r1 ]
+                                        if s2 <> "" then [ s2; $"{m2}"; $"{m1}"; r2 ]
+                    ]
+                )
+                |> List.distinct
+                |> List.filter (
+                    List.head 
+                    >> (fun s -> 
+                        s |> String.equalsCapInsens "INTRAVENTR" ||
+                        s |> String.equalsCapInsens "NIET GESPEC"
+                    >> not)
+                )
+                |> List.sortBy List.head
+                |> List.forall (List.forall String.notEmpty)
+                |> Expect.isTrue "should be true"
+            }
+
+            test "all frequencies can be mapped" {
+                // Test all frequency mappings
+                [ 
+                    (AppMap, allAppFreqs ())
+                    (GStandMap, allGStandFreqs ())
+                    (PedFormMap, allPedFormFreqs ())
+                    (ValueUnitMap, allValueUnitFreqs ()) 
+                ]
+                |> (fun freqs ->
+                    printfn "Mapping all freqs"
+                    [ for m1, fs1 in freqs do
+                        for m2, fs2 in freqs do
+                            if m1 = m2 then ()
+                            else
+                                for f1 in fs1 do
+                                    for f2 in fs2 do
+                                        let s1 = mapFreq m1 m2 f1
+                                        let s2 = mapFreq m2 m1 f2
+                                        if s1 <> "" then [ s1; $"{m1}"; $"{m2}"; f1 ]
+                                        if s2 <> "" then [ s2; $"{m2}"; $"{m1}"; f2 ]
+                    ]
+                )
+                |> List.distinct
+                |> List.distinct
+                |> List.filter (
+                    List.head 
+                    >> (fun s -> 
+                        s |> String.equalsCapInsens "INTRAVENTR" ||
+                        s |> String.equalsCapInsens "NIET GESPEC"
+                    >> not)
+                )
+                |> List.sortBy List.head
+                |> List.countBy (List.forall String.notEmpty)
+                |> function
+                | [(bTrue, nTrue) ; (bFalse, nFalse)] ->
+                    nTrue = 158 && nFalse = 2
+                | _ -> false
+                |> Expect.isTrue "should be true"
+            }
+
+        ]
 
 
     module PatientTests =
@@ -165,11 +277,22 @@ module Tests =
 
     module DoseRangeTests =
 
+        open Aether
+
         module Dto = DoseRule.DoseRange.Dto
 
-        let (|>!) x f =
-            printfn $"%A{x}"
-            x |> f
+        module DoseRange = DoseRule.DoseRange
+
+        let setMinNormDose = Optic.set DoseRange.Optics.inclMinNormLens
+        let setMaxNormDose = Optic.set DoseRange.Optics.inclMaxNormLens
+
+        let setMinNormPerKgDose = Optic.set DoseRange.Optics.inclMinNormWeightLens
+        let setMaxNormPerKgDose = Optic.set DoseRange.Optics.inclMaxNormWeightLens
+
+        let setMinAbsDose = Optic.set DoseRange.Optics.inclMinAbsLens
+        let setMaxAbsDose = Optic.set DoseRange.Optics.inclMaxAbsLens
+
+        let drToStr = DoseRange.toString None
 
 
         let processDto f dto = dto |> f; dto
@@ -200,13 +323,6 @@ module Tests =
                 dto.NormWeightUnit <- "kg"
 
 
-        let print () =
-            Dto.dto ()
-            |> processDto addValues
-            |>! Dto.fromDto
-            |>! Dto.toDto
-            |>! Dto.fromDto
-            |>! ignore
 
         let tests = testList "DoseRange" [
             
@@ -231,6 +347,41 @@ module Tests =
                 |> Dto.toDto
                 |> Dto.fromDto
                 |> Expect.equal "should be equal" expct
+            }
+
+            test "can create a dose range" {
+                DoseRange.empty
+                |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
+                |> setMaxAbsDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
+                |> drToStr
+                |> Expect.equal "should be a range" "tot 10 mg maximaal tot 100 mg"
+            }
+
+            test "can create a dose range with a rate" {
+                DoseRange.empty
+                |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
+                |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
+                |> DoseRange.toString (Some ValueUnit.Units.hour)
+                |> Expect.equal "should be a rate" "van 10 mg/uur - tot 100 mg/uur"
+            }
+
+            test "can create a dose range with a rate per kg" {
+                DoseRange.empty
+                |> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
+                |> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
+                |> DoseRange.convertTo (ValueUnit.Units.mcg)
+                |> DoseRange.toString (Some ValueUnit.Units.hour)
+                |> Expect.equal "should be a rate" "van 1 microg/kg/uur - tot 1000 microg/kg/uur"
+            }
+
+
+            test "can covert a unit" {
+                DoseRange.empty
+                |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
+                |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
+                |> DoseRange.convertTo (ValueUnit.Units.mcg)
+                |> drToStr
+                |> Expect.equal "should be a rate with a different unit" "van 1 microg/kg/uur - tot 1000 microg/kg/uur"
             }
 
         ]
@@ -278,6 +429,7 @@ module Tests =
     let tests =  
         [   
             MinIncrMaxTests.tests
+            MappingTests.tests
             PatientTests.tests
             DoseRangeTests.tests
             DoseRuleTests.tests
@@ -302,139 +454,6 @@ module Temp =
 
     open Informedica.GenUnits.Lib
     open Informedica.ZForm.Lib
-
-    module MappingTests =
-        
-        open Mapping
-
-        let tests () =
-
-            // Test all unit mappings
-            [ (AppMap, allAppUnits ())
-              (GStandMap, allGStandUnits ())
-              (PedFormMap, allPedFormUnits ())
-              (ValueUnitMap, allValueUnitUnits ()) ]
-            |> List.map (fun (m, units) ->
-                printfn $"Printing all units for: %A{m}"
-                units
-                |> Array.iter (fun s -> if s <> "" then s|> printfn "%s")
-                (m, units)
-            )
-            |> (fun units ->
-                printfn "Mapping all units"
-                [ for m1, us1 in units do
-                    for m2, us2 in units do
-                        if m1 = m2 then ()
-                        else
-                            for u1 in us1 do
-                                for u2 in us2 do
-                                    let s1 = mapUnit m1 m2 u1
-                                    let s2 = mapUnit m2 m1 u2
-                                    if s1 <> "" then yield s1 |> (sprintf "mapping %A to %A %s -> %s" m1 m2 u1)
-                                    if s2 <> "" then yield s2 |> (sprintf "mapping %A to %A %s -> %s" m2 m1 u2) ]
-            )
-            |> List.distinct
-            |> List.sort
-            |> List.iter (printfn "%s")
-
-            // Test all route mappings
-            [ (AppMap, allAppRoutes ())
-              (GStandMap, allGStandRoutes ())
-              (PedFormMap, allPedFormRoutes ()) ]
-            |> List.map (fun (m, routes) ->
-                printfn $"Printing all routes for: %A{m}"
-                routes
-                |> Array.iter (fun s -> if s <> "" then s|> printfn "%s")
-                (m, routes)
-            )
-            |> (fun routes ->
-                printfn "Mapping all routes"
-                [ for m1, rts1 in routes do
-                    for m2, rts2 in routes do
-                        if m1 = m2 then ()
-                        else
-                            for r1 in rts1 do
-                                for r2 in rts2 do
-                                    let s1 = mapRoute m1 m2 r1
-                                    let s2 = mapRoute m2 m1 r2
-                                    if s1 <> "" then yield s1 |> (sprintf "mapping %A to %A %s -> %s" m1 m2 r1)
-                                    if s2 <> "" then yield s2 |> (sprintf "mapping %A to %A %s -> %s" m2 m1 r2) ]
-            )
-            |> List.distinct
-            |> List.sort
-            |> List.iter (printfn "%s")
-
-            // Test all frequency mappings
-            [ (AppMap, allAppFreqs ())
-              (GStandMap, allGStandFreqs ())
-              (PedFormMap, allPedFormFreqs ())
-              (ValueUnitMap, allValueUnitFreqs ()) ]
-            |> List.map (fun (m, freqs) ->
-                printfn "Printing all freqs for: %A" m
-                freqs
-                |> Array.iter (fun s -> if s <> "" then s|> printfn "%s")
-                (m, freqs)
-            )
-            |> (fun freqs ->
-                printfn "Mapping all freqs"
-                [ for m1, fs1 in freqs do
-                    for m2, fs2 in freqs do
-                        if m1 = m2 then ()
-                        else
-                            for f1 in fs1 do
-                                for f2 in fs2 do
-                                    let s1 = mapFreq m1 m2 f1
-                                    let s2 = mapFreq m2 m1 f2
-                                    if s1 <> "" then yield s1 |> (sprintf "mapping %A to %A %s -> %s" m1 m2 f1)
-                                    if s2 <> "" then yield s2 |> (sprintf "mapping %A to %A %s -> %s" m2 m1 f2) ]
-            )
-            |> List.distinct
-            |> List.sort
-            |> List.iter (printfn "%s")
-
-
-
-    module DoseRangeTests =
-
-        module DoseRange = DoseRule.DoseRange
-
-        let setMinNormDose = Optic.set DoseRange.Optics.inclMinNormLens
-        let setMaxNormDose = Optic.set DoseRange.Optics.inclMaxNormLens
-
-        let setMinNormPerKgDose = Optic.set DoseRange.Optics.inclMinNormWeightLens
-        let setMaxNormPerKgDose = Optic.set DoseRange.Optics.inclMaxNormWeightLens
-
-        let setMinAbsDose = Optic.set DoseRange.Optics.inclMinAbsLens
-        let setMaxAbsDose = Optic.set DoseRange.Optics.inclMaxAbsLens
-
-        let drToStr = DoseRange.toString None
-
-        let toString () =
-            DoseRange.empty
-            |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
-            |> setMaxAbsDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
-            |> drToStr
-
-        let toRateString () =
-            DoseRange.empty
-            |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
-            |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
-            |> DoseRange.toString (Some ValueUnit.Units.hour)
-
-        let toRatePerKgString () =
-            DoseRange.empty
-            |> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
-            |> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
-            |> DoseRange.convertTo (ValueUnit.Units.mcg)
-            |> DoseRange.toString (Some ValueUnit.Units.hour)
-
-        let convert () =
-            DoseRange.empty
-            |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
-            |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
-            |> DoseRange.convertTo (ValueUnit.Units.mcg)
-            |> drToStr
-
 
 
 
