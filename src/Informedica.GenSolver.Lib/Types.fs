@@ -1,10 +1,13 @@
 namespace Informedica.GenSolver.Lib
 
+
 [<AutoOpen>]
 module rec Types =
 
     open System
     open MathNet.Numerics
+
+    open Informedica.GenUnits.Lib
 
     /// Represents a non empty/null string identifying a `Variable`.
     /// `Name` can be no longer than 1000 characters and cannot be
@@ -16,22 +19,22 @@ module rec Types =
     /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Minimum =
-        | MinIncl of BigRational
-        | MinExcl of BigRational
+        | MinIncl of ValueUnit
+        | MinExcl of ValueUnit
 
 
     /// The maximum value in
     /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Maximum =
-        | MaxIncl of BigRational
-        | MaxExcl of BigRational
+        | MaxIncl of ValueUnit
+        | MaxExcl of ValueUnit
 
 
-    type ValueSet = ValueSet of BigRational Set
+    type ValueSet = ValueSet of ValueUnit
 
 
-    type Increment = Increment of BigRational Set
+    type Increment = Increment of ValueUnit
 
 
     /// `ValueRange` represents a domain of
@@ -45,6 +48,7 @@ module rec Types =
     /// - `MinMax`: have both a minimum and maximum
     type ValueRange =
         | Unrestricted
+        | NonZeroNoneNegative
         | Min of Minimum
         | Max of Maximum
         | MinMax of Minimum * Maximum
@@ -175,4 +179,3 @@ module rec Types =
 
 
         type Logger = { Log: Message -> unit }
-

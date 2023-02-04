@@ -5,14 +5,4 @@
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
-
-#load "../Types.fs"
-#load "../Utils.fs"
-#load "../Logging.fs"
-#load "../Exceptions.fs"
-#load "../Variable.fs"
-#load "../Equation.fs"
-
-
-open Informedica.GenSolver.Lib
-
+#r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"

@@ -448,4 +448,3 @@ module Equation =
             let fs = c false
 
             e |> apply fp fs
-

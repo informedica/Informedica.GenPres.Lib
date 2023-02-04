@@ -1,3 +1,7 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","aliases":[]}]}}
+
 #!markdown
 
 # Examples for the ``Informedica.GenSolver.Lib`` library
@@ -8,7 +12,7 @@ First load all required references and source files.
 
 #!fsharp
 
-#load "../Scripts/load.fsx"
+#load "../Scripts/loadDLL.fsx"
 
 #!markdown
 
@@ -19,6 +23,7 @@ Do some preprocessing.
 open System
 open System.IO
 
+open Informedica.GenUnits.Lib
 open Informedica.GenSolver.Lib
 open Informedica.Utils.Lib.BCL
 open MathNet.Numerics
@@ -35,7 +40,9 @@ module ValueSet = ValueRange.ValueSet
 
 let procss s = printfn $"%s{s} "
 
-let printEqs = Solver.printEqs true procss
+let printEqs = function
+    | Ok eqs -> eqs |> Solver.printEqs true procss
+    | Error errs -> failwith "errors"
 
 let setProp n p eqs =
     let n = n |> Name.createExc
@@ -47,11 +54,23 @@ let setProp n p eqs =
         )
     | None -> eqs
 
-let setMinIncl n min = min |> Minimum.create true |> MinProp |> setProp n
-let setMinExcl n min = min |> Minimum.create false |> MinProp |> setProp n
-let setMaxIncl n max = max |> Maximum.create true |> MaxProp |> setProp n
-let setMaxExcl n max = max |> Maximum.create true |> MaxProp |> setProp n
-let setValues n vals = vals |> ValueSet.create |> ValsProp |> setProp n
+let create c v = 
+    [|v|] 
+    |> ValueUnit.withUnit ValueUnit.Units.Count.times
+    |> c
+
+let createMinIncl = create (Minimum.create true)
+let createMinExcl = create (Minimum.create false)
+let createMaxIncl = create (Maximum.create true)
+let createMaxExcl = create (Maximum.create false)
+let createIncr = create Increment.create
+let createValSet = create ValueSet.create
+
+let setMinIncl n min = min |> createMinIncl |> MinProp |> setProp n
+let setMinExcl n min = min |> createMinExcl |> MinProp |> setProp n
+let setMaxIncl n max = max |> createMaxIncl |> MaxProp |> setProp n
+let setMaxExcl n max = max |> createMaxExcl |> MaxProp |> setProp n
+let setValues n vals = vals |> createValSet |> ValsProp |> setProp n
 
 let solve n p eqs =
     let logger = 
@@ -61,11 +80,11 @@ let solve n p eqs =
     let n = n |> Name.createExc
     Api.solve true id logger n p eqs
 
-let solveMinIncl n min = solve n (min |> Minimum.create true |> MinProp)
-let solveMinExcl n min = solve n (min |> Minimum.create false |> MinProp)
-let solveMaxIncl n max = solve n (max |> Maximum.create true |> MaxProp)
-let solveMaxExcl n max = solve n (max |> Maximum.create false |> MaxProp)
-let solveIncr n incr = solve n (set [incr] |> Increment.create |> IncrProp)
+let solveMinIncl n min = solve n (min |> createMinIncl |> MinProp)
+let solveMinExcl n min = solve n (min |> createMinExcl |> MinProp)
+let solveMaxIncl n max = solve n (max |> createMaxIncl |> MaxProp)
+let solveMaxExcl n max = solve n (max |> createMaxExcl |> MaxProp)
+let solveIncr n incr = solve n (incr |> Increment.create |> IncrProp)
 let solveValues n vals = solve n (vals |> ValueSet.create |> ValsProp)
 
 let init     = Api.init
@@ -108,7 +127,7 @@ Meaning you can only "shrink" a variable, not expand a variable.
 #!fsharp
 
 let simpleEq = [ "a = b" ] |> init
-simpleEq |> printEqs |> ignore
+simpleEq |> Ok |> printEqs |> ignore
 
 #!markdown
 
@@ -116,12 +135,12 @@ We can limit the variables to a lower and upper limit.
 
 #!fsharp
 
-simpleEq |> printEqs
+simpleEq |> Ok |> printEqs
 
 simpleEq
-|> solveMinIncl "b" 0N
+|> solveMinIncl "b" 0m
 |> printEqs
-|> solveMaxExcl "b" 5N
+|> solveMaxExcl "b" 5m
 |> printEqs |> ignore
 
 #!markdown
@@ -133,35 +152,35 @@ We can now try to change variable ``a``.
 printfn "=== Try setting 10 to variable a will throw an exception ==="
 try
     simpleEq
-    |> solveMinIncl "b" 0N
-    |> solveMaxExcl "b" 5N
-    |> solveValues "a" [10N]
+    |> solveMinIncl "b" 0m
+    |> solveMaxExcl "b" 5m
+    |> solveValues "a" [10m]
     |> printEqs |> ignore
 with
 | e -> printfn "%A" e
 
 printfn "=== But setting 4 to variable a will succeed ==="
 simpleEq
-|> solveMinIncl "b" 0N
-|> solveMaxExcl "b" 5N
-|> solveValues "a" [4N]
+|> solveMinIncl "b" 0m
+|> solveMaxExcl "b" 5m
+|> solveValues "a" [4m]
 |> printEqs |> ignore
 
 printfn "=== Try setting a max 10 to variable a will be ignored ==="
 try
     simpleEq
-    |> solveMinIncl "b" 0N
-    |> solveMaxExcl "b" 5N
-    |> solveMaxExcl "b" 10N
+    |> solveMinIncl "b" 0m
+    |> solveMaxExcl "b" 5m
+    |> solveMaxExcl "b" 10m
     |> printEqs |> ignore
 with
 | e -> printfn "%A" e
 
 printfn "=== But setting a max 3 to variable a will succeed ==="
 simpleEq
-|> solveMinIncl "b" 0N
-|> solveMaxExcl "b" 5N
-|> solveMaxExcl "b" 3N
+|> solveMinIncl "b" 0m
+|> solveMaxExcl "b" 5m
+|> solveMaxExcl "b" 3m
 |> printEqs |> ignore
 
 #!markdown
