@@ -817,12 +817,14 @@ module ValueUnit =
         |> create u
 
 
+    // ToDo check logic
     let applyToValues fArr fValue vu =
         let u = vu |> getUnit
         vu
         |> getValue
         |> fArr fValue
         |> create u
+
 
 
     let filterValues = applyToValues Array.filter
