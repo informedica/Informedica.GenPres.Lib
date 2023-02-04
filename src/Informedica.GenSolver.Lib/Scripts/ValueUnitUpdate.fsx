@@ -1489,6 +1489,14 @@ module Variable =
         let setIncr onlyMinIncrMax newIncr vr =
             let restrict = Increment.restrict newIncr
 
+            let nonZero =
+                newIncr
+                |> Increment.toValueUnit
+                |> ValueUnit.setSingleValue 0N
+                |> Minimum.create false,
+                newIncr
+
+
             let fMin min = minIncrToValueRange min newIncr
 
             let fMax max = incrMaxToValueRange newIncr max
@@ -1512,7 +1520,7 @@ module Variable =
             vr
             |> apply
                 (newIncr |> Incr)
-                (newIncr |> Incr) // ToDo must be MinIncr!!!
+                (nonZero |> MinIncr)
                 fMin
                 fMax
                 fMinMax
@@ -2900,3 +2908,591 @@ module Equation =
             let fs = c false
 
             e |> apply fp fs
+
+
+
+/// Implementations of solvers for product equations
+/// sum equations and a set of product and/or sum
+/// equations
+module Solver =
+
+    module EQD = Equation.Dto
+    module Name = Variable.Name
+
+    open Types
+
+    let sortByName eqs =
+        eqs
+        |> List.sortBy (fun e ->
+            e
+            |> Equation.toVars
+            |> List.head
+            |> Variable.getName)
+
+
+    /// Format a set of equations to print.
+    /// Using **f** to allow additional processing
+    /// of the string.
+    let printEqs exact pf eqs =
+
+        "equations result:\n" |> pf
+        eqs
+        |> sortByName
+        |> List.map (Equation.toString exact)
+        |> List.iteri (fun i s -> $"%i{i}.\t%s{s}"  |> pf)
+        "-----" |> pf
+
+        eqs
+
+
+    /// Checks whether a list of `Equation` **eqs**
+    /// contains an `Equation` **eq**
+    let contains eq eqs = eqs |> List.exists ((=) eq)
+
+
+    /// Replace a list of `Variable` **vs**
+    /// in a list of `Equation` **es**, return
+    /// a list of replaced `Equation` and a list
+    /// of unchanged `Equation`
+    let replace vars es =
+        let rpl, rst =
+            es
+            |> List.partition (fun e ->
+                vars
+                |> List.exists (fun v -> e |> Equation.contains v)
+            )
+
+        vars
+        |> List.fold (fun acc v ->
+            acc
+            |> List.map (Equation.replace v)
+        ) rpl
+        , rst
+
+
+    let memSolve f =
+        let cache = ref Map.empty
+        fun e ->
+            match cache.Value.TryFind(e) with
+            | Some r -> r
+            | None ->
+                let r = f e
+                cache.Value <- cache.Value.Add(e, r)
+                r
+
+    let sortQue que =
+        if que |> List.length = 0 then que
+        else
+            que
+            |> List.sortBy Equation.count //Equation.countProduct
+
+
+    /// Create the equation solver using a
+    /// product equation and a sum equation solver
+    /// and function to determine whether an
+    /// equation is solved
+    let solve onlyMinIncrMax log sortQue var eqs =
+
+        let solveE n eqs eq =
+            try
+                Equation.solve onlyMinIncrMax log eq
+            with
+            | Exceptions.SolverException errs ->
+                (n, errs, eqs)
+                |> Exceptions.SolverErrored
+                |> Exceptions.raiseExc None errs
+            | e ->
+                let msg = $"didn't catch {e}"
+                printfn $"{msg}"
+                msg |> failwith
+
+        let rec loop n que acc =
+            match acc with
+            | Error _ -> acc
+            | Ok acc  ->
+                let n = n + 1
+                if n > ((que @ acc |> List.length) * Constants.MAX_LOOP_COUNT) then
+                    printfn $"too many loops: {n}"
+                    (n, que @ acc)
+                    |> Exceptions.SolverTooManyLoops
+                    |> Exceptions.raiseExc None []
+
+                let que = que |> sortQue
+
+                //(n, que)
+                //|> Events.SolverLoopedQue
+                //|> Logging.logInfo log
+
+                match que with
+                | [] ->
+                    match acc |> List.filter (Equation.check >> not) with
+                    | []      -> acc |> Ok
+                    | invalid ->
+                        printfn "invalid equations"
+                        invalid
+                        |> Exceptions.SolverInvalidEquations
+                        |> Exceptions.raiseExc None []
+
+                | eq::tail ->
+                    // need to calculate result first to enable tail call optimization
+                    let q, r =
+                        // If the equation is already solved, or not solvable
+                        // just put it to  the accumulated equations and go on with the rest
+                        if eq |> Equation.isSolvable |> not then
+                            tail,
+                            [ eq ]
+                            |> List.append acc
+                            |> Ok
+                        // Else go solve the equation
+                        else
+                            match eq |> solveE n (acc @ que) with
+                            // Equation is changed, so every other equation can
+                            // be changed as well (if changed vars are in the other
+                            // equations) so start new
+                            | eq, Changed cs ->
+                                let vars = cs |> List.map fst
+                                // find all eqs with vars in acc and put these back on que
+                                acc
+                                |> replace vars
+                                |> function
+                                | rpl, rst ->
+                                    // replace vars in tail
+                                    let que =
+                                        tail
+                                        |> replace vars
+                                        |> function
+                                        | es1, es2 ->
+                                            es1
+                                            |> List.append es2
+                                            |> List.append rpl
+
+                                    que,
+                                    rst
+                                    |> List.append [ eq ]
+                                    |> Ok
+
+                            // Equation did not in fact change, so put it to
+                            // the accumulated equations and go on with the rest
+                            | eq, Unchanged ->
+                                tail,
+                                [eq]
+                                |> List.append acc
+                                |> Ok
+
+                            | eq, Errored m ->
+                                [],
+                                [eq]
+                                |> List.append acc
+                                |> List.append que
+                                |> fun eqs ->
+                                    Error (eqs, m)
+                    loop n q r
+
+        match var with
+        | None     -> eqs, []
+        | Some var -> eqs |> replace [var]
+        |> function
+        | rpl, rst ->
+            rpl
+            |> Events.SolverStartSolving
+            |> Logging.logInfo log
+
+            try
+                match rpl with
+                | [] -> eqs |> Ok
+                | _  -> loop 0 rpl (Ok rst)
+            with
+            | Exceptions.SolverException errs  ->
+                 Error (rpl @ rst, errs)
+            | e ->
+                let msg = $"something unexpected happened, didn't catch {e}"
+                printfn $"{msg}"
+                msg |> failwith
+
+            |> function
+            | Ok eqs ->
+                eqs
+                |> Events.SolverFinishedSolving
+                |> Logging.logInfo log
+
+                eqs |> Ok
+            | Error (eqs, m) ->
+                eqs
+                |> Events.SolverFinishedSolving
+                |> Logging.logInfo log
+
+                Error (eqs, m)
+
+
+    let solveVariable onlyMinIncrMax log sortQue vr eqs =
+        solve onlyMinIncrMax log sortQue (Some vr) eqs
+
+
+    let solveAll onlyMinIncrMax log eqs =
+        solve onlyMinIncrMax log sortQue None eqs
+
+
+
+module Constraint =
+
+    open Types
+
+    module ValueRange = Variable.ValueRange
+    module Property = ValueRange.Property
+    module ValueSet = ValueRange.ValueSet
+    module Name = Variable.Name
+
+
+    let eqsName (c1 : Constraint) (c2 : Constraint) = c1.Name = c2.Name
+
+
+    let toString { Name = n; Property = p } = $"{n |> Name.toString}: {p}"
+
+
+    let scoreConstraint c =
+            match c.Property with
+            | ValsProp vs ->
+                let n = vs |> ValueSet.count
+                if n = 1 then    -3, c
+                else              n, c
+            | MinProp _   -> -5, c
+            | IncrProp _      -> -4, c
+            | _               -> -2, c
+
+
+    let orderConstraints log cs =
+        cs
+        // calc min and max from valsprop constraints
+        |> List.fold (fun acc c ->
+            match c.Property with
+            | ValsProp vs ->
+                if vs |> ValueSet.count <= 1 then [c] |> List.append acc
+                else
+                    let min = vs |> ValueSet.getMin |> Option.map MinProp
+                    let max = vs |> ValueSet.getMax |> Option.map MaxProp
+                    [
+                        c
+                        if min.IsSome then { c with Property = min.Value }
+                        if max.IsSome then { c with Property = max.Value }
+                    ]
+                    |> List.append acc
+            | _ -> [c] |> List.append acc
+        ) []
+        |> List.fold (fun acc c ->
+            if acc |> List.exists ((=) c) then acc
+            else
+                acc @ [c]
+        ) []
+        |> fun cs -> cs |> List.map scoreConstraint
+        |> List.sortBy fst
+        |> fun cs ->
+            cs
+            |> Events.ConstraintSortOrder
+            |> Logging.logInfo log
+
+            cs
+            |> List.map snd
+
+
+    let apply onlyMinIncrMax log (c : Constraint) eqs =
+
+        eqs
+        |> List.collect (Equation.findName c.Name)
+        |> function
+        | [] ->
+            (c, eqs)
+            |> Exceptions.ConstraintVariableNotFound
+            |> Exceptions.raiseExc (Some log) []
+
+        | vr::_ ->
+            c.Property
+            |> Property.toValueRange
+            |> Variable.setValueRange onlyMinIncrMax vr
+        |> fun var ->
+            c
+            |> Events.ConstraintApplied
+            |> Logging.logInfo log
+
+            var
+
+
+    let solve onlyMinIncrMax log sortQue (c : Constraint) eqs =
+        let var = apply onlyMinIncrMax log c eqs
+
+        eqs
+        |> Solver.solveVariable onlyMinIncrMax log sortQue var
+        |> fun eqs ->
+            c
+            |> Events.ConstrainedSolved
+            |> Logging.logInfo log
+
+            eqs
+
+
+
+/// Public funtions to use the library
+module Api =
+
+    open System
+
+    open Informedica.Utils.Lib.BCL
+
+    module VRD = Variable.Dto
+    module EQD = Equation.Dto
+
+    module ValueRange = Variable.ValueRange
+    module Property = ValueRange.Property
+    module Name = Variable.Name
+
+
+    /// Initialize the solver returning a set of equations
+    let init eqs =
+        let notEmpty = String.IsNullOrWhiteSpace >> not
+        let prodEqs, sumEqs = eqs |> List.partition (String.contains "*")
+        let createProdEqs = List.map (EQD.createProd >> EQD.fromDto)
+        let createSumEqs  = List.map (EQD.createSum  >> EQD.fromDto)
+
+        let parse eqs op =
+            eqs
+            |> List.map (String.splitAt '=')
+            |> List.map (Array.collect (String.splitAt op))
+            |> List.map (Array.map String.trim)
+            |> List.map (Array.filter notEmpty)
+            |> List.map (Array.map VRD.createNew)
+
+        (parse prodEqs '*' |> createProdEqs) @ (parse sumEqs '+' |> createSumEqs)
+
+
+    let setVariableValues onlyMinIncrMax n p eqs =
+        eqs
+        |> List.collect (Equation.findName n)
+        |> function
+        | [] -> None
+        | var::_ ->
+            p
+            |> Property.toValueRange
+            |> Variable.setValueRange onlyMinIncrMax var
+            |> Some
+
+
+    let solveAll = Solver.solveAll
+
+
+    /// Solve an `Equations` list with
+    ///
+    /// * f: function used to process string message
+    /// * n: the name of the variable to be updated
+    /// * p: the property of the variable to be updated
+    /// * vs: the values to update the property of the variable
+    /// * eqs: the list of equations to solve
+    let solve onlyMinIncrMax sortQue log n p eqs =
+        eqs
+        |> setVariableValues onlyMinIncrMax n p
+        |> function
+        | None -> eqs |> Ok
+        | Some var ->
+            eqs
+            |> Solver.solveVariable onlyMinIncrMax log sortQue var
+
+
+    /// Make a list of `EQD`
+    /// to contain only positive
+    /// values as solutions
+    let nonZeroNegative eqs =
+        eqs
+        |> List.map Equation.nonZeroOrNegative
+
+
+    let applyConstraints onlyMinIncrMax log eqs cs =
+        let apply = Constraint.apply onlyMinIncrMax log
+
+        cs
+        |> List.fold (fun acc c ->
+            acc
+            |> apply c
+            |> fun var ->
+                acc
+                |> List.map (Equation.replace var)
+        ) eqs
+
+
+    let solveConstraints onlyMinIncrMax log cs eqs =
+        cs
+        |> Constraint.orderConstraints log
+        |> applyConstraints false log eqs
+        |> Solver.solveAll onlyMinIncrMax log
+
+
+module SolverLogging =
+
+    open Informedica.Utils.Lib.BCL
+
+    open Types
+    open Types.Logging
+    open Types.Events
+
+    module Name = Variable.Name
+    module ValueRange = Variable.ValueRange
+
+
+    let private eqsToStr eqs =
+        let eqs =
+            eqs
+            |> List.sortBy (fun e ->
+                e
+                |> Equation.toVars
+                |> List.tryHead
+                |> function
+                | Some v -> Some v.Name
+                | None -> None
+            )
+        $"""{eqs |> List.map (Equation.toString true) |> String.concat "\n"}"""
+
+
+    let private varsToStr vars =
+        $"""{vars |> List.map (Variable.toString true) |> String.concat ", "}"""
+
+
+    let rec printException = function
+    | Exceptions.ValueRangeEmptyValueSet ->
+        "ValueRange cannot have an empty value set"
+
+    | Exceptions.EquationEmptyVariableList ->
+        "An equation should at least contain one variable"
+
+    | Exceptions.SolverInvalidEquations eqs ->
+        $"The following equations are invalid {eqs |> eqsToStr} "
+
+    | Exceptions.ValueRangeMinLargerThanMax (min, max) ->
+        $"{min} is larger than {max}"
+
+    | Exceptions.ValueRangeMinOverFlow min ->
+        $"Min overflow: {min}"
+
+    | Exceptions.ValueRangeMaxOverFlow max ->
+        $"Max overflow: {max}"
+
+    | Exceptions.ValueRangeNotAValidOperator ->
+        "The value range operator was invalid or unknown"
+
+    | Exceptions.EquationDuplicateVariables vars ->
+        $"""The list of variables for the equation contains duplicates
+{vars |> List.map (Variable.getName >> Name.toString) |> String.concat ", "}
+"""
+
+    | Exceptions.NameLongerThan1000 s ->
+        $"This name contains more than 1000 chars: {s}"
+
+    | Exceptions.NameNullOrWhiteSpaceException ->
+        "A name cannot be a blank string"
+
+    | Exceptions.VariableCannotSetValueRange (var, vlr) ->
+        $"This variable:\n{var |> Variable.toString true}\ncannot be set with this range:{vlr |> ValueRange.toString true}\n"
+
+    | Exceptions.SolverTooManyLoops (n, eqs) ->
+        $"""Looped (total {n}) more than {Constants.MAX_LOOP_COUNT} times the equation list count ({eqs |> List.length})
+{eqs |> eqsToStr}
+"""
+
+    | Exceptions.SolverErrored (n, msgs, eqs) ->
+        $"=== Solver Errored Solving ({n} loops) ===\n{eqs |> eqsToStr}"
+        |> fun s ->
+            msgs
+            |> List.map (fun msg ->
+                match msg with
+                | Exceptions.SolverErrored _ -> s
+                | _ ->
+                        $"Error: {msg |> printException}"
+            )
+            |> String.concat "\n"
+            |> fun es -> $"{s}\n{es}"
+
+    | Exceptions.ValueRangeEmptyIncrement -> "Increment can not be an empty set"
+
+    | Exceptions.ValueRangeTooManyValues c ->
+        $"Trying to calculate with {c} values, which is higher than the max calc count {Constants.MAX_CALC_COUNT}"
+
+    | Exceptions.ConstraintVariableNotFound (c, eqs) ->
+        $"""=== Constraint Variable not found ===
+        {c
+        |> sprintf "Constraint %A cannot be set"
+        |> (fun s ->
+            eqs
+            |> List.map (Equation.toString true)
+            |> String.concat "\n"
+            |> sprintf "%s\In equations:\%s" s
+        )
+        }
+        """
+    | _ -> "not a recognized msg"
+
+    let printMsg = function
+    | ExceptionMessage m ->
+        m
+        |> printException
+    | SolverMessage m ->
+        let toString eq =
+            let op = if eq |> Equation.isProduct then " * " else " + "
+            let varName = Variable.getName >> Variable.Name.toString
+
+            match eq |> Equation.toVars with
+            | [] -> ""
+            | [ _ ] -> ""
+            | y::xs ->
+                $"""{y |> varName } = {xs |> List.map varName |> String.concat op}"""
+
+
+        match m with
+        | EquationStartedSolving eq ->
+            $"=== Start solving Equation ===\n{eq |> toString}"
+
+        | EquationStartCalculation (op1, op2, y, x, xs) ->
+            $"start calculating: {Equation.calculationToString op1 op2 y x xs}"
+
+        | EquationFinishedCalculation (xs, changed) ->
+            $"""finished calculation: {if (not changed) then "No changes" else xs |> varsToStr}"""
+
+        | EquationFinishedSolving (eq, b) ->
+            $"""=== Equation Finished Solving ===
+{eq |> Equation.toString true}
+{b |> Equation.SolveResult.toString}
+"""
+
+        | EquationCouldNotBeSolved eq ->
+            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}"
+
+        | SolverStartSolving eqs ->
+            $"=== Solver Start Solving ===\n{eqs |> eqsToStr}"
+
+        | SolverLoopedQue (n, eqs) ->
+            $"solver looped que {n} times with {eqs |> List.length} equations"
+
+        | SolverFinishedSolving eqs ->
+            $"=== Solver Finished Solving ===\n{eqs |> eqsToStr}"
+
+        | ConstraintSortOrder cs ->
+            let s =
+                cs
+                |> List.map (fun (i, c) ->
+                    c
+                    |> Constraint.toString
+                    |> sprintf "%i: %s" i
+                )
+                |> String.concat "\n"
+            $"=== Constraint sort order ===\n{s}"
+
+        | ConstraintApplied c -> $"Constraint {c |> Constraint.toString} applied"
+
+        | ConstrainedSolved c -> $"Constraint {c |> Constraint.toString} solved"
+
+
+    let logger f =
+        {
+            Log =
+                fun { TimeStamp = _; Level = _; Message = msg } ->
+                    match msg with
+                    | :? Logging.SolverMessage as m ->
+                        m |> printMsg |> f
+                    | _ -> $"cannot print msg: {msg}" |> f
+
+        }
