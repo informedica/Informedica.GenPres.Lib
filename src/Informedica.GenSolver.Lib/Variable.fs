@@ -331,6 +331,7 @@ module Variable =
 
             let multipleOf incr max =
                 let incr = incr |> Increment.toValueUnit
+                
                 match max |> toBoolValueUnit with
                 | true, vu  -> vu |> ValueUnit.maxInclMultipleOf incr
                 | false, vu -> vu |> ValueUnit.maxExclMultipleOf incr
@@ -1112,38 +1113,40 @@ module Variable =
         /// Create a string (to print) representation of a `ValueRange`.
         /// `Exact` true prints exact bigrationals, when false
         /// print as floating numbers
-        let print exact min incr max vs =
+        let print exact isNonZero min incr max vs =
+            if isNonZero then "<0..>"
 
-            let printRange min incr max =
-                let minToStr = Minimum.toString exact
-                let maxToStr = Maximum.toString exact
-                let incrToStr = Increment.toString exact
+            else
+                let printRange min incr max =
+                    let minToStr = Minimum.toString exact
+                    let maxToStr = Maximum.toString exact
+                    let incrToStr = Increment.toString exact
 
-                match min, incr, max with
-                | None,     None,  None     -> "<..>"
-                | Some min, None,  None     -> $"{min |> minToStr}..>"
-                | Some min, None,  Some max -> $"{min |> minToStr}..{max |> maxToStr}"
-                | None,     None,  Some max -> $"<..{max |> maxToStr}"
-                | None,     Some incr, None     -> $"<..{incr |> incrToStr}..>"
-                | Some min, Some incr, None     -> $"{min |> minToStr}..{incr |> incrToStr}..>"
-                | None,     Some incr, Some max -> $"<..{incr |> incrToStr}..{max |> maxToStr}"
-                | Some min, Some incr, Some max -> $"{min |> minToStr}..{incr |> incrToStr}..{max |> maxToStr}"
+                    match min, incr, max with
+                    | None,     None,  None     -> "<..>"
+                    | Some min, None,  None     -> $"{min |> minToStr}..>"
+                    | Some min, None,  Some max -> $"{min |> minToStr}..{max |> maxToStr}"
+                    | None,     None,  Some max -> $"<..{max |> maxToStr}"
+                    | None,     Some incr, None     -> $"<..{incr |> incrToStr}..>"
+                    | Some min, Some incr, None     -> $"{min |> minToStr}..{incr |> incrToStr}..>"
+                    | None,     Some incr, Some max -> $"<..{incr |> incrToStr}..{max |> maxToStr}"
+                    | Some min, Some incr, Some max -> $"{min |> minToStr}..{incr |> incrToStr}..{max |> maxToStr}"
 
-            match vs with
-            | Some vs -> $"{vs |> ValueSet.toString exact}"
-            | None -> printRange min incr max
+                match vs with
+                | Some vs -> $"{vs |> ValueSet.toString exact}"
+                | None -> printRange min incr max
 
 
         /// Convert a `ValueRange` to a `string`.
         let toString exact vr =
             let fVs vs =
-                print exact None None None (Some vs)
+                print exact false None None None (Some vs)
 
-            let unr = print exact None None None None
+            let unr = print exact false None None None None
 
-            let nonZero = print exact None None None None
+            let nonZero = print exact true None None None None
 
-            let print min incr max = print exact min incr max None
+            let print min incr max = print exact false min incr max None
 
             let fMin min = print (Some min) None None
 
