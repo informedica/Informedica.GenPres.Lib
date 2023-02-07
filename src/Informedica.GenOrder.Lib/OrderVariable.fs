@@ -24,53 +24,43 @@ module OrderVariable =
     module Multipliers = ValueUnit.Multipliers
 
 
-    module Constraints =
+    let createVr c u v = 
+        [|v|] 
+        |> ValueUnit.create u
+        |> c
 
-
-        let create min incr max vs =
-            {
-                Min = min
-                Max = max
-                Incr = incr
-                Values = vs
-            }
-
-
-        let toString (cs : Constraints) =
-            let toStr = BigRational.toFloat >> Double.toStringNumberNLWithoutTrailingZerosFixPrecision 3
-
-            match cs.Values with
-            | None ->
-                let min = cs.Min |> Option.map Minimum.toBoolBigRational
-                let max = cs.Max |> Option.map Maximum.toBoolBigRational
-                let incr = cs.Incr |> Option.map (Increment.toList >> Set.ofSeq)
-                MinIncrMax.Calculator.toStringNL toStr min incr max
-            | Some vs ->
-                vs
-                |> ValueSet.toSet
-                |> Set.map toStr
-                |> String.concat ", "
+    let createMinIncl = createVr (Minimum.create true)
+    let createMinExcl = createVr (Minimum.create false)
+    let createMaxIncl = createVr (Maximum.create true)
+    let createMaxExcl = createVr (Maximum.create false)
+    let createIncr = createVr Increment.create
+    let createValSet u v = 
+        v 
+        |> Array.ofSeq
+        |> ValueUnit.create u
+        |> ValueSet.create
 
 
     /// Create a `OrderVariable` with preset values
-    let create n min incr max vs un cs =
-        ValueRange.create true min incr max vs
-        |> fun vlr ->
-            let var = Variable.create id n vlr
-            {
-                Constraints = cs
-                Variable = var
-                Unit = un
-            }
+    let create un var vr =
+        {
+            Variable = var
+            Constraints = vr
+            Unit = un
+        }
 
 
     /// Create a new `VariableUnit` with
     /// `Name` **nm** and `Unit` **un**
-    let createNew n un =
-        let min = Minimum.create false 0N |> Some
+    let createNew n un = 
+        let var = n |> Variable.empty
+        
+        var 
+        |> Variable.getValueRange
+        |> create un var
 
-        Constraints.create min None None None
-        |> create n min None None None un
+
+    let hasUnit (ovar : OrderVariable) = ovar.Unit <> NoUnit
 
 
     /// Apply **f** to `VariableUnit` **vru**
@@ -82,64 +72,24 @@ module OrderVariable =
 
 
     /// Get all record fields from a `VariableUnit`
-    let getVariableUnit { Variable = var; Unit = un } =
-        var, un
-
+    let getVariable { Variable = var } = var
+ 
 
     /// Get the `Variable` from a `VariableUnit`
-    let getVar = getVariableUnit >> fst
+    let getValues ovar =  (ovar |> getVariable).Values 
 
 
     /// Get the `Variable.Name` from a `VariableUnit` **vru**
-    let getName ovar = (ovar |> getVar).Name
+    let getName ovar = (ovar |> getVariable).Name
 
 
     let eqsName ovar1 ovar2 = (ovar1 |> getName) = (ovar2 |> getName)
 
 
-
-    /// Get the `Unit` from a `VariableUnit`
-    let getUnit = getVariableUnit >> snd
-
-
-    let hasUnit = getUnit >> ((<>) Unit.NoUnit)
-
-
-    let scale n ovar =
-        let calc = (*) n
-        { ovar with
-            Constraints =
-                { ovar.Constraints with
-                    Min = ovar.Constraints.Min |> Option.map (Minimum.map calc calc)
-                    Max = ovar.Constraints.Max |> Option.map (Maximum.map calc calc)
-                    Incr = ovar.Constraints.Incr |> Option.map (Increment.map calc)
-                    Values = ovar.Constraints.Values |> Option.map (ValueSet.map calc)
-                }
-            Variable =
-                ovar.Variable |> Variable.scale n
-        }
-
-
-    let toBase ovar =
-        let u = ovar |> getUnit
-        let n = u |> Multipliers.getMultiplier
-        ovar |> scale n
-
-
-    let toUnit ovar =
-        let u = ovar |> getUnit
-        let n = 1N / (u |> Multipliers.getMultiplier)
-        ovar |> scale n
-
-
     let applyConstraints (ovar : OrderVariable) =
         { ovar with
             Variable =
-                ovar.Variable.Values
-                |> ValueRange.setOptMin ovar.Constraints.Min
-                |> ValueRange.setOptMax ovar.Constraints.Max
-                |> ValueRange.setOptIncr ovar.Constraints.Incr
-                |> ValueRange.setOptVs ovar.Constraints.Values
+                ovar.Constraints
                 |> Variable.setValueRange true ovar.Variable
         }
 
@@ -158,121 +108,47 @@ module OrderVariable =
         }
 
 
-    let setUnit u ovar : OrderVariable =
-        { ovar with Unit = u }
-
-
     /// Get the string representation of a `VariableUnit` **vru**
     let toString exact ovar =
         let ns = ovar |> getName |> Variable.Name.toString
-        let us = ovar.Unit |> ValueUnit.unitToString
-
-        if us |> String.isNullOrWhiteSpace then ""
-        else
-            ns +
-            (ovar.Variable
-            |> Variable.getValueRange
-            |> ValueRange.toString exact) + " " + us
+        ns +
+        (ovar.Variable
+        |> Variable.getValueRange
+        |> ValueRange.toString exact)
 
 
     /// Returns the values with the string equivalents
     /// of an order variable value set
-    let toValueUnitStringList get n x =
+    let toValueUnitStringList get x =
         x
         |> get
-        |> getVar
+        |> getVariable
         |> Variable.getValueRange
         |> Variable.ValueRange.getValSet
         |> function
         | Some (ValueSet.ValueSet vs) ->
             vs
-            |> Seq.map (fun vs ->
-                vs, x |> get |> getUnit
-            )
-            |> Seq.map (fun (v, u) ->
-                let vs =
-                    v
-                    |> BigRational.toFloat
-                    |> fun x ->
-                        match n with
-                        | Some n -> x |> Double.fixPrecision n
-                        | None   -> x
-                    |> string
-
-                u
-                |> ValueUnit.unitToString
-                |> String.removeTextBetweenBrackets
-                |> fun us -> v, $"%s{vs} %s{us}"
-            )
-        | None -> Seq.empty
+            |> ValueUnit.toStringDutchShort
+        | None -> ""
 
 
-    let toValueUnitString get n x =
-        let toStr =
-            BigRational.toFloat >>
-            Double.toStringNumberNLWithoutTrailingZerosFixPrecision n
-
-        let unt =
-            x |> get |> getUnit
-            |> ValueUnit.unitToString
-            |> String.removeTextBetweenBrackets
-
+    let toValueUnitString get x =
         x
         |> get
-        |> getVar
+        |> getVariable
         |> Variable.getValueRange
         |> fun vr ->
-            let min = vr |> ValueRange.getMin |> Option.map Minimum.toBoolBigRational
-            let incr = vr |> ValueRange.getIncr |> Option.map (Increment.toList >> Set.ofList)
-            let max = vr |> ValueRange.getMax |> Option.map Maximum.toBoolBigRational
             match vr |> ValueRange.getValSet with
             | Some vs ->
                 vs
                 |> ValueSet.toSet
-                |> Set.map toStr
-                |> Set.toSeq
-                |> String.concat ", "
+                |> ValueUnit.toStringDutchShort
             | None ->
-                MinIncrMax.Calculator.toStringNL toStr min incr max
-        |> fun s -> $"%s{s} %s{unt}"
+                let min = vr |> ValueRange.getMin |> Option.map Minimum.toBoolValueUnit
+                let incr = vr |> ValueRange.getIncr |> Option.map (Increment.toValueUnit >> List.singleton)
+                let max = vr |> ValueRange.getMax |> Option.map Maximum.toBoolValueUnit
 
-
-    let getUnits vu =
-        (vu |> get).Unit
-        |> ValueUnit.getUnits
-
-
-    let calcUnit op (vru1, vru2) =
-        let u1 = vru1 |> getUnit
-        let u2 = vru2 |> getUnit
-
-        ValueUnit.calcUnit op u1 u2
-        |> createNew ("result" |> Variable.Name.createExc)
-
-
-    type OrderVariableCalc =
-         | Mult
-         | Div
-         | Add
-         | Subtr with
-
-        static member (?<-) (op, vru1, vru2) =
-            match op with
-            | Mult  -> calcUnit (*) (vru1, vru2)
-            | Div   -> calcUnit (/) (vru1, vru2)
-            | Add   -> calcUnit (+) (vru1, vru2)
-            | Subtr -> calcUnit (-) (vru1, vru2)
-
-
-    module Operators =
-
-        let inline (^*) vru1 vru2 = (?<-) Mult vru1 vru2
-
-        let inline (^/) vru1 vru2 = (?<-) Mult vru1 vru2
-
-        let inline (^+) vru1 vru2 = (?<-) Mult vru1 vru2
-
-        let inline (^-) vru1 vru2 = (?<-) Mult vru1 vru2
+                MinIncrMax.Calculator.toStringNL ValueUnit.toStringDutchShort min incr max
 
 
 
@@ -280,135 +156,34 @@ module OrderVariable =
     /// data transfer type for a `VariableUnit`
     module Dto =
 
-        module ValueRange = Variable.ValueRange
-
-        type VarDto () =
-            member val Min : BigRational option = None with get, set
-            member val MinIncl = false with get, set
-            member val Incr : BigRational list = [] with get, set
-            member val Max : BigRational option = None with get, set
-            member val MaxIncl = false with get, set
-            member val Vals : BigRational list = [] with get, set
-
 
         type Dto () =
-            member val Name = "" with get, set
+            member val Variable = Variable.Dto.dto () with get, set
+            member val Constraints = Variable.Dto.dto () with get, set
             member val Unit = "" with get, set
-            member val Constraints = VarDto () with get, set
-            member val Variable = VarDto () with get, set
 
 
         let dto () = Dto ()
 
 
         let fromDto (dto: Dto) =
-            let un =
-                if dto.Unit |> String.isNullOrWhiteSpace then Unit.NoUnit
-                else
-                    dto.Unit
-                    |> ValueUnit.unitFromString
-                    |> Option.defaultValue Unit.NoUnit
-
-            let cs =
-                let vs =
-                    dto.Constraints.Vals
-                    |> function
-                    | [] -> None
-                    | xs -> xs |> Set.ofList |> ValueSet.create |> Some
-
-                let incr =
-                    dto.Constraints.Incr
-                    |> function
-                    | [] -> None
-                    | xs -> xs |> Set.ofList |> Increment.create |> Some
-
-                let min  = dto.Constraints.Min  |> Option.map  (Minimum.create  dto.Constraints.MinIncl)
-                let max  = dto.Constraints.Max  |> Option.map  (Maximum.create  dto.Constraints.MaxIncl)
-                Constraints.create min incr max vs
-
-            let n = dto.Name |> Name.fromString
-            let vals =
-                dto.Variable.Vals
-                |> function
-                | [] -> None
-                | xs -> xs |> Set.ofList |> ValueSet.create |> Some
-
-            let incr =
-                dto.Variable.Incr
-                |> function
-                | [] -> None
-                | xs -> xs |> Set.ofList |> Increment.create |> Some
-
-            let min  = dto.Variable.Min  |> Option.map  (Minimum.create  dto.Variable.MinIncl)
-            let max  = dto.Variable.Max  |> Option.map  (Maximum.create  dto.Variable.MaxIncl)
-
-            create n min incr max vals un cs
+            dto.Unit 
+            |> Units.fromString
+            |> Option.map (fun un ->
+                dto.Constraints 
+                |> Variable.Dto.fromDto
+                |> Variable.getValueRange
+                |> create un (dto.Variable |> Variable.Dto.fromDto)
+            )
 
 
         let toDto (ovar : OrderVariable) =
             let dto = dto ()
-            let vr =
-                ovar
-                |> getVar
-                |> Variable.getValueRange
-
-            dto.Name <-
-                ovar |> getName |> Name.toString
-            dto.Unit <-
-                ovar |> getUnit |> ValueUnit.unitToString
-
-            dto.Variable.Vals <-
-                vr
-                |> ValueRange.getValSet
-                |> Option.map (ValueSet.toSet >> Set.toList)
-                |> Option.defaultValue []
-            dto.Variable.Incr <-
-                vr
-                |> ValueRange.getIncr
-                |> Option.map Increment.toList
-                |> Option.defaultValue []
-            dto.Variable.Min <-
-                vr
-                |> ValueRange.getMin
-                |> Option.map Minimum.toBigRational
-            dto.Variable.MinIncl <-
-                vr
-                |> ValueRange.getMin
-                |> Option.map Minimum.isIncl
-                |> Option.defaultValue false
-            dto.Variable.Max <-
-                vr
-                |> ValueRange.getMax
-                |> Option.map Maximum.toBigRational
-            dto.Variable.MaxIncl <-
-                vr
-                |> ValueRange.getMax
-                |> Option.map Maximum.isIncl
-                |> Option.defaultValue false
-
-            dto.Constraints.Vals <-
-                ovar.Constraints.Values
-                |> Option.map (ValueSet.toSet >> Set.toList)
-                |> Option.defaultValue []
-            dto.Constraints.Incr <-
-                ovar.Constraints.Incr
-                |> Option.map Increment.toList
-                |> Option.defaultValue []
-
-            dto.Constraints.Min <-
-                ovar.Constraints.Min
-                |> Option.map Minimum.toBigRational
-            dto.Constraints.MinIncl <-
-                ovar.Constraints.Min
-                |> Option.map Minimum.isIncl
-                |> Option.defaultValue false
-            dto.Constraints.Max <-
-                ovar.Constraints.Max
-                |> Option.map Maximum.toBigRational
-            dto.Constraints.MaxIncl <-
-                ovar.Constraints.Max
-                |> Option.map Maximum.isIncl
-                |> Option.defaultValue false
+            dto.Variable <- ovar.Variable |> Variable.Dto.toDto
+            dto.Constraints <- 
+                ovar.Constraints 
+                |> Variable.createSucc ovar.Variable.Name
+                |> Variable.Dto.toDto
 
             dto
 
@@ -427,19 +202,10 @@ module OrderVariable =
         let toOrdVar (Count.Count cnt) = cnt
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits = toOrdVar >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> count
+        let fromDto dto = dto |> Dto.fromDto |> Option.map count
 
 
         /// Set a `Count` with a `Variable`
@@ -465,12 +231,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> count
-
-
-        let toUnit = toOrdVar >> toUnit >> count
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> count
 
 
@@ -489,19 +249,10 @@ module OrderVariable =
         let toOrdVar (Time.Time tme) = tme
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits = toOrdVar >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> time
+        let fromDto dto = dto |> Dto.fromDto |> Option.map time
 
 
         /// Set a `Time` with a `Variable`
@@ -528,11 +279,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> time
-
-
-        let toUnit = toOrdVar >> toUnit >> time
-
 
         let applyConstraints = toOrdVar >> applyConstraints >> time
 
@@ -549,19 +295,11 @@ module OrderVariable =
         let toOrdVar (Frequency frq) = frq
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits = toOrdVar >> getUnits
-
 
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Frequency
+        let fromDto dto = dto |> Dto.fromDto |> Option.map Frequency
 
 
         /// Set a `Frequency` with a `Variable`
@@ -592,12 +330,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Frequency
-
-
-        let toUnit = toOrdVar >> toUnit >> Frequency
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> Frequency
 
 
@@ -614,21 +346,11 @@ module OrderVariable =
         let toOrdVar (Concentration cnc) = cnc
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
 
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Concentration
+        let fromDto dto = dto |> Dto.fromDto |> Option.map Concentration
 
 
         /// Set a `Concentration` with a `Variable`
@@ -660,11 +382,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Concentration
-
-
-        let toUnit = toOrdVar >> toUnit >> Concentration
-
 
         let applyConstraints = toOrdVar >> applyConstraints >> Concentration
 
@@ -681,21 +398,11 @@ module OrderVariable =
         let toOrdVar (Quantity qty) = qty
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
 
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Quantity
+        let fromDto dto = dto |> Dto.fromDto |> Option.map Quantity
 
 
         /// Set a `Quantity` with a `Variable`
@@ -722,12 +429,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Quantity
-
-
-        let toUnit = toOrdVar >> toUnit >> Quantity
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> Quantity
 
 
@@ -743,20 +444,10 @@ module OrderVariable =
         let toOrdVar (PerTime ptm) = ptm
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> PerTime
+        let fromDto dto = dto |> Dto.fromDto |> Option.map PerTime
 
 
         /// Set a `PerTime` with a `Variable`
@@ -787,12 +478,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> PerTime
-
-
-        let toUnit = toOrdVar >> toUnit >> PerTime
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> PerTime
 
 
@@ -807,20 +492,10 @@ module OrderVariable =
         let toOrdVar (Rate rte) = rte
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Rate
+        let fromDto dto = dto |> Dto.fromDto |> Option.map Rate
 
 
         /// Set a `PerTime` with a `Variable`
@@ -851,12 +526,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Rate
-
-
-        let toUnit = toOrdVar >> toUnit >> Rate
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> Rate
 
 
@@ -872,21 +541,10 @@ module OrderVariable =
         let toOrdVar (Total tot) = tot
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> Total
+        let fromDto dto = dto |> Dto.fromDto |> Option.map Total
 
 
         /// Set a `Quantity` with a `Variable`
@@ -913,12 +571,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> Total
-
-
-        let toUnit = toOrdVar >> toUnit >> Total
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> Total
 
 
@@ -935,18 +587,11 @@ module OrderVariable =
         let toOrdVar (QuantityAdjust qty_adj) = qty_adj
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
 
         let toDto = toOrdVar >> Dto.toDto
 
-        let fromDto dto = dto |> Dto.fromDto |> QuantityAdjust
+
+        let fromDto dto = dto |> Dto.fromDto |> Option.map QuantityAdjust
 
         /// Set a `QuantityAdjust` with a `Variable`
         /// in a list fromVariable` lists
@@ -977,12 +622,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> QuantityAdjust
-
-
-        let toUnit = toOrdVar >> toUnit >> QuantityAdjust
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> QuantityAdjust
 
 
@@ -999,21 +638,10 @@ module OrderVariable =
         let toOrdVar (PerTimeAdjust ptm_adj) = ptm_adj
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> PerTimeAdjust
+        let fromDto dto = dto |> Dto.fromDto |> Option.map PerTimeAdjust
 
 
         /// Set a `TotalAdjust` with a `Variable`
@@ -1047,12 +675,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> PerTimeAdjust
-
-
-        let toUnit = toOrdVar >> toUnit >> PerTimeAdjust
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> PerTimeAdjust
 
 
@@ -1069,21 +691,10 @@ module OrderVariable =
         let toOrdVar (RateAdjust rte_adj) = rte_adj
 
 
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
-
         let toDto = toOrdVar >> Dto.toDto
 
 
-        let fromDto dto = dto |> Dto.fromDto |> RateAdjust
+        let fromDto dto = dto |> Dto.fromDto |> Option.map RateAdjust
 
 
         /// Set a `TotalAdjust` with a `Variable`
@@ -1117,12 +728,6 @@ module OrderVariable =
         let toValueUnitString = toValueUnitString toOrdVar
 
 
-        let toBase = toOrdVar >> toBase >> RateAdjust
-
-
-        let toUnit = toOrdVar >> toUnit >> RateAdjust
-
-
         let applyConstraints = toOrdVar >> applyConstraints >> RateAdjust
 
 
@@ -1138,19 +743,9 @@ module OrderVariable =
         /// Turn `QuantityAdjust` in a `VariableUnit`
         let toOrdVar (TotalAdjust tot_adj) = tot_adj
 
-
-        let unitToString =
-            toOrdVar
-            >> getUnit
-            >> ValueUnit.unitToString
-
-        let getUnits =
-            toOrdVar
-            >> getUnits
-
         let toDto = toOrdVar >> Dto.toDto
 
-        let fromDto dto = dto |> Dto.fromDto |> TotalAdjust
+        let fromDto dto = dto |> Dto.fromDto |> Option.map TotalAdjust
 
         /// Set a `QuantityAdjust` with a `Variable`
         /// in a list fromVariable` lists
@@ -1179,12 +774,6 @@ module OrderVariable =
 
 
         let toValueUnitString = toValueUnitString toOrdVar
-
-
-        let toBase = toOrdVar >> toBase >> TotalAdjust
-
-
-        let toUnit = toOrdVar >> toUnit >> TotalAdjust
 
 
         let applyConstraints = toOrdVar >> applyConstraints >> TotalAdjust

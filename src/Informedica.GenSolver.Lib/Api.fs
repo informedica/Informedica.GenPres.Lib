@@ -29,7 +29,7 @@ module Api =
             |> List.map (Array.collect (String.splitAt op))
             |> List.map (Array.map String.trim)
             |> List.map (Array.filter notEmpty)
-            |> List.map (Array.map VRD.createNew)
+            |> List.map (Array.map VRD.withName)
 
         (parse prodEqs '*' |> createProdEqs) @ (parse sumEqs '+' |> createSumEqs)
 

@@ -1629,6 +1629,9 @@ module Variable =
     let createSucc = create id
 
 
+    let empty n = Unrestricted |> createSucc n
+
+
     /// Helper create function to
     /// store the result of a `Variable`
     /// calculation before applying to
@@ -1835,76 +1838,29 @@ module Variable =
         module Increment = ValueRange.Increment
 
         /// The `Dto` representation of a `Variable`
-        type Dto =
-            {
-                Name: string
-                Min: ValueUnit.Dto.Dto option
-                MinIncl: bool
-                Incr : ValueUnit.Dto.Dto option
-                Max: ValueUnit.Dto.Dto option
-                MaxIncl: bool
-                Vals: ValueUnit.Dto.Dto option
-            }
+        type Dto () =
+            member val Name = "" with get, set
+            member val isNonZeroNegative = false with get, set
+            member val Min : ValueUnit.Dto.Dto option = None with get, set
+            member val MinIncl = false with get, set
+            member val Incr : ValueUnit.Dto.Dto option = None with get, set
+            member val Max : ValueUnit.Dto.Dto option = None with get, set
+            member val MaxIncl = false with get, set
+            member val Vals : ValueUnit.Dto.Dto option = None with get, set
+
 
         let isUnr (dto : Dto) =
             dto.Min.IsNone && dto.Max.IsNone &&
-            dto.Incr.IsNone && dto.Vals.IsNone
-
-        /// Create a `Dto`
-        let createDto n min minincl incr max maxincl vals =
-            {
-                Name = n
-                Vals = vals
-                Min = min
-                MinIncl = minincl
-                Incr = incr
-                Max = max
-                MaxIncl = maxincl
-            }
-
-        /// Create an *empty* *new* `Dto` with only a name **n**
-        let createNew n = createDto n None false None None false None
-
-        /// Apply `f` to an `Dto` `d`
-        let apply f (d: Dto) = f d
-
-        /// Apply an array of `vals` to an **dto**
-        /// making sure the `Unr` is set to `false`.
-        let setVals vals dto = { dto with Vals = vals }
+            dto.Incr.IsNone && dto.Vals.IsNone &&
+            not dto.isNonZeroNegative 
 
 
-        let setIncr incr dto = { dto with Incr = incr }
+        let dto () = Dto ()
 
-        /// Set a `min` to an **dto** that is either inclusive `incl` true or exclusive `false`
-        let setMin  min incl dto = { dto with Min = min; MinIncl = incl }
-
-        /// Set a `max` to an **dto** that is either inclusive `incl` true or exclusive `false`
-        let setMax  max incl dto = { dto with Max = max; MaxIncl = incl }
-
-        /// Match a string **p** to a field of `Dto`
-        let (|Vals|Incr|MinIncl|MinExcl|MaxIncl|MaxExcl|NoProp|) p =
-            match p |> String.toLower with
-            | "vals"     -> Vals
-            | "incr"     -> Incr
-            | "minincl"  -> MinIncl
-            | "minexcl"  -> MinExcl
-            | "maxincl"  -> MaxIncl
-            | "maxexcl"  -> MaxExcl
-            | _          -> NoProp
-
-
-        /// Set a `Dto` member **p** with a value `v` to a `Dto` **dto**.
-        /// If no field can be matched the **dto** is returned unchanged.
-        let setProp p vs dto =
-
-            match p with
-            | Vals     -> dto |> setVals vs
-            | Incr     -> dto |> setIncr vs
-            | MinIncl  -> dto |> setMin  vs true
-            | MinExcl  -> dto |> setMin  vs false
-            | MaxIncl  -> dto |> setMax  vs true
-            | MaxExcl  -> dto |> setMax  vs false
-            | _   -> dto
+        let withName n = 
+            let dto = dto ()
+            dto.Name <- n
+            dto
 
 
         /// Create a `Variable` from a `Dto` and
@@ -1919,7 +1875,10 @@ module Variable =
             let max = dto.Max |> Option.bind (fun v -> v |> ValueUnit.Dto.fromDto |> Option.map  (Maximum.create dto.MaxIncl))
             let incr = dto.Incr |> Option.bind (fun v -> v |> ValueUnit.Dto.fromDto |> Option.map (Increment.create))
 
-            let vr = ValueRange.create true min incr max vs
+            let vr = 
+                if dto.isNonZeroNegative then NonZeroNoneNegative
+                else
+                    ValueRange.create true min incr max vs
 
             create succ n vr
 
@@ -1928,78 +1887,53 @@ module Variable =
         let toString exact = fromDto >> toString exact
 
 
-        (*
-        /// Create a `Variable` option from a `Dto` and
-        /// return `None` when this fails.
-        let fromDtoOpt (dto: Dto) =
-            let succ = Some
-            let fail = Option.none
-
-            let n = dto.Name |> Name.create succ (fun m -> m |> fail)
-
-            let vs =
-                match dto.Vals with
-                | [] -> None
-                | _ ->
-                    dto.Vals
-                    |> Set.ofList
-                    |> ValueRange.ValueSet.create
-                    |> Some
-
-            let min = dto.Min |> Option.bind (fun v -> v |> Minimum.create dto.MinIncl |> Some)
-            let max = dto.Max |> Option.bind (fun v -> v |> Maximum.create dto.MaxIncl |> Some)
-            let incr =
-                if dto.Incr |> List.isEmpty then None
-                else
-                    dto.Incr
-                    |> Set.ofList |> ValueRange.Increment.create
-                    |> Some
-
-            try
-                let vr = ValueRange.create true min incr max vs
-
-                match n with
-                | Some n' -> create succ n' vr
-                | _ -> None
-            with _ -> None
-        *)
-
-
         /// Create a `Dto` from a `Variable`.
         let toDto (v: Variable) =
+            let vuToDto = ValueUnit.Dto.toDtoDutchShort
 
-            let dto = createNew (let (Name.Name n) = v.Name in n)
+            let dto = dto ()
+            dto.Name <- v.Name |> Name.toString
 
-            let minincl =
-                match v.Values |> ValueRange.getMin with
-                | Some m -> m |> Minimum.isExcl |> not | None -> false
+            match v.Values with
+            | Unrestricted -> dto
+            | NonZeroNoneNegative ->
+                dto.isNonZeroNegative <- true 
+                dto
+            | _ ->
+                let incr = 
+                    v.Values 
+                    |> ValueRange.getIncr
+                    |> Option.map (Increment.toValueUnit >> vuToDto)
 
-            let maxincl =
-                match v.Values |> ValueRange.getMax with
-                | Some m -> m |> Maximum.isExcl |> not | None -> false
+                let minincl =
+                    match v.Values |> ValueRange.getMin with
+                    | Some m -> m |> Minimum.isExcl |> not | None -> false
 
-            let min  =
-                v.Values
-                |> ValueRange.getMin
-                |> Option.map Minimum.toValueUnit
-                |> Option.bind (ValueUnit.Dto.toDto true ValueUnit.Dto.english)
+                let maxincl =
+                    match v.Values |> ValueRange.getMax with
+                    | Some m -> m |> Maximum.isExcl |> not | None -> false
 
-            let max  =
-                v.Values
-                |> ValueRange.getMax
-                |> Option.map Maximum.toValueUnit
-                |> Option.bind (ValueUnit.Dto.toDto true ValueUnit.Dto.english)
+                let min  =
+                    v.Values
+                    |> ValueRange.getMin
+                    |> Option.map (Minimum.toValueUnit >> vuToDto)
 
-            let vals =
-                v.Values
-                |> ValueRange.getValSet
-                |> function
-                | Some (ValueSet vs) -> vs |> ValueUnit.Dto.toDto true ValueUnit.Dto.english
-                | None -> None
+                let max  =
+                    v.Values
+                    |> ValueRange.getMax
+                    |> Option.map (Maximum.toValueUnit >> vuToDto)
 
-            { dto with
-                Vals = vals
-                Min = min
-                MinIncl = minincl
-                Max = max
-                MaxIncl = maxincl }
+                let vals =
+                    v.Values
+                    |> ValueRange.getValSet
+                    |> Option.map (ValueSet.toSet >> vuToDto)
+
+                dto.Incr <- incr
+                dto.Min <- min
+                dto.MinIncl <- minincl
+                dto.Max <- max
+                dto.MaxIncl <- maxincl
+                dto.Vals <- vals
+                
+                dto
+

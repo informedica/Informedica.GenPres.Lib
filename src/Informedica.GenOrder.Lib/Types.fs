@@ -20,18 +20,10 @@ module Types =
         /// to the `Unit`
         type OrderVariable =
             {
-                Constraints : Constraints
                 /// Stores the values/range
                 Variable:  Variable
-                /// Stores the unit
-                Unit: Unit
-            }
-        and Constraints =
-            {
-                    Min : Minimum option
-                    Max : Maximum option
-                    Incr : Increment option
-                    Values : ValueSet option
+                Constraints : ValueRange
+                Unit : Unit
             }
 
 

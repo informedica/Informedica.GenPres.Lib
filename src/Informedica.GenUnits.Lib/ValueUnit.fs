@@ -482,6 +482,9 @@ module ValueUnit =
     let create u v = (v |> Array.distinct, u) |> ValueUnit
 
 
+    let empty = create NoUnit [||]
+
+
     let createSingle u v = [|v|] |> create u
 
 
