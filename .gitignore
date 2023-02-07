@@ -152,6 +152,9 @@
 # Informedica.Utils.Tests
 !/tests/Informedica.Utils.Tests/
 !/tests/Informedica.Utils.Tests/Scripts/
+# Informedica.Utils.Tests
+!/tests/Informedica.ZIndex.Tests/
+!/tests/Informedica.ZIndex.Tests/Scripts/
 # Informedica.GenUnits.Tests
 !/tests/Informedica.GenUnits.Tests/
 !/tests/Informedica.GenUnits.Tests/Scripts/

@@ -799,14 +799,15 @@ module ValueUnit =
 
 
     let cmp cp vu1 vu2 =
-        if vu1 |> eqsGroup vu2 |> not then false
-        else
-            let vs1 = vu1 |> toBaseValue
-            let vs2 = vu2 |> toBaseValue
-            Array.allPairs vs1 vs2
-            |> Array.forall (fun (v1, v2)  ->
-                v1 |> cp <| v2
-            )
+        // ToDo need better eqsGroup like mg/kg/day = (mg/kg)/day = (mg/kg*day) <> mg/(kg/day) = mg*day/kg 
+        //if vu1 |> eqsGroup vu2 |> not then false
+        //else
+        let vs1 = vu1 |> toBaseValue
+        let vs2 = vu2 |> toBaseValue
+        Array.allPairs vs1 vs2
+        |> Array.forall (fun (v1, v2)  ->
+            v1 |> cp <| v2
+        )
 
 
     let applyToValue fValue vu =

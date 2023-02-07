@@ -269,7 +269,7 @@ module Equation =
                             // recalculate x
                             x <== (y |> op2 <| (xs |> without x |> List.reduce op1))
 
-                (changed || (x.Values <> newX.Values))
+                (changed || (x.Values <> newX.Values)) 
                 |> calcXs op1 op2 y (xs |> replAdd newX) tail
 
         let calcY op1 y xs =
@@ -283,7 +283,7 @@ module Equation =
                 let temp = xs |> List.reduce op1
                 let newY = y <== temp //(xs |> List.reduce op1)
 
-                let yChanged = newY.Values <> y.Values
+                let yChanged = newY.Values <> y.Values // should be in base units?
 
                 // log finishing the calculation
                 (newY::xs, yChanged)

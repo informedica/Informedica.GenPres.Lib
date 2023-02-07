@@ -112,6 +112,11 @@ let solveValues u n vals = solve n (vals |> createValSet u |> ValsProp)
 let init     = Api.init
 let nonZeroNegative = Api.nonZeroNegative
 
+
+let solveCountMinIncl = solveMinIncl Units.Count.times
+let solveCountMaxExcl = solveMaxExcl Units.Count.times
+let solveCountValues u n vals = solveValues Units.Count.times u n vals
+
 #!markdown
 
 ## Variables, equations and notation
@@ -159,9 +164,6 @@ We can limit the variables to a lower and upper limit.
 
 simpleEq |> Ok |> printEqs
 
-let solveCountMinIncl = solveMinIncl Units.Count.times
-let solveCountMaxExcl = solveMaxExcl Units.Count.times
-
 simpleEq
 |> solveCountMinIncl "b" 0N
 |> printEqs
@@ -173,8 +175,6 @@ simpleEq
 We can now try to change variable ``a``.
 
 #!fsharp
-
-let solveCountValues = solveValues Units.Count.times
 
 printfn "=== Try setting 10 to variable a will throw an exception ==="
 try
@@ -739,11 +739,11 @@ pcmEqs
 |>> solveValues supp "SuppositoryDoseQuantity" [1N]
 |>> solveMinIncl mgPerKgPerDay "ParacetamolDoseTotalAdjust" 40N
 |>> solveMaxIncl mgPerKgPerDay "ParacetamolDoseTotalAdjust" 90N
-|>> solveMaxIncl Units.Mass.milliGram "ParacetamolDoseQuantity" 1000N
+|>> solveMaxIncl mg "ParacetamolDoseQuantity" 1000N
 |>> solveMaxIncl mgPerDay "ParacetamolDoseTotal" 4000N
 |>> solveValues timesPerDay "Frequency" [2N; 3N; 4N; 6N]
 |>> solveValues kg "Adjust" [10N]
-|> printEqs
+|> printEqsWithUnits
 |> ignore
 
 #!markdown
@@ -757,10 +757,10 @@ pcmEqs
 |>> solveValues supp "SuppositoryDoseQuantity" [1N]
 |>> solveMinIncl mgPerKgPerDay "ParacetamolDoseTotalAdjust" 40N
 |>> solveMaxIncl mgPerKgPerDay "ParacetamolDoseTotalAdjust" 90N
-|>> solveMaxIncl Units.Mass.milliGram "ParacetamolDoseQuantity" 1000N
+|>> solveMaxIncl mg "ParacetamolDoseQuantity" 1000N
 |>> solveMaxIncl mgPerDay "ParacetamolDoseTotal" 4000N
 |>> solveValues timesPerDay "Frequency" [3N] // picked frequency = 3
 |>> solveValues kg "Adjust" [10N]
 //|>> solveAll 
-|> printEqs
+|> printEqsWithUnits
 |> ignore

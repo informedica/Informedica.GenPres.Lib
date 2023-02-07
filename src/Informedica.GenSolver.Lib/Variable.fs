@@ -809,6 +809,7 @@ module Variable =
         let incrMaxToValueRange incr max =
             (incr, max |> maxMultipleOf incr) |> IncrMax
 
+
         /// Create a `MinIncrMax` `ValueRange`. If **min** > **max** raises
         /// an `MinLargetThanMax` exception. If min equals max, a `ValueSet` with
         /// value min (=max).
@@ -972,6 +973,54 @@ module Variable =
                 v |> ValueUnit.getBaseValue |> Array.forall (isMultipleOfIncr incr)
 
 
+        /// Apply a **incr** to a `ValueRange` **vr**.
+        /// If increment cannot be set the original is returned.
+        /// So, the resulting increment is always more restrictive as the previous one
+        let setIncr onlyMinIncrMax newIncr vr =
+            let restrict = Increment.restrict newIncr
+
+            let nonZero =
+                newIncr
+                |> Increment.toValueUnit
+                |> ValueUnit.setSingleValue 0N // ToDo should be min el of incr
+                |> Minimum.create false,
+                newIncr
+
+
+            let fMin min = minIncrToValueRange min newIncr
+
+            let fMax max = incrMaxToValueRange newIncr max
+
+            let fMinMax (min, max) = minIncrMaxToValueRange onlyMinIncrMax min newIncr max
+
+            let fIncr = restrict >> Incr
+
+            let fMinIncr (min, incr) =
+                minIncrToValueRange min (incr |> restrict)
+
+            let fIncrMax (incr, max) =
+                incrMaxToValueRange (incr |> restrict) max
+
+            let fMinIncrMax (min, incr, max) =
+                minIncrMaxToValueRange onlyMinIncrMax min (incr |> restrict) max
+
+            let fValueSet =
+                filter None (Some newIncr) None >> ValSet
+
+            vr
+            |> apply
+                (newIncr |> Incr)
+                (nonZero |> MinIncr)
+                fMin
+                fMax
+                fMinMax
+                fIncr
+                fMinIncr
+                fIncrMax
+                fMinIncrMax
+                fValueSet
+
+
         /// Apply a `Minimum` **min** to a `ValueRange` **vr**.
         /// If minimum cannot be set the original `Minimum` is returned.
         /// So, it always returns a more restrictive, i.e. larger, or equal `Minimum`.
@@ -1013,53 +1062,6 @@ module Variable =
                 fMinIncrMax
                 fValueSet
 
-
-        /// Apply a **incr** to a `ValueRange` **vr**.
-        /// If increment cannot be set the original is returned.
-        /// So, the resulting increment is always more restrictive as the previous one
-        let setIncr onlyMinIncrMax newIncr vr =
-            let restrict = Increment.restrict newIncr
-
-            let nonZero =
-                newIncr
-                |> Increment.toValueUnit
-                |> ValueUnit.setSingleValue 0N
-                |> Minimum.create false,
-                newIncr
-
-
-            let fMin min = minIncrToValueRange min newIncr
-
-            let fMax max = incrMaxToValueRange newIncr max
-
-            let fMinMax (min, max) = minIncrMaxToValueRange onlyMinIncrMax min newIncr max
-
-            let fIncr = restrict >> Incr
-
-            let fMinIncr (min, incr) =
-                minIncrToValueRange min (incr |> restrict)
-
-            let fIncrMax (incr, max) =
-                incrMaxToValueRange (incr |> restrict) max
-
-            let fMinIncrMax (min, incr, max) =
-                minIncrMaxToValueRange onlyMinIncrMax min (incr |> restrict) max
-
-            let fValueSet =
-                filter None (Some newIncr) None >> ValSet
-
-            vr
-            |> apply
-                (newIncr |> Incr)
-                (nonZero |> MinIncr)
-                fMin
-                fMax
-                fMinMax
-                fIncr
-                fMinIncr
-                fIncrMax
-                fMinIncrMax
-                fValueSet
 
 
         let setMax onlyMinIncrMax newMax (vr: ValueRange) =
@@ -1570,7 +1572,7 @@ module Variable =
         /// Set a `ValueRange` expr to a `ValueRange` y.
         /// So, the result is equal to or more restrictive than the original `y`.
         let applyExpr onlyMinIncrMax y expr =
-            let set get set vr =
+            let appl get set vr =
                 match expr |> get with
                 | Some m -> vr |> set m
                 | None   -> vr
@@ -1580,9 +1582,9 @@ module Variable =
             | ValSet vs    -> y |> setValueSet vs
             | _ ->
                 y
-                |> set getMin (setMin onlyMinIncrMax)
-                |> set getIncr (setIncr onlyMinIncrMax)
-                |> set getMax (setMax onlyMinIncrMax)
+                |> appl getIncr (setIncr onlyMinIncrMax)
+                |> appl getMin (setMin onlyMinIncrMax)
+                |> appl getMax (setMax onlyMinIncrMax)
 
 
         module Operators =
@@ -1682,6 +1684,7 @@ module Variable =
             |> Exceptions.VariableCannotSetValueRange
             |> raiseExc errs
 
+
     /// Set the values to a `ValueRange`
     /// that prevents zero or negative values.
     let setNonZeroOrNegative v =
@@ -1699,16 +1702,19 @@ module Variable =
     let eqValues var1 var2 =
         var1 |> getValueRange = (var2 |> getValueRange)
 
+
     /// Checks whether a `Variable` **v** is solved,
     /// i.e. there is but one possible value left.
     let isSolved var =
         (var |> getValueRange |> ValueRange.isValueSet) &&
         (var |> count = 1)
 
+
     /// Checks whether a `Variable` is *solvable*
     /// i.e. can be further restricted to one value
     /// (or no values at all)
     let isSolvable = isSolved >> not
+
 
     /// Checks whether there are no restrictions to
     /// possible values a `Variable` can contain
@@ -1761,7 +1767,11 @@ module Variable =
 
         let inline (@<-) vr1 vr2 =
             try
-                { vr1 with Values = (vr1 |> getValueRange) @<- (vr2 |> getValueRange) }
+                { vr1 with 
+                    Values = 
+                        (vr2 |> getValueRange)
+                        |> ValueRange.applyExpr true (vr1 |> getValueRange) 
+                }
             with
             | Exceptions.SolverException errs ->
                 (vr1, vr2 |> getValueRange)
