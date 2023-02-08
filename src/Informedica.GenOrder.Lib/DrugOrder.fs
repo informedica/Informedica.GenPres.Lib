@@ -15,7 +15,21 @@ module DrugOrder =
     module MinMax = Informedica.GenForm.Lib.MinMax
 
 
+
+    let createValueUnitDto u br =
+        let vuDto = ValueUnit.Dto.dto()
+        vuDto.Value <- br |> Seq.toArray |> Array.map BigRational.toDecimal
+        vuDto.Unit <- u
+        vuDto |> Some
+
+
+    let createSingleValueUnitDto u br =
+        createValueUnitDto u [| br |]
+
+
     module MinMax =
+
+
 
         let setConstraints (brs : BigRational []) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
             let min =
@@ -28,10 +42,17 @@ module DrugOrder =
                 | None, [|br|] -> br + br / 10N |> Some
                 | _  -> minMax.Maximum
 
-            dto.MinIncl <- min.IsSome
-            dto.Min <- min
-            dto.MaxIncl <- max.IsSome
-            dto.Max <- max
+            match min with
+            | None -> ()
+            | Some min ->
+                dto.MinIncl <- true
+                dto.Min <- min |> createSingleValueUnitDto ""
+
+            match max with
+            | None -> ()
+            | Some max ->
+                dto.MaxIncl <- true
+                dto.Max <- max |> createSingleValueUnitDto ""
 
             dto
 
@@ -110,11 +131,11 @@ module DrugOrder =
         let toArr = Option.map Array.singleton >> Option.defaultValue [||]
 
         let setDoseRate (orbDto : Order.Orderable.Dto.Dto) =
-            orbDto.Dose.Rate.Constraints.Incr <- [ 1N/10N ]
+            orbDto.Dose.Rate.Constraints.Incr <- 1N/10N |> createSingleValueUnitDto ""
             orbDto.Dose.Rate.Constraints.MinIncl <- true
-            orbDto.Dose.Rate.Constraints.Min <- 1N/10N |> Some
+            orbDto.Dose.Rate.Constraints.Min <- 1N/10N |> createSingleValueUnitDto ""
             orbDto.Dose.Rate.Constraints.MaxIncl <- true
-            orbDto.Dose.Rate.Constraints.Max <- 1000N |> Some
+            orbDto.Dose.Rate.Constraints.Max <- 1000N |> createSingleValueUnitDto ""
 
         let ou = d.Unit |> unitGroup
         let au = d.AdjustUnit |> unitGroup
@@ -129,17 +150,15 @@ module DrugOrder =
 
         orbDto.DoseCount.Constraints.Vals <-
             d.DoseCount
-            |> Option.map List.singleton
-            |> Option.defaultValue []
+            |> Option.bind (createSingleValueUnitDto "")
 
-        orbDto.OrderableQuantity.Constraints.Vals <- d.Quantities
+        orbDto.OrderableQuantity.Constraints.Vals <- d.Quantities |> createValueUnitDto ""
         orbDto.OrderableQuantity.Unit <- ou
         orbDto.OrderQuantity.Unit <- ou
 
         orbDto.DoseCount.Constraints.Vals <-
             d.DoseCount
-            |> Option.map List.singleton
-            |> Option.defaultValue []
+            |> Option.bind (createSingleValueUnitDto "")
 
         match d.OrderType with
         | AnyOrder
@@ -153,14 +172,14 @@ module DrugOrder =
             match d.Dose with
             | Some dl ->
                 orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
-                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Maximum.IsSome
-                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Maximum
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Minimum.IsSome
-                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Maximum.IsSome
-                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Maximum
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
             | None -> ()
 
@@ -173,27 +192,27 @@ module DrugOrder =
             orbDto.Dose.PerTimeAdjust.Unit <- $"{du}/{au}/{fu}"
             match d.Dose with
             | Some dl ->
-                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> Array.toList
+                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> createValueUnitDto ""
 
                 orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Minimum.IsSome
-                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum
+                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.Quantity.Constraints.MaxIncl <- dl.Quantity.Maximum.IsSome
-                orbDto.Dose.Quantity.Constraints.Max <- dl.Quantity.Maximum
+                orbDto.Dose.Quantity.Constraints.Max <- dl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.QuantityAdjust.Constraints.MinIncl <- dl.QuantityAdjust.Minimum.IsSome
-                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum
+                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.QuantityAdjust.Constraints.MaxIncl <- dl.QuantityAdjust.Maximum.IsSome
-                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum
+                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.PerTime.Constraints.MinIncl <- dl.PerTime.Minimum.IsSome
-                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum
+                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.PerTime.Constraints.MaxIncl <- dl.PerTime.Maximum.IsSome
-                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum
+                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.PerTimeAdjust.Constraints.MinIncl <- dl.PerTimeAdjust.Minimum.IsSome
-                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum
+                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
-                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum
+                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
             | None -> ()
 
@@ -210,37 +229,37 @@ module DrugOrder =
 
             match d.Dose with
             | Some dl ->
-                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> Array.toList
+                orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> createValueUnitDto ""
 
                 orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Minimum.IsSome
-                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum
-                orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Maximum.IsSome
-                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Maximum
+                orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto "")
+                orbDto.Dose.Quantity.Constraints.MaxIncl <- dl.Quantity.Maximum.IsSome
+                orbDto.Dose.Quantity.Constraints.Max <- dl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.QuantityAdjust.Constraints.MinIncl <- dl.QuantityAdjust.Minimum.IsSome
-                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum
+                orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.QuantityAdjust.Constraints.MaxIncl <- dl.QuantityAdjust.Maximum.IsSome
-                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum
+                orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.PerTime.Constraints.MinIncl <- dl.PerTime.Minimum.IsSome
-                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum
+                orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.PerTime.Constraints.MaxIncl <- dl.PerTime.Maximum.IsSome
-                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum
+                orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.PerTimeAdjust.Constraints.MinIncl <- dl.PerTimeAdjust.Minimum.IsSome
-                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum
+                orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
-                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum
+                orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
-                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum
+                orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.Rate.Constraints.MaxIncl <- dl.Rate.Maximum.IsSome
-                orbDto.Dose.Rate.Constraints.Max <- dl.Rate.Maximum
+                orbDto.Dose.Rate.Constraints.Max <- dl.Rate.Maximum |> Option.bind (createSingleValueUnitDto "")
 
                 orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Minimum.IsSome
-                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum
+                orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum |> Option.bind (createSingleValueUnitDto "")
                 orbDto.Dose.RateAdjust.Constraints.MaxIncl <- dl.RateAdjust.Maximum.IsSome
-                orbDto.Dose.RateAdjust.Constraints.Max <- dl.RateAdjust.Maximum
+                orbDto.Dose.RateAdjust.Constraints.Max <- dl.RateAdjust.Maximum |> Option.bind (createSingleValueUnitDto "")
 
             | None -> ()
 
@@ -249,11 +268,11 @@ module DrugOrder =
                 for p in d.Products do
                     let cdto = Order.Orderable.Component.Dto.dto d.Id d.Name p.Name p.Shape
 
-                    cdto.ComponentQuantity.Constraints.Vals <- p.Quantities
+                    cdto.ComponentQuantity.Constraints.Vals <- p.Quantities |> createValueUnitDto ""
                     cdto.ComponentQuantity.Unit <- ou
 
                     cdto.OrderableConcentration.Unit <- "x[Count]"
-                    cdto.OrderableQuantity.Constraints.Incr <- [ 1N / p.Divisible ]
+                    cdto.OrderableQuantity.Constraints.Incr <- 1N / p.Divisible |> createSingleValueUnitDto ""
                     cdto.OrderableQuantity.Unit <- ou
 
                     match d.OrderType with
@@ -288,21 +307,20 @@ module DrugOrder =
                             let itmDto =
                                 Order.Orderable.Item.Dto.dto d.Id d.Name p.Name s.Name
 
-                            itmDto.ComponentConcentration.Constraints.Vals <- s.Concentrations
+                            itmDto.ComponentConcentration.Constraints.Vals <- s.Concentrations |> createValueUnitDto ""
                             itmDto.ComponentConcentration.Unit <- $"{su}/{ou}"
                             itmDto.OrderableConcentration.Unit <- $"{su}/{ou}"
 
                             match s.Solution with
                             | Some sl ->
                                 itmDto.OrderableQuantity.Constraints.MinIncl <- sl.Quantity.Minimum.IsSome
-                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum
+                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto "")
                                 itmDto.OrderableQuantity.Constraints.MaxIncl <- sl.Quantity.Maximum.IsSome
-
-                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum
+                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto "")
                                 itmDto.OrderableConcentration.Constraints.MinIncl <- sl.Concentration.Minimum.IsSome
-                                itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum
+                                itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum |> Option.bind (createSingleValueUnitDto "")
                                 itmDto.OrderableConcentration.Constraints.MaxIncl <- sl.Concentration.Maximum.IsSome
-                                itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum
+                                itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum |> Option.bind (createSingleValueUnitDto "")
                             | None -> ()
 
                             itmDto.OrderableQuantity.Unit <- su
@@ -404,20 +422,19 @@ module DrugOrder =
 
         dto.Prescription.Frequency.Unit <-
             $"x[Count]/{(d.FreqUnit |> unitGroup)}"
-        dto.Prescription.Frequency.Constraints.Vals <- d.Frequencies
+        dto.Prescription.Frequency.Constraints.Vals <- d.Frequencies |> createValueUnitDto ""
 
         dto.Prescription.Time.Unit <- d.TimeUnit |> unitGroup
         dto.Prescription.Time.Constraints.MinIncl <- d.Time.Minimum.IsSome
-        dto.Prescription.Time.Constraints.Min <- d.Time.Minimum
+        dto.Prescription.Time.Constraints.Min <- d.Time.Minimum |> Option.bind (createSingleValueUnitDto "")
         dto.Prescription.Time.Constraints.MaxIncl <- d.Time.Maximum.IsSome
-        dto.Prescription.Time.Constraints.Max <- d.Time.Maximum
+        dto.Prescription.Time.Constraints.Max <- d.Time.Maximum |> Option.bind (createSingleValueUnitDto "")
 
-        dto.Adjust.Constraints.Min <- Some (200N /1000N)
-        dto.Adjust.Constraints.Max <- Some 150N
+        dto.Adjust.Constraints.Min <- (200N /1000N) |> createSingleValueUnitDto ""
+        dto.Adjust.Constraints.Max <- 150N |> createSingleValueUnitDto ""
         dto.Adjust.Constraints.Vals <-
             d.Adjust
-            |> Option.map List.singleton
-            |> Option.defaultValue []
+            |> Option.bind (createSingleValueUnitDto "")
         dto.Adjust.Unit <- au
 
         dto

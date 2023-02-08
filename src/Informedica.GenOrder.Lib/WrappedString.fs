@@ -1,6 +1,7 @@
 ﻿namespace Informedica.GenOrder.Lib
 
 
+
 /// Types and functions to deal with
 /// value primitives
 [<AutoOpen>]
@@ -63,5 +64,6 @@ module WrappedString =
             | e ->
                 printfn $"cannot add name with {s} and {n}"
                 raise e
+
 
 

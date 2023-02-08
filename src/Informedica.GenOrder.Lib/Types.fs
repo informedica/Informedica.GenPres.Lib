@@ -1,6 +1,7 @@
 namespace Informedica.GenOrder.Lib
 
 
+
 [<AutoOpen>]
 module Types =
         open System
@@ -11,7 +12,7 @@ module Types =
 
         type Gender = Informedica.GenForm.Lib.Types.Gender
         type Patient = Informedica.GenForm.Lib.Types.Patient
-        type MinIncrMax = Informedica.GenCore.Lib.Ranges.MinIncrMax
+
 
         /// A `VariableUnit` is the combination of
         /// an `Informedica.GenSolver.Lib.Variable` with
@@ -28,9 +29,10 @@ module Types =
             }
         and Constraints =
             {
-                    MinIncrMax : MinIncrMax
-                    Vals : ValueUnit option
-                    AbsMax : ValueUnit option
+                    Min : Minimum option
+                    Max : Maximum option
+                    Incr : Increment option
+                    Values : ValueSet option
             }
 
 
@@ -352,4 +354,5 @@ module Types =
                 | OrderException of Exceptions.Message
                 | OrderEvent of Events.Event
                 interface IMessage
+
 

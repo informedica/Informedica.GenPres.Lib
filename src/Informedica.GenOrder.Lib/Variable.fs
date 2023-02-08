@@ -10,6 +10,7 @@ module Variable =
 
         open Informedica.GenSolver.Lib.Variable.ValueRange
 
+
         let inline setOpt m set vr =
             match m with
             | Some m -> vr |> set true m
@@ -29,7 +30,4 @@ module Variable =
             match vs with
             | Some vs -> vr |> setValueSet vs
             | None    -> vr
-
-
-
 

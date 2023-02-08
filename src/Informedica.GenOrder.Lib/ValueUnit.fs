@@ -1,6 +1,7 @@
 namespace Informedica.GenOrder.Lib
 
 
+
 /// Helper functions to
 /// facilitate the use of the
 /// `Informedica.GenUnits.Lib`

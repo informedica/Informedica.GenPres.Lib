@@ -273,9 +273,7 @@ module OrderLogger =
             match sc with
             | h::_ ->
                 h.Adjust
-                |> Quantity.toValueUnitStringList None
-                |> Seq.map snd
-                |> Seq.tryHead
+                |> Quantity.toValueUnitStringList
                 |> Option.defaultValue ""
             | _ -> ""
 
@@ -296,3 +294,4 @@ module OrderLogger =
 
                 printfn "\n"
         )
+

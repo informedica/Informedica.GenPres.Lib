@@ -2,6 +2,7 @@ namespace Informedica.GenOrder.Lib
 
 
 
+
 /// Types and functions that deal with an order.
 /// An `Order` models the `Prescription` of an
 /// `Orderable` with a `StartStop` start date and
@@ -1313,8 +1314,6 @@ module Order =
         let oEqs =
             ord
             |> mapToEquations mapping
-            |> Solver.solveUnits logger
-            |> Solver.orderEqsToBase
 
         try
             oEqs
@@ -1324,13 +1323,11 @@ module Order =
             | Ok eqs ->
                 eqs
                 |> Solver.mapToOrderEqs oEqs
-                |> Solver.orderEqsToUnit
                 |> mapFromEquations ord
                 |> Ok
             | Error (eqs, m) ->
                 eqs
                 |> Solver.mapToOrderEqs oEqs
-                |> Solver.orderEqsToUnit
                 |> mapFromEquations ord
                 |> fun eqs -> Error (eqs, m)
 
@@ -1338,7 +1335,6 @@ module Order =
         | e ->
             if printErr then
                 oEqs
-                |> Solver.orderEqsToUnit
                 |> mapFromEquations ord
                 |> toString
                 |> List.iteri (printfn "%i. %s")
@@ -1592,4 +1588,9 @@ module Order =
                 dto.Prescription
                 |> Prescription.Dto.setToTimed
             dto
+
+
+
+
+
 
