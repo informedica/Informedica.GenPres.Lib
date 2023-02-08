@@ -11,7 +11,7 @@ module Types =
 
         type Gender = Informedica.GenForm.Lib.Types.Gender
         type Patient = Informedica.GenForm.Lib.Types.Patient
-
+        type MinIncrMax = Informedica.GenCore.Lib.Ranges.MinIncrMax
 
         /// A `VariableUnit` is the combination of
         /// an `Informedica.GenSolver.Lib.Variable` with
@@ -20,10 +20,17 @@ module Types =
         /// to the `Unit`
         type OrderVariable =
             {
+                Constraints : Constraints
                 /// Stores the values/range
                 Variable:  Variable
-                Constraints : ValueRange
-                Unit : Unit
+                /// Stores the unit
+                Unit: Unit
+            }
+        and Constraints =
+            {
+                    MinIncrMax : MinIncrMax
+                    Vals : ValueUnit option
+                    AbsMax : ValueUnit option
             }
 
 
@@ -345,5 +352,4 @@ module Types =
                 | OrderException of Exceptions.Message
                 | OrderEvent of Events.Event
                 interface IMessage
-
 

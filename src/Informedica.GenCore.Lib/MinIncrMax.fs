@@ -42,6 +42,12 @@ module Errors =
 
 
 
+module LimitIncr =
+
+    let getIncr (LimitIncr incr) = incr
+
+
+
 module Limit =
 
     open MathNet.Numerics
@@ -959,6 +965,7 @@ module MinIncrMax =
                 dto
 
 
+    /// TODO: this makes no sense in this lib!!!
     /// Turn a `MinMax` to a string with
     /// `mins` and `maxs` as annotations
     /// for resp. the min and max value.
