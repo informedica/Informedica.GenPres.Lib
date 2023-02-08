@@ -13,7 +13,8 @@ module Utils =
         let MAX_CALC_COUNT = 5000
 
 
-        let MAX_BIGINT = 999999999999999999999999999999999999999999999999I
+        let MAX_BIGINT =
+            999999999999999999999999999999999999999999999999I
 
 
 
@@ -22,9 +23,9 @@ module Utils =
         open MathNet.Numerics
 
 
-        let denominator (br : BigRational) = br.Denominator
+        let denominator (br: BigRational) = br.Denominator
 
-        let numerator (br : BigRational) = br.Numerator
+        let numerator (br: BigRational) = br.Numerator
 
 
 
@@ -33,16 +34,16 @@ module Utils =
         open Informedica.Utils.Lib.BCL
 
         let removeBigRationalMultiples xs =
-            if xs |> Array.isEmpty then xs
+            if xs |> Array.isEmpty then
+                xs
             else
                 xs
-                |> Array.fold (fun acc x1 ->
-                    acc
-                    |> Array.filter (fun x2 ->
-                        x1 = x2 ||
-                        x2 |> BigRational.isMultiple x1 |> not
+                |> Array.fold
+                    (fun acc x1 ->
+                        acc
+                        |> Array.filter (fun x2 -> x1 = x2 || x2 |> BigRational.isMultiple x1 |> not)
                     )
-                ) xs
+                    xs
 
 
 
@@ -63,54 +64,72 @@ module Utils =
         let isEmpty = getValue >> Array.isEmpty
 
 
-        let isZero = getValue >> Array.forall ((=) 0N)
+        let isZero =
+            getValue >> Array.forall ((=) 0N)
 
-        let gtZero = getValue >> Array.forall ((<) 0N)
+        let gtZero =
+            getValue >> Array.forall ((<) 0N)
 
-        let gteZero = getValue >> Array.forall ((<=) 0N)
+        let gteZero =
+            getValue >> Array.forall ((<=) 0N)
 
-        let stZero = getValue >> Array.forall ((>) 0N)
+        let stZero =
+            getValue >> Array.forall ((>) 0N)
 
-        let steZero = getValue >> Array.forall ((>=) 0N)
+        let steZero =
+            getValue >> Array.forall ((>=) 0N)
 
 
-        let minElement = applyToValue (Array.min >> Array.singleton)
+        let minElement =
+            applyToValue (Array.min >> Array.singleton)
 
 
-        let maxElement = applyToValue (Array.max >> Array.singleton)
+        let maxElement =
+            applyToValue (Array.max >> Array.singleton)
 
 
         let multipleOf f incr vu =
             vu
             |> toBase
             |> applyToValue (fun vs ->
-                let incr = incr |> getBaseValue |> Set.ofArray
-                vs
-                |> Array.map (f incr)
-                |> Array.map snd
+                let incr =
+                    incr |> getBaseValue |> Set.ofArray
+
+                vs |> Array.map (f incr) |> Array.map snd
             )
             |> toUnit
 
 
-        let minInclMultipleOf = multipleOf BigRational.minInclMultipleOf
+        let minInclMultipleOf =
+            multipleOf BigRational.minInclMultipleOf
 
-        let minExclMultipleOf = multipleOf BigRational.minExclMultipleOf
-
-
-        let maxInclMultipleOf = multipleOf BigRational.maxInclMultipleOf
-
-        let maxExclMultipleOf = multipleOf BigRational.maxExclMultipleOf
+        let minExclMultipleOf =
+            multipleOf BigRational.minExclMultipleOf
 
 
-        let denominator = getValue >> (Array.map BigRational.denominator)
+        let maxInclMultipleOf =
+            multipleOf BigRational.maxInclMultipleOf
 
-        let numerator = getValue >> (Array.map BigRational.numerator)
+        let maxExclMultipleOf =
+            multipleOf BigRational.maxExclMultipleOf
 
 
-        let filter pred = toBase >> applyToValue (Array.filter pred) >> toUnit
+        let denominator =
+            getValue >> (Array.map BigRational.denominator)
+
+        let numerator =
+            getValue >> (Array.map BigRational.numerator)
+
+
+        let filter pred =
+            toBase
+            >> applyToValue (Array.filter pred)
+            >> toUnit
 
         let removeBigRationalMultiples =
-            toBase >> applyToValue (Array.removeBigRationalMultiples) >> toUnit
+            toBase
+            >> applyToValue (Array.removeBigRationalMultiples)
+            >> toUnit
 
 
         let intersect vu1 vu2 =
@@ -136,65 +155,63 @@ module Utils =
             vu2
             |> toBase
             |> getValue
-            |> Array.forall (fun v ->
-                vu1
-                |> toBase
-                |> getValue
-                |> Array.exists ((=) v)
-            )
+            |> Array.forall (fun v -> vu1 |> toBase |> getValue |> Array.exists ((=) v))
 
         let takeFirst n = applyToValue (Array.take n)
 
-        let takeLast n = applyToValue (Array.rev >> Array.take n >> Array.rev)
+        let takeLast n =
+            applyToValue (Array.rev >> Array.take n >> Array.rev)
 
 
-        let setSingleValue v vu =
-            vu
-            |> getUnit
-            |> withValue [|v|]
+        let setSingleValue v vu = vu |> getUnit |> withValue [| v |]
 
 
-        let setValue v vu =
-            vu
-            |> getUnit
-            |> withValue v
+        let setValue v vu = vu |> getUnit |> withValue v
 
 
         // ToDo replace with this
         let valueCount = getValue >> Array.length
 
 
-        let toStr exact=
-            if exact then getValue >> Array.toReadableString >> String.removeBrackets
-            else toStringPrec 3
+        let toStr exact =
+            if exact then
+                getValue
+                >> Array.toReadableString
+                >> String.removeBrackets
+            else
+                toReadableDutchStringWithPrec 3
 
 
 
         module Operators =
 
             /// Constant 0
-            let zero = [|0N|] |> create Units.Count.times
+            let zero =
+                [| 0N |] |> create Units.Count.times
 
             /// Constant 1
-            let one = [|1N|] |> create Units.Count.times
+            let one =
+                [| 1N |] |> create Units.Count.times
 
             /// Constant 2
-            let two = [|2N|] |> create Units.Count.times
+            let two =
+                [| 2N |] |> create Units.Count.times
 
             /// Constant 3
-            let three = [|3N|] |> create Units.Count.times
+            let three =
+                [| 3N |] |> create Units.Count.times
 
             /// Check whether the operator is subtraction
             let opIsSubtr op = (three |> op <| two) = three - two // = 1
 
             /// Check whether the operator is addition
-            let opIsAdd op   = (three |> op <| two) = three + two // = 5
+            let opIsAdd op = (three |> op <| two) = three + two // = 5
 
             /// Check whether the operator is multiplication
-            let opIsMult op  = (three |> op <| two) = three * two // = 6
+            let opIsMult op = (three |> op <| two) = three * two // = 6
 
             /// Check whether the operator is divsion
-            let opIsDiv op   = (three |> op <| two) = three / two // = 3/2
+            let opIsDiv op = (three |> op <| two) = three / two // = 3/2
 
 
 
@@ -204,8 +221,8 @@ module Utils =
             /// the operation is neither.
             let (|Mult|Div|Add|Subtr|) op =
                 match op with
-                | _ when op |> opIsMult  -> Mult
-                | _ when op |> opIsDiv   -> Div
-                | _ when op |> opIsAdd   -> Add
+                | _ when op |> opIsMult -> Mult
+                | _ when op |> opIsDiv -> Div
+                | _ when op |> opIsAdd -> Add
                 | _ when op |> opIsSubtr -> Subtr
                 | _ -> failwith "Operator is not supported"
