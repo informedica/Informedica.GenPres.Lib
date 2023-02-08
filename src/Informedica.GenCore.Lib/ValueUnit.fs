@@ -24,50 +24,50 @@ module ValueUnit =
                 |> getValue
                 |> Array.map (brTo >> toMeasure)
                 |> Ok
-            else 
-                $"cannot convert valueunit: {vu |> toStringEngShort} to {s}" 
+            else
+                $"cannot convert valueunit: {vu |> toStringEngShort} to {s}"
                 |> Error
 
 
         let toDecimalCm =
-            toMeasure 
-                Group.HeightGroup 
+            toMeasure
+                Group.HeightGroup
                 BigRational.toDecimal
                 Conversions.cmFromDecimal
                 Units.Height.centiMeter
                 "cm"
 
         let toIntCm =
-            toMeasure 
-                Group.HeightGroup 
+            toMeasure
+                Group.HeightGroup
                 BigRational.ToInt32
                 Conversions.cmFromInt
                 Units.Height.centiMeter
                 "cm"
 
         let toDecimalMeter =
-            toMeasure 
-                Group.HeightGroup 
+            toMeasure
+                Group.HeightGroup
                 BigRational.toDecimal
                 Conversions.meterFromDecimal
                 Units.Height.meter
                 "m"
 
         let toIntGram =
-            toMeasure 
-                Group.WeightGroup 
+            toMeasure
+                Group.WeightGroup
                 BigRational.ToInt32
                 Conversions.gramFromInt
                 Units.Weight.gram
                 "gram"
 
         let toDecimalKg =
-            toMeasure 
-                Group.WeightGroup 
+            toMeasure
+                Group.WeightGroup
                 BigRational.toDecimal
                 Conversions.kgFromDecimal
                 Units.Weight.kiloGram
-                "kg"            
+                "kg"
 
         let toIntDay =
             toMeasure
@@ -103,12 +103,13 @@ module ValueUnit =
 
 
         let inline fromMeasure u conv v =
-            v 
+            v
             |> conv
-            |> withUnitSingle u
+            |> BigRational.fromDecimal
+            |> singleWithUnit u
 
 
-        let fromIntGram (v : int<gram>) = v |> fromMeasure Units.Weight.gram (int >> decimal) 
+        let fromIntGram (v : int<gram>) = v |> fromMeasure Units.Weight.gram (int >> decimal)
 
         let fromDecimalM2 (v : decimal<bsa>) = v |> fromMeasure Units.BSA.M2 decimal
 
@@ -144,9 +145,9 @@ module ValueUnit =
             if [vu1; vu2; vu3] |> List.forall isSingleValue |> not then
                 return! Error "value unit arugments must be all single value"
             else
-                let! v1 = vu1 |> vu1To 
-                let! v2 = vu2 |> vu2To 
-                let! v3 = vu3 |> vu3To 
+                let! v1 = vu1 |> vu1To
+                let! v2 = vu2 |> vu2To
+                let! v3 = vu3 |> vu3To
 
                 let v1 = v1 |>  Array.item 0
                 let v2 = v2 |>  Array.item 0
@@ -165,10 +166,10 @@ module ValueUnit =
                 return! Error "value unit arugments must be all single value"
 
             else
-                let! v1 = vu1 |> vu1To 
-                let! v2 = vu2 |> vu2To 
-                let! v3 = vu3 |> vu3To 
-                let! v4 = vu4 |> vu4To 
+                let! v1 = vu1 |> vu1To
+                let! v2 = vu2 |> vu2To
+                let! v3 = vu3 |> vu3To
+                let! v4 = vu4 |> vu4To
 
                 let v1 = v1 |>  Array.item 0
                 let v2 = v2 |>  Array.item 0
@@ -189,10 +190,10 @@ module ValueUnit =
                 return! Error "value unit arugments must be all single value"
 
             else
-                let! v1 = vu1 |> vu1To 
-                let! v2 = vu2 |> vu2To 
-                let! v3 = vu3 |> vu3To 
-                let! v4 = vu4 |> vu4To 
+                let! v1 = vu1 |> vu1To
+                let! v2 = vu2 |> vu2To
+                let! v3 = vu3 |> vu3To
+                let! v4 = vu4 |> vu4To
 
                 let v1 = v1 |>  Array.item 0
                 let v2 = v2 |>  Array.item 0
@@ -211,22 +212,22 @@ module ValueUnit =
 
 
             let adjusted bd dt =
-                calc2 
+                calc2
                     Measures.toIntDay
                     Measures.toIntWeek
                     Measures.fromIntDay
                     (fun _ d w -> Calculations.Age.adjustedAge d w bd dt)
 
 
-            let yearsMonthsWeeksDaysToDays = 
+            let yearsMonthsWeeksDaysToDays =
                 calc4
                     Measures.toIntYear
                     Measures.toIntMonth
-                    Measures.toIntWeek 
+                    Measures.toIntWeek
                     Measures.toIntDay
                     Measures.fromIntDay
                     Calculations.Age.yearsMonthsWeeksDaysToDays
-            
+
 
             let fromBirthDate bd dt =
                 let y, m, w, d = Calculations.Age.fromBirthDate bd dt
@@ -240,7 +241,7 @@ module ValueUnit =
                 calc4
                     Measures.toIntYear
                     Measures.toIntMonth
-                    Measures.toIntWeek 
+                    Measures.toIntWeek
                     Measures.toIntDay
                     id
                     (Calculations.Age.toBirthDate dt)
@@ -255,30 +256,30 @@ module ValueUnit =
                     Calculations.Age.postMenstrualAge
 
 
-            let ageToString = 
-                
+            let ageToString =
+
                 let fYear = Option.map (Measures.toIntYear >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fMonth = Option.map (Measures.toIntMonth >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fWeek = Option.map (Measures.toIntWeek >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fDay = Option.map (Measures.toIntDay >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
 
                 calc4Opt fYear fMonth fWeek fDay id
-                    Calculations.Age.ageToString    
-            
-            
+                    Calculations.Age.ageToString
+
+
             let ageToStringNL =
-                
+
                 let fYear = Option.map (Measures.toIntYear >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fMonth = Option.map (Measures.toIntMonth >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fWeek = Option.map (Measures.toIntWeek >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fDay = Option.map (Measures.toIntDay >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
 
                 calc4Opt fYear fMonth fWeek fDay id
-                    Calculations.Age.ageToStringNL  
-            
-            
+                    Calculations.Age.ageToStringNL
+
+
             let ageToStringNLShort =
-                
+
                 let fYear = Option.map (Measures.toIntYear >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fMonth = Option.map (Measures.toIntMonth >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
                 let fWeek = Option.map (Measures.toIntWeek >> Result.map (Array.map Some)) >> Option.defaultValue (Ok [|None|])
@@ -293,8 +294,8 @@ module ValueUnit =
 
 
             let calcBSA method =
-                calc2 
-                    Measures.toDecimalKg 
+                calc2
+                    Measures.toDecimalKg
                     Measures.toDecimalCm
                     Measures.fromDecimalM2
                     method

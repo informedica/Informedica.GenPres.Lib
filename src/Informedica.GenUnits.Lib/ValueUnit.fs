@@ -89,6 +89,7 @@ module ValueUnit =
     open Informedica.Utils.Lib.BCL
 
 
+    /// Transforms an operator to a string
     let opToStr op =
         match op with
         | OpPer -> "/"
@@ -97,6 +98,9 @@ module ValueUnit =
         | OpMinus -> "-"
 
 
+    /// Transforms an operator to a string
+    /// (*, /, +, -), throws an error if
+    /// no match
     let opFromString s =
         match s with
         | _ when s = "/" -> OpPer
@@ -106,6 +110,8 @@ module ValueUnit =
         | _ -> failwith  <| $"Cannot parse %s{s} to operand"
 
 
+    /// Apply a function f to the
+    /// value of a unit
     let apply f u =
         let rec app u =
             match u with
@@ -169,11 +175,14 @@ module ValueUnit =
         app u
 
 
+    /// Change the value of a unit
+    /// the the value v
     let setUnitValue v =
         let f = fun _ -> v
         apply f
 
 
+    /// Get the value of the unit
     let getUnitValue u =
         let rec app u =
             match u with
@@ -231,7 +240,8 @@ module ValueUnit =
 
     module Group =
 
-
+        /// Transform a unit to the
+        /// unit group
         let unitToGroup u =
             let rec get u =
                 match u with
@@ -252,6 +262,10 @@ module ValueUnit =
             get u
 
 
+        /// Check whether a group g1
+        /// contains group g2, i.e.
+        /// g1 |> contains g2 checks
+        /// whether groupe g1 contains g2
         let contains g2 g1 =
             let rec cont g =
                 match g with
@@ -272,6 +286,8 @@ module ValueUnit =
             cont g1
 
 
+        /// Checks whether u1 contains
+        /// the same unit groups as u2
         let eqsGroup u1 u2 =
             if u1 = u2 then true
             else
@@ -281,6 +297,7 @@ module ValueUnit =
                 g1 = g2
 
 
+        /// Transforms a group g to a string
         let toString g =
             let rec str g s =
                 match g with
@@ -304,6 +321,7 @@ module ValueUnit =
             str g ""
 
 
+        /// Get all the units that belong to a group in a list
         let getGroupUnits = function
                 | Group.NoGroup -> [ NoUnit ]
                 | Group.GeneralGroup n -> [ (n, 1N) |> General ]
@@ -357,6 +375,8 @@ module ValueUnit =
                 | Group.CombiGroup _ -> []
 
 
+        /// Get all the units that belong to group
+        /// or a combination of groups
         let getUnits g =
             let rec get g =
                 match g with
@@ -364,7 +384,7 @@ module ValueUnit =
                     [
                         for ul in gl |> get do
                             for ur in gr |> get do
-                                yield (ul, op, ur) |> CombiUnit
+                                (ul, op, ur) |> CombiUnit
                     ]
                 | _ -> g |> getGroupUnits
 
@@ -416,6 +436,9 @@ module ValueUnit =
         let inline toBase m v  = v * m
         let inline toUnit m v  = v / m
 
+
+        /// Get the multiplier of a unit
+        /// (also when this is a combination of units)
         let getMultiplier u =
             let rec get u m =
                 match u with
@@ -478,23 +501,33 @@ module ValueUnit =
             get u 1N
 
 
-
+    /// Create a ValueUnit from a value v
+    /// (a bigrational array) and a unit u
+    /// Makes sure there are nog duplicates.
     let create u v = (v |> Array.distinct, u) |> ValueUnit
 
 
+    /// An empty ValueUnit that has no value
+    /// and no unit, i.e. an empty array with
+    /// NoUnit.
     let empty = create NoUnit [||]
 
 
+    /// Create a a ValueUnit from a single
+    /// value v and a unit u
     let createSingle u v = [|v|] |> create u
 
 
+    /// Creates a ValueUnit with syntax
+    /// v |> WithUnit u
     let withUnit u v =
         v
-        |> Array.map BigRational.fromDecimal
         |> create u
 
 
-    let withUnitSingle u v = [|v|] |> withUnit u
+    /// Creates a 'single value' ValueUnit with syntax
+    /// v |> singleWithUnit u
+    let singleWithUnit u v = [|v|] |> withUnit u
 
 
     let withValue v u = create u v
@@ -802,7 +835,7 @@ module ValueUnit =
 
 
     let cmp cp vu1 vu2 =
-        // ToDo need better eqsGroup like mg/kg/day = (mg/kg)/day = (mg/kg*day) <> mg/(kg/day) = mg*day/kg 
+        // ToDo need better eqsGroup like mg/kg/day = (mg/kg)/day = (mg/kg*day) <> mg/(kg/day) = mg*day/kg
         //if vu1 |> eqsGroup vu2 |> not then false
         //else
         let vs1 = vu1 |> toBaseValue

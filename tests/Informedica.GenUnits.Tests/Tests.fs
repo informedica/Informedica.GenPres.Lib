@@ -71,12 +71,12 @@ module Tests =
             }
 
             test "base value of 1 day" {
-                let vu = (1m |> withUnitSingle Units.Time.day)
+                let vu = (1N |> singleWithUnit Units.Time.day)
                 Expect.equal "" (60m * 60m * 24m) (vu |> toBase)
             }
 
             test "3 days" {
-                let vu = (1m |> withUnitSingle (Units.Time.nDay 3N))
+                let vu = (1N |> singleWithUnit (Units.Time.nDay 3N))
                 Expect.equal "" (3m * 60m * 60m * 24m) (vu |> toBase)
             }
 
@@ -95,7 +95,7 @@ module Tests =
 
             test "there and back again 2 units" {
                 let vu1 =
-                    1m |> withUnitSingle (Units.Mass.milliGram |> per Units.Volume.milliLiter)
+                    1N |> singleWithUnit (Units.Mass.milliGram |> per Units.Volume.milliLiter)
                 let vu2 =
                     vu1
                     |> get
@@ -110,8 +110,8 @@ module Tests =
 
             test "there and back again 3 units" {
                 let vu1 =
-                    1m
-                    |> withUnitSingle (Units.Mass.milliGram
+                    1N
+                    |> singleWithUnit (Units.Mass.milliGram
                     |> per Units.Volume.milliLiter
                     |> per Units.Time.day)
                 let vu2 =
