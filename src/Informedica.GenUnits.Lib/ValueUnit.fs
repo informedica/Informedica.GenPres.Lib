@@ -1081,6 +1081,9 @@ module ValueUnit =
         let getUnit ud = (ud |> get).Unit
 
 
+        let per = per
+
+
         let create un gr ab nm sy =
             {
                 Unit = un

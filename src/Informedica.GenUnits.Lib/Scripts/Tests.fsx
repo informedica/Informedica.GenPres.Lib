@@ -19,7 +19,7 @@ module Tests =
         u |> printfn "%A"
         f u
 
-    // Some basic units
+    // Some basic value units
     let mg400 = 400N |> createSingle Units.Mass.milliGram
     let gram2 = 2N   |> createSingle Units.Mass.gram
     let ml50  = 50N  |> createSingle Units.Volume.milliLiter
@@ -27,6 +27,7 @@ module Tests =
     let l5 = 5N      |> createSingle Units.Volume.liter
     let day2 = 2N    |> createSingle Units.Time.day
     let hour3 = 3N   |> createSingle Units.Time.hour
+    let kg10 = 10N   |> createSingle Units.Weight.kiloGram
 
     // The count group is a special unit group
     // with only one unit: times.
@@ -61,12 +62,12 @@ module Tests =
             }
 
             test "base value of 1 day" {
-                let vu = (1m |> withUnitSingle Units.Time.day)
+                let vu = (1N |> singleWithUnit Units.Time.day)
                 Expect.equal "" (60m * 60m * 24m) (vu |> toBase)
             }
 
             test "3 days" {
-                let vu = (1m |> withUnitSingle (Units.Time.nDay 3N))
+                let vu = (1N |> singleWithUnit (Units.Time.nDay 3N))
                 Expect.equal "" (3m * 60m * 60m * 24m) (vu |> toBase)
             }
 
@@ -85,7 +86,7 @@ module Tests =
 
             test "there and back again 2 units" {
                 let vu1 =
-                    1m |> withUnitSingle (Units.Mass.milliGram |> per Units.Volume.milliLiter)
+                    1N |> singleWithUnit (Units.Mass.milliGram |> per Units.Volume.milliLiter)
                 let vu2 =
                     vu1
                     |> get
@@ -100,8 +101,8 @@ module Tests =
 
             test "there and back again 3 units" {
                 let vu1 =
-                    1m
-                    |> withUnitSingle (Units.Mass.milliGram
+                    1N
+                    |> singleWithUnit (Units.Mass.milliGram
                     |> per Units.Volume.milliLiter
                     |> per Units.Time.day)
                 let vu2 =
@@ -142,34 +143,6 @@ module Tests =
                 ml50 * times100  =? l5
                 |> Expect.isTrue ""
             }
-
-            testList "comparison to string" [
-                test "is equal" {
-                    eq |> cmpToStr
-                    |> Expect.equal "should be =" "="
-                }
-
-                test "is equal or greater than" {
-                    gte |> cmpToStr
-                    |> Expect.equal "should be >=" ">="
-                }
-
-                test "is greater" {
-                    gt |> cmpToStr
-                    |> Expect.equal "should be >" ">"
-                }
-
-                test "is equal or smaller than" {
-                    ste |> cmpToStr
-                    |> Expect.equal "should be <=" "<="
-                }
-
-                test "is smaller than" {
-                    st |> cmpToStr
-                    |> Expect.equal "should be <" "<"
-                }
-
-            ]
         ]
 
 
@@ -267,6 +240,19 @@ module Tests =
                  (mg400 / ml50) / (day2 / ml50) // equals (mg400 / ml50) * (ml50 / day2) = mg400 / day2
 
              Expect.equal "" (mg400 / day2) vu
+            }
+
+            test "divsion resulting in combi with 3 units" {
+                mg400/kg10/day2
+                |> toStringEngShort
+                |> Expect.equal "should be equal" "20 mg[Mass]/kg[Weight]/day[Time]"
+
+            }
+
+            test "multiplying with a combi with 3 units with the middle unit" {
+                (mg400/kg10/day2) * kg10
+                |> toStringEngShort
+                |> Expect.equal "should be equal" "200 mg[Mass]/day[Time]"
             }
 
         ]
