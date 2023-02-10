@@ -13,6 +13,7 @@ module Mapping =
     open Informedica.ZIndex.Lib
 
 
+    
     let combineWith = Path.combineWith
 
 
@@ -141,5 +142,36 @@ module Mapping =
 
     /// Map a route
     let mapRoute = map routePath
+    
 
+    open MathNet.Numerics
+    open Informedica.GenUnits.Lib
 
+    let unitMapping =
+        [
+            ("day",  Units.Time.day)
+            ("day2",  Units.Time.nDay 2N)
+            ("day3",  Units.Time.nDay 3N)
+            ("dropl",  Units.General.general "druppel")
+            ("FIP",  Units.General.general "FIP")
+            ("g",  Units.Mass.gram)
+            ("hour",  Units.Time.hour)
+            ("hour36",  Units.Time.nHour 36N)
+            ("IE",  Units.InterNatUnit.iu)
+            ("kg",  Units.Weight.kiloGram)
+            ("m2",  Units.BSA.m2)
+            ("mcg",  Units.Mass.microGram)
+            ("mg",  Units.Mass.milliGram)
+            ("min",  Units.Time.minute)
+            ("ml",  Units.Volume.milliLiter)
+            ("mmol",  Units.Molar.milliMol)
+            ("month",  Units.Time.month)
+            ("ng",  Units.Mass.nanoGram)
+            ("piece",  Units.General.general "stuk")
+            ("puff",  Units.General.general "puff")
+            ("times",  Units.Count.times)
+            ("week",  Units.Time.week)
+            ("week13",  Units.Time.nWeek 13N)
+            ("week2",  Units.Time.nWeek 2N)
+            ("week4",  Units.Time.nWeek 4N)
+        ]

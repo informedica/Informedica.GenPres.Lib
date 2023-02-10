@@ -115,6 +115,7 @@ module GStand =
         s |> parseTimeString |> Units.fromString
 
 
+    // TODO: rewrite to frequency mapping
     /// Map GStand frequency string to a valid
     /// frequency `ValueUnit`.
     let mapFreq (fr: DR.Frequency) =
@@ -466,6 +467,7 @@ module GStand =
                 gp.Substances
                 |> Seq.collect (fun s ->
                     match s.Unit
+                        //TODO: rewrite to new online mapping
                           |> ValueUnit.unitFromMappedString Mapping.GStandMap
                         with
                     | None -> []

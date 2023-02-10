@@ -11,7 +11,7 @@ module Route =
 
 
     let mapping_ () =
-        GoogleSheets.getDataFromSheet FilePath.genpres "RouteMapping"
+        GoogleSheets.getDataFromSheet FilePath.genpres "Routes"
         |> fun data ->
             data 
             |> Array.tryHead

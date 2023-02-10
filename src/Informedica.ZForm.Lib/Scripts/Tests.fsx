@@ -378,7 +378,7 @@ module Tests =
                 DoseRange.empty
                 |> setMinNormDose (ValueUnit.valueUnitFromGStandUnitString 10m "milligram")
                 |> setMaxNormDose (ValueUnit.valueUnitFromGStandUnitString 100m "milligram")
-                |> DoseRange.toString (Some ValueUnit.Units.hr)
+                |> DoseRange.toString (Some ValueUnit.Units.hour)
                 |> Expect.equal "should be a rate" "van 10 mg/uur - tot 100 mg/uur"
             }
 
@@ -387,7 +387,7 @@ module Tests =
                 |> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
                 |> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
                 |> DoseRange.convertTo (ValueUnit.Units.mcg)
-                |> DoseRange.toString (Some ValueUnit.Units.hr)
+                |> DoseRange.toString (Some ValueUnit.Units.hour)
                 |> Expect.equal "should be a rate" "van 1 microg/kg/uur - tot 1000 microg/kg/uur"
             }
 
@@ -511,7 +511,7 @@ module Temp =
             Dosage.empty
             |> setNormMinRateDose (ValueUnit.valueUnitFromGStandUnitString 0.01m "milligram")
             |> setNormMaxRateDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
-            |> setRateUnit (ValueUnit.Units.hr)
+            |> setRateUnit (ValueUnit.Units.hour)
             |> Dosage.convertSubstanceUnitTo (ValueUnit.Units.mcg)
             |> Dosage.convertRateUnitTo (ValueUnit.Units.min)
             |> Dosage.toString false
@@ -812,26 +812,3 @@ module Temp =
 
 
 
-
-open Informedica.ZForm.Lib
-open DoseRule
-open Tests.DoseRangeTests
-
-
-DoseRange.empty
-|> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
-|> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
-|> DoseRange.convertTo (ValueUnit.Units.mcg)
-|> DoseRange.toString (Some ValueUnit.Units.hr)
-
-DoseRange.empty
-|> setMinNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 0.001m "milligram")
-|> setMaxNormPerKgDose (ValueUnit.valueUnitFromGStandUnitString 1.m "milligram")
-|> DoseRange.convertTo (ValueUnit.Units.mcgPerKg)
-|> DoseRange.toString (Some ValueUnit.Units.hr)
-
-
-open Informedica.GenUnits.Lib
-
-
-"kg[weight]" |> Units.fromString

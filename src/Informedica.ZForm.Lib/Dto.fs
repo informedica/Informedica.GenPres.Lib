@@ -148,6 +148,7 @@ module Dto =
     let find (dto : Dto) =
         let rte =
             dto.Route
+            //TODO: rewrite to new online mapping
             |> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
 
         let gpps =
@@ -214,6 +215,7 @@ module Dto =
                 f
                 |> ValueUnit.createSingle (ValueUnit.createCombiUnit (Units.Count.times, OpPer, fr.TimeUnit))
                 |> ValueUnit.freqToValueUnitString
+                //TODO: rewrite to new online mapping
                 |> Mapping.mapFreq Mapping.ValueUnitMap Mapping.AppMap
             )
             |> String.concat "||"
@@ -283,6 +285,7 @@ module Dto =
 
         let rte =
             dto.Route
+            //TODO: rewrite to new online mapping
             |> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
             |> (fun r ->
                 if r = "" then printfn "Could not map route %s" dto.Route
@@ -437,6 +440,7 @@ module Dto =
                     Concentration = conc
                     ConcentrationUnit =
                         unt
+                        //TODO: rewrite to new online mapping
                         |> Mapping.mapUnit Mapping.GStandMap Mapping.AppMap
                     Multiple =
                         if dto.Multiple = 0m then conc
@@ -444,6 +448,7 @@ module Dto =
                     MultipleUnit =
                         if dto.MultipleUnit = "" then
                             unt
+                            //TODO: rewrite to new online mapping
                             |> Mapping.mapUnit Mapping.GStandMap Mapping.AppMap
                         else dto.MultipleUnit
                     Rules = rules |> List.toArray
