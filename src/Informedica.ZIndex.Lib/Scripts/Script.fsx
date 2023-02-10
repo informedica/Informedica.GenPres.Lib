@@ -27,16 +27,12 @@ printfn "Loading Substance"
 Substance.load ()
 
 
-// Print log genericproducts
-let logGenericProducts () =
-    printfn "Start ..."
-    let _log = List<string>()
-    let logf s =
-        _log.Add(s)
-    GenericProduct.getWithLog logf [] |> ignore
-    _log.ToArray()
-    |> Array.distinct
-    |> Array.iter (printfn "%s")
+GenPresProduct.getRoutes ()
+|> Array.sortBy String.toLower
+|> Array.iter (printfn "%s")
 
-logGenericProducts ()
+
+DoseRule.routes ()
+|> Array.sortBy String.toLower
+|> Array.iter (printfn "%s")
 

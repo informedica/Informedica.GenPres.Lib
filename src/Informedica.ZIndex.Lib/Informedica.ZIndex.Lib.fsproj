@@ -13,13 +13,14 @@
     <Compile Include="BST000T.fs" />
     <Compile Include="CodeGen.fs" />
     <Compile Include="Zindex.fs" />
+    <Compile Include="Assortment.fs" />
     <Compile Include="Names.fs" />
+    <Compile Include="Route.fs" />
     <Compile Include="Substance.fs" />
     <Compile Include="ConsumerProduct.fs" />
     <Compile Include="TradeProduct.fs" />
     <Compile Include="PrescriptionProduct.fs" />
     <Compile Include="GenericProduct.fs" />
-    <Compile Include="ProductRange.fs" />
     <Compile Include="GenPresProduct.fs" />
     <Compile Include="DoseRule.fs" />
     <Compile Include="ATCGroup.fs" />

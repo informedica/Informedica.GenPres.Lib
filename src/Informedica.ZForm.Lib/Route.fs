@@ -7,18 +7,8 @@ module Route =
     open Informedica.ZIndex.Lib
 
 
-    let routeMapping = RuleFinder.routeMapping
 
-    let createRoute s =
-        let m =
-            routeMapping
-            |> List.tryFind (fun (_, rs) ->
-                rs
-                |> List.exists (String.equalsCapInsens s)
-            )
-        match m with
-        | Some (r, _) -> r
-        | _ -> Route.NoRoute
+    let createRoute s = Route.c
 
 
     let eqsRoute r s = s |> createRoute = r

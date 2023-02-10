@@ -20,8 +20,8 @@ module GenPresProduct =
         }
 
 
-    let private parse (prs : ProductRange.ProductRange []) =
-        let gpks =  prs |> Array.map (fun pr -> pr.GPK |> Option.get)
+    let private parse (prs : Assortment []) =
+        let gpks =  prs |> Array.map (fun pr -> pr.GPK)
 
         GenericProduct.get (gpks |> Array.toList)
         |> Array.map (fun gp ->
@@ -40,11 +40,9 @@ module GenPresProduct =
             let dpn =
                 prs
                 |> Array.filter (fun pr ->
-                    if pr.GPK |> Option.isNone then false
-                    else
                         gps
                         |> Array.exists (fun gp ->
-                            pr.GPK |> Option.get = gp.Id
+                            pr.GPK = gp.Id
                         )
 
                 )
@@ -87,7 +85,7 @@ module GenPresProduct =
             create nm sh rt ph gps dpn unt [||])
 
 
-    let private _get (prs : ProductRange.ProductRange []) =
+    let private _get (prs : Assortment []) =
         if FilePath.productCache |> File.exists then
             FilePath.productCache
             |> Json.getCache
@@ -99,7 +97,7 @@ module GenPresProduct =
                         gpp.GenericProducts
                         |> Array.exists (fun gp ->
                             prs
-                            |> Array.exists (fun pr -> pr.GPK |> Option.get = gp.Id)
+                            |> Array.exists (fun pr -> pr.GPK = gp.Id)
                         )
                     )
             )
@@ -115,9 +113,8 @@ module GenPresProduct =
 
     let private getAssortment () =
         let gpks =
-            ProductRange.data ()
-            |> Array.filter (fun pr -> pr.GPK |> Option.isSome)
-            |> Array.map (fun pr -> pr.GPK |> Option.get)
+            Assortment.assortment ()
+            |> Array.map (fun pr -> pr.GPK)
 
         Array.empty
         |> memGet

@@ -24,5 +24,5 @@ module FilePath =
     [<Literal>]
     let groupCache = data + "cache/group.cache"
 
-    [<Literal>]
-    let mapping = data + "mapping/Formulary.csv"
+    //https://docs.google.com/spreadsheets/d/1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ/edit?usp=sharing
+    let [<Literal>] genpres = "1AEVYnqjAbVniu3VuczeoYvMu3RRBu930INhr3QzSDYQ"

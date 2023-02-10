@@ -23,93 +23,71 @@ module Types =
 
     module Route =
 
-        // * ARTI/LESION
-        // * AURICULAIR
-        // * CUTAAN
-        // DENTAAL
-        // ENDOCERVIC
-        // * ENDOTR.PULM
-        // * ENDOTRACHEOPULMONAIR
-        // * EPIDURAAL
-        // EPIDURAAL, INTRATHECAAL, PERINEURAAL
-        // EXTRACORPORAAL
-        // * GASTR-ENTER
-        // * IM
-        // * INHALATIE
-        // INTRA-ART.
-        // INTRA-ARTERIEEL
-        // INTRA-ARTICULAIR
-        // INTRA-OCUL.
-        // INTRA-UTERIEN
-        // INTRABURSAAL
-        // INTRACARDIAAL
-        // INTRACAVERNEUS
-        // INTRACORONAIR
-        // * INTRADERMAAL
-        // INTRALAESIONAAL
-        // INTRALYMFATISCH
-        // * INTRAMUSCULAIR
-        // INTRAMUSCULAIR, INTRAVENEUS
-        // INTRAMUSCULAIR, SUBCUTAAN
-        // INTRAOSSAAL
-        // INTRAPERITONEAAL
-        // INTRAPLEURAAL
-        // INTRATHECAAL
-        // * INTRAVENEUS
-        // INTRAVENEUS, SUBCUTAAN
-        // * INTRAVESIC.
-        // * INTRAVESICAAL
-        // INTRAVITR.
-        // INTRAVITREAAL
-        // * IV
-        // * LOKAAL
-        // * NASAAL
-        // * NEUS
-        // NIET GESPEC
-        // NVT
-        // OOG
-        // * OOR
-        // * ORAAL
-        // ORAAL/RECT
-        // * OROMUCOSAAL
-        // PAR./ORAAL
-        // PAR/UTERIEN
-        // PAR/VESICAL
-        // PARABULBAIR
-        // PARENT/RECT
-        // PARENTERAAL
-        // PERI-ARTICULAIR
-        // PERIBULBAIR
-        // PERINEURAAL
-        // PERITONEAAL
-        // * RECTAAL
-        // RETROBULBAIR
-        // SUBCONJUNCTIVAAL
-        // * SUBCUTAAN
-        // SUBLINGUAAL
-        // * TRANSDERMAAL
-        // TRANSDERML
-        // URETHRAAL
-        // UTERIEN
-        // VAGINAAL
 
         type Route =
-            | Alternative of string
-            | AUR // AURICULAIR OOR
-            | CUT // CUTAAN TRANSDERMAAL TRANSDERML LOKAAL
-            | ENDOTR // ENDOTR.PULM ENDOTRACHEOPULMONAIR
-            | EPIDUR // EPIDURAAL
-            | IM // INTRAMUSCULAIR IM
-            | INH // INHALATIE
-            | INTRAVESIC // INTRAVESIC. INTRAVESICAAL
-            | IV // INTRAVENEUS IV
-            | LESION // ARTI/LESION
-            | NASAL // NASAAL NEUS
-            | ORAL // ORAAL GASTR-ENTER OROMUCOSAAL
-            | OROMUCOSAL //OROMUCOSAAL
-            | RECTAL // RECTAAL
-            | SUBCUT // INTRADERMAAL SUBCUTAAN
+            | AURICULAR
+            | CUTANEOUS
+            | ENDOTRACHEOPULMONAR
+            | EPIDURAL
+            | EXTRACORPORAL
+            | GASTRO_ENTERAL
+            | INHALATION
+            | INTRA_ARTERIAL
+            | INTRA_ARTICULAR
+            | INTRA_OCULAR
+            | INTRABURSAL
+            | INTRACAMERAL
+            | INTRACARDIAL
+            | INTRACAVERNEUS
+            | INTRACEREBRAL
+            | INTRACERVICAL
+            | INTRACORONARY
+            | INTRADERMAL
+            | INTRALAESIONAL
+            | INTRALYMPHATIC
+            | INTRAMUSCULAR
+            | INTRAOSSAL
+            | INTRAPERICARDIAL
+            | INTRAPERITONEAL
+            | INTRAPLEURAL
+            | INTRATHECAL
+            | INTRATUMORAL
+            | INTRAVENEUS
+            | INTRAVESICAL
+            | INTRAVITREAL
+            | LOCAL
+            | NASAL
+            | NON_SPECIFIED
+            | NOT_APPLICABLE
+            | OCULARY
+            | ORAL
+            | OROMUCOSAL
+            | PARABULBAR
+            | PARENTERAL
+            | PERI_ARTICULAR
+            | PERIBULBAR
+            | PERINEURAL
+            | RECTAL
+            | RETROBULBAR
+            | SUBCONJUNCTIVAL
+            | SUBCUTAN
+            | SUBLINGUAL
+            | SUBMUCOSAL
+            | TRANSDERMAL
+            | URETHRAL
+            | VAGINAL
             | NoRoute
+
+
+        type Mapping = 
+            {
+                Route : Route
+                Name : string
+                ZIndex : string
+                Product : string
+                Rule : string
+                Short : string
+            }
 
 
     type Substance =
@@ -406,3 +384,11 @@ module Types =
             Unit: string
         }
 
+
+    type Assortment =
+        {
+            GPK: int
+            Generic: string
+            TallMan : string
+            Divisible : int
+        }

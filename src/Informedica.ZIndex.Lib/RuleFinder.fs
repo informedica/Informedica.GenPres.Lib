@@ -8,42 +8,11 @@ module RuleFinder =
     type MinMax = RuleMinMax
 
 
-    let routeMapping =
-        [
-            (Route.AUR, ["AURICULAIR"; "OOR"])
-            (Route.CUT, [ "CUTAAN"; "TRANSDERMAAL"; "TRANSDERML"; "LOKAAL"])
-            (Route.ENDOTR, ["ENDOTR.PULM"; "ENDOTRACHEOPULMONAIR"])
-            (Route.EPIDUR, ["EPIDURAAL"])
-            (Route.IM, ["INTRAMUSCULAIR"; "IM"])
-            (Route.INH, ["INHALATIE"; "INH"])
-            (Route.INTRAVESIC, ["INTRAVESIC."; "INTRAVESICAAL"])
-            (Route.IV, ["INTRAVENEUS"; "IV"])
-            (Route.NASAL, ["NASAAL"; "NEUS"])
-            (Route.ORAL, ["ORAAL"; "GASTR-ENTER"; "OR"])
-            (Route.OROMUCOSAL, ["OROMUCOSAAL"])
-            (Route.RECTAL, ["RECTAAL"; "RECT"])
-            (Route.SUBCUT, ["SUBCUTAAN"; "SC"])
-        ]
+
+    let createRoute = Route.fromString (Route.routeMapping ())
 
 
-    let createRoute s =
-        let m =
-            routeMapping
-            |> List.tryFind (fun (_, rs) ->
-                rs
-                |> List.exists (String.equalsCapInsens s)
-            )
-        match m with
-        | Some (r, _) -> r
-        | _ -> Route.NoRoute
-
-
-    let eqsRoute r rs =
-        if r = Route.NoRoute then true
-        else
-            rs
-            |> Array.map createRoute
-            |> Array.exists ((=) r)
+    let eqsRoute = Route.eqsRoute (Route.routeMapping ())
 
 
     type AgeInMo = decimal Option
