@@ -111,7 +111,7 @@ module ValueUnit =
 
         let fromIntGram (v : int<gram>) = v |> fromMeasure Units.Weight.gram (int >> decimal)
 
-        let fromDecimalM2 (v : decimal<bsa>) = v |> fromMeasure Units.BSA.M2 decimal
+        let fromDecimalM2 (v : decimal<bsa>) = v |> fromMeasure Units.BSA.m2 decimal
 
         let fromIntDay (v : int<day>) = v |> fromMeasure Units.Time.day (int >> decimal)
 

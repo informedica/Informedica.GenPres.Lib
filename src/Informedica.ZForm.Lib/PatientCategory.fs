@@ -209,15 +209,9 @@ module PatientCategory =
             let gnd = dto.Gender |> stringToGender
 
             match gestAge, age, wght, bsa with
-            | Some gestAge, Some age, Some wght, Some bsa ->
-                {
-                    GestAge = gestAge
-                    Age = age
-                    Weight = wght
-                    BSA = bsa
-                    Gender = gnd
-                } |> Some
-
+            | Some ga, Some age, Some wght, Some bsa ->
+                create ga age wght bsa gnd
+                |> Some
             | _ -> None
 
 

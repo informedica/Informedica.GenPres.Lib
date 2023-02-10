@@ -16,7 +16,6 @@
 #load "../Mapping.fs"
 #load "../ValueUnit.fs"
 #load "../ValueUnit.fs"
-#load "../Route.fs"
 #load "../Product.fs"
 #load "../PatientCategory.fs"
 #load "../DoseRule.fs"

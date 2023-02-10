@@ -78,7 +78,7 @@ module Route =
 
 
     let eqsRoute mapping r rs =
-        if r = NoRoute then true
+        if r = NoRoute || r = NON_SPECIFIED then true
         else
             rs
             |> Array.map (fromString mapping)

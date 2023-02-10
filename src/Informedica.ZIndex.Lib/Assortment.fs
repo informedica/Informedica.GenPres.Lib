@@ -34,14 +34,18 @@ module Assortment =
                 |> Array.skip 1
                 |> Array.map (fun r ->                
                     {|
-                        gpk = r |> getInt "GPK"
+                        gpk = r |> getInt "GPKODE"
                         generic = r |>  getStr "Generic"
                         tallMan = r |> getStr "TallMan"
-                        divisible = r |> getInt "Divisible"
+                        divisible = 
+                            "Divisible" 
+                            |> Csv.getInt32OptionColumn cs r
+                            |> Option.defaultValue 1
                     |}            
                 )
         |> Array.map (fun r ->
             create r.gpk r.generic r.tallMan r.divisible  
         )
+
 
     let assortment : unit -> Assortment [] = Memoization.memoize get_

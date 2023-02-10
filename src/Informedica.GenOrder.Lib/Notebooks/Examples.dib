@@ -1,3 +1,7 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","aliases":[]},{"name":".NET","languageName":null,"aliases":[]},{"name":"html","languageName":"HTML","aliases":[]},{"name":"vscode","languageName":null,"aliases":["frontend"]}]}}
+
 #!markdown
 
 # Examples for use of the `Informedica.GenOrder.Lib` library

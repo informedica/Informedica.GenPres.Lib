@@ -98,15 +98,15 @@ module Types =
         {
             // Normal limits
             Norm : MinMax
-            // Normal limits adjusted by weight
+            // Normal limits adjusted by weight (Unit = weight unit)
             NormWeight : MinMax * Unit
-            // Normal limits adjusted by BSA
+            // Normal limits adjusted by BSA (Unit = BSA unit)
             NormBSA : MinMax * Unit
             // Absolute limits
             Abs : MinMax
-            // Absolute limits adjusted by weight
+            // Absolute limits adjusted by weight (Unit = weight unit)
             AbsWeight : MinMax * Unit
-            // Absolute limits adjusted by BSA
+            // Absolute limits adjusted by BSA (Unit = bsa unit)
             AbsBSA : MinMax * Unit
         }
         static member Norm_ :

@@ -50,7 +50,7 @@ module Api =
     let convert loc verb s2 s1 =
         let vu = s1 |> ValueUnit.fromString
 
-        match s2 |> ValueUnit.Units.fromString with
+        match s2 |> Units.fromString with
         | Some u ->
             vu
             |> ValueUnit.convertTo u

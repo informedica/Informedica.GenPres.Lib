@@ -26,6 +26,10 @@ module DoseRule =
     module DoseRange =
 
 
+        /// Create a DoseRange with a Norm, NormWeight, NormBSA,
+        /// Abs, AbsWeight and AbsBSA min max values.
+        /// Note: units in normWght and absWght are weight units and
+        /// units in normBSA and absBSA are bsa units.
         let create norm normWght normBSA abs absWght absBSA =
             {
                 Norm = norm
@@ -37,10 +41,10 @@ module DoseRule =
             }
 
         let emptyWeight =
-            MinIncrMax.empty, Unit.NoUnit
+            MinIncrMax.empty, NoUnit
 
 
-        let emptyBSA = MinIncrMax.empty, Unit.NoUnit
+        let emptyBSA = MinIncrMax.empty, NoUnit
 
 
         let empty =
@@ -59,10 +63,9 @@ module DoseRule =
                 |> setMinIncl (Some n)
                 |> setMaxIncl (Some n)
 
-            let wmm =
-                (mm, ValueUnit.Units.Weight.kiloGram)
+            let wmm = (mm, Units.Weight.kiloGram)
 
-            let bmm = (mm, ValueUnit.Units.BSA.M2)
+            let bmm = (mm, Units.BSA.m2)
 
             create mm wmm bmm mm wmm bmm
 
@@ -84,6 +87,8 @@ module DoseRule =
             }
 
 
+        /// Only converts the substance unit to unit u
+        /// weight and bsa units remain the same!
         let convertTo u (dr: DoseRange) =
 
             { dr with
@@ -369,7 +374,7 @@ module DoseRule =
                        || g |> String.isNullOrWhiteSpace then
                         o
                     else
-                        match $"%s{u}[%s{g}]" |> ValueUnit.Units.fromString with
+                        match $"%s{u}[%s{g}]" |> Units.fromString with
                         | None -> o
                         | Some u ->
                             match mm |> MinIncrMax.Dto.fromDto with
@@ -464,7 +469,7 @@ module DoseRule =
                 |> ValueUnit.convertTo u1
                 |> ValueUnit.get
                 |> fst
-                |> ValueUnit.create ValueUnit.Units.Count.times
+                |> ValueUnit.create Units.Count.times
                 |> DoseRange.count
 
             { ds with

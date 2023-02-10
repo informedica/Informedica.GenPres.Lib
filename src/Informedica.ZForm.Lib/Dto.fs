@@ -212,7 +212,7 @@ module Dto =
             fr.Frequencies
             |> List.map (fun f ->
                 f
-                |> ValueUnit.createSingle (ValueUnit.createCombiUnit (ValueUnit.Units.Count.times, OpPer, fr.TimeUnit))
+                |> ValueUnit.createSingle (ValueUnit.createCombiUnit (Units.Count.times, OpPer, fr.TimeUnit))
                 |> ValueUnit.freqToValueUnitString
                 |> Mapping.mapFreq Mapping.ValueUnitMap Mapping.AppMap
             )
@@ -279,7 +279,7 @@ module Dto =
             dto.MultipleUnit |> ValueUnit.unitFromAppString
 
         let ru =
-            dto.RateUnit |> ValueUnit.Units.fromString
+            dto.RateUnit |> Units.fromString
 
         let rte =
             dto.Route

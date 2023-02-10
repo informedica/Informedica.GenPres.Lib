@@ -996,11 +996,10 @@ module MinIncrMax =
     /// for resp. the min and max value.
     let toString minInclStr minExclStr maxInclStr maxExclStr { Min = min; Max = max } =
         let vuToStr vu =
-            let milliGram =
-                ValueUnit.Units.Mass.milliGram
+            let milliGram = Units.Mass.milliGram
 
-            let gram = ValueUnit.Units.Mass.gram
-            let day = ValueUnit.Units.Time.day
+            let gram = Units.Mass.gram
+            let day = Units.Time.day
 
             let per = ValueUnit.per
             let convertTo = ValueUnit.convertTo

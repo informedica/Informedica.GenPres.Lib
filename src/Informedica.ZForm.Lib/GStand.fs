@@ -188,7 +188,7 @@ module GStand =
                     fr
                     |> ValueUnit.get
                     |> fst
-                    |> ValueUnit.create ValueUnit.Units.Count.times
+                    |> ValueUnit.create Units.Count.times
 
                 vu * x |> Some
 
@@ -252,7 +252,7 @@ module GStand =
                     | _ when
                         cfg.IsRate
                         && dsr.frequencies |> List.length = 1
-                        && tu = ValueUnit.Units.Time.hour
+                        && tu = Units.Time.hour
                         ->
 
                         ds
@@ -309,7 +309,7 @@ module GStand =
             // remove the adjust unit by making it a count
             let c =
                 c
-                |> MinIncrMax.withUnit ValueUnit.Units.Count.times
+                |> MinIncrMax.withUnit Units.Count.times
 
             let calc op x1 x2 y =
                 match y with
@@ -341,19 +341,13 @@ module GStand =
             doserules = dsg.doserules
             doseRange =
                 DoseRange.create
-                    (calcNoneAndAdjusted w dsg.normDose dsg.normKg
-                     |> fst)
-                    (calcNoneAndAdjusted w dsg.normDose dsg.normKg
-                     |> snd,
-                     ValueUnit.Units.Weight.kiloGram)
-                    (calcNoneAndAdjusted b dsg.normDose dsg.normM2
-                     |> snd,
-                     ValueUnit.Units.BSA.M2)
-                    (calcNoneAndAdjusted w dsg.absDose dsg.absKg |> fst)
-                    (calcNoneAndAdjusted w dsg.absDose dsg.absKg |> snd, ValueUnit.Units.Weight.kiloGram)
-                    (calcNoneAndAdjusted b dsg.absDose dsg.absM2 |> snd, ValueUnit.Units.BSA.M2)
+                    (calcNoneAndAdjusted w dsg.normDose dsg.normKg |> fst) // norm
+                    (calcNoneAndAdjusted w dsg.normDose dsg.normKg |> snd, Units.Weight.kiloGram) // normKg
+                    (calcNoneAndAdjusted b dsg.normDose dsg.normM2 |> snd, Units.BSA.m2) // normBSA
+                    (calcNoneAndAdjusted w dsg.absDose dsg.absKg |> fst) // abs
+                    (calcNoneAndAdjusted w dsg.absDose dsg.absKg |> snd, Units.Weight.kiloGram) // absKg
+                    (calcNoneAndAdjusted b dsg.absDose dsg.absM2 |> snd, Units.BSA.m2) // absBSA
         |}
-
 
 
     // fold maximize with preservation of min

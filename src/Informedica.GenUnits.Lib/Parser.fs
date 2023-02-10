@@ -7,7 +7,6 @@ module Parser =
     open Informedica.Utils.Lib.BCL
     open FParsec
 
-    module Units = ValueUnit.Units
 
     let setUnitValue u v =
         u

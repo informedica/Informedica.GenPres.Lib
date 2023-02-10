@@ -113,7 +113,6 @@ module TestSolver =
     module Maximum = ValueRange.Maximum
     module Increment = ValueRange.Increment
     module ValueSet = ValueRange.ValueSet
-    module Units = ValueUnit.Units
 
 
     let (|>>) r f =
@@ -234,8 +233,6 @@ module Tests =
 
 
     module VariableTests =
-
-        module Units = ValueUnit.Units
 
 
         module ValueRangeTests =
@@ -825,7 +822,6 @@ module Tests =
 
     module EquationTests =
 
-        module Units = ValueUnit.Units
 
         let eqs =
             [ "ParacetamolDoseTotal = ParacetamolDoseTotalAdjust * Adjust" ]

@@ -4,6 +4,7 @@ namespace Informedica.ZIndex.Lib
 [<AutoOpen>]
 module Types =
 
+
     module Names =
 
         type Name = Full | Short | Memo | Label
@@ -181,6 +182,11 @@ module Types =
         }
 
 
+    type RuleFrequency = { Frequency: decimal; Time: string }
+
+
+    type RuleMinMax = { Min: decimal Option; Max: decimal Option }
+
 
     type DoseRule =
         {
@@ -294,10 +300,6 @@ module Types =
         }
 
     and RuleSubstance = { Name: string; Quantity: decimal; Unit: string }
-
-    and RuleFrequency = { Frequency: decimal; Time: string }
-
-    and RuleMinMax = { Min: decimal Option; Max: decimal Option }
 
 
     type ATCGroup =

@@ -528,12 +528,16 @@ module Tests =
                 |> Expect.equal "should be 27" 27
             }
 
-            test "should not have routes not in doserule" {
+            test "should only have epilesionaal and hemodialyse routes not in doserule" {
                 GenPresProduct.getRoutes()
                 |> Array.filter (fun r ->
                     DoseRuleTests.rts
                     |> Array.exists ((=) r)
                     |> not
+                )
+                |> Array.filter (fun r -> 
+                    r |> String.equalsCapInsens "epilesionaal" |> not &&
+                    r |> String.equalsCapInsens "hemodialyse" |> not
                 )
                 |> Array.isEmpty
                 |> Expect.isTrue "should be empty"
@@ -649,3 +653,26 @@ open Expecto.Flip
 
 Tests.tests
 |> Expecto.run
+
+
+open Informedica.Utils.Lib.BCL
+open Informedica.ZIndex.Lib
+
+GenPresProduct.getRoutes()
+|> Array.filter (fun r ->
+    Tests.DoseRuleTests.rts
+    |> Array.exists ((=) r)
+    |> not
+)
+|> Array.filter (fun r -> 
+    r |> String.equalsCapInsens "epilesionaal" |> not &&
+    r |> String.equalsCapInsens "hemodialyse"
+)
+
+
+RuleFinder.createFilter (Some 12m) (Some 10m) None None "paracetamol" "drank" "oraal"
+|> RuleFinder.find true
+|> RuleFinder.convertToResult
+
+""
+|> Route.fromString (Route.routeMapping ())

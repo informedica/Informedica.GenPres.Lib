@@ -14,17 +14,17 @@ module Utils =
 
 
         let ageToString { Min = min; Max = max } =
-            let oneWk = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.week
-            let oneMo = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.month
-            let oneYr = 1N |> ValueUnit.createSingle ValueUnit.Units.Time.year
+            let oneWk = 1N |> ValueUnit.createSingle Units.Time.week
+            let oneMo = 1N |> ValueUnit.createSingle Units.Time.month
+            let oneYr = 1N |> ValueUnit.createSingle Units.Time.year
 
             let convert =
                 let c vu =
                     match vu with
-                    | _ when vu <? oneWk -> vu ==> ValueUnit.Units.Time.day
-                    | _ when vu <? oneMo -> vu ==> ValueUnit.Units.Time.week
-                    | _ when vu <? oneYr -> vu ==> ValueUnit.Units.Time.month
-                    | _ -> vu ==> ValueUnit.Units.Time.year
+                    | _ when vu <? oneWk -> vu ==> Units.Time.day
+                    | _ when vu <? oneMo -> vu ==> Units.Time.week
+                    | _ when vu <? oneYr -> vu ==> Units.Time.month
+                    | _ -> vu ==> Units.Time.year
                 Option.bind (Limit.apply c c >> Some)
 
             { Min = min |> convert; Incr = None; Max = max |> convert } |> MinIncrMax.toString "van " "van " "tot " "tot "
@@ -33,7 +33,7 @@ module Utils =
         let gestAgeToString { Min = min; Max = max } =
 
             let convert =
-                let c vu = vu ==> ValueUnit.Units.Time.week
+                let c vu = vu ==> Units.Time.week
                 Option.bind (Limit.apply c c >> Some)
 
             { Min = min |> convert; Incr = None;  Max = max |> convert } |> MinIncrMax.toString "van " "van " "tot " "tot "

@@ -1,6 +1,11 @@
-namespace Informedica.GenUnits.Lib
+namespace rec Informedica.GenUnits.Lib
+
+#nowarn "40"
 
 open MathNet.Numerics
+
+open Informedica.Utils.Lib
+open Informedica.Utils.Lib.BCL
 
 
 type Unit =
@@ -90,11 +95,595 @@ module Group =
 
 
 
+
+module Units =
+
+
+    type Localization =
+        | English
+        | Dutch
+
+
+    type Verbal =
+        | Long
+        | Short
+
+
+    type Language = { Eng: string; Dut: string }
+
+
+    let getDutch (lang: Language) = lang.Dut
+
+
+    let getEnglish (lang: Language) = lang.Eng
+
+
+    type UnitDetails =
+        {
+            Unit: Unit
+            Group: Group.Group
+            Abbreviation: Language
+            Name: Language
+            Synonyms: string list
+        }
+
+
+    let apply f (ud: UnitDetails) = f ud
+
+
+    let get = apply id
+
+
+    let getUnit ud = (ud |> get).Unit
+
+
+    let per = ValueUnit.per
+
+
+    let create un gr ab nm sy =
+        {
+            Unit = un
+            Group = gr
+            Abbreviation = ab
+            Name = nm
+            Synonyms = sy
+        }
+
+
+    let createGeneral n v =
+        let un = (n, v) |> General
+        let ab = { Eng = n; Dut = n }
+        let nm = { Eng = n; Dut = n }
+
+        create un (Group.GeneralGroup n) ab nm []
+
+
+    let getGroup ud = (ud |> get).Group
+
+
+    let getName ud = (ud |> get).Name
+
+
+    let getAbbreviation ud = (ud |> get).Abbreviation
+
+
+    let getEnglishName = getName >> getEnglish
+
+
+    let getDutchName = getName >> getDutch
+
+
+    let getEnglishAbbreviation =
+        getAbbreviation >> getEnglish
+
+
+    let getDutchAbbreviation =
+        getAbbreviation >> getDutch
+
+
+    let getUnitString loc verb =
+        match loc with
+        | English ->
+            match verb with
+            | Short -> getEnglishAbbreviation
+            | Long -> getEnglishName
+        | Dutch ->
+            match verb with
+            | Short -> getDutchAbbreviation
+            | Long -> getDutchName
+
+
+    module General =
+
+        let toGeneral = General
+        let general n = (n, 1N) |> toGeneral
+
+
+    module Count =
+
+        let toCount = Count
+
+        let nTimes n = n |> Times |> toCount
+
+        let times = 1N |> nTimes
+
+
+    module Mass =
+
+        let toMass = Mass
+
+        let nKiloGram n = n |> KiloGram |> toMass
+        let nGram n = n |> Gram |> toMass
+        let nMilliGram n = n |> MilliGram |> toMass
+        let nMicroGram n = n |> MicroGram |> toMass
+        let nNanoGram n = n |> NanoGram |> toMass
+
+        let kiloGram = 1N |> nKiloGram
+        let gram = 1N |> nGram
+        let milliGram = 1N |> nMilliGram
+        let microGram = 1N |> nMicroGram
+        let nanoGram = 1N |> nNanoGram
+
+
+    module Weight =
+
+        let toWeight = Weight
+
+        let nKiloGram n = n |> WeightKiloGram |> toWeight
+        let nGram n = n |> WeightGram |> toWeight
+
+        let kiloGram = 1N |> nKiloGram
+        let gram = 1N |> nGram
+
+
+    module Volume =
+
+        let toVolume = Volume
+
+        let nLiter n = n |> Liter |> toVolume
+        let nDeciLiter n = n |> DeciLiter |> toVolume
+        let nMilliLiter n = n |> MilliLiter |> toVolume
+        let nMicroLiter n = n |> MicroLiter |> toVolume
+        let nDroplet n = n |> Droplet |> toVolume
+
+        let liter = 1N |> nLiter
+        let deciLiter = 1N |> nDeciLiter
+        let milliLiter = 1N |> nMilliLiter
+        let microLiter = 1N |> nMicroLiter
+        let droplet = 1N |> nDroplet
+
+
+    module Time =
+
+        let toTime = Time
+
+        let nYear n = n |> Year |> toTime
+        let nMonth n = n |> Month |> toTime
+        let nWeek n = n |> Week |> toTime
+        let nDay n = n |> Day |> toTime
+        let nHour n = n |> Hour |> toTime
+        let nMinute n = n |> Minute |> toTime
+        let nSecond n = n |> Second |> toTime
+
+        let year = 1N |> nYear
+        let month = 1N |> nMonth
+        let week = 1N |> nWeek
+        let day = 1N |> nDay
+        let hour = 1N |> nHour
+        let minute = 1N |> nMinute
+        let second = 1N |> nSecond
+
+
+    module Molar =
+
+        let toMolar = Molar
+
+        let nMol n = n |> Mol |> toMolar
+        let nMilliMol n = n |> MilliMol |> toMolar
+
+        let mol = 1N |> nMol
+        let milliMol = 1N |> nMilliMol
+
+
+    module InterNatUnit =
+
+        let toInterNatUnit = InterNatUnit
+
+        let nMIU n = n |> MIU |> toInterNatUnit
+        let nIU n = n |> IU |> toInterNatUnit
+
+        let mIU = 1N |> nMIU
+        let iu = 1N |> nIU
+
+
+    module Height =
+
+        let toHeight = Height
+
+        let nMeter n = n |> HeightMeter |> toHeight
+        let nCentiMeter n = n |> HeightCentiMeter |> toHeight
+
+        let meter = 1N |> HeightMeter |> toHeight
+
+        let centiMeter =
+            1N |> HeightCentiMeter |> toHeight
+
+
+    module BSA =
+
+        let toBSA = BSA
+
+        let nM2 n = n |> M2 |> toBSA
+
+        let m2 = 1N |> nM2
+
+
+    let units =
+        [
+            {
+                Unit = Count.times
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "x"; Dut = "x" }
+                Name = { Eng = "times"; Dut = "keer" }
+                Synonyms = []
+            }
+
+            {
+                Unit = Mass.kiloGram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "kg"; Dut = "kg" }
+                Name = { Eng = "kilogram"; Dut = "kilogram" }
+                Synonyms = []
+            }
+            {
+                Unit = Mass.gram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "g"; Dut = "g" }
+                Name = { Eng = "gram"; Dut = "gram" }
+                Synonyms = [ "gr" ]
+            }
+            {
+                Unit = Mass.milliGram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "mg"; Dut = "mg" }
+                Name = { Eng = "milligram"; Dut = "milligram" }
+                Synonyms = [ "millig"; "milligr" ]
+            }
+            {
+                Unit = Mass.microGram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "microg"; Dut = "microg" }
+                Name = { Eng = "microgram"; Dut = "microgram" }
+                Synonyms = [ "mcg"; "µg"; "mcgr" ]
+            }
+            {
+                Unit = Mass.nanoGram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "nanog"; Dut = "nanog" }
+                Name = { Eng = "nanogram"; Dut = "nanogram" }
+                Synonyms = [ "nanogr"; "ng" ]
+            }
+
+            {
+                Unit = Volume.liter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "l"; Dut = "l" }
+                Name = { Eng = "liter"; Dut = "liter" }
+                Synonyms = [ "ltr" ]
+            }
+            {
+                Unit = Volume.deciLiter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "dl"; Dut = "dl" }
+                Name = { Eng = "deciliter"; Dut = "deciliter" }
+                Synonyms = [ "decil" ]
+            }
+            {
+                Unit = Volume.milliLiter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "ml"; Dut = "ml" }
+                Name =
+                    {
+                        Eng = "milliliter"
+                        Dut = "milliliter"
+                    }
+                Synonyms = [ "millil" ]
+            }
+            {
+                Unit = Volume.microLiter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "microl"; Dut = "microl" }
+                Name =
+                    {
+                        Eng = "microliter"
+                        Dut = "microliter"
+                    }
+                Synonyms = [ "µl" ]
+            }
+            {
+                Unit = Volume.droplet
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "dr"; Dut = "dr" }
+                Name = { Eng = "droplet"; Dut = "druppel" }
+                Synonyms = [ "drop" ]
+            }
+
+            {
+                Unit = Time.year
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "yr"; Dut = "jr" }
+                Name = { Eng = "year"; Dut = "jaar" }
+                Synonyms = [ "years"; "jaren" ]
+            }
+            {
+                Unit = Time.month
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "mo"; Dut = "mnd" }
+                Name = { Eng = "month"; Dut = "maand" }
+                Synonyms = [ "months"; "maanden" ]
+            }
+            {
+                Unit = Time.week
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "wk"; Dut = "wk" }
+                Name = { Eng = "week"; Dut = "week" }
+                Synonyms = [ "weeks"; "weken" ]
+            }
+            {
+                Unit = Time.day
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "day"; Dut = "dag" }
+                Name = { Eng = "day"; Dut = "dag" }
+                Synonyms = [ "days"; "dagen" ]
+            }
+            {
+                Unit = Time.hour
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "hr"; Dut = "uur" }
+                Name = { Eng = "hour"; Dut = "uur" }
+                Synonyms = [ "hours"; "uren" ]
+            }
+            {
+                Unit = Time.minute
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "min"; Dut = "min" }
+                Name = { Eng = "minute"; Dut = "minuut" }
+                Synonyms = [ "minutes"; "minuten" ]
+            }
+            {
+                Unit = Time.second
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "sec"; Dut = "sec" }
+                Name = { Eng = "second"; Dut = "seconde" }
+                Synonyms = [ "s" ]
+            }
+
+            {
+                Unit = Molar.mol
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "mol"; Dut = "mol" }
+                Name = { Eng = "mol"; Dut = "mol" }
+                Synonyms = []
+            }
+            {
+                Unit = Molar.milliMol
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "mmol"; Dut = "mmol" }
+                Name = { Eng = "millimol"; Dut = "millimol" }
+                Synonyms = []
+            }
+
+            {
+                Unit = InterNatUnit.iu
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "IE"; Dut = "IE" }
+                Name = { Eng = "IE"; Dut = "IE" }
+                Synonyms = [ "E"; "U"; "IU" ]
+            }
+            {
+                Unit = InterNatUnit.mIU
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "miljIE"; Dut = "miljIE" }
+                Name = { Eng = "millionIE"; Dut = "miljoenIE" }
+                Synonyms = [ "milj.IE"; "milj.E" ]
+            }
+
+            {
+                Unit = Weight.kiloGram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "kg"; Dut = "kg" }
+                Name = { Eng = "kilogram"; Dut = "kilogram" }
+                Synonyms = []
+            }
+            {
+                Unit = Weight.gram
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "g"; Dut = "g" }
+                Name = { Eng = "gram"; Dut = "gram" }
+                Synonyms = [ "gr" ]
+            }
+
+            {
+                Unit = BSA.m2
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "m2"; Dut = "m2" }
+                Name =
+                    {
+                        Eng = "square meter"
+                        Dut = "vierkante meter"
+                    }
+                Synonyms = [ "gr" ]
+            }
+
+        ]
+        |> List.map (fun ud ->
+            { ud with
+                Group = ud.Unit |> ValueUnit.Group.unitToGroup
+            }
+        )
+
+
+    /// Get the n value and unit but
+    /// cannot do this with a combined unit!
+    let nUnit =
+        function
+        | NoUnit -> (1N, NoUnit)
+        | General (n, v) -> (v, ((n, 1N) |> General))
+        | Count g ->
+            match g with
+            | Times n -> (n, Count.times)
+        | Mass g ->
+            match g with
+            | KiloGram n -> (n, Mass.kiloGram)
+            | Gram n -> (n, Mass.gram)
+            | MilliGram n -> (n, Mass.milliGram)
+            | MicroGram n -> (n, Mass.microGram)
+            | NanoGram n -> (n, Mass.nanoGram)
+        | Volume g ->
+            match g with
+            | Liter n -> (n, Volume.liter)
+            | DeciLiter n -> (n, Volume.deciLiter)
+            | MilliLiter n -> (n, Volume.milliLiter)
+            | MicroLiter n -> (n, Volume.microLiter)
+            | Droplet n -> (n, Volume.droplet)
+        | Time g ->
+            match g with
+            | Year n -> (n, Time.year)
+            | Month n -> (n, Time.month)
+            | Week n -> (n, Time.week)
+            | Day n -> (n, Time.day)
+            | Hour n -> (n, Time.hour)
+            | Minute n -> (n, Time.minute)
+            | Second n -> (n, Time.second)
+        | Molar g ->
+            match g with
+            | Mol n -> (n, Molar.mol)
+            | MilliMol n -> (n, Molar.milliMol)
+        | InterNatUnit g ->
+            match g with
+            | MIU n -> (n, InterNatUnit.mIU)
+            | IU n -> (n, InterNatUnit.iu)
+        | Weight g ->
+            match g with
+            | WeightKiloGram n -> (n, Weight.kiloGram)
+            | WeightGram n -> (n, Weight.gram)
+        | Height g ->
+            match g with
+            | HeightMeter n -> (n, Height.meter)
+            | HeightCentiMeter n -> (n, Height.centiMeter)
+        | BSA g ->
+            match g with
+            | M2 n -> (n, BSA.m2)
+        | CombiUnit (u1, op, u2) ->
+            failwith
+            <| $"Cannot map combined unit %A{(u1, op, u2) |> CombiUnit}"
+
+
+    /// Try finds the unit details in
+    /// a unit u
+    let tryFind u =
+        match units |> List.tryFind (fun udt -> udt.Unit = u) with
+        | Some udt -> Some udt
+        | None -> None
+
+
+    /// Creates a Unit from a string s, if possible
+    /// otherwise returns None. Note doesn't take care of
+    /// the n value of a unit! So, for example, the unit
+    /// 36 hour cannot be parsed correctly.
+    let fromString s =
+        match s |> String.splitAt '[' with
+        | [| us; gs |] ->
+            let gs = gs |> String.replace "]" ""
+
+            let eqsUnit (udt: UnitDetails) =
+                udt.Abbreviation.Dut |> String.equalsCapInsens us
+                || udt.Abbreviation.Eng |> String.equalsCapInsens us
+                || udt.Name.Dut |> String.equalsCapInsens us
+                || udt.Name.Eng |> String.equalsCapInsens us
+                || udt.Synonyms
+                    |> List.exists (String.equalsCapInsens us)
+
+            let eqsGroup (udt: UnitDetails) =
+                udt.Group
+                |> ValueUnit.Group.toString
+                |> String.equalsCapInsens gs
+
+            match units
+                    |> List.tryFind (fun udt -> udt |> eqsUnit && udt |> eqsGroup)
+                with
+            | Some udt -> udt.Unit
+            | None -> ValueUnit.generalUnit 1N s
+            |> Some
+
+        | _ -> None
+
+
+    /// Turn a unit u to a string with
+    /// localization loc and verbality verb.
+    let toString loc verb u =
+        let gtost u g = u + "[" + (g |> ValueUnit.Group.toString) + "]"
+
+        let rec str u =
+            match u with
+            | NoUnit -> ""
+
+            | CombiUnit (ul, op, ur) ->
+                let uls = str ul
+                let urs = str ur
+
+                uls + (op |> ValueUnit.opToStr) + urs
+
+            | General (n, v) ->
+                let ustr = n // + "[General]"
+
+                if v > 1N then
+                    (1N |> BigRational.toString) + ustr
+                else
+                    ustr
+
+            | _ ->
+                let v, u = u |> nUnit
+
+                match u |> tryFind with
+                | Some udt ->
+                    match loc with
+                    | English ->
+                        match verb with
+                        | Short -> udt.Group |> gtost udt.Abbreviation.Eng
+                        | Long -> udt.Group |> gtost udt.Name.Eng
+                    | Dutch ->
+                        match verb with
+                        | Short -> udt.Group |> gtost udt.Abbreviation.Dut
+                        | Long -> udt.Group |> gtost udt.Name.Dut
+                | None -> ""
+                |> (fun s ->
+                    if s = "" then
+                        ""
+                    else if v = 1N then
+                        s
+                    else
+                        (v |> BigRational.toString) + " " + s
+                )
+
+        str u
+
+
+    let toStringDutchShort =
+        toString Dutch Short
+
+    let toStringDutchLong = toString Dutch Long
+
+    let toStringEngShort =
+        toString English Short
+
+    let toStringEngLong = toString English Long
+
+
+
+
+
 module ValueUnit =
-
-
-    open Informedica.Utils.Lib
-    open Informedica.Utils.Lib.BCL
 
 
     /// Transforms an operator to a string
@@ -1040,590 +1629,6 @@ module ValueUnit =
             |> create u
 
 
-    module Units =
-
-
-        type Localization =
-            | English
-            | Dutch
-
-
-        type Verbal =
-            | Long
-            | Short
-
-
-        type Language = { Eng: string; Dut: string }
-
-
-        let getDutch (lang: Language) = lang.Dut
-
-
-        let getEnglish (lang: Language) = lang.Eng
-
-
-        type UnitDetails =
-            {
-                Unit: Unit
-                Group: Group.Group
-                Abbreviation: Language
-                Name: Language
-                Synonyms: string list
-            }
-
-
-        let apply f (ud: UnitDetails) = f ud
-
-
-        let get = apply id
-
-
-        let getUnit ud = (ud |> get).Unit
-
-
-        let per = per
-
-
-        let create un gr ab nm sy =
-            {
-                Unit = un
-                Group = gr
-                Abbreviation = ab
-                Name = nm
-                Synonyms = sy
-            }
-
-
-        let createGeneral n v =
-            let un = (n, v) |> General
-            let ab = { Eng = n; Dut = n }
-            let nm = { Eng = n; Dut = n }
-
-            create un (Group.GeneralGroup n) ab nm []
-
-
-        let getGroup ud = (ud |> get).Group
-
-
-        let getName ud = (ud |> get).Name
-
-
-        let getAbbreviation ud = (ud |> get).Abbreviation
-
-
-        let getEnglishName = getName >> getEnglish
-
-
-        let getDutchName = getName >> getDutch
-
-
-        let getEnglishAbbreviation =
-            getAbbreviation >> getEnglish
-
-
-        let getDutchAbbreviation =
-            getAbbreviation >> getDutch
-
-
-        let getUnitString loc verb =
-            match loc with
-            | English ->
-                match verb with
-                | Short -> getEnglishAbbreviation
-                | Long -> getEnglishName
-            | Dutch ->
-                match verb with
-                | Short -> getDutchAbbreviation
-                | Long -> getDutchName
-
-
-        module General =
-
-            let toGeneral = General
-            let general n = (n, 1N) |> toGeneral
-
-
-        module Count =
-
-            let toCount = Count
-
-            let nTimes n = n |> Times |> toCount
-
-            let times = 1N |> nTimes
-
-
-        module Mass =
-
-            let toMass = Mass
-
-            let nKiloGram n = n |> KiloGram |> toMass
-            let nGram n = n |> Gram |> toMass
-            let nMilliGram n = n |> MilliGram |> toMass
-            let nMicroGram n = n |> MicroGram |> toMass
-            let nNanoGram n = n |> NanoGram |> toMass
-
-            let kiloGram = 1N |> nKiloGram
-            let gram = 1N |> nGram
-            let milliGram = 1N |> nMilliGram
-            let microGram = 1N |> nMicroGram
-            let nanoGram = 1N |> nNanoGram
-
-
-        module Weight =
-
-            let toWeight = Weight
-
-            let nKiloGram n = n |> WeightKiloGram |> toWeight
-            let nGram n = n |> WeightGram |> toWeight
-
-            let kiloGram = 1N |> nKiloGram
-            let gram = 1N |> nGram
-
-
-        module Volume =
-
-            let toVolume = Volume
-
-            let nLiter n = n |> Liter |> toVolume
-            let nDeciLiter n = n |> DeciLiter |> toVolume
-            let nMilliLiter n = n |> MilliLiter |> toVolume
-            let nMicroLiter n = n |> MicroLiter |> toVolume
-            let nDroplet n = n |> Droplet |> toVolume
-
-            let liter = 1N |> nLiter
-            let deciLiter = 1N |> nDeciLiter
-            let milliLiter = 1N |> nMilliLiter
-            let microLiter = 1N |> nMicroLiter
-            let droplet = 1N |> nDroplet
-
-
-        module Time =
-
-            let toTime = Time
-
-            let nYear n = n |> Year |> toTime
-            let nMonth n = n |> Month |> toTime
-            let nWeek n = n |> Week |> toTime
-            let nDay n = n |> Day |> toTime
-            let nHour n = n |> Hour |> toTime
-            let nMinute n = n |> Minute |> toTime
-            let nSecond n = n |> Second |> toTime
-
-            let year = 1N |> nYear
-            let month = 1N |> nMonth
-            let week = 1N |> nWeek
-            let day = 1N |> nDay
-            let hour = 1N |> nHour
-            let minute = 1N |> nMinute
-            let second = 1N |> nSecond
-
-
-        module Molar =
-
-            let toMolar = Molar
-
-            let nMol n = n |> Mol |> toMolar
-            let nMilliMol n = n |> MilliMol |> toMolar
-
-            let mol = 1N |> nMol
-            let milliMol = 1N |> nMilliMol
-
-
-        module InterNatUnit =
-
-            let toInterNatUnit = InterNatUnit
-
-            let nMIU n = n |> MIU |> toInterNatUnit
-            let nIU n = n |> IU |> toInterNatUnit
-
-            let MIU = 1N |> nMIU
-            let IU = 1N |> nIU
-
-
-        module Height =
-
-            let toHeight = Height
-
-            let nMeter n = n |> HeightMeter |> toHeight
-            let nCentiMeter n = n |> HeightCentiMeter |> toHeight
-
-            let meter = 1N |> HeightMeter |> toHeight
-
-            let centiMeter =
-                1N |> HeightCentiMeter |> toHeight
-
-
-        module BSA =
-
-            let toBSA = BSA
-
-            let nM2 n = n |> M2 |> toBSA
-
-            let M2 = 1N |> nM2
-
-
-        let units =
-            [
-                {
-                    Unit = Count.times
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "x"; Dut = "x" }
-                    Name = { Eng = "times"; Dut = "keer" }
-                    Synonyms = []
-                }
-
-                {
-                    Unit = Mass.kiloGram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "kg"; Dut = "kg" }
-                    Name = { Eng = "kilogram"; Dut = "kilogram" }
-                    Synonyms = []
-                }
-                {
-                    Unit = Mass.gram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "g"; Dut = "g" }
-                    Name = { Eng = "gram"; Dut = "gram" }
-                    Synonyms = [ "gr" ]
-                }
-                {
-                    Unit = Mass.milliGram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "mg"; Dut = "mg" }
-                    Name = { Eng = "milligram"; Dut = "milligram" }
-                    Synonyms = [ "millig"; "milligr" ]
-                }
-                {
-                    Unit = Mass.microGram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "microg"; Dut = "microg" }
-                    Name = { Eng = "microgram"; Dut = "microgram" }
-                    Synonyms = [ "mcg"; "µg"; "mcgr" ]
-                }
-                {
-                    Unit = Mass.nanoGram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "nanog"; Dut = "nanog" }
-                    Name = { Eng = "nanogram"; Dut = "nanogram" }
-                    Synonyms = [ "nanogr"; "ng" ]
-                }
-
-                {
-                    Unit = Volume.liter
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "l"; Dut = "l" }
-                    Name = { Eng = "liter"; Dut = "liter" }
-                    Synonyms = [ "ltr" ]
-                }
-                {
-                    Unit = Volume.deciLiter
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "dl"; Dut = "dl" }
-                    Name = { Eng = "deciliter"; Dut = "deciliter" }
-                    Synonyms = [ "decil" ]
-                }
-                {
-                    Unit = Volume.milliLiter
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "ml"; Dut = "ml" }
-                    Name =
-                        {
-                            Eng = "milliliter"
-                            Dut = "milliliter"
-                        }
-                    Synonyms = [ "millil" ]
-                }
-                {
-                    Unit = Volume.microLiter
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "microl"; Dut = "microl" }
-                    Name =
-                        {
-                            Eng = "microliter"
-                            Dut = "microliter"
-                        }
-                    Synonyms = [ "µl" ]
-                }
-                {
-                    Unit = Volume.droplet
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "dr"; Dut = "dr" }
-                    Name = { Eng = "droplet"; Dut = "druppel" }
-                    Synonyms = [ "drop" ]
-                }
-
-                {
-                    Unit = Time.year
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "yr"; Dut = "jr" }
-                    Name = { Eng = "year"; Dut = "jaar" }
-                    Synonyms = [ "years"; "jaren" ]
-                }
-                {
-                    Unit = Time.month
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "mo"; Dut = "mnd" }
-                    Name = { Eng = "month"; Dut = "maand" }
-                    Synonyms = [ "months"; "maanden" ]
-                }
-                {
-                    Unit = Time.week
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "wk"; Dut = "wk" }
-                    Name = { Eng = "week"; Dut = "week" }
-                    Synonyms = [ "weeks"; "weken" ]
-                }
-                {
-                    Unit = Time.day
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "day"; Dut = "dag" }
-                    Name = { Eng = "day"; Dut = "dag" }
-                    Synonyms = [ "days"; "dagen" ]
-                }
-                {
-                    Unit = Time.hour
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "hr"; Dut = "uur" }
-                    Name = { Eng = "hour"; Dut = "uur" }
-                    Synonyms = [ "hours"; "uren" ]
-                }
-                {
-                    Unit = Time.minute
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "min"; Dut = "min" }
-                    Name = { Eng = "minute"; Dut = "minuut" }
-                    Synonyms = [ "minutes"; "minuten" ]
-                }
-                {
-                    Unit = Time.second
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "sec"; Dut = "sec" }
-                    Name = { Eng = "second"; Dut = "seconde" }
-                    Synonyms = [ "s" ]
-                }
-
-                {
-                    Unit = Molar.mol
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "mol"; Dut = "mol" }
-                    Name = { Eng = "mol"; Dut = "mol" }
-                    Synonyms = []
-                }
-                {
-                    Unit = Molar.milliMol
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "mmol"; Dut = "mmol" }
-                    Name = { Eng = "millimol"; Dut = "millimol" }
-                    Synonyms = []
-                }
-
-                {
-                    Unit = InterNatUnit.IU
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "IE"; Dut = "IE" }
-                    Name = { Eng = "IE"; Dut = "IE" }
-                    Synonyms = [ "E"; "U"; "IU" ]
-                }
-                {
-                    Unit = InterNatUnit.MIU
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "miljIE"; Dut = "miljIE" }
-                    Name = { Eng = "millionIE"; Dut = "miljoenIE" }
-                    Synonyms = [ "milj.IE"; "milj.E" ]
-                }
-
-                {
-                    Unit = Weight.kiloGram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "kg"; Dut = "kg" }
-                    Name = { Eng = "kilogram"; Dut = "kilogram" }
-                    Synonyms = []
-                }
-                {
-                    Unit = Weight.gram
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "g"; Dut = "g" }
-                    Name = { Eng = "gram"; Dut = "gram" }
-                    Synonyms = [ "gr" ]
-                }
-
-                {
-                    Unit = BSA.M2
-                    Group = Group.NoGroup
-                    Abbreviation = { Eng = "m2"; Dut = "m2" }
-                    Name =
-                        {
-                            Eng = "square meter"
-                            Dut = "vierkante meter"
-                        }
-                    Synonyms = [ "gr" ]
-                }
-
-            ]
-            |> List.map (fun ud ->
-                { ud with
-                    Group = ud.Unit |> Group.unitToGroup
-                }
-            )
-
-
-        /// Get the n value and unit but
-        /// cannot do this with a combined unit!
-        let nUnit =
-            function
-            | NoUnit -> (1N, NoUnit)
-            | General (n, v) -> (v, ((n, 1N) |> General))
-            | Count g ->
-                match g with
-                | Times n -> (n, Count.times)
-            | Mass g ->
-                match g with
-                | KiloGram n -> (n, Mass.kiloGram)
-                | Gram n -> (n, Mass.gram)
-                | MilliGram n -> (n, Mass.milliGram)
-                | MicroGram n -> (n, Mass.microGram)
-                | NanoGram n -> (n, Mass.nanoGram)
-            | Volume g ->
-                match g with
-                | Liter n -> (n, Volume.liter)
-                | DeciLiter n -> (n, Volume.deciLiter)
-                | MilliLiter n -> (n, Volume.milliLiter)
-                | MicroLiter n -> (n, Volume.microLiter)
-                | Droplet n -> (n, Volume.droplet)
-            | Time g ->
-                match g with
-                | Year n -> (n, Time.year)
-                | Month n -> (n, Time.month)
-                | Week n -> (n, Time.week)
-                | Day n -> (n, Time.day)
-                | Hour n -> (n, Time.hour)
-                | Minute n -> (n, Time.minute)
-                | Second n -> (n, Time.second)
-            | Molar g ->
-                match g with
-                | Mol n -> (n, Molar.mol)
-                | MilliMol n -> (n, Molar.milliMol)
-            | InterNatUnit g ->
-                match g with
-                | MIU n -> (n, InterNatUnit.MIU)
-                | IU n -> (n, InterNatUnit.IU)
-            | Weight g ->
-                match g with
-                | WeightKiloGram n -> (n, Weight.kiloGram)
-                | WeightGram n -> (n, Weight.gram)
-            | Height g ->
-                match g with
-                | HeightMeter n -> (n, Height.meter)
-                | HeightCentiMeter n -> (n, Height.centiMeter)
-            | BSA g ->
-                match g with
-                | M2 n -> (n, BSA.M2)
-            | CombiUnit (u1, op, u2) ->
-                failwith
-                <| $"Cannot map combined unit %A{(u1, op, u2) |> CombiUnit}"
-
-
-        /// Try finds the unit details in
-        /// a unit u
-        let tryFind u =
-            match units |> List.tryFind (fun udt -> udt.Unit = u) with
-            | Some udt -> Some udt
-            | None -> None
-
-
-        /// Creates a Unit from a string s, if possible
-        /// otherwise returns None. Note doesn't take care of
-        /// the n value of a unit! So, for example, the unit
-        /// 36 hour cannot be parsed correctly.
-        let fromString s =
-            match s |> String.splitAt '[' with
-            | [| us; gs |] ->
-                let gs = gs |> String.replace "]" ""
-
-                let eqsUnit (udt: UnitDetails) =
-                    udt.Abbreviation.Dut |> String.equalsCapInsens us
-                    || udt.Abbreviation.Eng |> String.equalsCapInsens us
-                    || udt.Name.Dut |> String.equalsCapInsens us
-                    || udt.Name.Eng |> String.equalsCapInsens us
-                    || udt.Synonyms
-                       |> List.exists (String.equalsCapInsens us)
-
-                let eqsGroup (udt: UnitDetails) =
-                    udt.Group
-                    |> Group.toString
-                    |> String.equalsCapInsens gs
-
-                match units
-                      |> List.tryFind (fun udt -> udt |> eqsUnit && udt |> eqsGroup)
-                    with
-                | Some udt -> udt.Unit
-                | None -> generalUnit 1N s
-                |> Some
-
-            | _ -> None
-
-
-        /// Turn a unit u to a string with
-        /// localization loc and verbality verb.
-        let toString loc verb u =
-            let gtost u g = u + "[" + (g |> Group.toString) + "]"
-
-            let rec str u =
-                match u with
-                | NoUnit -> ""
-
-                | CombiUnit (ul, op, ur) ->
-                    let uls = str ul
-                    let urs = str ur
-
-                    uls + (op |> opToStr) + urs
-
-                | General (n, v) ->
-                    let ustr = n // + "[General]"
-
-                    if v > 1N then
-                        (1N |> BigRational.toString) + ustr
-                    else
-                        ustr
-
-                | _ ->
-                    let v, u = u |> nUnit
-
-                    match u |> tryFind with
-                    | Some udt ->
-                        match loc with
-                        | English ->
-                            match verb with
-                            | Short -> udt.Group |> gtost udt.Abbreviation.Eng
-                            | Long -> udt.Group |> gtost udt.Name.Eng
-                        | Dutch ->
-                            match verb with
-                            | Short -> udt.Group |> gtost udt.Abbreviation.Dut
-                            | Long -> udt.Group |> gtost udt.Name.Dut
-                    | None -> ""
-                    |> (fun s ->
-                        if s = "" then
-                            ""
-                        else if v = 1N then
-                            s
-                        else
-                            (v |> BigRational.toString) + " " + s
-                    )
-
-            str u
-
-
-        let toStringDutchShort =
-            toString Dutch Short
-
-        let toStringDutchLong = toString Dutch Long
-
-        let toStringEngShort =
-            toString English Short
-
-        let toStringEngLong = toString English Long
-
-
     /// Get the user readable string version
     /// of a unit, i.e. without unit group between
     /// brackets
@@ -1757,14 +1762,6 @@ module ValueUnit =
 
     module Operators =
 
-        let (*) vu1 vu2 = calc true (*) vu1 vu2
-
-        let (/) vu1 vu2 = calc true (/) vu1 vu2
-
-        let (+) vu1 vu2 = calc true (+) vu1 vu2
-
-        let (-) vu1 vu2 = calc true (-) vu1 vu2
-
         let (=?) vu1 vu2 = cmp (=) vu1 vu2
 
         let (>?) vu1 vu2 = cmp (>) vu1 vu2
@@ -1855,24 +1852,28 @@ module ValueUnit =
                 | _ -> None
 
 
+
+
+
+
 type ValueUnit with
 
-    static member (*)(vu1, vu2) = ValueUnit.calc true (*) vu1 vu2
+    static member (*) (vu1, vu2) = ValueUnit.calc true (*) vu1 vu2
 
-    static member (/)(vu1, vu2) = ValueUnit.calc true (/) vu1 vu2
+    static member (/) (vu1, vu2) = ValueUnit.calc true (/) vu1 vu2
 
-    static member (+)(vu1, vu2) = ValueUnit.calc true (+) vu1 vu2
+    static member (+) (vu1, vu2) = ValueUnit.calc true (+) vu1 vu2
 
-    static member (-)(vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
+    static member (-) (vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
 
-    static member (=?)(vu1, vu2) = ValueUnit.cmp (=) vu1 vu2
+    static member (=?) (vu1, vu2) = ValueUnit.cmp (=) vu1 vu2
 
-    static member (>?)(vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
+    static member (>?) (vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
 
-    static member (<?)(vu1, vu2) = ValueUnit.cmp (<) vu1 vu2
+    static member (<?) (vu1, vu2) = ValueUnit.cmp (<) vu1 vu2
 
-    static member (>=?)(vu1, vu2) = ValueUnit.cmp (>=) vu1 vu2
+    static member (>=?) (vu1, vu2) = ValueUnit.cmp (>=) vu1 vu2
 
-    static member (<=?)(vu1, vu2) = ValueUnit.cmp (<=) vu1 vu2
+    static member (<=?) (vu1, vu2) = ValueUnit.cmp (<=) vu1 vu2
 
-    static member (==>)(vu, u) = vu |> ValueUnit.convertTo u
+    static member (==>) (vu, u) = vu |> ValueUnit.convertTo u

@@ -512,8 +512,6 @@ try
     let oEqs =
         ord
         |> mapToEquations mapping
-        |> Solver.solveUnits { Log = ignore }
-        |> Solver.orderEqsToBase
 
     oEqs
 //    |> Solver.mapToSolverEqs

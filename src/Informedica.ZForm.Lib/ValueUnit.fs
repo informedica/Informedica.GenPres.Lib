@@ -117,7 +117,7 @@ module ValueUnit =
     let weightInKg =  (fun n -> fromDecimal n Units.Weight.kiloGram)
 
 
-    let bsaInM2 =  (fun n -> fromDecimal n Units.BSA.M2)
+    let bsaInM2 =  (fun n -> fromDecimal n Units.BSA.m2)
 
 
     /// Create a frequency unit
@@ -165,29 +165,43 @@ module ValueUnit =
     /// combined units
     module Units =
 
+        let (/.) = per
+
         let perOneHour = freqPerOneHour
 
         let perFourHour = freqUnitPerNHour 4N
 
         let perOneDay = freqUnitPerNday 1N
 
-        let mgKgDay = Units.Mass.milliGram   |> per Units.Weight.kiloGram |> per Units.Time.day
-
-        let mgKgHour = Units.Mass.milliGram  |> per Units.Weight.kiloGram |> per Units.Time.hour
-
-        let mgKg4Hour = Units.Mass.milliGram |> per Units.Weight.kiloGram |> per (Units.Time.nHour 4N)
-
-        let mcgKgHour = Units.Mass.microGram |> per Units.Weight.kiloGram |> per Units.Time.hour
-
-        let mcgKgMin = Units.Mass.microGram  |> per Units.Weight.kiloGram |> per Units.Time.minute
-
-        let mcgKgDay = Units.Mass.microGram |> per Units.Weight.kiloGram |> per Units.Time.day
+        let mg = Units.Mass.milliGram
 
         let mcg = Units.Mass.microGram
 
+        let day = Units.Time.day
+
+        let hr = Units.Time.hour
+
         let min = Units.Time.minute
 
-        let hour = Units.Time.hour
+        let hr4 = Units.Time.nHour 4N
+
+        let kg = Units.Weight.kiloGram
+
+        let mgPerKg = mg/.kg
+
+        let mcgPerKg = mcg/.kg
+
+        let mgKgDay = mg/.kg/.day
+
+        let mgKgHour = mg/.kg/.hr
+
+        let mgKg4Hour = mg/.kg/.hr4
+
+        let mcgKgHour = mcg/.kg/.hr
+
+        let mcgKgMin = mcg/.kg/.min
+
+        let mcgKgDay = mcg/.kg/.day
 
 
 
@@ -209,7 +223,7 @@ module ValueUnit =
                 match s |> unitFromGStandString with
                 | Some u ->
                     u
-                    |> ValueUnit.Units.toString Units.Localization.English Units.Short
+                    |> Units.toString Units.Localization.English Units.Short
                     |> printfn "ValueUnit unit string: %s"
                 | None -> ()
                 printfn $"ValueUnit: %A{valueUnitFromGStandUnitString 1.5m s}"
@@ -225,7 +239,7 @@ module ValueUnit =
                 match s |> unitFromAppString with
                 | Some u ->
                     u
-                    |> ValueUnit.Units.toString Units.Localization.English Units.Short
+                    |> Units.toString Units.Localization.English Units.Short
                     |> printfn "ValueUnit unit string: %s"
                 | None -> ()
                 let vu = valueUnitFromAppUnitString 1.5m s

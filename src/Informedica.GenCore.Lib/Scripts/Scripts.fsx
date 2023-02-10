@@ -221,8 +221,6 @@ module ValueUnitScripts =
     open Informedica.GenCore.Lib
     open Informedica.GenCore.Lib.ValueUnits
 
-    module Units = ValueUnit.Units
-
 
     Units.Height.centiMeter
     |> ValueUnit.withSingleValue 100N 
@@ -235,11 +233,11 @@ module ValueUnitScripts =
 
     1200<gram> |> ValueUnit.Measures.fromIntGram
 
-    let w1 = 70m |> ValueUnit.withUnitSingle Units.Weight.kiloGram
-    let w2 = 70000m |> ValueUnit.withUnitSingle Units.Weight.gram
+    let w1 = 70N |> ValueUnit.singleWithUnit Units.Weight.kiloGram
+    let w2 = 70000N |> ValueUnit.singleWithUnit Units.Weight.gram
 
-    let h1 = 180m |> ValueUnit.withUnitSingle Units.Height.centiMeter
-    let h2 = 1.80m |> ValueUnit.withUnitSingle Units.Height.meter
+    let h1 = 180N |> ValueUnit.singleWithUnit Units.Height.centiMeter
+    let h2 = (180N/100N) |> ValueUnit.singleWithUnit Units.Height.meter
 
     ValueUnit.Calculations.BSA.calcDuBois w1 h1
     ValueUnit.Calculations.BSA.calcMosteller w1 h1

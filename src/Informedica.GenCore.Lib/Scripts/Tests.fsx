@@ -304,7 +304,7 @@ module Tests =
 
         let createValueUnit (d : decimal) u =
             let v = d |> float
-            match u |> ValueUnit.Units.fromString with
+            match u |> Units.fromString with
             | None -> None
             | Some u ->
                 match v |> BigRational.fromFloat with
@@ -346,10 +346,10 @@ module Tests =
             |> ValueUnit.createSingle u
 
 
-        let ageInMo =  (fun n -> fromDecimal n ValueUnit.Units.Time.month)
+        let ageInMo =  (fun n -> fromDecimal n Units.Time.month)
 
 
-        let ageInYr =  (fun n -> fromDecimal n ValueUnit.Units.Time.year)
+        let ageInYr =  (fun n -> fromDecimal n Units.Time.year)
 
 
         let ageInclOneMo, ageExclOneYr =
@@ -498,7 +498,7 @@ module Tests =
 
             testList "in range" [
                 for v, mm, b in inRange do
-                    test $"%s{v |> ValueUnit.toStringPrec 0} in range: %s{mm |> mmToStr} = %A{MinIncrMax.inRange v mm}" {
+                    test $"%s{v |> ValueUnit.toReadableDutchStringWithPrec 0} in range: %s{mm |> mmToStr} = %A{MinIncrMax.inRange v mm}" {
                         MinIncrMax.inRange v mm
                         |> Expect.equal $"should be {b}" b
                     }

@@ -343,7 +343,7 @@ module Tests =
         let createValueUnit (d: decimal) u =
             let v = d |> float
 
-            match u |> ValueUnit.Units.fromString with
+            match u |> Units.fromString with
             | None -> None
             | Some u ->
                 match v |> BigRational.fromFloat with
@@ -389,11 +389,11 @@ module Tests =
 
 
         let ageInMo =
-            (fun n -> fromDecimal n ValueUnit.Units.Time.month)
+            (fun n -> fromDecimal n Units.Time.month)
 
 
         let ageInYr =
-            (fun n -> fromDecimal n ValueUnit.Units.Time.year)
+            (fun n -> fromDecimal n Units.Time.year)
 
 
         let ageInclOneMo, ageExclOneYr =

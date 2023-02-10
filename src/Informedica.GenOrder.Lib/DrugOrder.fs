@@ -105,7 +105,7 @@ module DrugOrder =
     let unitGroup u =
         if u = "kg" then "kg[Weight]"
         else
-            ValueUnit.Units.units
+            Units.units
             |> List.filter (fun ud ->
                 ud.Group <> Group.WeightGroup
             )
