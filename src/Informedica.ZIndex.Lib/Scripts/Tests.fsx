@@ -449,7 +449,7 @@ module Tests =
                 |> Expect.isFalse "should not be empty"
             }
 
-            test "doserules with route 'parenteraal' exist" {
+            test "doserules with route 'parenteraal' do not exist" {
                 // Look for parenteral dose rules (should not exist?)
                 DoseRule.get ()
                 |> Array.filter (fun dr ->
@@ -459,7 +459,7 @@ module Tests =
                     parent
                 )
                 |> Array.isEmpty
-                |> Expect.isFalse "should not be empty"
+                |> Expect.isTrue "should be empty"
             }
 
         ]
