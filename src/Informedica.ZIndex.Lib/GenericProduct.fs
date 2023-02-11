@@ -68,6 +68,10 @@ module GenericProduct =
         if rts |> Array.isEmpty |> not then rts
         else
             [| Names.getThes gp.GPKTWG Names.Route Names.Fifty |]
+        |> Array.collect (String.split "," >> List.toArray)
+        |> Array.map String.trim
+        |> Array.filter (String.equalsCapInsens "parenteraal" >> not)
+        |> Array.distinct
 
 
     let getSubstances log un (gp : Zindex.BST711T.BST711T) hpks =

@@ -28,14 +28,20 @@ module Types =
         type Route =
             | AURICULAR
             | CUTANEOUS
+            | DENTAL
+            | ENDOCERVICAL
             | ENDOTRACHEOPULMONAR
             | EPIDURAL
+            | EPILESIONAL
             | EXTRACORPORAL
             | GASTRO_ENTERAL
+            | HEMODIALYSIS
+            | IMPLANT
             | INHALATION
             | INTRA_ARTERIAL
             | INTRA_ARTICULAR
             | INTRA_OCULAR
+            | INTRA_UTERINE
             | INTRABURSAL
             | INTRACAMERAL
             | INTRACARDIAL
@@ -53,6 +59,7 @@ module Types =
             | INTRAPLEURAL
             | INTRATHECAL
             | INTRATUMORAL
+            | INTRATYMPANAL
             | INTRAVENEUS
             | INTRAVESICAL
             | INTRAVITREAL
@@ -74,6 +81,7 @@ module Types =
             | SUBCUTAN
             | SUBLINGUAL
             | SUBMUCOSAL
+            | SUBRETINAL
             | TRANSDERMAL
             | URETHRAL
             | VAGINAL

@@ -80,19 +80,31 @@ module Mapping =
                 |> Array.map (fun r ->                
                     {|
                         zindex = r |> getStr "ZIndex"
+                        zindexfreq = r |> getInt "ZIndexFreq"
+                        zindexUnit = r |> getStr "ZIndexUnit"
                         mv1 = r |>  getStr "MetaVision1"
                         mv2 = r |> getStr "MetaVision2"
-                        count = r |> getInt "Count"
+                        freq = r |> getInt "Freq"
                         n = r |> getInt "n"
-                        time = r |> getStr "Time"
+                        time = r |> getStr "Unit"
                     |}            
                 )
-                |> Array.filter (fun r -> r.count |> Option.isSome)
+                |> Array.filter (fun r -> r.freq |> Option.isSome)
                 |> Array.map (fun r ->
                     {
                         ZIndex = r.zindex
+                        ZIndexFreq =    
+                            r.zindexfreq
+                            |> Option.defaultValue 1
+                            |> BigRational.fromInt
+                        ZIndexUnit = r.zindexUnit
                         MetaVision1 = r.mv1
                         MetaVision2 = r.mv2
+                        Frequency = 
+                            r.freq
+                            |> Option.defaultValue 1
+                            |> BigRational.fromInt
+
                         Unit =
                             let n = 
                                 r.n 
@@ -106,9 +118,7 @@ module Mapping =
                                 | None   -> n |> Units.Count.nTimes
                                 | Some u -> n |> (u |> snd)
 
-                            r.count.Value
-                            |> BigRational.fromInt
-                            |> Units.Count.nTimes
+                            Units.Count.times
                             |> Units.per tu
                     }
                 )
@@ -135,4 +145,9 @@ module Mapping =
         |> Option.defaultValue NoUnit
 
 
-    
+    let mapFrequency n s =
+        getFrequencyMapping ()
+        |> Array.tryFind(fun f ->
+            f.ZIndexFreq |> BigRational.toDecimal = n &&
+            f.ZIndexUnit = s
+        )

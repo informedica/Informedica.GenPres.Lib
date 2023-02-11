@@ -89,20 +89,46 @@ module Tests =
                 |> Array.distinct
                 |> Array.map (fun s -> s, s |> Mapping.stringToUnit (Mapping.getUnitMapping ()))
                 |> Array.filter (fst >> (<>) "NIET VAN TOEPASSING")
+                |> Array.filter (fst >> (<>) "n.v.t.")
                 |> Array.forall (snd >> (<>) NoUnit)
                 |> Expect.isTrue "should all have a unit"
             }
 
             test "all routes can be mapped" {
-                true
+                let gpp =
+                    Informedica.ZIndex.Lib.GenPresProduct.get true
+                    |> Array.collect (fun gpp -> gpp.Routes)
+                    |> Array.distinct
+                    |> Array.sort
+                    |> Array.map (fun s ->
+                        s,
+                        s |> Informedica.ZIndex.Lib.Route.fromString (Informedica.ZIndex.Lib.Route.routeMapping ())
+                    )
+                    |> Array.filter (snd >> ((=) Route.NoRoute))
+
+                let dr =
+                    Informedica.ZIndex.Lib.DoseRule.get ()
+                    |> Array.collect (fun dr -> dr.Routes)
+                    |> Array.distinct
+                    |> Array.sort
+                    |> Array.map (fun s ->
+                        s,
+                        s |> Informedica.ZIndex.Lib.Route.fromString (Informedica.ZIndex.Lib.Route.routeMapping ())
+                    )
+                    |> Array.filter (snd >> ((=) Route.NoRoute))
+
+                ((gpp |> Array.isEmpty) && (dr |> Array.isEmpty))
                 |> Expect.isTrue "should be true"
             }
 
             test "all frequencies can be mapped" {
-                true
-                |> Expect.isTrue "should be true"
+                Informedica.ZIndex.Lib.DoseRule.get ()
+                |> Array.map (fun dr -> dr.Freq.Frequency, dr.Freq.Time |> String.replace "per " "")
+                |> Array.distinct
+                |> Array.map (fun (v, s) -> v, s, Mapping.mapFrequency v s)
+                |> Array.filter (fun (_, _, u) -> u |> Option.isNone)
+                |> Expect.equal "should be true" [| 99.99m, "dag", None |]
             }
-
         ]
 
 
@@ -371,7 +397,7 @@ module Tests =
     let tests =
         [
             MinIncrMaxTests.tests
-//            MappingTests.tests
+            MappingTests.tests
             PatientTests.tests
             DoseRangeTests.tests
             DoseRuleTests.tests
@@ -744,4 +770,38 @@ module Temp =
 open Informedica.Utils.Lib.BCL
 open Informedica.GenUnits.Lib
 open Informedica.ZForm.Lib
-open Mapping
+open Informedica.ZIndex.Lib
+
+
+GenPresProduct.get true
+|> Array.collect (fun gpp -> gpp.Routes)
+|> Array.distinct
+|> Array.sort
+|> Array.map (fun s ->
+    s,
+    s |> Route.fromString (Route.routeMapping ())
+)
+|> Array.filter (snd >> ((=) Route.NoRoute))
+
+
+DoseRule.get ()
+|> Array.collect (fun dr -> dr.Routes)
+|> Array.distinct
+|> Array.sort
+|> Array.map (fun s ->
+    s,
+    s |> Route.fromString (Route.routeMapping ())
+)
+|> Array.filter (snd >> ((=) Route.NoRoute))
+
+
+Mapping.getFrequencyMapping ()
+
+
+DoseRule.get ()
+|> Array.map (fun dr -> dr.Freq.Frequency, dr.Freq.Time |> String.replace "per " "")
+|> Array.distinct
+|> Array.map (fun (v, s) -> v, s, Mapping.mapFrequency v s)
+|> Array.filter (fun (_, _, u) -> u |> Option.isNone)
+
+$"%f{1.000m}"

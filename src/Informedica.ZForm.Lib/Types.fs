@@ -396,8 +396,11 @@ module Types =
     type FrequencyMapping =
         {
             ZIndex : string
+            ZIndexFreq : BigRational
+            ZIndexUnit : string
             MetaVision1 : string
             MetaVision2 : string
+            Frequency : BigRational
             Unit : Unit
         }            
 

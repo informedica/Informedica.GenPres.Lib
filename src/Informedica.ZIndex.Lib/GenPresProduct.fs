@@ -168,7 +168,7 @@ module GenPresProduct =
 
     let getRoutes =
         fun () ->
-            getAssortment ()
+            getAll ()
             |> Array.collect (fun gpp ->
                 gpp.Routes
             )
@@ -179,7 +179,7 @@ module GenPresProduct =
 
     let getShapes =
         fun () ->
-            getAssortment ()
+            getAll ()
             |> Array.map (fun gpp ->
                 gpp.Shape
             )
@@ -190,7 +190,7 @@ module GenPresProduct =
 
     let getUnits =
         fun () ->
-            getAssortment ()
+            getAll ()
             |> Array.map (fun gpp ->
                 gpp.Unit
             )
@@ -229,7 +229,7 @@ module GenPresProduct =
 
     let getSubstanceUnits =
         fun () ->
-            getAssortment ()
+            getAll ()
             |> Array.collect (fun gpp ->
                 gpp.GenericProducts
                 |> Array.collect (fun gp ->
@@ -245,7 +245,7 @@ module GenPresProduct =
 
     let getGenericUnits =
         fun () ->
-            getAssortment ()
+            getAll ()
             |> Array.collect (fun gpp ->
                 gpp.GenericProducts
                 |> Array.collect (fun gp ->
