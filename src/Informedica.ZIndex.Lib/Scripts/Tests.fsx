@@ -676,3 +676,62 @@ RuleFinder.createFilter (Some 12m) (Some 10m) None None "paracetamol" "drank" "o
 
 ""
 |> Route.fromString (Route.routeMapping ())
+
+
+//TODO: rewrite to new online mapping and test code
+(*
+module ValueUnitTests =
+
+
+    let tests () =
+
+        let (|>!) x f =
+            printfn "%A" x
+            f x
+
+        createValueUnit Mapping.ZIndex Decimal.Ten "milligram"
+        |> printfn "Create value unit 10 milligram using GStand mapping: %A"
+
+        Mapping.allGStandUnits ()
+        |> Array.iter (fun s ->
+            printfn $"Mapping %s{s}: %A{s |> unitFromGStandString}"
+            match s |> unitFromGStandString with
+            | Some u ->
+                u
+                |> Units.toString Units.Localization.English Units.Short
+                |> printfn "ValueUnit unit string: %s"
+            | None -> ()
+            printfn $"ValueUnit: %A{valueUnitFromGStandUnitString 1.5m s}"
+            match (valueUnitFromGStandUnitString 1.5m s) |> (Option.bind (valueUnitToGStandUnitString >> Some)) with
+            | Some (_, u) ->
+                if u = "" then printfn $"Cannot parse: %s{s}"
+            | None -> ()
+        )
+
+        Mapping.allAppUnits ()
+        |> Array.iter (fun s ->
+            printfn $"Mapping %s{s}: %A{s |> unitFromAppString}"
+            match s |> unitFromAppString with
+            | Some u ->
+                u
+                |> Units.toString Units.Localization.English Units.Short
+                |> printfn "ValueUnit unit string: %s"
+            | None -> ()
+            let vu = valueUnitFromAppUnitString 1.5m s
+            match vu with
+            | Some vu ->
+                printfn $"ValueUnit: %A{vu}"
+                vu
+                |> Dto.toDtoDutchLong
+                |> (fun dto -> dto |> Dto.toString |> printfn "dto: %s"; dto)
+                |> Dto.fromDto
+                |>! ignore
+
+            | None -> ()
+            match vu |> (Option.bind (valueUnitToAppUnitString >> Some)) with
+            | Some (_, u) ->
+                if u = "" then printfn $"Cannot parse: %s{s}"
+            | None -> ()
+        )
+
+*)

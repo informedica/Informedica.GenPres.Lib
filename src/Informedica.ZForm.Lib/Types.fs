@@ -384,6 +384,25 @@ module Types =
         | AbsM2
 
 
+    type UnitMapping =
+        { 
+            ZIndexLong : string
+            ZIndexShort : string
+            MetaVision : string
+            Unit : Unit
+        }
+
+
+    type FrequencyMapping =
+        {
+            ZIndex : string
+            MetaVision1 : string
+            MetaVision2 : string
+            Unit : Unit
+        }            
+
+
+
     type CreateConfig =
         {
             UseAll : bool

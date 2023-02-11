@@ -42,9 +42,11 @@ module Utils =
 
     module Web =
 
-        open Informedica.Utils.Lib
 
-        // Constraints spreadsheet
+        open Informedica.Utils.Lib
+        open Informedica.ZIndex.Lib
+
+        // Constraints spreadsheet GenPres
         //https://docs.google.com/spreadsheets/d/1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g/edit?usp=sharing
         [<Literal>]
         let dataUrlId = "1nny8rn9zWtP8TMawB3WeNWhl5d4ofbWKbGzGqKTd49g"
@@ -53,5 +55,8 @@ module Utils =
         let download = Web.GoogleSheets.download
 
 
-        let getDataFromSheet sheet = Web.GoogleSheets.getDataFromSheet dataUrlId sheet
+        let getDataFromSheet sheet =
+            sheet 
+            |> Web.GoogleSheets.getDataFromSheet FilePath.genpres
 
+        

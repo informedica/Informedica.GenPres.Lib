@@ -30,43 +30,21 @@ module ValueUnit =
         $"%s{s}[Time]"
         |> Units.fromString
 
-    //TODO: rewrite to new online mapping
-    /// Map a unit `u` to a `ValueUnit.Unit`
-    /// using a mapping `m`.
-    let unitFromMappedString m u =
-            u
-            |> Mapping.mapUnit m Mapping.ValueUnitMap
-            |> Units.fromString
 
     //TODO: rewrite to new online mapping
     /// Create a unit from a GStand unit
-    let unitFromGStandString = unitFromMappedString Mapping.GStandMap
+    let unitFromZIndexString = Mapping.stringToUnit (Mapping.getUnitMapping ())
 
-    //TODO: rewrite to new online mapping
-    /// Create a unit from an App unit
-    let unitFromAppString = unitFromMappedString Mapping.AppMap
 
     /// Create a value unit using a specific mapping `m`
     /// with value `v` and unit `u`.
-    let createValueUnit m (d : decimal) u =
+    let createValueUnit (d : decimal) u =
         let v = d |> float
-        match u |> unitFromMappedString m with
+        let u = u |> unitFromZIndexString
+
+        match v |> BigRational.fromFloat with
         | None -> None
-        | Some u ->
-            match v |> BigRational.fromFloat with
-            | None -> None
-            | Some v  -> createSingle u v |> Some
-
-    //TODO: rewrite to new online mapping
-    /// Create a `ValueUnit` using a float value
-    /// and a string unit using the GStand mapping
-    let valueUnitFromGStandUnitString = createValueUnit Mapping.GStandMap
-
-
-    //TODO: rewrite to new online mapping
-    /// Create a `ValueUnit` using a float value
-    /// and a string unit using the App mapping
-    let valueUnitFromAppUnitString = createValueUnit Mapping.AppMap
+        | Some v  -> createSingle u v |> Some
 
     /// Create a `ValueUnit` using a float value
     /// `v` and a `Unit` `u`.
@@ -79,26 +57,21 @@ module ValueUnit =
     //TODO: rewrite to new online mapping
     /// Turn a `ValueUnit` to a float, string tuple.
     /// Where the unit string representation is a
-    /// GSTand string.
-    let valueUnitToGStandUnitString vu =
+    /// ZIndex string.
+    let valueUnitToZIndexString vu =
         let v, u = get vu
 
         v |> Array.map BigRational.toDecimal,
         u
-        |> Units.toString Units.Localization.English Units.Short
-        |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.GStandMap
+        |> Mapping.unitToString (Mapping.getUnitMapping ())
 
-    //TODO: rewrite to new online mapping
-    /// Turn a `ValueUnit` to a float, string tuple.
-    /// Where the unit string representation is an
-    /// App string.
-    let valueUnitToAppUnitString vu =
-        let v, u = get vu
 
-        v |> Array.map BigRational.toDecimal,
-        u
-        |> Units.toString Units.Localization.English Units.Short
-        |> Mapping.mapUnit Mapping.ValueUnitMap Mapping.AppMap
+    let valueUnitFromZIndexString v u =
+        let u = u |> unitFromZIndexString
+        v
+        |> BigRational.fromDecimal
+        |> ValueUnit.singleWithUnit u
+
 
     let timeInMinute = (fun n -> fromDecimal n Units.Time.minute)
 
@@ -259,59 +232,4 @@ module ValueUnit =
         let ng_kg_day = ng/.kg/.day
         let ng_kg_min = ng/.kg/.min
 
-
-    //TODO: rewrite to new online mapping and test code
-    module ValueUnitTests =
-
-
-        let tests () =
-
-            let (|>!) x f =
-                printfn "%A" x
-                f x
-
-            createValueUnit Mapping.GStandMap Decimal.Ten "milligram"
-            |> printfn "Create value unit 10 milligram using GStand mapping: %A"
-
-            Mapping.allGStandUnits ()
-            |> Array.iter (fun s ->
-                printfn $"Mapping %s{s}: %A{s |> unitFromGStandString}"
-                match s |> unitFromGStandString with
-                | Some u ->
-                    u
-                    |> Units.toString Units.Localization.English Units.Short
-                    |> printfn "ValueUnit unit string: %s"
-                | None -> ()
-                printfn $"ValueUnit: %A{valueUnitFromGStandUnitString 1.5m s}"
-                match (valueUnitFromGStandUnitString 1.5m s) |> (Option.bind (valueUnitToGStandUnitString >> Some)) with
-                | Some (_, u) ->
-                    if u = "" then printfn $"Cannot parse: %s{s}"
-                | None -> ()
-            )
-
-            Mapping.allAppUnits ()
-            |> Array.iter (fun s ->
-                printfn $"Mapping %s{s}: %A{s |> unitFromAppString}"
-                match s |> unitFromAppString with
-                | Some u ->
-                    u
-                    |> Units.toString Units.Localization.English Units.Short
-                    |> printfn "ValueUnit unit string: %s"
-                | None -> ()
-                let vu = valueUnitFromAppUnitString 1.5m s
-                match vu with
-                | Some vu ->
-                    printfn $"ValueUnit: %A{vu}"
-                    vu
-                    |> Dto.toDtoDutchLong
-                    |> (fun dto -> dto |> Dto.toString |> printfn "dto: %s"; dto)
-                    |> Dto.fromDto
-                    |>! ignore
-
-                | None -> ()
-                match vu |> (Option.bind (valueUnitToAppUnitString >> Some)) with
-                | Some (_, u) ->
-                    if u = "" then printfn $"Cannot parse: %s{s}"
-                | None -> ()
-            )
 

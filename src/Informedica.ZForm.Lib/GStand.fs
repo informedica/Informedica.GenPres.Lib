@@ -468,10 +468,10 @@ module GStand =
                 |> Seq.collect (fun s ->
                     match s.Unit
                         //TODO: rewrite to new online mapping
-                          |> ValueUnit.unitFromMappedString Mapping.GStandMap
+                          |> ValueUnit.unitFromZIndexString
                         with
-                    | None -> []
-                    | Some u -> [ mapDoses s.Name s.Quantity u dr ]
+                    | NoUnit -> []
+                    | u -> [ mapDoses s.Name s.Quantity u dr ]
                 )
             )
         )

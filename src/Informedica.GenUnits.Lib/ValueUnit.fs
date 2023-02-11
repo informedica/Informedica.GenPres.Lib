@@ -14,6 +14,7 @@ type Unit =
     | General of (string * BigRational)
     | Count of CountUnit
     | Mass of MassUnit
+    | Distance of DistanceUnit
     | Volume of VolumeUnit
     | Time of TimeUnit
     | Molar of MolarUnit
@@ -30,6 +31,11 @@ and MassUnit =
     | MilliGram of BigRational
     | MicroGram of BigRational
     | NanoGram of BigRational
+
+and DistanceUnit =
+    | Meter of BigRational
+    | CentiMeter of BigRational
+    | MilliMeter of BigRational
 
 and VolumeUnit =
     | Liter of BigRational
@@ -50,10 +56,12 @@ and TimeUnit =
 and MolarUnit =
     | Mol of BigRational
     | MilliMol of BigRational
+    | MicroMol of BigRational
 
 and IUnit =
     | MIU of BigRational
     | IU of BigRational
+    | MILLIIU of BigRational
 
 and WeightUnit =
     | WeightKiloGram of BigRational
@@ -84,6 +92,7 @@ module Group =
         | GeneralGroup of string
         | CountGroup
         | MassGroup
+        | DistanceGroup
         | VolumeGroup
         | TimeGroup
         | MolarGroup
@@ -225,6 +234,19 @@ module Units =
         let nanoGram = 1N |> nNanoGram
 
 
+    module Distance =
+        
+        let toDistance = Distance
+
+        let nMeter n = n |> Meter |> toDistance
+        let nCentiMeter n = n |> CentiMeter |> toDistance
+        let nMilliMeter n = n |> MilliMeter |> toDistance
+
+        let meter = 1N |> nMeter
+        let centimeter = 1N |> nCentiMeter
+        let millimeter = 1N |> nMilliMeter
+
+
     module Weight =
 
         let toWeight = Weight
@@ -280,9 +302,11 @@ module Units =
 
         let nMol n = n |> Mol |> toMolar
         let nMilliMol n = n |> MilliMol |> toMolar
+        let nMicroMol n = n |> MicroMol |> toMolar
 
         let mol = 1N |> nMol
         let milliMol = 1N |> nMilliMol
+        let microMol = 1N |> nMicroMol
 
 
     module InterNatUnit =
@@ -291,9 +315,11 @@ module Units =
 
         let nMIU n = n |> MIU |> toInterNatUnit
         let nIU n = n |> IU |> toInterNatUnit
+        let nMilliIU n = n |> MILLIIU |> toInterNatUnit
 
         let mIU = 1N |> nMIU
         let iu = 1N |> nIU
+        let milliIU = 1N |> nMilliIU
 
 
     module Height =
@@ -365,6 +391,29 @@ module Units =
             }
 
             {
+                Unit = Distance.meter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "m"; Dut = "m" }
+                Name = { Eng = "meter"; Dut = "meter" }
+                Synonyms = [ ]
+            }
+            {
+                Unit = Distance.centimeter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "cm"; Dut = "cm" }
+                Name = { Eng = "centimeter"; Dut = "centimeter" }
+                Synonyms = [ ]
+            }
+            {
+                Unit = Distance.millimeter
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "mm"; Dut = "mm" }
+                Name = { Eng = "millimeter"; Dut = "millimeter" }
+                Synonyms = [ ]
+            }
+
+
+            {
                 Unit = Volume.liter
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "l"; Dut = "l" }
@@ -381,51 +430,43 @@ module Units =
             {
                 Unit = Volume.milliLiter
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "ml"; Dut = "ml" }
-                Name =
-                    {
-                        Eng = "milliliter"
-                        Dut = "milliliter"
-                    }
+                Abbreviation = { Eng = "ml"; Dut = "mL" }
+                Name = { Eng = "milliliter"; Dut = "milliliter" }
                 Synonyms = [ "millil" ]
             }
             {
                 Unit = Volume.microLiter
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "microl"; Dut = "microl" }
-                Name =
-                    {
-                        Eng = "microliter"
-                        Dut = "microliter"
-                    }
+                Abbreviation = { Eng = "microL"; Dut = "microL" }
+                Name = { Eng = "microliter"; Dut = "microliter" }
                 Synonyms = [ "µl" ]
             }
             {
                 Unit = Volume.droplet
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "dr"; Dut = "dr" }
+                Abbreviation = { Eng = "droplet"; Dut = "druppel" }
                 Name = { Eng = "droplet"; Dut = "druppel" }
-                Synonyms = [ "drop" ]
+                Synonyms = [ "drop"; "dr" ]
             }
 
             {
                 Unit = Time.year
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "yr"; Dut = "jr" }
+                Abbreviation = { Eng = "yr"; Dut = "jaar" }
                 Name = { Eng = "year"; Dut = "jaar" }
                 Synonyms = [ "years"; "jaren" ]
             }
             {
                 Unit = Time.month
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "mo"; Dut = "mnd" }
+                Abbreviation = { Eng = "mo"; Dut = "maand" }
                 Name = { Eng = "month"; Dut = "maand" }
                 Synonyms = [ "months"; "maanden" ]
             }
             {
                 Unit = Time.week
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "wk"; Dut = "wk" }
+                Abbreviation = { Eng = "week"; Dut = "week" }
                 Name = { Eng = "week"; Dut = "week" }
                 Synonyms = [ "weeks"; "weken" ]
             }
@@ -472,6 +513,13 @@ module Units =
                 Name = { Eng = "millimol"; Dut = "millimol" }
                 Synonyms = []
             }
+            {
+                Unit = Molar.microMol
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "micromol"; Dut = "micromol" }
+                Name = { Eng = "micromol"; Dut = "micromol" }
+                Synonyms = [ "umol"]
+            }
 
             {
                 Unit = InterNatUnit.iu
@@ -483,9 +531,16 @@ module Units =
             {
                 Unit = InterNatUnit.mIU
                 Group = Group.NoGroup
-                Abbreviation = { Eng = "miljIE"; Dut = "miljIE" }
-                Name = { Eng = "millionIE"; Dut = "miljoenIE" }
+                Abbreviation = { Eng = "miljIE"; Dut = "milj-IE" }
+                Name = { Eng = "millionIE"; Dut = "miljoen-ie" }
                 Synonyms = [ "milj.IE"; "milj.E" ]
+            }
+            {
+                Unit = InterNatUnit.milliIU
+                Group = Group.NoGroup
+                Abbreviation = { Eng = "milliIU"; Dut = "milliIE" }
+                Name = { Eng = "milliIU"; Dut = "milliIE" }
+                Synonyms = [ "milli-internationale eenheid"; "mie" ]
             }
 
             {
@@ -507,12 +562,8 @@ module Units =
                 Unit = BSA.m2
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "m2"; Dut = "m2" }
-                Name =
-                    {
-                        Eng = "square meter"
-                        Dut = "vierkante meter"
-                    }
-                Synonyms = [ "gr" ]
+                Name = { Eng = "square meter";  Dut = "vierkante meter" }
+                Synonyms = [ "m^2" ]
             }
 
         ]
@@ -539,6 +590,11 @@ module Units =
             | MilliGram n -> (n, Mass.milliGram)
             | MicroGram n -> (n, Mass.microGram)
             | NanoGram n -> (n, Mass.nanoGram)
+        | Distance d ->
+            match d with
+            | Meter n -> (n, Distance.meter)
+            | CentiMeter n -> (n, Distance.centimeter)
+            | MilliMeter n -> (n, Distance.millimeter)
         | Volume g ->
             match g with
             | Liter n -> (n, Volume.liter)
@@ -559,10 +615,12 @@ module Units =
             match g with
             | Mol n -> (n, Molar.mol)
             | MilliMol n -> (n, Molar.milliMol)
+            | MicroMol n -> (n, Molar.microMol)
         | InterNatUnit g ->
             match g with
             | MIU n -> (n, InterNatUnit.mIU)
             | IU n -> (n, InterNatUnit.iu)
+            | MILLIIU n -> (n, InterNatUnit.milliIU)
         | Weight g ->
             match g with
             | WeightKiloGram n -> (n, Weight.kiloGram)
@@ -725,6 +783,12 @@ module ValueUnit =
                 | MicroGram n -> n |> f |> MicroGram
                 | NanoGram n -> n |> f |> NanoGram
                 |> Mass
+            | Distance d ->
+                match d with
+                | Meter n -> n |> f |> Meter
+                | CentiMeter n -> n |> f |> CentiMeter
+                | MilliMeter n -> n |> f |> MilliMeter
+                |> Distance
             | Volume g ->
                 match g with
                 | Liter n -> n |> f |> Liter
@@ -747,11 +811,13 @@ module ValueUnit =
                 match g with
                 | Mol n -> n |> f |> Mol
                 | MilliMol n -> n |> f |> MilliMol
+                | MicroMol n -> n |> f |> MicroMol
                 |> Molar
             | InterNatUnit g ->
                 match g with
                 | MIU n -> n |> f |> MIU
                 | IU n -> n |> f |> IU
+                | MILLIIU n -> n |> f |> MILLIIU
                 |> InterNatUnit
             | Weight g ->
                 match g with
@@ -794,6 +860,11 @@ module ValueUnit =
                 | MilliGram n -> n |> Some
                 | MicroGram n -> n |> Some
                 | NanoGram n -> n |> Some
+            | Distance d ->
+                match d with
+                | Meter n -> n |> Some
+                | CentiMeter n -> n |> Some
+                | MilliMeter n -> n |> Some
             | Volume g ->
                 match g with
                 | Liter n -> n |> Some
@@ -814,10 +885,12 @@ module ValueUnit =
                 match g with
                 | Mol n -> n |> Some
                 | MilliMol n -> n |> Some
+                | MicroMol n -> n |> Some
             | InterNatUnit g ->
                 match g with
                 | MIU n -> n |> Some
                 | IU n -> n |> Some
+                | MILLIIU n -> n |> Some
             | Weight g ->
                 match g with
                 | WeightKiloGram n -> n |> Some
@@ -845,6 +918,7 @@ module ValueUnit =
                 | General (n, _) -> Group.GeneralGroup n
                 | Count _ -> Group.CountGroup
                 | Mass _ -> Group.MassGroup
+                | Distance _ -> Group.DistanceGroup
                 | Volume _ -> Group.VolumeGroup
                 | Time _ -> Group.TimeGroup
                 | Molar _ -> Group.MolarGroup
@@ -868,6 +942,7 @@ module ValueUnit =
                 | Group.NoGroup
                 | Group.CountGroup
                 | Group.MassGroup
+                | Group.DistanceGroup
                 | Group.VolumeGroup
                 | Group.TimeGroup
                 | Group.MolarGroup
@@ -900,6 +975,7 @@ module ValueUnit =
                 | Group.GeneralGroup _ -> "General"
                 | Group.CountGroup -> "Count"
                 | Group.MassGroup -> "Mass"
+                | Group.DistanceGroup -> "Distance"
                 | Group.VolumeGroup -> "Volume"
                 | Group.TimeGroup -> "Time"
                 | Group.MolarGroup -> "Molar"
@@ -929,6 +1005,12 @@ module ValueUnit =
                     1N |> MilliGram |> Mass
                     1N |> MicroGram |> Mass
                     1N |> NanoGram |> Mass
+                ]
+            | Group.DistanceGroup ->
+                [
+                    1N |> Meter |> Distance
+                    1N |> CentiMeter |> Distance
+                    1N |> MilliMeter |> Distance
                 ]
             | Group.VolumeGroup ->
                 [
@@ -1049,6 +1131,11 @@ module ValueUnit =
                     | MilliGram n -> n * milli
                     | MicroGram n -> n * micro
                     | NanoGram n -> n * nano
+                | Distance d ->
+                    match d with
+                    | Meter n -> n * one
+                    | CentiMeter n -> n * centi
+                    | MilliMeter n -> n * milli
                 | Volume g ->
                     match g with
                     | Liter n -> n * one
@@ -1069,10 +1156,12 @@ module ValueUnit =
                     match g with
                     | Mol n -> n * one
                     | MilliMol n -> n * milli
+                    | MicroMol n -> n * micro
                 | InterNatUnit g ->
                     match g with
                     | MIU n -> n * kilo * kilo
                     | IU n -> n * one
+                    | MILLIIU n -> n * milli
                 | Weight g ->
                     match g with
                     | WeightKiloGram n -> n * kilo

@@ -18,7 +18,7 @@ GenPresProduct.get true
     |> Seq.collect (fun gp ->
         gp.Route
         |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap, r
+            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres, r
         )
     )
 )
@@ -36,7 +36,7 @@ GenPresProduct.get true
     |> Seq.collect (fun gp ->
         gp.Route
         |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap
+            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres
         )
     )
 )
@@ -69,7 +69,7 @@ GenPresProduct.get true
     |> Seq.collect (fun gp ->
         gp.Route
         |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.GStandMap Mapping.AppMap
+            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres
         )
     )
 )
@@ -275,7 +275,7 @@ GenPresProduct.get true
 
 
 "rect"
-|> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
+|> Mapping.mapRoute Mapping.GenPres Mapping.ZIndex
 
 
 RuleFinder.createFilter None None None (Some 00161527) "" "" ""

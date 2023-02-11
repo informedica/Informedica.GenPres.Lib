@@ -149,7 +149,7 @@ module Dto =
         let rte =
             dto.Route
             //TODO: rewrite to new online mapping
-            |> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
+            //|> Informedica.ZIndex.Lib.Route.fromString
 
         let gpps =
             let ps = dto.GPK |> GPP.findByGPK
@@ -216,7 +216,7 @@ module Dto =
                 |> ValueUnit.createSingle (ValueUnit.createCombiUnit (Units.Count.times, OpPer, fr.TimeUnit))
                 |> ValueUnit.freqToValueUnitString
                 //TODO: rewrite to new online mapping
-                |> Mapping.mapFreq Mapping.ValueUnitMap Mapping.AppMap
+                //|> Mapping.mapFreq Mapping.ValueUnitMap Mapping.GenPres
             )
             |> String.concat "||"
 
@@ -278,7 +278,9 @@ module Dto =
     let processDto (dto : Dto) =
 
         let u =
-            dto.MultipleUnit |> ValueUnit.unitFromAppString
+            // TODO: check this mapping
+            dto.MultipleUnit |> ValueUnit.unitFromZIndexString
+            |> Some
 
         let ru =
             dto.RateUnit |> Units.fromString
@@ -286,7 +288,7 @@ module Dto =
         let rte =
             dto.Route
             //TODO: rewrite to new online mapping
-            |> Mapping.mapRoute Mapping.AppMap Mapping.GStandMap
+            //|> Mapping.mapRoute Mapping.GenPres Mapping.ZIndex
             |> (fun r ->
                 if r = "" then printfn "Could not map route %s" dto.Route
                 r
@@ -314,13 +316,20 @@ module Dto =
                 if dto.MultipleUnit = "" then None
                 else
                     dto.MultipleUnit
-                    |> ValueUnit.unitFromAppString
+                    |> Mapping.stringToUnit (Mapping.getUnitMapping ())
+                    |> Some
+                    // TODO: check mapping
+                    //|> ValueUnit.unitFromAppString
+                    
 
             let tu =
                 if dto.RateUnit = "" then None
                 else
-                    dto.RateUnit
-                    |> ValueUnit.unitFromAppString
+                    dto.RateUnit 
+                    |> Mapping.stringToUnit (Mapping.getUnitMapping ())                    
+                    |> Some
+                    // TODO: check mapping
+                    //|> ValueUnit.unitFromAppString
 
             let cfg : CreateConfig =
                 {
@@ -441,7 +450,7 @@ module Dto =
                     ConcentrationUnit =
                         unt
                         //TODO: rewrite to new online mapping
-                        |> Mapping.mapUnit Mapping.GStandMap Mapping.AppMap
+                        //|> Mapping.mapUnit Mapping.ZIndex Mapping.GenPres
                     Multiple =
                         if dto.Multiple = 0m then conc
                         else dto.Multiple
@@ -449,7 +458,7 @@ module Dto =
                         if dto.MultipleUnit = "" then
                             unt
                             //TODO: rewrite to new online mapping
-                            |> Mapping.mapUnit Mapping.GStandMap Mapping.AppMap
+                            //|> Mapping.mapUnit Mapping.ZIndex Mapping.GenPres
                         else dto.MultipleUnit
                     Rules = rules |> List.toArray
                     Text =
