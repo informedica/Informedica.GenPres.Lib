@@ -23,15 +23,15 @@ module Examples =
     (* CREATE VALUE UNITS *)
 
     // Some basic units
-    let mg400  = 400.  |> withUnit Units.Mass.milliGram
-    let ml50   = 50.   |> withUnit Units.Volume.milliLiter
-    let ml5    = 5.    |> withUnit Units.Volume.milliLiter
-    let l5     = 5.    |> withUnit Units.Volume.liter 
-    let ml5000 = 5000. |> withUnit Units.Volume.milliLiter
+    let mg400  = 400N  |> singleWithUnit Units.Mass.milliGram
+    let ml50   = 50N   |> singleWithUnit Units.Volume.milliLiter
+    let ml5    = 5N    |> singleWithUnit Units.Volume.milliLiter
+    let l5     = 5N    |> singleWithUnit Units.Volume.liter 
+    let ml5000 = 5000N |> singleWithUnit Units.Volume.milliLiter
 
     // The count group is a special unit group 
     // with only one unit: times.
-    let times3 = 3. |> withUnit Units.Count.times
+    let times3 = 3N |> singleWithUnit Units.Count.times
     // Division or mutliplication with times
     // results in unchanged units:
     // 3 times * 5 ml = 15 ml
@@ -98,8 +98,8 @@ module Examples =
 
     // Calculate and get the resulting unit group
     4N
-    |> create (Units.General.general "dose") // 4 dose[General]
-    >>* (fun vu -> vu / (1N |> create Units.Time.day)) // divide by 1 day[Time]
+    |> singleWithUnit (Units.General.general "dose") // 4 dose[General]
+    >>* (fun vu -> vu / (1N |> singleWithUnit Units.Time.day)) // divide by 1 day[Time]
     >>* (fun vu -> vu ==> (Units.General.general "dose" |> per (Units.Time.week)))
     |> (fun (ValueUnit(_, u)) ->
         u |> Group.unitToGroup
@@ -107,14 +107,14 @@ module Examples =
 
 
     // Calculate and get all valid units for conversion
-    mg400 / ml50 / (1N |> create Units.Time.day) // 8 mg[Mass]/ml[Volume]/day[Time]
+    mg400 / ml50 / (1N |> singleWithUnit Units.Time.day) // 8 mg[Mass]/ml[Volume]/day[Time]
     >>* (fun vu -> 
         let (_, u) = vu |> get
         u 
         |> Group.unitToGroup
         |> Group.getUnits
         |> List.iter (fun u ->
-            create u 1N
+            create u [|1N|]
             >>* ignore
         )
     )

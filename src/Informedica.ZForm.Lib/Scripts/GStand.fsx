@@ -16,7 +16,7 @@ let config =
     }
 
 
-let path = $"{__SOURCE_DIRECTORY__}/gstand.md"
+let path = $"{__SOURCE_DIRECTORY__}/paracetamol.md"
 
 
 GStand.createDoseRules config None None None None "paracetamol" "" ""

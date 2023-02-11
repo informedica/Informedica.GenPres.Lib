@@ -11,22 +11,9 @@ open Informedica.ZForm.Lib
 File.exists "data/cache/README.md"
 
 
-// List all products that have no app route
-GenPresProduct.get true
-|> Seq.collect (fun gpp ->
-    gpp.GenericProducts
-    |> Seq.collect (fun gp ->
-        gp.Route
-        |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres, r
-        )
-    )
-)
-|> Seq.filter (fun (_, _, rt, _) -> rt = "")
-|> Seq.map (fun (n, _,_, r) -> n, r)
-|> Seq.distinct
-|> Seq.sort
-|> Seq.iter (printfn "%A")
+let mapRoute = 
+    (Route.fromString (Route.routeMapping ())) 
+    >> Route.toString (Route.routeMapping ())
 
 
 // Process all possible dtos
@@ -36,7 +23,7 @@ GenPresProduct.get true
     |> Seq.collect (fun gp ->
         gp.Route
         |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres
+            gpp.Name, gp.Id, r |> mapRoute
         )
     )
 )
@@ -69,7 +56,7 @@ GenPresProduct.get true
     |> Seq.collect (fun gp ->
         gp.Route
         |> Seq.map (fun r ->
-            gpp.Name, gp.Id, r |> Mapping.mapRoute Mapping.ZIndex Mapping.GenPres
+            gpp.Name, gp.Id, r |> mapRoute
         )
     )
 )
@@ -274,8 +261,6 @@ GenPresProduct.get true
 |> fun dto -> dto.Text
 
 
-"rect"
-|> Mapping.mapRoute Mapping.GenPres Mapping.ZIndex
 
 
 RuleFinder.createFilter None None None (Some 00161527) "" "" ""

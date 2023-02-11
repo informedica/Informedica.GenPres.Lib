@@ -1,4 +1,6 @@
 
+#r "nuget: MathNet.Numerics.FSharp"
+
 #load "../Continuation.fs"
 #load "../Memoization.fs"
 #load "../Reflection.fs"

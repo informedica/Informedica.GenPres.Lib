@@ -134,6 +134,7 @@ module Treatment =
 
     let run = Program.run init apply runCmd
 
+    (*
     let runCmds () =
         [
             (fun _ -> "Test Patient" |> Patient) |> AdmitPatient
@@ -141,11 +142,12 @@ module Treatment =
                 ["Infection"; "Low bloodpressure"] 
                 |> List.map Problem
             ) |> CheckPatient
-            (fun (_, pl)
+            (fun (_, pl) ->
                 pl
-                |> 
+//                |> 
 
                 
             )
         ]
         |> run
+        *)
