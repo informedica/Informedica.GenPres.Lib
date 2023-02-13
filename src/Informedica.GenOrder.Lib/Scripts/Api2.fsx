@@ -455,7 +455,7 @@ let getRule i pat =
 )
 
 
-test child 5
+test child 26
 |> function
 | Ok (pat, ind, (prs, prep, adm)) ->
     [
@@ -477,7 +477,7 @@ child
 |> Api.createDrugOrder //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
-|> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
+|> Order.applyConstraints |> Order.toString |> List.iter (printfn "%s")
 |> Order.solveMinMax true OrderLogger.logger.Logger
 |> function
 | Error (ord, msgs) ->

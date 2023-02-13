@@ -251,9 +251,9 @@ module DrugOrder =
                             match s.Solution with
                             | Some sl ->
                                 itmDto.OrderableQuantity.Constraints.MinIncl <- sl.Quantity.Minimum.IsSome
-                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto du)
+                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto su)
                                 itmDto.OrderableQuantity.Constraints.MaxIncl <- sl.Quantity.Maximum.IsSome
-                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto du)
+                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto su)
                                 itmDto.OrderableConcentration.Constraints.MinIncl <- sl.Concentration.Minimum.IsSome
                                 itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum |> Option.bind (createSingleValueUnitDto $"{su}/{ou}")
                                 itmDto.OrderableConcentration.Constraints.MaxIncl <- sl.Concentration.Maximum.IsSome
