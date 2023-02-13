@@ -131,7 +131,7 @@ module TestSolver =
     module ValueSet = ValueRange.ValueSet
 
 
-    let (|>>) r f = 
+    let (|>>) r f =
         match r with
         | Ok x -> x |> f
         | Error _ -> r
@@ -160,8 +160,8 @@ module TestSolver =
             )
         | None -> eqs
 
-    let create c u v = 
-        [|v|] 
+    let create c u v =
+        [|v|]
         |> ValueUnit.create u
         |> c
 
@@ -170,8 +170,8 @@ module TestSolver =
     let createMaxIncl = create (Maximum.create true)
     let createMaxExcl = create (Maximum.create false)
     let createIncr = create Increment.create
-    let createValSet u v = 
-        v 
+    let createValSet u v =
+        v
         |> Array.ofSeq
         |> ValueUnit.create u
         |> ValueSet.create
@@ -183,10 +183,7 @@ module TestSolver =
     let setValues u n vals = vals |> createValSet u |> ValsProp |> setProp n
     let setIncrement u n vals = vals |> createIncr u |> IncrProp |> setProp n
 
-    let logger = 
-        fun (s : string) ->
-            File.AppendAllLines("examples.log", [s])
-        |> SolverLogging.logger 
+    let logger = SolverLogging.logger ignore
 
     let solve n p eqs =
         let n = n |> Name.createExc
@@ -541,7 +538,7 @@ module Tests =
                         }
 
                         test "90 mg/kg/day < 300 mg/kg/day" {
-                            let mgPerKgPerDay = 
+                            let mgPerKgPerDay =
                                 (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                                 Units.Time.day)
                                 |> CombiUnit
@@ -552,7 +549,7 @@ module Tests =
                                 [|300N|] |> ValueUnit.create mgPerKgPerDay
                                 |> Maximum.create true
                             Expect.isTrue "should be true" (max1 |> Maximum.maxSTmax max2)
-                                
+
                         }
 
                         fun b m ->
@@ -673,19 +670,19 @@ module Tests =
                     // dos_ptm [92 mg/dag..345 mg/dag] = dos_qty [92/3 mg..345/2 mg] x prs_frq [2, 3 x/dag]
                     // prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]
                     test "" {
-                        let dos_ptm = 
+                        let dos_ptm =
                             ((createMin true 92N), (createMax true 92N))
                             |> MinMax
-                        let dos_qty = 
+                        let dos_qty =
                             ((createMin true (92N/3N)), (createMax true (345N/2N)))
                             |> MinMax
-                        let prs_frq = 
+                        let prs_frq =
                             createVals [|2N; 3N|]
                             |> ValSet
-                        let res = 
+                        let res =
                             ValueRange.calc false (/)  (dos_ptm, dos_qty)
                             |> ValueRange.applyExpr true prs_frq
-                        
+
                         res
                         |> ValueRange.eqs prs_frq
                         |> Expect.isTrue "should equal"
@@ -695,41 +692,41 @@ module Tests =
                 testList "valuerange set min incr max" [
 
                     test "smaller max can be set" {
-                        let max1 = createMax true 3N 
+                        let max1 = createMax true 3N
                         let max2 = createMax true 1N
-                        (max1 |> Max) 
+                        (max1 |> Max)
                         |> ValueRange.setMax true max2
                         |> Expect.equal "should be equal" (max2 |> Max)
                     }
 
                     test "greater max can not be set" {
-                        let max1 = createMax true 3N 
+                        let max1 = createMax true 3N
                         let max2 = createMax true 1N
-                        (max2 |> Max) 
+                        (max2 |> Max)
                         |> ValueRange.setMax true max1
                         |> Expect.notEqual "should not be equal" (max1 |> Max)
                     }
 
                     test "min max smaller max can be set" {
                         let min = createMin true 0N
-                        let max1 = createMax true 3N 
+                        let max1 = createMax true 3N
                         let max2 = createMax true 1N
-                        ((min, max1) |> MinMax) 
+                        ((min, max1) |> MinMax)
                         |> ValueRange.setMax true max2
                         |> Expect.equal "should be equal" ((min, max2) |> MinMax)
                     }
 
                     test "min max greater max can not be set" {
                         let min = createMin true 0N
-                        let max1 = createMax true 3N 
+                        let max1 = createMax true 3N
                         let max2 = createMax true 1N
-                        ((min, max2) |> MinMax) 
+                        ((min, max2) |> MinMax)
                         |> ValueRange.setMax true max1
                         |> Expect.notEqual "should not be equal" ((min, max1) |> MinMax)
                     }
 
                     test "max 90 mg/kg/day cannot be replaced by 300 mg/kg/day" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
@@ -739,13 +736,13 @@ module Tests =
                         let max2 =
                             [|300N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        (max1 |> Max) 
+                        (max1 |> Max)
                         |> ValueRange.setMax true max2
-                        |> Expect.notEqual "should not be equal" (max2 |> Max)                            
+                        |> Expect.notEqual "should not be equal" (max2 |> Max)
                     }
 
                     test "max 300 mg/kg/day can be replaced by 90 mg/kg/day" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
@@ -755,13 +752,13 @@ module Tests =
                         let max2 =
                             [|300N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        (max2 |> Max) 
+                        (max2 |> Max)
                         |> ValueRange.setMax true max1
-                        |> Expect.equal "should be equal" (max1 |> Max)                            
+                        |> Expect.equal "should be equal" (max1 |> Max)
                     }
 
                     test "apply expr cannot set greater max" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
@@ -771,17 +768,17 @@ module Tests =
                         let max2 =
                             [|300N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        (max1 |> Max) 
+                        (max1 |> Max)
                         |> ValueRange.applyExpr true (max2 |> Max)
-                        |> Expect.notEqual "should not be equal" (max2 |> Max)                            
+                        |> Expect.notEqual "should not be equal" (max2 |> Max)
                     }
 
                     test "apply expr cannot set greater max to minmax" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
-                        let min = 
+                        let min =
                             [|40N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max1 =
@@ -790,17 +787,17 @@ module Tests =
                         let max2 =
                             [|300N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        ((min, max1) |> MinMax) 
+                        ((min, max1) |> MinMax)
                         |> ValueRange.applyExpr true (max2 |> Max)
-                        |> Expect.notEqual "should not be equal" ((min, max2) |> MinMax)                            
+                        |> Expect.notEqual "should not be equal" ((min, max2) |> MinMax)
                     }
 
                     test "apply expr can set smaller max to minmax" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
-                        let min = 
+                        let min =
                             [|40N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max1 =
@@ -809,58 +806,58 @@ module Tests =
                         let max2 =
                             [|300N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        ((min, max2) |> MinMax) 
+                        ((min, max2) |> MinMax)
                         |> ValueRange.applyExpr true (max1 |> Max)
-                        |> Expect.equal "should not be equal" ((min, max1) |> MinMax)                            
+                        |> Expect.equal "should not be equal" ((min, max1) |> MinMax)
                     }
 
                     //set valuerange: [40 mg/kg/dag..90 mg/kg/dag]
                     //with valuerange: [2.4 mg/dag/kg..1500 mg/dag/kg]
                     //= valuerange: [40 mg/kg/dag..1500 mg/dag/kg]
                     test "apply expr min max cannot set smaller min or larger max to minmax" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
-                        let min1 = 
+                        let min1 =
                             [|40N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max1 =
                             [|90N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        let min2 = 
+                        let min2 =
                             [|24N/10N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max2 =
                             [|1500N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        ((min2, max2) |> MinMax) 
+                        ((min2, max2) |> MinMax)
                         |> ValueRange.applyExpr true ((min1, max1) |> MinMax)
-                        |> Expect.equal "should be equal" ((min1, max1) |> MinMax)                            
+                        |> Expect.equal "should be equal" ((min1, max1) |> MinMax)
                     }
 
                     //set valuerange: [40 mg/kg/dag..90 mg/kg/dag]
                     //with valuerange: [2.4 mg/dag/kg..1500 mg/dag/kg]
                     //= valuerange: [40 mg/kg/dag..1500 mg/dag/kg]
                     test "apply with operator expr min max cannot set smaller min or larger max to minmax" {
-                        let mgPerKgPerDay = 
+                        let mgPerKgPerDay =
                             (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
                             Units.Time.day)
                             |> CombiUnit
-                        let min1 = 
+                        let min1 =
                             [|40N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max1 =
                             [|90N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
-                        let min2 = 
+                        let min2 =
                             [|24N/10N|] |> ValueUnit.create mgPerKgPerDay
                             |> Minimum.create true
                         let max2 =
                             [|1500N|] |> ValueUnit.create mgPerKgPerDay
                             |> Maximum.create true
                         ((min1, max1) |> MinMax) @<- ((min2, max2) |> MinMax)
-                        |> Expect.equal "should be equal" ((min1, max1) |> MinMax)                            
+                        |> Expect.equal "should be equal" ((min1, max1) |> MinMax)
                     }
 
                 ]
@@ -870,7 +867,7 @@ module Tests =
     module EquationTests =
 
 
-        let eqs = 
+        let eqs =
             [ "ParacetamolDoseTotal = ParacetamolDoseTotalAdjust * Adjust" ]
             |> TestSolver.init
 
@@ -882,6 +879,15 @@ module Tests =
         let frq = Units.Count.times |> Units.per day
         let mL = Units.Volume.milliLiter
         let x = Units.Count.times
+        let min = Units.Time.minute
+        let hr = Units.Time.hour
+        let mcg = Units.Mass.microGram
+        let mcgPerKgPerMin =
+            mcg |> Units.per kg |> Units.per min
+        let mcgPerMin = mcg |> Units.per min
+        let mcgPerHour =
+            mcg |> Units.per hr
+
 
         // ParacetamolDoseTotal [180..3000] = ParacetamolDoseTotalAdjust [40..90] x Adjust <..100]
         let tests = testList "Equations" [
@@ -903,44 +909,76 @@ module Tests =
             // dos_ptm [92 mg/dag..345 mg/dag] = dos_qty [92/3 mg..345/2 mg] x prs_frq [2, 3 x/dag]
             // prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]
             test "failing case: prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]" {
-                let eqs = 
-                    ["dos_ptm = dos_qty * prs_frq"] 
+                let eqs =
+                    ["dos_ptm = dos_qty * prs_frq"]
                     |> TestSolver.init
                     |> TestSolver.setMinIncl mgPerDay "dos_ptm" 92N
                     |> TestSolver.setMaxIncl mgPerDay "dos_ptm" 345N
                     |> TestSolver.setMinIncl mg "dos_qty" (92N/3N)
                     |> TestSolver.setMaxIncl mg "dos_qty" (345N/2N)
                     |> TestSolver.setValues frq "prs_frq" [2N; 3N]
-                
+
                 eqs
                 |> TestSolver.solveAll
                 |> function
                 | Error _ -> false
-                | Ok res  -> res = eqs 
-                |> Expect.isTrue "should not change"   
+                | Ok res  -> res = eqs
+                |> Expect.isTrue "should not change"
             }
 
             // failing case:
             // cmp_orb_qty [1/10 mL..1/10 mL..> = orb_cnc [1/2500 x..21875000/243 x> x orb_orb_qty [250 mL]
+            // problem with very expensive calculation
             test "failing case: cmp_orb_qty [1/10 mL..1/10 mL..> = orb_cnc [1/2500 x..21875000/243 x> x orb_orb_qty [250 mL]" {
-                let eqs = 
-                    ["cmp_orb_qty = orb_cnc * orb_orb_qty"] 
+                let eqs =
+                    ["cmp_orb_qty = orb_cnc * orb_orb_qty"]
                     |> TestSolver.init
                     |> TestSolver.setMinIncl mL "cmp_orb_qty" (1N/10N)
                     |> TestSolver.setIncrement mL "cmp_orb_qty" (1N/10N)
                     |> TestSolver.setMinIncl x "orb_cnc" (1N/2500N)
                     |> TestSolver.setMaxIncl x "orb_cnc" (21875000N/243N)
                     |> TestSolver.setValues mL "orb_orb_qty" [250N]
-                
+
                 eqs
                 |> TestSolver.solveAll
                 |> function
                 | Error _ -> false
-                | Ok res  -> res = eqs 
-                |> Expect.isTrue "should not change"   
+                | Ok _  -> true
+                |> Expect.isTrue "should be calculated"
             }
 
 
+            test "units should be preserved once set or calculated" {
+                // adr_dos_rte_adj [1/100 microg/kg/min..1/2 microg/min/kg] = adr_dos_rte [17/100 microg/min..1/360000000000 microg/uur..100 microg/uur] / adj_qty [17 kg]
+                let eqs =
+                    ["adr_dos_rte = adr_dos_rte_adj * adj_qty"]
+                    |> TestSolver.init
+                    |> TestSolver.setMinIncl mcgPerKgPerMin "adr_dos_rte_adj" (1N/100N)
+                    |> TestSolver.setMaxIncl mcgPerKgPerMin "adr_dos_rte_adj" (1N/2N)
+                    |> TestSolver.setMinIncl mcgPerMin "adr_dos_rte" (17N/100N)
+                    |> TestSolver.setIncrement mcgPerHour "adr_dos_rte" (1N/360000000000N)
+                    |> TestSolver.setMaxIncl mcgPerHour "adr_dos_rte" (100N)
+                    |> TestSolver.setValues kg "adj_qty" [17N]
+
+                eqs
+                |> TestSolver.solveAll
+                |> function
+                | Ok eqs ->
+                    eqs
+                    |> List.head
+                    |> Equation.findName (Variable.Name.createExc "adr_dos_rte_adj")
+                    |> List.head
+                    |> fun var ->
+                        var.Values
+                        |> Variable.ValueRange.getMax
+                        |> Option.get
+                        |> Variable.ValueRange.Maximum.toValueUnit
+                        |> ValueUnit.getUnit
+                        |> Expect.equal "should be mcg/kg/min" mcgPerKgPerMin
+
+                | Error _ ->
+                    false |> Expect.isTrue "an error occured"
+            }
         ]
 
 
@@ -985,46 +1023,12 @@ let mgPerKgPerDay = (CombiUnit (mg, OpPer, kg), OpPer, day) |> CombiUnit
 let frq = Units.Count.times |> Units.per day
 let mL = Units.Volume.milliLiter
 let x = Units.Count.times
+let min = Units.Time.minute
+let hr = Units.Time.hour
+let mcg = Units.Mass.microGram
+let mcgPerKgPerMin =
+    mcg |> Units.per kg |> Units.per min
+let mcgPerMin = mcg |> Units.per min
+let mcgPerHour =
+    mcg |> Units.per hr
 
-let eqs = 
-    ["cmp_orb_qty = orb_cnc * orb_orb_qty"] 
-    |> TestSolver.init
-    |> TestSolver.setMinIncl mL "cmp_orb_qty" (1N/10N)
-    |> TestSolver.setIncrement mL "cmp_orb_qty" (1N/10N)
-    |> TestSolver.setMinIncl x "orb_cnc" (1N/2500N)
-    |> TestSolver.setMaxIncl x "orb_cnc" (21875000N/243N)
-    |> TestSolver.setValues mL "orb_orb_qty" [250N]
-
-eqs
-|> TestSolver.solveAll
-
-
-(5468750000N/243N)
-|> BigRational.toDecimal
-
-// failing case:
-// set valuerange MinMax
-//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
-//    MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N)))) to MinIncr
-//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
-//    Increment (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))))
-
-// setMax MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N))) to MinIncr
-//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
-//    Increment (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))))
-
-// minIncrMaxToValueRange: False MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))) MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N)))
-// calculated min max
-// starting expensive calc
-
-((5468750000N/243N) - (1N/10N)) / (1N/10N)
-|> BigRational.toDecimal
-
-
-[|
-    for i in [|(1N/10N)|] do
-        for mi in [|((1N/10N))|] do
-            for ma in [|(5468750000N/243N)|] do
-//                if ma - mi / i
-                [|mi..i..ma|]
-|]

@@ -236,7 +236,7 @@ module Units =
 
 
     module Distance =
-        
+
         let toDistance = Distance
 
         let nMeter n = n |> Meter |> toDistance
@@ -772,7 +772,7 @@ module ValueUnit =
     let apply f u =
         let rec app u =
             match u with
-            | NoUnit 
+            | NoUnit
             | ZeroUnit -> u
             | General (s, n) -> (s, n |> f) |> General
             | Count g ->
@@ -918,7 +918,7 @@ module ValueUnit =
         let unitToGroup u =
             let rec get u =
                 match u with
-                | NoUnit 
+                | NoUnit
                 | ZeroUnit -> Group.NoGroup
                 | General (n, _) -> Group.GeneralGroup n
                 | Count _ -> Group.CountGroup
@@ -1425,14 +1425,14 @@ module ValueUnit =
 
     let plus u2 u1 =
         match u2, u1 with
-        | ZeroUnit, u 
+        | ZeroUnit, u
         | u, ZeroUnit -> u
         | _ -> (u1, OpPlus, u2) |> createCombiUnit
 
 
     let minus u2 u1 =
         match u2, u1 with
-        | ZeroUnit, u 
+        | ZeroUnit, u
         | u, ZeroUnit -> u
         | _ -> (u1, OpMinus, u2) |> createCombiUnit
 
@@ -1606,8 +1606,8 @@ module ValueUnit =
                 match u1, u2 with
                 | _ when u1 |> Group.eqsGroup u2 -> u2
                 // Special case when one value is a dimensionless zero
-                | ZeroUnit, u 
-                | u, ZeroUnit -> u 
+                | ZeroUnit, u
+                | u, ZeroUnit -> u
                 // Otherwise fail
                 | _ ->
                     failwith
@@ -1740,10 +1740,11 @@ module ValueUnit =
     /// a unit u.
     /// For example 1 gram -> 1000 mg:
     /// ValueUnit(1, Gram) |> convertTo Milligram
+    /// Do not convert to no unit or zerounit
     let convertTo u vu =
         let _, u_ = vu |> get
 
-        if u = u_ then
+        if u = u_ || u = NoUnit || u = ZeroUnit then
             vu
         else
             vu
@@ -1971,7 +1972,7 @@ module ValueUnit =
 
             if dto.Group |> String.isNullOrWhiteSpace then
                 try
-                    $"1 {dto.Unit}" 
+                    $"1 {dto.Unit}"
                     |> fromString
                     |> setValue v
                     |> Some
