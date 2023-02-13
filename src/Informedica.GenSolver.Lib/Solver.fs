@@ -82,7 +82,6 @@ module Solver =
     /// and function to determine whether an
     /// equation is solved
     let solve onlyMinIncrMax log sortQue var eqs =
-
         let solveE n eqs eq =
             try
                 Equation.solve onlyMinIncrMax log eq

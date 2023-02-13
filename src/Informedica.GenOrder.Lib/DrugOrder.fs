@@ -220,7 +220,7 @@ module DrugOrder =
             | None -> ()
 
         | TimedOrder ->
-            orbDto |> standDoseRate ru
+            orbDto |> standDoseRate oru
 
             match d.Dose with
             | Some dl ->

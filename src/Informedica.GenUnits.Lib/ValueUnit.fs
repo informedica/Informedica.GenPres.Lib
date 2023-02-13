@@ -1196,7 +1196,7 @@ module ValueUnit =
     /// Create a ValueUnit from a value v
     /// (a bigrational array) and a unit u
     /// Makes sure there are nog duplicates.
-    let create u v = (v |> Array.distinct, u) |> ValueUnit
+    let create u v = (v |> Array.distinct |> Array.sort, u) |> ValueUnit
 
 
     /// An empty ValueUnit that has no value
@@ -1275,6 +1275,9 @@ module ValueUnit =
     /// Checks whether a ValueUnit has an
     /// empty value
     let isEmpty = getValue >> Array.isEmpty
+
+
+    let isZeroUnit = getUnit >> ((=) ZeroUnit)
 
 
     /// Check whether a ValueUnit is a single value

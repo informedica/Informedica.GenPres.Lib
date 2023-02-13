@@ -452,7 +452,7 @@ let getRule i pat =
 )
 
 
-test infant 408
+test child 15
 |> function
 | Ok (pat, ind, (prs, prep, adm)) ->
     [
@@ -469,8 +469,8 @@ test infant 408
 startLogger ()
 
 
-infant
-|> getRule 2
+child
+|> getRule 16
 |> Api.createDrugOrder
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto

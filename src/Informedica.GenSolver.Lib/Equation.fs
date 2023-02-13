@@ -273,7 +273,8 @@ module Equation =
                 |> calcXs op1 op2 y (xs |> replAdd newX) tail
 
         let calcY op1 y xs =
-            if y |> Variable.isSolved then y, false
+            if y |> Variable.isSolved then 
+                y, false
             else
                 // log the calculation
                 (op1, op1, y, (xs |> List.head), (xs |> List.tail))

@@ -8,7 +8,8 @@
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
-#r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"
+
+#load "load.fsx"
 
 
 #time
@@ -180,6 +181,7 @@ module TestSolver =
     let setMaxIncl u n max = max |> createMaxIncl u |> MaxProp |> setProp n
     let setMaxExcl u n max = max |> createMaxExcl u |> MaxProp |> setProp n
     let setValues u n vals = vals |> createValSet u |> ValsProp |> setProp n
+    let setIncrement u n vals = vals |> createIncr u |> IncrProp |> setProp n
 
     let logger = 
         fun (s : string) ->
@@ -878,6 +880,8 @@ module Tests =
         let mgPerDay = CombiUnit(mg, OpPer, day)
         let mgPerKgPerDay = (CombiUnit (mg, OpPer, kg), OpPer, day) |> CombiUnit
         let frq = Units.Count.times |> Units.per day
+        let mL = Units.Volume.milliLiter
+        let x = Units.Count.times
 
         // ParacetamolDoseTotal [180..3000] = ParacetamolDoseTotalAdjust [40..90] x Adjust <..100]
         let tests = testList "Equations" [
@@ -916,6 +920,26 @@ module Tests =
                 |> Expect.isTrue "should not change"   
             }
 
+            // failing case:
+            // cmp_orb_qty [1/10 mL..1/10 mL..> = orb_cnc [1/2500 x..21875000/243 x> x orb_orb_qty [250 mL]
+            test "failing case: cmp_orb_qty [1/10 mL..1/10 mL..> = orb_cnc [1/2500 x..21875000/243 x> x orb_orb_qty [250 mL]" {
+                let eqs = 
+                    ["cmp_orb_qty = orb_cnc * orb_orb_qty"] 
+                    |> TestSolver.init
+                    |> TestSolver.setMinIncl mL "cmp_orb_qty" (1N/10N)
+                    |> TestSolver.setIncrement mL "cmp_orb_qty" (1N/10N)
+                    |> TestSolver.setMinIncl x "orb_cnc" (1N/2500N)
+                    |> TestSolver.setMaxIncl x "orb_cnc" (21875000N/243N)
+                    |> TestSolver.setValues mL "orb_orb_qty" [250N]
+                
+                eqs
+                |> TestSolver.solveAll
+                |> function
+                | Error _ -> false
+                | Ok res  -> res = eqs 
+                |> Expect.isTrue "should not change"   
+            }
+
 
         ]
 
@@ -943,7 +967,64 @@ Tests.tests
 
 
 
+
 open MathNet.Numerics
+open Expecto
+open Expecto.Flip
+
+open Informedica.Utils.Lib
+open Informedica.Utils.Lib.BCL
 open Informedica.GenUnits.Lib
+open Informedica.GenSolver.Lib
+
+let mg = Units.Mass.milliGram
+let day = Units.Time.day
+let kg = Units.Weight.kiloGram
+let mgPerDay = CombiUnit(mg, OpPer, day)
+let mgPerKgPerDay = (CombiUnit (mg, OpPer, kg), OpPer, day) |> CombiUnit
+let frq = Units.Count.times |> Units.per day
+let mL = Units.Volume.milliLiter
+let x = Units.Count.times
+
+let eqs = 
+    ["cmp_orb_qty = orb_cnc * orb_orb_qty"] 
+    |> TestSolver.init
+    |> TestSolver.setMinIncl mL "cmp_orb_qty" (1N/10N)
+    |> TestSolver.setIncrement mL "cmp_orb_qty" (1N/10N)
+    |> TestSolver.setMinIncl x "orb_cnc" (1N/2500N)
+    |> TestSolver.setMaxIncl x "orb_cnc" (21875000N/243N)
+    |> TestSolver.setValues mL "orb_orb_qty" [250N]
+
+eqs
+|> TestSolver.solveAll
 
 
+(5468750000N/243N)
+|> BigRational.toDecimal
+
+// failing case:
+// set valuerange MinMax
+//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
+//    MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N)))) to MinIncr
+//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
+//    Increment (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))))
+
+// setMax MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N))) to MinIncr
+//   (MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))),
+//    Increment (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))))
+
+// minIncrMaxToValueRange: False MinIncl (ValueUnit ([|1/10N|], Volume (MilliLiter 1N))) MaxIncl (ValueUnit ([|5468750000/243N|], Volume (MilliLiter 1N)))
+// calculated min max
+// starting expensive calc
+
+((5468750000N/243N) - (1N/10N)) / (1N/10N)
+|> BigRational.toDecimal
+
+
+[|
+    for i in [|(1N/10N)|] do
+        for mi in [|((1N/10N))|] do
+            for ma in [|(5468750000N/243N)|] do
+//                if ma - mi / i
+                [|mi..i..ma|]
+|]
