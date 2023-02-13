@@ -35,7 +35,7 @@ module Examples =
     // Division or mutliplication with times
     // results in unchanged units:
     // 3 times * 5 ml = 15 ml
-    times3 * ml5
+    times3 * (ml5 / (1N |> singleWithUnit Units.Time.day))
     >>* ignore
 
     (* GET BASE AND UNIT VALUES *)

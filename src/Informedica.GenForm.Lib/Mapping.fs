@@ -21,8 +21,8 @@ module Mapping =
                 let get = getColumn r
 
                 {|
-                    Long = get "Long"
-                    Short = get "Short"
+                    Long = get "ZIndex"
+                    Short = get "ShortDutch"
                 |}
             )
 
@@ -41,8 +41,8 @@ module Mapping =
                 let get = getColumn r
 
                 {|
-                    Long = get "Z-IndexUnitLong"
-                    Short = get "Z-IndexUnitShort"
+                    Long = get "ZIndexUnitLong"
+                    Short = get "Unit"
                     MV = get "MetaVisionUnit"
                 |}
             )

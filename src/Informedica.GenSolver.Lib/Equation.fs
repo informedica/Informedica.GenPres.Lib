@@ -228,8 +228,8 @@ module Equation =
 
         else true
 
-    let calculationToString op1 op2 x y xs =
-        let varToStr = Variable.toString true
+    let calculationToString b op1 op2 x y xs =
+        let varToStr = Variable.toString b
         let opToStr op  = $" {op |> Variable.Operators.toString} "
         let filter x xs = xs |> List.filter (Variable.eqName x >> not)
 
@@ -245,15 +245,15 @@ module Equation =
 
         let (<==) = if onlyMinIncrMax then (@<-) else (^<-)
 
-        let rec calcXs op1 op2 y xs rest changed =
+        let rec calcXs op1 op2 y xs rest xChanged =
             match rest with
             | []  ->
                 // log finishing the calculation
-                (y::xs, changed)
-                |> Events.EquationFinishedCalculation
+                (y::xs, xChanged)
+                |> Events.EquationFinishedCalculation // TODO: need to rename
                 |> Logging.logInfo log
                 // return the result and whether this is changed
-                xs, changed
+                xs, xChanged
 
             | x::tail ->
                 let newX =
@@ -269,7 +269,7 @@ module Equation =
                             // recalculate x
                             x <== (y |> op2 <| (xs |> without x |> List.reduce op1))
 
-                (changed || (x.Values <> newX.Values)) 
+                (xChanged || (x.Values |> ValueRange.eqs newX.Values |> not)) 
                 |> calcXs op1 op2 y (xs |> replAdd newX) tail
 
         let calcY op1 y xs =
@@ -283,7 +283,7 @@ module Equation =
                 let temp = xs |> List.reduce op1
                 let newY = y <== temp //(xs |> List.reduce op1)
 
-                let yChanged = newY.Values <> y.Values // should be in base units?
+                let yChanged = newY.Values |> ValueRange.eqs y.Values |> not
 
                 // log finishing the calculation
                 (newY::xs, yChanged)
@@ -292,7 +292,7 @@ module Equation =
                 // return the result and whether it changed
                 newY, yChanged
         // op1 = (*) or (+) and op2 = (/) or (-)
-        let rec loop op1 op2 y xs changed =
+        let rec loop op1 op2 y xs eqChanged =
             let y, yChanged, xs, xChanged =
                 // for performance reasons pick the most efficient order of
                 // calculations, first xs then y or vice versa.
@@ -315,10 +315,10 @@ module Equation =
 
                     y, yChanged, xs, xChanged
 
-            // If something has changed restart until nothing changes anymore
-            if not (yChanged || xChanged) then (y, xs, changed)
+            // If neither yChanged or xChanged return the result
+            if not (yChanged || xChanged) then (y, xs, eqChanged)
             else
-                // equation has changed so loop
+                // y or x has changed so loop
                 loop op1 op2 y xs true
 
         let calcResult (y, xs, isChanged) =

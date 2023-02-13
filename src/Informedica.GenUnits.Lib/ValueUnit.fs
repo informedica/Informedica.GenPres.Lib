@@ -10,6 +10,7 @@ open Informedica.Utils.Lib.BCL
 
 type Unit =
     | NoUnit
+    | ZeroUnit
     | CombiUnit of Unit * Operator * Unit
     | General of (string * BigRational)
     | Count of CountUnit
@@ -22,7 +23,7 @@ type Unit =
     | Weight of WeightUnit
     | Height of HeightUnit
     | BSA of BSAUnit
-
+// TODO: probably can simplify count to unitless without unit n
 and CountUnit = Times of BigRational
 
 and MassUnit =
@@ -579,6 +580,7 @@ module Units =
     let nUnit =
         function
         | NoUnit -> (1N, NoUnit)
+        | ZeroUnit -> (0N, ZeroUnit)
         | General (n, v) -> (v, ((n, 1N) |> General))
         | Count g ->
             match g with
@@ -770,7 +772,8 @@ module ValueUnit =
     let apply f u =
         let rec app u =
             match u with
-            | NoUnit -> u
+            | NoUnit 
+            | ZeroUnit -> u
             | General (s, n) -> (s, n |> f) |> General
             | Count g ->
                 match g with
@@ -848,7 +851,8 @@ module ValueUnit =
     let getUnitValue u =
         let rec app u =
             match u with
-            | NoUnit -> None
+            | NoUnit
+            | ZeroUnit -> None
             | General (_, n) -> n |> Some
             | Count g ->
                 match g with
@@ -914,7 +918,8 @@ module ValueUnit =
         let unitToGroup u =
             let rec get u =
                 match u with
-                | NoUnit -> Group.NoGroup
+                | NoUnit 
+                | ZeroUnit -> Group.NoGroup
                 | General (n, _) -> Group.GeneralGroup n
                 | Count _ -> Group.CountGroup
                 | Mass _ -> Group.MassGroup
@@ -1094,6 +1099,7 @@ module ValueUnit =
 
     module Multipliers =
 
+        let zero = 0N
         let one = 1N
         let kilo = 1000N
         let deci = 1N / 10N
@@ -1119,7 +1125,8 @@ module ValueUnit =
         let getMultiplier u =
             let rec get u m =
                 match u with
-                | NoUnit -> one
+                | NoUnit
+                | ZeroUnit -> one
                 | General (_, n) -> n * one
                 | Count g ->
                     match g with
@@ -1246,6 +1253,9 @@ module ValueUnit =
     let getValue (ValueUnit (v, _)) = v
 
 
+    let setValue v (ValueUnit(_, u)) = v |> create u
+
+
     /// Get the unit of a ValueUnit
     let getUnit (ValueUnit (_, u)) = u
 
@@ -1337,12 +1347,14 @@ module ValueUnit =
     /// Recalculates the unit n values. Takes care of dividing
     /// by the same unitgroups and multipying with count groups.
     let createCombiUnit (u1, op, u2) = // ToDo: need to check if this is correct!!
-        if u1 = NoUnit && u2 = NoUnit then
-            NoUnit
-        else
+        match u1, u2 with
+        | NoUnit, NoUnit     -> NoUnit
+        | ZeroUnit, ZeroUnit -> ZeroUnit
+        | _ ->
             match op with
             | OpPer ->
                 match u1, u2 with
+                | _ when u1 |> Group.eqsGroup ZeroUnit -> u2
                 // this is not enough when u2 is combiunit but
                 // contains u1!
                 | _ when u1 |> Group.eqsGroup u2 ->
@@ -1362,6 +1374,8 @@ module ValueUnit =
                 | _ -> (u1, OpPer, u2) |> CombiUnit
             | OpTimes ->
                 match u1, u2 with
+                | _ when u1 |> Group.eqsGroup ZeroUnit -> u2
+                | _ when u2 |> Group.eqsGroup ZeroUnit -> u1
                 | _ when
                     u1 |> Group.eqsGroup count
                     && u2 |> Group.eqsGroup count
@@ -1406,10 +1420,18 @@ module ValueUnit =
     let times u2 u1 = (u1, OpTimes, u2) |> createCombiUnit
 
 
-    let plus u2 u1 = (u1, OpPlus, u2) |> createCombiUnit
+    let plus u2 u1 =
+        match u2, u1 with
+        | ZeroUnit, u 
+        | u, ZeroUnit -> u
+        | _ -> (u1, OpPlus, u2) |> createCombiUnit
 
 
-    let minus u2 u1 = (u1, OpMinus, u2) |> createCombiUnit
+    let minus u2 u1 =
+        match u2, u1 with
+        | ZeroUnit, u 
+        | u, ZeroUnit -> u
+        | _ -> (u1, OpMinus, u2) |> createCombiUnit
 
 
     /// Checks wheter u1 has a unit u2
@@ -1578,9 +1600,13 @@ module ValueUnit =
             | BigRational.Div -> u1 |> per u2
             | BigRational.Add
             | BigRational.Subtr ->
-                if u1 |> Group.eqsGroup u2 then
-                    u2
-                else
+                match u1, u2 with
+                | _ when u1 |> Group.eqsGroup u2 -> u2
+                // Special case when one value is a dimensionless zero
+                | ZeroUnit, u 
+                | u, ZeroUnit -> u 
+                // Otherwise fail
+                | _ ->
                     failwith
                     <| $"cannot add or subtract different units %A{u1} %A{u2}"
         // recreate valueunit with base value and combined unit
@@ -1599,7 +1625,7 @@ module ValueUnit =
     /// greater or equal
     /// smaller
     /// smaller or equal
-    /// equal
+    /// doesn't work for equal!!
     let cmp cp vu1 vu2 =
         // ToDo need better eqsGroup like mg/kg/day = (mg/kg)/day = (mg/kg*day) <> mg/(kg/day) = mg*day/kg
         //if vu1 |> eqsGroup vu2 |> not then false
@@ -1609,6 +1635,12 @@ module ValueUnit =
 
         Array.allPairs vs1 vs2
         |> Array.forall (fun (v1, v2) -> v1 |> cp <| v2)
+
+
+    let eqs vu1 vu2 =
+        let vs1 = vu1 |> toBaseValue |> Array.distinct |> Array.sort
+        let vs2 = vu2 |> toBaseValue |> Array.distinct |> Array.sort
+        vs1 = vs2
 
 
     /// Apply a function fValue to the Value
@@ -1851,7 +1883,7 @@ module ValueUnit =
 
     module Operators =
 
-        let (=?) vu1 vu2 = cmp (=) vu1 vu2
+        let (=?) vu1 vu2 = eqs vu1 vu2
 
         let (>?) vu1 vu2 = cmp (>) vu1 vu2
 
@@ -1934,11 +1966,19 @@ module ValueUnit =
             let v =
                 dto.Value |> Array.map BigRational.fromDecimal
 
-            $"%s{dto.Unit}[%s{dto.Group}]"
-            |> Units.fromString
-            |> function
-                | Some u -> v |> create u |> Some
-                | _ -> None
+            if dto.Group |> String.isNullOrWhiteSpace then
+                try
+                    $"1 {dto.Unit}" 
+                    |> fromString
+                    |> setValue v
+                    |> Some
+                with | _ -> None
+            else
+                $"%s{dto.Unit}[%s{dto.Group}]"
+                |> Units.fromString
+                |> function
+                    | Some u -> v |> create u |> Some
+                    | _ -> None
 
 
 
@@ -1955,7 +1995,7 @@ type ValueUnit with
 
     static member (-) (vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
 
-    static member (=?) (vu1, vu2) = ValueUnit.cmp (=) vu1 vu2
+    static member (=?) (vu1, vu2) = ValueUnit.eqs vu1 vu2
 
     static member (>?) (vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
 

@@ -24,8 +24,6 @@ module Types =
                 Constraints : Constraints
                 /// Stores the values/range
                 Variable:  Variable
-                /// Stores the unit
-                Unit: Unit
             }
         and Constraints =
             {
@@ -261,15 +259,19 @@ module Types =
                 Route : string
                 // The type of order
                 OrderType : OrderType
+                /// The list of possible frequency values
                 Frequencies : BigRational list
                 /// The time unit to be used when using a frequency
                 FreqUnit : string
+                /// The list of possible rate values
                 Rates : BigRational list
                 /// The time unit to be used when using a rate
                 RateUnit : string
+                /// The min and/or max time for the infusion time
                 Time : MinMax
                 /// The time unit for infusion time (duration)
                 TimeUnit : string
+                /// The dose limits for an drugorder
                 Dose : DoseLimit option
                 // The amount of orderable that will be given each time
                 DoseCount : BigRational option
@@ -310,7 +312,9 @@ module Types =
                 Unit : string
                 /// The time unit used for the frequency
                 TimeUnit : string
+                /// The dose limits for a substance
                 Dose : DoseLimit option
+                /// The solution limits for a solution
                 Solution : SolutionLimit option
             }
 

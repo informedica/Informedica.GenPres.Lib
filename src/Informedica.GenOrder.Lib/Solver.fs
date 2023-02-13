@@ -21,23 +21,14 @@ module Solver =
 
 
 
-    let filterEqsWithUnits =
-        List.filter (fun eq ->
-            match eq with
-            | OrderProductEquation (y, xs)
-            | OrderSumEquation     (y, xs) ->
-                y::xs |> List.forall OrderVariable.hasUnit
-        )
-
-
     let mapToSolverEqs eqs =
         eqs
-        |> filterEqsWithUnits
         |> List.map (fun eq ->
             match eq with
             | OrderProductEquation (y, xs) -> (y.Variable, xs |> List.map (fun v -> v.Variable)) |> ProductEquation
             | OrderSumEquation     (y, xs) -> (y.Variable, xs |> List.map (fun v -> v.Variable)) |> SumEquation
         )
+        |> List.map Equation.nonZeroOrNegative
 
 
     let mapToOrderEqs ordEqs eqs =

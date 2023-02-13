@@ -175,8 +175,9 @@ module Utils =
 
         let toStr exact =
             if exact then
-                getValue
-                >> Array.toReadableString
+                toStringDutchShort
+                // getValue
+                // >> Array.toReadableString
                 >> String.removeBrackets
             else
                 toReadableDutchStringWithPrec 3

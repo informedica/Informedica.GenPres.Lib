@@ -70,6 +70,12 @@ test<@
 @>
 
 
+test<@
+    ([|1000N|] |> mcg) =? ([|1N|] |> mg) 
+@>
+
+
+
 let mgPerKgPerDay = 
     (CombiUnit (Units.Mass.milliGram, OpPer, Units.Weight.kiloGram), OpPer,
     Units.Time.day)

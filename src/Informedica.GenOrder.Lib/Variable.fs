@@ -12,9 +12,11 @@ module Variable =
 
 
         let inline setOpt m set vr =
-            match m with
-            | Some m -> vr |> set true m
-            | None   -> vr
+            try
+                match m with
+                | Some m -> vr |> set true m
+                | None   -> vr
+            with | _ -> vr // TODO: ugly fix need to refactor 
 
 
         let setOptMin min vr = vr |> setOpt min setMin
@@ -27,7 +29,9 @@ module Variable =
 
 
         let setOptVs vs vr =
-            match vs with
-            | Some vs -> vr |> setValueSet vs
-            | None    -> vr
+            try
+                match vs with
+                | Some vs -> vr |> setValueSet vs
+                | None    -> vr
 
+            with | _ -> vr // TODO: ugly fix need to refactor 

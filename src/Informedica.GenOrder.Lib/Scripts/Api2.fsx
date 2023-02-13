@@ -126,7 +126,7 @@ module Api =
             |> List.singleton
 
         { DrugOrder.drugOrder with
-            Id = Guid.NewGuid().ToString()
+            Id = "1" //Guid.NewGuid().ToString()
             Name = pr.DoseRule.Generic
             Products =
                 pr.DoseRule.Products
@@ -238,8 +238,9 @@ let evaluate logger (rule : PrescriptionRule) =
 
             let shps =
                 dto.Orderable.Components
-                |> List.collect (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
+                |> List.choose (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
                 |> List.toArray
+                |> Array.collect (fun dto -> dto.Value |> Array.map BigRational.fromDecimal)
 
             let sbsts =
                 dto.Orderable.Components
@@ -247,10 +248,14 @@ let evaluate logger (rule : PrescriptionRule) =
                 |> Array.collect (fun cDto ->
                     cDto.Items
                     |> List.toArray
-                    |> Array.collect (fun iDto ->
+                    |> Array.choose (fun iDto ->
                         iDto.ComponentConcentration.Variable.Vals
-                        |> List.toArray
-                        |> Array.map (fun v -> iDto.Name, v |> Some)
+                        |> Option.map (fun v -> 
+                            iDto.Name, 
+                            v.Value 
+                            |> Array.map BigRational.fromDecimal
+                            |> Array.tryHead
+                        )
                     )
                 )
                 |> Array.distinct
@@ -475,17 +480,18 @@ infant
 |> function
 | Error (ord, msgs) ->
     printfn "oeps error"
-    printfn $"{msgs |> List.map string}"
-    ord
-    |> Order.toString
-    |> String.concat "\n"
-    |> printfn "%s"
+    // printfn $"{msgs |> List.map string}"
+    // ord
+    // |> Order.toString
+    // |> String.concat "\n"
+    // |> printfn "%s"
 
 | Ok ord  ->
     ord
     |> Order.toString
     |> String.concat "\n"
     |> printfn "%s"
+
 
 
 open Order
@@ -524,3 +530,27 @@ with
     raise e
 
 
+
+
+
+let testDto =
+    infant
+    |> getRule 2
+    |> Api.createDrugOrder
+    |> DrugOrder.toOrder
+
+
+testDto.Orderable.Components[0].Items[0].Dose.PerTimeAdjust.Constraints.Max
+|> Option.bind(fun dto ->
+        
+    printfn $"processing:{dto |> ValueUnit.Dto.toString}"
+    dto |> ValueUnit.Dto.fromDto
+)
+
+let vuDto =testDto.Orderable.Components[0].Items[0].Dose.PerTimeAdjust.Constraints.Max.Value
+
+
+vuDto.Unit |> Units.fromString
+
+$"1 {vuDto.Unit}"
+|> ValueUnit.fromString

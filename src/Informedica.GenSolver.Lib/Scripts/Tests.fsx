@@ -342,6 +342,7 @@ module Tests =
                 ]
 
 
+
             module MinimumTests =
 
 
@@ -459,6 +460,7 @@ module Tests =
                         |> Generators.testProp "restrict different min"
 
                     ]
+
 
 
             module MaximumTests =
@@ -607,6 +609,10 @@ module Tests =
                 |> ValueUnit.withSingleValue br
                 |> Maximum.create isIncl
 
+            let createVals brs =
+                Units.Count.times
+                |> ValueUnit.withValue brs
+                |> ValueRange.ValueSet.create
 
             open ValueRange.Operators
 
@@ -658,6 +664,30 @@ module Tests =
                     fun v ->
                         v |> ValueRange.isMultipleOfIncr None
                     |> Generators.testProp "is always multiple of none incr"
+                ]
+
+                testList "equals" [
+                    // failing case:
+                    // dos_ptm [92 mg/dag..345 mg/dag] = dos_qty [92/3 mg..345/2 mg] x prs_frq [2, 3 x/dag]
+                    // prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]
+                    test "" {
+                        let dos_ptm = 
+                            ((createMin true 92N), (createMax true 92N))
+                            |> MinMax
+                        let dos_qty = 
+                            ((createMin true (92N/3N)), (createMax true (345N/2N)))
+                            |> MinMax
+                        let prs_frq = 
+                            createVals [|2N; 3N|]
+                            |> ValSet
+                        let res = 
+                            ValueRange.calc false (/)  (dos_ptm, dos_qty)
+                            |> ValueRange.applyExpr true prs_frq
+                        
+                        res
+                        |> ValueRange.eqs prs_frq
+                        |> Expect.isTrue "should equal"
+                    }
                 ]
 
                 testList "valuerange set min incr max" [
@@ -847,6 +877,7 @@ module Tests =
         let kg = Units.Weight.kiloGram
         let mgPerDay = CombiUnit(mg, OpPer, day)
         let mgPerKgPerDay = (CombiUnit (mg, OpPer, kg), OpPer, day) |> CombiUnit
+        let frq = Units.Count.times |> Units.per day
 
         // ParacetamolDoseTotal [180..3000] = ParacetamolDoseTotalAdjust [40..90] x Adjust <..100]
         let tests = testList "Equations" [
@@ -863,6 +894,28 @@ module Tests =
                 |> ignore
                 true |> Expect.isTrue "should run"
             }
+
+            // failing case:
+            // dos_ptm [92 mg/dag..345 mg/dag] = dos_qty [92/3 mg..345/2 mg] x prs_frq [2, 3 x/dag]
+            // prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]
+            test "failing case: prs_frq [2, 3 x/dag] = dos_ptm [92 mg/dag..345 mg/dag] / dos_qty [92/3 mg..345/2 mg]" {
+                let eqs = 
+                    ["dos_ptm = dos_qty * prs_frq"] 
+                    |> TestSolver.init
+                    |> TestSolver.setMinIncl mgPerDay "dos_ptm" 92N
+                    |> TestSolver.setMaxIncl mgPerDay "dos_ptm" 345N
+                    |> TestSolver.setMinIncl mg "dos_qty" (92N/3N)
+                    |> TestSolver.setMaxIncl mg "dos_qty" (345N/2N)
+                    |> TestSolver.setValues frq "prs_frq" [2N; 3N]
+                
+                eqs
+                |> TestSolver.solveAll
+                |> function
+                | Error _ -> false
+                | Ok res  -> res = eqs 
+                |> Expect.isTrue "should not change"   
+            }
+
 
         ]
 

@@ -11,7 +11,7 @@ module Exceptions =
         let raiseExc log m o =
             match log with
             | Some log ->
-                printfn $"logging error {m}"
+                printfn $"logging error"
                 (m, o)
                 |> Exceptions.OrderCouldNotBeSolved
                 |> Logging.logError log

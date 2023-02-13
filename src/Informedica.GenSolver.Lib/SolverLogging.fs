@@ -24,11 +24,11 @@ module SolverLogging =
                 | Some v -> Some v.Name
                 | None -> None
             )
-        $"""{eqs |> List.map (Equation.toString true) |> String.concat "\n"}"""
+        $"""{eqs |> List.map (Equation.toString false) |> String.concat "\n"}"""
 
 
-    let private varsToStr vars =
-        $"""{vars |> List.map (Variable.toString true) |> String.concat ", "}"""
+    let private varsToStr b vars =
+        $"""{vars |> List.map (Variable.toString b) |> String.concat ", "}"""
 
 
     let rec printException = function
@@ -125,19 +125,21 @@ module SolverLogging =
             $"=== Start solving Equation ===\n{eq |> toString}"
 
         | EquationStartCalculation (op1, op2, y, x, xs) ->
-            $"start calculating: {Equation.calculationToString op1 op2 y x xs}"
+            $"start calculating: {Equation.calculationToString true op1 op2 y x xs}"
 
         | EquationFinishedCalculation (xs, changed) ->
-            $"""finished calculation: {if (not changed) then "No changes" else xs |> varsToStr}"""
+            if not changed then "No Changes"
+            else
+                $"Changed: {xs |> varsToStr true}"
 
         | EquationFinishedSolving (eq, b) ->
             $"""=== Equation Finished Solving ===
-{eq |> Equation.toString true}
+{eq |> Equation.toString false}
 {b |> Equation.SolveResult.toString}
 """
 
         | EquationCouldNotBeSolved eq ->
-            $"=== Cannot solve Equation ===\n{eq |> Equation.toString true}"
+            $"=== Cannot solve Equation ===\n{eq |> Equation.toString false}"
 
         | SolverStartSolving eqs ->
             $"=== Solver Start Solving ===\n{eqs |> eqsToStr}"

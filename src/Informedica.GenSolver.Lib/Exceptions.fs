@@ -9,9 +9,10 @@ module Exceptions =
 
     /// Raise an `EquationException` with `Message` `m`.
     let raiseExc log errs m =
+        printfn $"raising error"
+
         match log with
         | Some log ->
-            // printfn $"adding error {m} to {errs |> List.length}"
             m |> Logging.logError log
         | None -> ()
 

@@ -808,13 +808,6 @@ module Order =
         let getDose orb = (orb |> get).Dose
 
 
-        // Get the base `Unit` of an `Orderable`
-        let getUnit orb =
-            (orb |> get).OrderableQuantity
-            |> Quantity.toOrdVar
-            |> OrderVariable.getUnit
-
-
         /// Map an `Orderable` **orb** to
         /// `VariableUnit`s
         let toOrdVars orb =
