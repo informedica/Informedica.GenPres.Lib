@@ -26,6 +26,7 @@ let startLogger () =
     OrderLogger.logger.Start path Logging.Level.Informative
 
 
+
 module Api =
 
     open System
@@ -250,9 +251,9 @@ let evaluate logger (rule : PrescriptionRule) =
                     |> List.toArray
                     |> Array.choose (fun iDto ->
                         iDto.ComponentConcentration.Variable.Vals
-                        |> Option.map (fun v -> 
-                            iDto.Name, 
-                            v.Value 
+                        |> Option.map (fun v ->
+                            iDto.Name,
+                            v.Value
                             |> Array.map BigRational.fromDecimal
                             |> Array.tryHead
                         )
@@ -281,6 +282,7 @@ let evaluate logger (rule : PrescriptionRule) =
         | Error (ord, m) -> Error (ord, pr, m)
 
     solve true rule
+
 
 
 let test pat n =
@@ -312,6 +314,7 @@ let test pat n =
             $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
         Error ($"%A{m}", p, o)
+
 
 
 type Age = Patient.Optics.Age
@@ -452,7 +455,7 @@ let getRule i pat =
 )
 
 
-test child 15
+test child 5
 |> function
 | Ok (pat, ind, (prs, prep, adm)) ->
     [
@@ -470,12 +473,11 @@ startLogger ()
 
 
 child
-|> getRule 16
-|> Api.createDrugOrder
+|> getRule 26
+|> Api.createDrugOrder //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
-|> Order.applyConstraints
-//|> Order.toString
+|> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
 |> Order.solveMinMax true OrderLogger.logger.Logger
 |> function
 | Error (ord, msgs) ->
@@ -535,22 +537,13 @@ with
 
 let testDto =
     infant
-    |> getRule 2
+    |> getRule 5
     |> Api.createDrugOrder
     |> DrugOrder.toOrder
 
 
-testDto.Orderable.Components[0].Items[0].Dose.PerTimeAdjust.Constraints.Max
-|> Option.bind(fun dto ->
-        
-    printfn $"processing:{dto |> ValueUnit.Dto.toString}"
-    dto |> ValueUnit.Dto.fromDto
-)
+testDto.Orderable.DoseCount.Constraints.Vals
 
-let vuDto =testDto.Orderable.Components[0].Items[0].Dose.PerTimeAdjust.Constraints.Max.Value
-
-
-vuDto.Unit |> Units.fromString
-
-$"1 {vuDto.Unit}"
-|> ValueUnit.fromString
+1N
+|> DrugOrder.createSingleValueUnitDto "keer[Count]"
+|> Option.bind ValueUnit.Dto.fromDto

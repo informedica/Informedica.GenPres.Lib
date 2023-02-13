@@ -137,7 +137,7 @@ module DrugOrder =
             orbDto.Dose.Rate.Constraints.Max <- 1000N |> createSingleValueUnitDto un
 
         // create the units
-        let cu = "keer[Count]"
+        let cu = "x[Count]"
         let ml = "ml[Volume]"
 
         let ou = d.Unit |> unitGroup
@@ -164,10 +164,6 @@ module DrugOrder =
             |> Option.bind (createSingleValueUnitDto cu)
 
         orbDto.OrderableQuantity.Constraints.Vals <- d.Quantities |> createValueUnitDto ou
-
-        orbDto.DoseCount.Constraints.Vals <-
-            d.DoseCount
-            |> Option.bind (createSingleValueUnitDto "")
 
         let setOrbDoseRate (dl : DoseLimit) =
             orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
@@ -202,7 +198,7 @@ module DrugOrder =
             orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum |> Option.bind (createSingleValueUnitDto pta)
             orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
             orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum |> Option.bind (createSingleValueUnitDto pta)
-    
+
         match d.OrderType with
         | AnyOrder
         | ProcessOrder -> ()
@@ -214,7 +210,7 @@ module DrugOrder =
             | Some dl -> dl |> setOrbDoseRate
             | None -> ()
 
-        | DiscontinuousOrder ->            
+        | DiscontinuousOrder ->
             match d.Dose with
             | Some dl -> dl |> setOrbDoseQty
             | None -> ()
@@ -270,7 +266,7 @@ module DrugOrder =
 
                                 itmDto.Dose.Rate.Constraints <-
                                     itmDto.Dose.Rate.Constraints
-                                    |> MinMax.setConstraints dru dl.NormRate dl.Rate 
+                                    |> MinMax.setConstraints dru dl.NormRate dl.Rate
 
                                 itmDto.Dose.RateAdjust.Constraints <-
                                     itmDto.Dose.RateAdjust.Constraints
