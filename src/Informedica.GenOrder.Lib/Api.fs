@@ -78,7 +78,7 @@ module Api =
         )
 
 
-    let createDrugOrder (pr : PrescriptionRule) =
+    let createDrugOrder (sr : SolutionRule option) (pr : PrescriptionRule) =
         let parenteral = Product.Parenteral.get ()
         let au =
             if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
@@ -119,7 +119,7 @@ module Api =
             RateUnit = "uur"
             Route = pr.DoseRule.Route
             DoseCount =
-                if pr.SolutionRule.IsNone then Some 1N
+                if pr.SolutionRules |> Array.isEmpty then Some 1N
                 else None
             OrderType =
                 match pr.DoseRule.DoseType with
@@ -135,7 +135,7 @@ module Api =
             AdjustUnit = au
         }
         |> fun dro ->
-                match pr.SolutionRule with
+                match sr with
                 | None -> dro
                 | Some sr ->
 //                    printfn "found solutionrule"
@@ -172,6 +172,7 @@ module Api =
                                 printfn $"couldn't find {s} in parenterals"
                                 ps
                     }
+
 
     let evaluate (dr : DrugOrder) =
         dr

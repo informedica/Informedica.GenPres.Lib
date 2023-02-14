@@ -13,69 +13,28 @@ module PrescriptionRule =
 
         DoseRule.get ()
         |> DoseRule.filter filter
-        |> Array.collect (fun dr ->
+        |> Array.map (fun dr ->
             let dr = dr |> DoseRule.reconstitute pat.Department pat.Location
-            // ugly hack to get the right solution rule based on the dose quantity
-            let dose =
-                dr.DoseLimits[0]
-                |> fun d ->
-                    let dq = d.Quantity.Maximum
-                    let dp =
-                        match dr.Frequencies |> Array.tryHead with
-                        | Some f -> d.PerTime.Maximum |> Option.map (fun v -> v / f)
-                        | None   -> None
-                    let dqa =
-                        match pat.Weight with
-                        | None   -> None
-                        | Some w ->
-                            let w = w / 1000N
-                            d.QuantityAdjust.Maximum
-                            |> Option.map ((*) w)
-                    let dpa =
-                        match dr.Frequencies |> Array.tryHead with
-                        | Some f ->
-                            match pat.Weight with
-                            | None   -> None
-                            | Some w ->
-                                let w = w / 1000N
-                                d.PerTimeAdjust.Maximum |> Option.map (fun v -> w * v / f)
-                        | None   -> None
-
-                    match dq, dp, dqa, dpa with
-                    | Some q, _, _, _
-                    | _, Some q, _, _
-                    | _, _, Some q, _
-                    | _, _, _, Some q -> q |> Some
-                    | _ -> None
-
-            SolutionRule.get ()
-            |> SolutionRule.filter
-                { filter with
-                    Generic = dr.Generic |> Some
-                    Shape = dr.Shape |> Some
-                    Route = dr.Route |> Some
-                    DoseType = dr.DoseType
-                    Dose = dose
-                }
-            //|> fun xs ->
-            //    if xs |> Array.length > 1 then
-            //        printfn $"multiple solution rules for {dr.Generic}, {dr.Shape}"
-            //    xs
-            |> function
-            | srs when srs |> Array.isEmpty ->
-                [| { Patient = pat; DoseRule = dr; SolutionRule = None }  |]
-            | srs ->
-                srs
-                |> Array.map (fun sr ->
-                    {
-                        Patient = pat
-                        DoseRule = dr
-                        SolutionRule = sr |> Some
-                    }
-                )
+            {
+                Patient = pat
+                DoseRule = dr
+                SolutionRules =
+                    SolutionRule.get ()
+                    |> SolutionRule.filter
+                        { filter with
+                            Generic = dr.Generic |> Some
+                            Shape = dr.Shape |> Some
+                            Route = dr.Route |> Some
+                            Weight = pat.Weight
+                            DoseType = dr.DoseType
+                        }
+            }
         )
 
-    let filterProducts shapeQuantities (substs : (string * BigRational option) array)  (pr : PrescriptionRule) =
+
+    let filterProducts shapeQuantities
+                       (substs : (string * BigRational option) array)
+                       (pr : PrescriptionRule) =
         { pr with
             DoseRule =
                 { pr.DoseRule with
@@ -99,19 +58,18 @@ module PrescriptionRule =
 
 
     let toMarkdown (prs : PrescriptionRule []) =
-            [
-                yield!
-                    prs
-                    |> Array.collect (fun x ->
-                        [|
-                            [| x.DoseRule |] |> DoseRule.Print.toMarkdown
-                            if x.SolutionRule.IsSome then
-                                [| x.SolutionRule.Value |] |> SolutionRule.Print.toMarkdown "verdunnen"
-                          |]
-                  )
-            ]
-            |> List.append [ prs[0].Patient |> Patient.toString ]
-            |> String.concat "\n"
+        [
+            yield!
+                prs
+                |> Array.collect (fun x ->
+                    [|
+                        [| x.DoseRule |] |> DoseRule.Print.toMarkdown
+                        x.SolutionRules |> SolutionRule.Print.toMarkdown "verdunnen"
+                    |]
+                )
+        ]
+        |> List.append [ prs[0].Patient |> Patient.toString ]
+        |> String.concat "\n"
 
 
     let getDoseRule (pr : PrescriptionRule) = pr.DoseRule
@@ -145,6 +103,4 @@ module PrescriptionRule =
 
 
     let frequencies = getDoseRules >> DoseRule.frequencies
-
-
 

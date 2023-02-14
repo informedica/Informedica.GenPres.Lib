@@ -103,7 +103,7 @@ module Api =
         )
 
 
-    let createDrugOrder (pr : PrescriptionRule) =
+    let createDrugOrder (sr: SolutionRule option) (pr : PrescriptionRule) =
         let parenteral = Product.Parenteral.get ()
         let au =
             if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
@@ -144,7 +144,7 @@ module Api =
             RateUnit = "uur"
             Route = pr.DoseRule.Route
             DoseCount =
-                if pr.SolutionRule.IsNone then Some 1N
+                if pr.SolutionRules |> Array.isEmpty then Some 1N
                 else None
             OrderType =
                 match pr.DoseRule.DoseType with
@@ -160,7 +160,7 @@ module Api =
             AdjustUnit = au
         }
         |> fun dro ->
-                match pr.SolutionRule with
+                match sr with
                 | None -> dro
                 | Some sr ->
 //                    printfn "found solutionrule"
@@ -227,9 +227,9 @@ module Api =
 
 
 let evaluate logger (rule : PrescriptionRule) =
-    let rec solve retry pr =
+    let rec solve retry sr pr =
         pr
-        |> Api.createDrugOrder
+        |> Api.createDrugOrder sr
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
         |> Order.solveMinMax false logger
@@ -269,19 +269,22 @@ let evaluate logger (rule : PrescriptionRule) =
 
             Ok (ord, pr)
         | Error _ when retry ->
-            printfn "trying a second time with manual product"
-            { pr with
-                DoseRule =
-                    { pr.DoseRule with
-                        Products =
-                            pr.DoseRule.Products
-                            |> Array.choose Product.manual
-                    }
-            }
-            |> solve false
+                printfn "trying a second time with manual product"
+                { pr with
+                    DoseRule =
+                        { pr.DoseRule with
+                            Products =
+                                pr.DoseRule.Products
+                                |> Array.choose Product.manual
+                        }
+                }
+                |> solve false None
         | Error (ord, m) -> Error (ord, pr, m)
 
-    solve true rule
+    if rule.SolutionRules |> Array.isEmpty then [| solve true None rule |]
+    else
+        rule.SolutionRules
+        |> Array.map (fun sr -> solve true (Some sr) rule)
 
 
 
@@ -294,26 +297,27 @@ let test pat n =
 
     pr
     |> evaluate { Log = ignore }
-    |> function
-    | Ok (ord, pr) ->
-        let ns =
-            pr.DoseRule.DoseLimits
-            |> Array.map (fun dl -> dl.Substance)
-        let o =
-            ord
-            |> Order.Print.printPrescription ns
-        let p =
-            $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
-        Ok (pat, p, o)
-    | Error (ord, pr, m) ->
-        let o =
-            ord
-            |> Order.toString
-            |> String.concat "\n"
-        let p =
-            $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
+    |> Array.map (function
+        | Ok (ord, pr) ->
+            let ns =
+                pr.DoseRule.DoseLimits
+                |> Array.map (fun dl -> dl.Substance)
+            let o =
+                ord
+                |> Order.Print.printPrescription ns
+            let p =
+                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
+            Ok (pat, p, o)
+        | Error (ord, pr, m) ->
+            let o =
+                ord
+                |> Order.toString
+                |> String.concat "\n"
+            let p =
+                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
 
-        Error ($"%A{m}", p, o)
+            Error ($"%A{m}", p, o)
+    )
 
 
 
@@ -367,6 +371,7 @@ let child =
     |> Patient.Optics.setWeight (17m |> Weight.Kilogram |> Some)
     |> Patient.Optics.setHeight (100 |> Height.Centimeter |> Some)
     |> Patient.Optics.setDepartment "ICK"
+    |> fun p -> { p with Location = CVL}
 
 
 let teenager =
@@ -399,20 +404,23 @@ let run n pat =
         try
             i
             |> test pat
-            |> function
-            | Ok (pat, ind, (prs, prep, adm)) ->
-                [
-                    ""
-                    $"{i}"
-                    $"Patient: {pat |> Patient.toString}"
-                    $"Indicatie: {ind}"
-                    $"Voorschrift: {prs}"
-                    if prep |> String.notEmpty then $"Bereiding: {prep}"
-                    $"Toediening: {adm}"
-                    ""
-                ]
-                |> String.concat "\n"
-            | Error (_, p, _) -> $"\n{i}.Fail: {p}\n"
+            |> Array.map (function
+                | Ok (pat, ind, (prs, prep, adm)) ->
+                    [
+                        ""
+                        $"{i}"
+                        $"Patient: {pat |> Patient.toString}"
+                        $"Indicatie: {ind}"
+                        $"Voorschrift: {prs}"
+                        if prep |> String.notEmpty then $"Bereiding: {prep}"
+                        $"Toediening: {adm}"
+                        ""
+                    ]
+                    |> String.concat "\n"
+                | Error (_, p, _) -> $"\n{i}.Fail: {p}\n"
+            )
+            |> String.concat "\n"
+
         with
         | _ ->
             let pr =
@@ -455,26 +463,27 @@ let getRule i pat =
 )
 
 
-test child 703
-|> function
-| Ok (pat, ind, (prs, prep, adm)) ->
-    [
-        $"Patient: {pat |> Patient.toString}"
-        $"Indicatie: {ind}"
-        $"Voorschrift: {prs}"
-        if prep |> String.notEmpty then $"Bereiding: {prep}"
-        $"Toediening: {adm}"
-    ]
-    |> List.iter (printfn "%s")
-| Error _ -> ()
+test child 16
+|> Array.iter (function
+    | Ok (pat, ind, (prs, prep, adm)) ->
+        [
+            $"Patient: {pat |> Patient.toString}"
+            $"Indicatie: {ind}"
+            $"Voorschrift: {prs}"
+            if prep |> String.notEmpty then $"Bereiding: {prep}"
+            $"Toediening: {adm}"
+        ]
+        |> List.iter (printfn "%s")
+    | Error _ -> ()
+)
 
 
 startLogger ()
 
 
 child
-|> getRule 703
-|> Api.createDrugOrder //|> printfn "%A"
+|> getRule 24
+|> Api.createDrugOrder None //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
 |> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
@@ -482,11 +491,11 @@ child
 |> function
 | Error (ord, msgs) ->
     printfn "oeps error"
-    // printfn $"{msgs |> List.map string}"
-    // ord
-    // |> Order.toString
-    // |> String.concat "\n"
-    // |> printfn "%s"
+    printfn $"{msgs |> List.map string}"
+    ord
+    |> Order.toString
+    |> String.concat "\n"
+    |> printfn "%s"
 
 | Ok ord  ->
     ord.Orderable.OrderableQuantity
@@ -505,7 +514,7 @@ try
     let ord =
         child
         |> getRule 703
-        |> Api.createDrugOrder
+        |> Api.createDrugOrder None
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
         |> Order.applyConstraints
@@ -541,12 +550,10 @@ with
 let testDto =
     infant
     |> getRule 5
-    |> Api.createDrugOrder
+    |> Api.createDrugOrder None
     |> DrugOrder.toOrder
 
 
 testDto.Orderable.DoseCount.Constraints.Vals
 
-1N
-|> DrugOrder.createSingleValueUnitDto "keer[Count]"
-|> Option.bind ValueUnit.Dto.fromDto
+(8. * 60. + 26.)/ 928.

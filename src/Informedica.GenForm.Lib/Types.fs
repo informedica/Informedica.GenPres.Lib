@@ -231,5 +231,5 @@ module Types =
         {
             Patient : Patient
             DoseRule : DoseRule
-            SolutionRule : SolutionRule option
+            SolutionRules : SolutionRule []
         }

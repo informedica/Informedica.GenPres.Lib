@@ -146,7 +146,12 @@ module SolutionRule =
                 | AnyDoseType, _
                 | _, AnyDoseType -> true
                 | _ -> filter.DoseType = sr.DoseType
-            fun (sr : SolutionRule) -> filter.Dose |> MinMax.isBetween sr.Dose
+            fun (sr : SolutionRule) -> filter.Weight |> MinMax.isBetween sr.Weight
+            fun (sr : SolutionRule) ->
+                match sr.Location with
+                | CVL  -> filter.Location = CVL
+                | AnyAccess
+                | PVL -> true
         |]
         |> Array.fold (fun (acc : SolutionRule[]) pred ->
             acc |> Array.filter pred

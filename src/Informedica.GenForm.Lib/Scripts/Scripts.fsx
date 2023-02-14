@@ -60,3 +60,14 @@ DoseRule.get ()
     dr.Generic = "adrenaline"
 )
 
+
+
+{ Patient.patient with
+    Department = "ICK"
+    Age = 365N * 4N |> Some
+    Weight = 17000N |> Some
+    Location = CVL
+}
+|> PrescriptionRule.get
+|> Array.filter (fun r -> r.DoseRule.Generic = "adrenaline")
+|> Array.item 0
