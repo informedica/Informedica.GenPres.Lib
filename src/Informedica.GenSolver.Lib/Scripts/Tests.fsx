@@ -8,8 +8,9 @@
 
 #r "../../Informedica.Utils.Lib/bin/Debug/net6.0/Informedica.Utils.Lib.dll"
 #r "../../Informedica.GenUnits.Lib/bin/Debug/net6.0/Informedica.GenUnits.Lib.dll"
+#r "../../Informedica.GenSolver.Lib/bin/Debug/net6.0/Informedica.GenSolver.Lib.dll"
 
-#load "load.fsx"
+//#load "load.fsx"
 
 
 #time
@@ -183,13 +184,13 @@ module TestSolver =
     let setValues u n vals = vals |> createValSet u |> ValsProp |> setProp n
     let setIncrement u n vals = vals |> createIncr u |> IncrProp |> setProp n
 
-    let logger = SolverLogging.logger ignore
+    let logger = SolverLogging.logger (printfn "%A")
 
     let solve n p eqs =
         let n = n |> Name.createExc
         Api.solve true id logger n p eqs
 
-    let solveAll = Api.solveAll false logger
+    let solveAll = Api.solveAll true logger
 
     let solveMinIncl u n min = solve n (min |> createMinIncl u |> MinProp)
     let solveMinExcl u n min = solve n (min |> createMinExcl u  |> MinProp)
@@ -887,6 +888,7 @@ module Tests =
         let mcgPerMin = mcg |> Units.per min
         let mcgPerHour =
             mcg |> Units.per hr
+        let piece = Units.General.general "stuk"
 
 
         // ParacetamolDoseTotal [180..3000] = ParacetamolDoseTotalAdjust [40..90] x Adjust <..100]
@@ -979,6 +981,43 @@ module Tests =
                 | Error _ ->
                     false |> Expect.isTrue "an error occured"
             }
+
+            test "zero unit should be replaced by unit with a dimension" {
+                // failing case
+                // orb_qty <0 ..> = cmp_orb_qty [1 stuk..1 stuk..> +
+                let eqs =
+                    [ "orb_qty = cmp_orb_qty +" ]
+                    |> TestSolver.init
+                    |> TestSolver.setMinExcl NoUnit "orb_qty" 0N
+                    |> TestSolver.setMinIncl piece "cmp_orb_qty" (1N)
+                    |> TestSolver.setIncrement piece "cmp_orb_qty" (1N)
+                    |> TestSolver.nonZeroNegative
+                    |> fun eqs ->
+                        eqs
+                        |> List.map (Equation.toString true)
+                        |> List.iter (printfn "%s")
+                        eqs
+
+                eqs
+                |> TestSolver.solveAll
+                |> function
+                | Ok eqs ->
+                    eqs
+                    |> List.head
+                    |> Equation.findName (Variable.Name.createExc "orb_qty")
+                    |> List.head
+                    |> fun var ->
+                        var.Values
+                        |> Variable.ValueRange.getMin
+                        |> Option.get
+                        |> Variable.ValueRange.Minimum.toValueUnit
+                        |> ValueUnit.getUnit
+                        |> Expect.equal "should be 'stuk'" piece
+
+                | Error _ ->
+                    false |> Expect.isTrue "an error occured"
+
+            }
         ]
 
 
@@ -1031,4 +1070,7 @@ let mcgPerKgPerMin =
 let mcgPerMin = mcg |> Units.per min
 let mcgPerHour =
     mcg |> Units.per hr
+let piece = Units.General.general "stuk"
+
+
 

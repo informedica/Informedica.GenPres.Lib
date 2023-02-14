@@ -8,6 +8,21 @@ open Informedica.Utils.Lib
 open Informedica.Utils.Lib.BCL
 
 
+module Array =
+
+    let removeBigRationalMultiples xs =
+        if xs |> Array.isEmpty then
+            xs
+        else
+            xs
+            |> Array.fold
+                (fun acc x1 ->
+                    acc
+                    |> Array.filter (fun x2 -> x1 = x2 || x2 |> BigRational.isMultiple x1 |> not)
+                )
+                xs
+
+
 type Unit =
     | NoUnit
     | ZeroUnit
@@ -396,21 +411,29 @@ module Units =
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "m"; Dut = "m" }
                 Name = { Eng = "meter"; Dut = "meter" }
-                Synonyms = [ ]
+                Synonyms = []
             }
             {
                 Unit = Distance.centimeter
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "cm"; Dut = "cm" }
-                Name = { Eng = "centimeter"; Dut = "centimeter" }
-                Synonyms = [ ]
+                Name =
+                    {
+                        Eng = "centimeter"
+                        Dut = "centimeter"
+                    }
+                Synonyms = []
             }
             {
                 Unit = Distance.millimeter
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "mm"; Dut = "mm" }
-                Name = { Eng = "millimeter"; Dut = "millimeter" }
-                Synonyms = [ ]
+                Name =
+                    {
+                        Eng = "millimeter"
+                        Dut = "millimeter"
+                    }
+                Synonyms = []
             }
 
 
@@ -432,14 +455,22 @@ module Units =
                 Unit = Volume.milliLiter
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "ml"; Dut = "mL" }
-                Name = { Eng = "milliliter"; Dut = "milliliter" }
+                Name =
+                    {
+                        Eng = "milliliter"
+                        Dut = "milliliter"
+                    }
                 Synonyms = [ "millil" ]
             }
             {
                 Unit = Volume.microLiter
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "microL"; Dut = "microL" }
-                Name = { Eng = "microliter"; Dut = "microliter" }
+                Name =
+                    {
+                        Eng = "microliter"
+                        Dut = "microliter"
+                    }
                 Synonyms = [ "µl" ]
             }
             {
@@ -519,7 +550,7 @@ module Units =
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "micromol"; Dut = "micromol" }
                 Name = { Eng = "micromol"; Dut = "micromol" }
-                Synonyms = [ "umol"]
+                Synonyms = [ "umol" ]
             }
 
             {
@@ -533,7 +564,11 @@ module Units =
                 Unit = InterNatUnit.mIU
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "miljIE"; Dut = "milj-IE" }
-                Name = { Eng = "millionIE"; Dut = "miljoen-ie" }
+                Name =
+                    {
+                        Eng = "millionIE"
+                        Dut = "miljoen-ie"
+                    }
                 Synonyms = [ "milj.IE"; "milj.E" ]
             }
             {
@@ -541,7 +576,11 @@ module Units =
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "milliIU"; Dut = "milliIE" }
                 Name = { Eng = "milliIU"; Dut = "milliIE" }
-                Synonyms = [ "milli-internationale eenheid"; "mie" ]
+                Synonyms =
+                    [
+                        "milli-internationale eenheid"
+                        "mie"
+                    ]
             }
 
             {
@@ -563,7 +602,11 @@ module Units =
                 Unit = BSA.m2
                 Group = Group.NoGroup
                 Abbreviation = { Eng = "m2"; Dut = "m2" }
-                Name = { Eng = "square meter";  Dut = "vierkante meter" }
+                Name =
+                    {
+                        Eng = "square meter"
+                        Dut = "vierkante meter"
+                    }
                 Synonyms = [ "m^2" ]
             }
 
@@ -662,7 +705,7 @@ module Units =
                 || udt.Name.Dut |> String.equalsCapInsens us
                 || udt.Name.Eng |> String.equalsCapInsens us
                 || udt.Synonyms
-                    |> List.exists (String.equalsCapInsens us)
+                   |> List.exists (String.equalsCapInsens us)
 
             let eqsGroup (udt: UnitDetails) =
                 udt.Group
@@ -670,7 +713,7 @@ module Units =
                 |> String.equalsCapInsens gs
 
             match units
-                    |> List.tryFind (fun udt -> udt |> eqsUnit && udt |> eqsGroup)
+                  |> List.tryFind (fun udt -> udt |> eqsUnit && udt |> eqsGroup)
                 with
             | Some udt -> udt.Unit
             | None -> ValueUnit.generalUnit 1N s
@@ -682,7 +725,8 @@ module Units =
     /// Turn a unit u to a string with
     /// localization loc and verbality verb.
     let toString loc verb u =
-        let gtost u g = u + "[" + (g |> ValueUnit.Group.toString) + "]"
+        let gtost u g =
+            u + "[" + (g |> ValueUnit.Group.toString) + "]"
 
         let rec str u =
             match u with
@@ -1196,7 +1240,9 @@ module ValueUnit =
     /// Create a ValueUnit from a value v
     /// (a bigrational array) and a unit u
     /// Makes sure there are nog duplicates.
-    let create u v = (v |> Array.distinct |> Array.sort, u) |> ValueUnit
+    let create u v =
+        (v |> Array.distinct |> Array.sort, u)
+        |> ValueUnit
 
 
     /// An empty ValueUnit that has no value
@@ -1253,7 +1299,10 @@ module ValueUnit =
     let getValue (ValueUnit (v, _)) = v
 
 
-    let setValue v (ValueUnit(_, u)) = v |> create u
+    let setValue v (ValueUnit (_, u)) = v |> create u
+
+
+    let setSingleValue v = setValue [| v |]
 
 
     /// Get the unit of a ValueUnit
@@ -1277,7 +1326,7 @@ module ValueUnit =
     let isEmpty = getValue >> Array.isEmpty
 
 
-    let isZeroUnit = getUnit >> ((=) ZeroUnit)
+    let hasZeroUnit = getUnit >> ((=) ZeroUnit)
 
 
     /// Check whether a ValueUnit is a single value
@@ -1333,6 +1382,17 @@ module ValueUnit =
     let one u = [| 1N |] |> create u
 
 
+    let setZeroNonNegative vu =
+        if vu |> getUnit = NoUnit then ZeroUnit |> zero
+        else
+            let vu = vu |> filter (fun br -> br > 0N)
+
+            if vu |> isEmpty |> not then
+                vu
+            else
+                vu |> setValue [| 0N |]
+
+
     /// A 'count' unit with n = 1
     let count = 1N |> Times |> Count
 
@@ -1351,7 +1411,7 @@ module ValueUnit =
     /// by the same unitgroups and multipying with count groups.
     let createCombiUnit (u1, op, u2) = // ToDo: need to check if this is correct!!
         match u1, u2 with
-        | NoUnit, NoUnit     -> NoUnit
+        | NoUnit, NoUnit -> NoUnit
         | ZeroUnit, ZeroUnit -> ZeroUnit
         | _ ->
             match op with
@@ -1641,8 +1701,12 @@ module ValueUnit =
 
 
     let eqs vu1 vu2 =
-        let vs1 = vu1 |> toBaseValue |> Array.distinct |> Array.sort
-        let vs2 = vu2 |> toBaseValue |> Array.distinct |> Array.sort
+        let vs1 =
+            vu1 |> toBaseValue |> Array.distinct |> Array.sort
+
+        let vs2 =
+            vu2 |> toBaseValue |> Array.distinct |> Array.sort
+
         vs1 = vs2
 
 
@@ -1742,9 +1806,9 @@ module ValueUnit =
     /// ValueUnit(1, Gram) |> convertTo Milligram
     /// Do not convert to no unit or zerounit
     let convertTo u vu =
-        let _, u_ = vu |> get
+        let _, oldU = vu |> get
 
-        if u = u_ || u = NoUnit || u = ZeroUnit then
+        if u = oldU || u = NoUnit || u = ZeroUnit then
             vu
         else
             vu
@@ -1752,6 +1816,132 @@ module ValueUnit =
             |> create u
             |> toUnitValue
             |> create u
+
+
+    let getBaseValue = toBase >> getValue
+
+
+    let isZero =
+        getValue >> Array.forall ((=) 0N)
+
+    let gtZero =
+        getValue >> Array.forall ((<) 0N)
+
+    let gteZero =
+        getValue >> Array.forall ((<=) 0N)
+
+    let stZero =
+        getValue >> Array.forall ((>) 0N)
+
+    let steZero =
+        getValue >> Array.forall ((>=) 0N)
+
+
+    let minElement vu =
+        if vu |> isEmpty then None
+        else
+            vu
+            |> applyToValue (Array.min >> Array.singleton)
+            |> Some
+
+
+    let maxElement vu =
+        if vu |> isEmpty then None
+        else
+            vu
+            |> applyToValue (Array.max >> Array.singleton)
+            |> Some
+
+
+    let multipleOf f incr vu =
+        vu
+        |> toBase
+        |> applyToValue (fun vs ->
+            let incr =
+                incr |> getBaseValue |> Set.ofArray
+
+            vs |> Array.map (f incr) |> Array.map snd
+        )
+        |> toUnit
+
+
+    let minInclMultipleOf =
+        multipleOf BigRational.minInclMultipleOf
+
+    let minExclMultipleOf =
+        multipleOf BigRational.minExclMultipleOf
+
+
+    let maxInclMultipleOf =
+        multipleOf BigRational.maxInclMultipleOf
+
+    let maxExclMultipleOf =
+        multipleOf BigRational.maxExclMultipleOf
+
+
+    let denominator =
+        getValue >> (Array.map BigRational.denominator)
+
+    let numerator =
+        getValue >> (Array.map BigRational.numerator)
+
+
+    let filter pred =
+        toBase
+        >> applyToValue (Array.filter pred)
+        >> toUnit
+
+    let removeBigRationalMultiples =
+        toBase
+        >> applyToValue (Array.removeBigRationalMultiples)
+        >> toUnit
+
+
+    let intersect vu1 vu2 =
+        vu1
+        |> toBase
+        |> applyToValue (fun vs ->
+            vu2
+            |> getBaseValue
+            |> Set.ofArray
+            |> Set.intersect (vs |> Set.ofArray)
+            |> Set.toArray
+        )
+        |> toUnit
+
+
+    let isSubset vu1 vu2 =
+        let s1 = vu1 |> getBaseValue |> Set.ofArray
+        let s2 = vu2 |> getBaseValue |> Set.ofArray
+        Set.isSubset s1 s2
+
+
+    let containsValue vu2 vu1 =
+        vu2
+        |> toBase
+        |> getValue
+        |> Array.forall (fun v -> vu1 |> toBase |> getValue |> Array.exists ((=) v))
+
+
+    let takeFirst n = applyToValue (Array.take n)
+
+
+    let takeLast n =
+        applyToValue (Array.rev >> Array.take n >> Array.rev)
+
+
+    // ToDo replace with this
+    let valueCount = getValue >> Array.length
+
+
+    let toStr exact =
+        if exact then
+            toStringDutchShort
+            // getValue
+            // >> Array.toReadableString
+            >> String.removeBrackets
+        else
+            toReadableDutchStringWithPrec 3
 
 
     /// Get the user readable string version
@@ -1976,7 +2166,8 @@ module ValueUnit =
                     |> fromString
                     |> setValue v
                     |> Some
-                with | _ -> None
+                with
+                | _ -> None
             else
                 $"%s{dto.Unit}[%s{dto.Group}]"
                 |> Units.fromString
@@ -1991,22 +2182,22 @@ module ValueUnit =
 
 type ValueUnit with
 
-    static member (*) (vu1, vu2) = ValueUnit.calc true (*) vu1 vu2
+    static member (*)(vu1, vu2) = ValueUnit.calc true (*) vu1 vu2
 
-    static member (/) (vu1, vu2) = ValueUnit.calc true (/) vu1 vu2
+    static member (/)(vu1, vu2) = ValueUnit.calc true (/) vu1 vu2
 
-    static member (+) (vu1, vu2) = ValueUnit.calc true (+) vu1 vu2
+    static member (+)(vu1, vu2) = ValueUnit.calc true (+) vu1 vu2
 
-    static member (-) (vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
+    static member (-)(vu1, vu2) = ValueUnit.calc true (-) vu1 vu2
 
-    static member (=?) (vu1, vu2) = ValueUnit.eqs vu1 vu2
+    static member (=?)(vu1, vu2) = ValueUnit.eqs vu1 vu2
 
-    static member (>?) (vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
+    static member (>?)(vu1, vu2) = ValueUnit.cmp (>) vu1 vu2
 
-    static member (<?) (vu1, vu2) = ValueUnit.cmp (<) vu1 vu2
+    static member (<?)(vu1, vu2) = ValueUnit.cmp (<) vu1 vu2
 
-    static member (>=?) (vu1, vu2) = ValueUnit.cmp (>=) vu1 vu2
+    static member (>=?)(vu1, vu2) = ValueUnit.cmp (>=) vu1 vu2
 
-    static member (<=?) (vu1, vu2) = ValueUnit.cmp (<=) vu1 vu2
+    static member (<=?)(vu1, vu2) = ValueUnit.cmp (<=) vu1 vu2
 
-    static member (==>) (vu, u) = vu |> ValueUnit.convertTo u
+    static member (==>)(vu, u) = vu |> ValueUnit.convertTo u

@@ -378,3 +378,8 @@ module BigRational =
             br |> BigRational.ToInt32 |> Int32.toStringNumberNL
         else
             br |> toFloat |> Double.toStringNumberNLWithoutTrailingZeros
+
+
+    let denominator (br: BigRational) = br.Denominator
+
+    let numerator (br: BigRational) = br.Numerator

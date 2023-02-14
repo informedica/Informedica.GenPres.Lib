@@ -455,7 +455,7 @@ let getRule i pat =
 )
 
 
-test child 26
+test child 703
 |> function
 | Ok (pat, ind, (prs, prep, adm)) ->
     [
@@ -473,11 +473,11 @@ startLogger ()
 
 
 child
-|> getRule 26
+|> getRule 703
 |> Api.createDrugOrder //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
-|> Order.applyConstraints |> Order.toString |> List.iter (printfn "%s")
+|> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
 |> Order.solveMinMax true OrderLogger.logger.Logger
 |> function
 | Error (ord, msgs) ->
@@ -489,6 +489,9 @@ child
     // |> printfn "%s"
 
 | Ok ord  ->
+    ord.Orderable.OrderableQuantity
+    |> printfn "%A"
+
     ord
     |> Order.toString
     |> String.concat "\n"
@@ -500,8 +503,8 @@ open Order
 
 try
     let ord =
-        infant
-        |> getRule 7
+        child
+        |> getRule 703
         |> Api.createDrugOrder
         |> DrugOrder.toOrder
         |> Order.Dto.fromDto
@@ -522,7 +525,7 @@ try
         |> mapToEquations mapping
 
     oEqs
-//    |> Solver.mapToSolverEqs
+    |> Solver.mapToSolverEqs
 
 
 
