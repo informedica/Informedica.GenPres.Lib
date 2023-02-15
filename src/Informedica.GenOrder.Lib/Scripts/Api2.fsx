@@ -59,76 +59,6 @@ let test pat n =
 
 
 
-type Age = Patient.Optics.Age
-type Weight = Patient.Optics.Weight
-type Height = Patient.Optics.Height
-
-
-
-let premature =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 1 |> Age.Weeks]
-    |> Patient.Optics.setGestAge [ 32 |> Age.Weeks ]
-    |> Patient.Optics.setWeight (1200 |> Weight.Gram |> Some)
-    |> Patient.Optics.setHeight (45 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "NEO"
-
-
-let newBorn =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 1 |> Age.Weeks]
-    |> Patient.Optics.setWeight (3.5m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (60 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-
-
-let infant =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 1 |> Age.Years]
-    |> Patient.Optics.setWeight (11.5m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (70 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-
-
-let toddler =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 3 |> Age.Years]
-    |> Patient.Optics.setWeight (15m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (90 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-
-
-let child =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 4 |> Age.Years]
-    |> Patient.Optics.setWeight (17m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (100 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-    |> fun p -> { p with Location = CVL}
-
-
-let teenager =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 12 |> Age.Years]
-    |> Patient.Optics.setWeight (40m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (150 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-
-
-let adult =
-    Patient.patient
-
-    |> Patient.Optics.setAge [ 18 |> Age.Years]
-    |> Patient.Optics.setWeight (70m |> Weight.Kilogram |> Some)
-    |> Patient.Optics.setHeight (180 |> Height.Centimeter |> Some)
-    |> Patient.Optics.setDepartment "ICK"
-
 
 let getN pat =
     pat
@@ -182,13 +112,13 @@ let getRule i pat =
 
 
 [
-    premature
-    newBorn
-    infant
-    toddler
-    child
-    teenager
-    adult
+    Patient.premature
+    Patient.newBorn
+    Patient.infant
+    Patient.toddler
+    Patient.child
+    Patient.teenager
+    Patient.adult
 ]
 // |> List.skip 4
 // |> List.take 1
@@ -202,7 +132,7 @@ let getRule i pat =
 
 
 
-test premature 111
+test Patient.premature 111
 |> Array.iter (function
     | Ok (pat, ind, (prs, prep, adm)) ->
         [
@@ -221,7 +151,7 @@ startLogger ()
 stopLogger ()
 
 
-premature
+Patient.premature
 |> getRule 111 //|> Api.evaluate (OrderLogger.logger.Logger)
 |> fun pr -> pr |> Api.createDrugOrder None //(pr.SolutionRules[0] |> Some)  //|> printfn "%A"
 |> DrugOrder.toOrder
@@ -252,7 +182,7 @@ open Order
 
 try
     let ord =
-        child
+        Patient.child
         |> getRule 703
         |> Api.createDrugOrder None
         |> DrugOrder.toOrder
@@ -288,7 +218,7 @@ with
 
 
 let testDto =
-    infant
+    Patient.infant
     |> getRule 5
     |> Api.createDrugOrder None
     |> DrugOrder.toOrder

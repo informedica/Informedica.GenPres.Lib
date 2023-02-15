@@ -8,20 +8,21 @@ module Patient =
     open Informedica.Utils.Lib.BCL
     open Informedica.GenForm.Lib
 
-    type Patient = Informedica.GenForm.Lib.Types.Patient
-    type Access = Informedica.GenForm.Lib.Types.VenousAccess
+    type Patient =Types.Patient
+    type Access = Types.VenousAccess
+
 
     let patient : Patient =
         {
             Department = ""
             Diagnoses = [||]
-            Gender = Gender.AnyGender
+            Gender = AnyGender
             Age = None
             Weight = None
             Height = None
             GestAge = None
             PMAge = None
-            Location = Access.AnyAccess
+            Location = AnyAccess
         }
 
 
@@ -217,5 +218,64 @@ module Patient =
 
 
         let setDepartment = Optic.set Patient.Department_
+
+
+
+    let premature =
+        patient
+        |> setAge [ 1 |> Weeks]
+        |> setGestAge [ 32 |> Weeks ]
+        |> setWeight (1200 |> Gram |> Some)
+        |> setHeight (45 |> Centimeter |> Some)
+        |> setDepartment "NEO"
+
+
+    let newBorn =
+        patient
+        |> setAge [ 1 |> Weeks]
+        |> setWeight (3.5m |> Kilogram |> Some)
+        |> setHeight (60 |> Centimeter |> Some)
+        |> setDepartment "ICK"
+
+
+    let infant =
+        patient
+        |> setAge [ 1 |> Years]
+        |> setWeight (11.5m |> Kilogram |> Some)
+        |> setHeight (70 |> Centimeter |> Some)
+        |> setDepartment "ICK"
+
+
+    let toddler =
+        patient
+        |> setAge [ 3 |> Years]
+        |> setWeight (15m |> Kilogram |> Some)
+        |> setHeight (90 |> Centimeter |> Some)
+        |> setDepartment "ICK"
+
+
+    let child =
+        patient
+        |> setAge [ 4 |> Years]
+        |> setWeight (17m |> Kilogram |> Some)
+        |> setHeight (100 |> Centimeter |> Some)
+        |> setDepartment "ICK"
+        |> fun p -> { p with Location = CVL}
+
+
+    let teenager =
+        patient
+        |> setAge [ 12 |> Years]
+        |> setWeight (40m |> Kilogram |> Some)
+        |> setHeight (150 |> Centimeter |> Some)
+        |> setDepartment "ICK"
+
+
+    let adult =
+        patient
+        |> setAge [ 18 |> Years]
+        |> setWeight (70m |> Kilogram |> Some)
+        |> setHeight (180 |> Centimeter |> Some)
+        |> setDepartment "ICK"
 
 
