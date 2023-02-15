@@ -145,6 +145,7 @@ module OrderLogger =
         | Received of Informedica.GenSolver.Lib.Types.Logging.Message
         | Report
         | Write of string
+        | Stop
 
     // The type for an order logger agent that will
     // catch a message and will process this in an asynchronous way.
@@ -154,6 +155,7 @@ module OrderLogger =
             Logger: Logger
             Report: unit -> unit
             Write : string -> unit
+            Stop : unit -> unit
         }
 
 
@@ -187,6 +189,7 @@ module OrderLogger =
                         let! msg = inbox.Receive ()
 
                         match msg with
+                        | Stop -> return ()
                         | Start (path, level) ->
                             if path.IsSome then System.IO.File.WriteAllText(path.Value, "")
 
@@ -265,7 +268,9 @@ module OrderLogger =
                 fun path ->
                     Write path
                     |> loggerAgent.Post
+            Stop = fun () -> Stop |> loggerAgent.Post
         }
+
 
     // print an order list
     let printScenarios v n (sc : Order list) =

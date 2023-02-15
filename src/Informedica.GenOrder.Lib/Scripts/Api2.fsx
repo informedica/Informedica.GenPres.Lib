@@ -22,8 +22,9 @@ let path = Some $"{__SOURCE_DIRECTORY__}/log.txt"
 let startLogger () =
     // Start the logger at an informative level
     OrderLogger.logger.Start path Logging.Level.Informative
+let stopLogger () = OrderLogger.logger.Stop ()
 
-let stopLogger () = OrderLogger.logger.
+
 
 let test pat n =
     let pr =
@@ -43,7 +44,7 @@ let test pat n =
                 ord
                 |> Order.Print.printPrescription ns
             let p =
-                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.Indication}"
+                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.DoseType} {pr.DoseRule.Indication}"
             Ok (pat, p, o)
         | Error (ord, pr, m) ->
             let o =
@@ -196,8 +197,9 @@ let getRule i pat =
     printfn $"=== Running pat: {pat |> Patient.toString}: {n} ==="
 
     pat
-    |> run 20 //n
+    |> run n
 )
+
 
 
 test child 9
@@ -216,11 +218,11 @@ test child 9
 
 
 startLogger ()
-
+stopLogger ()
 
 child
-|> getRule 13
-|> Api.createDrugOrder None //|> printfn "%A"
+|> getRule 9 |> Api.evaluate (OrderLogger.logger.Logger)
+|> fun pr -> pr |> Api.createDrugOrder (pr.SolutionRules[0] |> Some)  //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
 |> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
@@ -235,8 +237,8 @@ child
     // |> printfn "%s"
 
 | Ok ord  ->
-    ord.Orderable.OrderableQuantity
-    |> printfn "%A"
+//    ord.Orderable.OrderableQuantity
+//    |> printfn "%A"
 
     ord
     |> Order.toString

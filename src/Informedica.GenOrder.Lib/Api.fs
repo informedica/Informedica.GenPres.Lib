@@ -217,17 +217,19 @@ module Api =
                         sbsts
 
                 Ok (ord, pr)
-            | Error _ when retry ->
-                    printfn "trying a second time with manual product"
-                    { pr with
-                        DoseRule =
-                            { pr.DoseRule with
-                                Products =
-                                    pr.DoseRule.Products
-                                    |> Array.choose Product.manual
-                            }
-                    }
-                    |> solve false None
+            | Error (ord, m) when retry ->
+                    if sr |> Option.isSome then Error(ord, pr, m)
+                    else
+                        printfn "trying a second time with manual product"
+                        { pr with
+                            DoseRule =
+                                { pr.DoseRule with
+                                    Products =
+                                        pr.DoseRule.Products
+                                        |> Array.choose Product.manual
+                                }
+                        }
+                        |> solve false None
             | Error (ord, m) -> Error (ord, pr, m)
 
         if rule.SolutionRules |> Array.isEmpty then [| solve true None rule |]
