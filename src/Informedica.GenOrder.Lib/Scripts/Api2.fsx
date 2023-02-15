@@ -215,8 +215,6 @@ with
 
 
 
-
-
 let testDto =
     Patient.infant
     |> getRule 5
@@ -224,6 +222,13 @@ let testDto =
     |> DrugOrder.toOrder
 
 
-testDto.Orderable.DoseCount.Constraints.Vals
 
-(8. * 60. + 26.)/ 928.
+
+Patient.infant
+|> Api.getIndications
+|> Array.iter (printfn "%s")
+
+
+Patient.infant
+|> Api.getGenerics
+|> Array.iter (printfn "%s")

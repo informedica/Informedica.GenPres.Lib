@@ -518,7 +518,8 @@ module DoseRule =
     let private getMember getter (drs : DoseRule[]) =
         drs
         |> Array.map getter
-        |> Array.distinct
+        |> Array.map String.trim
+        |> Array.distinctBy String.toLower
         |> Array.sortBy String.toLower
 
 

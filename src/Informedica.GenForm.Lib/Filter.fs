@@ -38,3 +38,16 @@ module Filter =
         }
 
 
+    let getPatient (filter : Filter) =
+        { Patient.patient with
+            Department = filter.Department |> Option.defaultValue ""
+            Diagnoses = filter.Diagnoses
+            Gender = filter.Gender
+            Age = filter.Age
+            Weight = filter.Weight
+            GestAge = filter.GestAge
+            PMAge = filter.PMAge
+            Location = filter.Location
+        }
+        
+        

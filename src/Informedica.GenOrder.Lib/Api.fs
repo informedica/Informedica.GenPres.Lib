@@ -12,6 +12,34 @@ module Api =
     open Informedica.GenOrder.Lib
 
 
+
+
+    let getIndications = PrescriptionRule.get >> PrescriptionRule.indications
+
+    let getGenerics = PrescriptionRule.get >> PrescriptionRule.generics
+
+    let getRoutes = PrescriptionRule.get >> PrescriptionRule.routes
+
+    let getShapes = PrescriptionRule.get >> PrescriptionRule.shapes
+
+    let getDiagnoses = PrescriptionRule.get >> PrescriptionRule.diagnoses
+
+    let getFrequencies =  PrescriptionRule.get >> PrescriptionRule.shapes
+
+
+    let filterIndictions = PrescriptionRule.filter >> PrescriptionRule.indications 
+
+    let filterGenerics = PrescriptionRule.filter >> PrescriptionRule.generics
+
+    let filterRoutes = PrescriptionRule.filter >> PrescriptionRule.routes
+
+    let filterShapes = PrescriptionRule.filter >> PrescriptionRule.shapes
+
+    let filterDiagnoses = PrescriptionRule.filter >> PrescriptionRule.diagnoses
+
+    let filterFrequencies =  PrescriptionRule.filter >> PrescriptionRule.shapes
+
+
     let tryHead m = (Array.map m) >> Array.tryHead >> (Option.defaultValue "")
 
 
@@ -66,7 +94,6 @@ module Api =
         }
 
 
-
     let setSolutionLimit (sls : SolutionLimit[]) (items : SubstanceItem list) =
         items
         |> List.map (fun item ->
@@ -77,7 +104,6 @@ module Api =
                     Solution = Some sl
                 }
         )
-
 
 
     let createDrugOrder (sr: SolutionRule option) (pr : PrescriptionRule) =
@@ -172,7 +198,6 @@ module Api =
                                 printfn $"couldn't find {s} in parenterals"
                                 ps
                     }
-
 
 
     let evaluate logger (rule : PrescriptionRule) =

@@ -6,10 +6,8 @@ module PrescriptionRule =
     open MathNet.Numerics
 
 
-    let get (pat : Patient) =
-        let filter =
-            Filter.filter
-            |> Filter.setPatient pat
+    let filter (filter : Filter) =
+        let pat = filter |> Filter.getPatient
 
         DoseRule.get ()
         |> DoseRule.filter filter
@@ -30,6 +28,12 @@ module PrescriptionRule =
                         }
             }
         )
+
+
+    let get (pat : Patient) = 
+        Filter.filter
+        |> Filter.setPatient pat
+        |> filter 
 
 
     let filterProducts shapeQuantities
