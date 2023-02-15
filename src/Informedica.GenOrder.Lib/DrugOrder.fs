@@ -340,8 +340,13 @@ module DrugOrder =
         dto.Prescription.Time.Constraints.MaxIncl <- d.Time.Maximum.IsSome
         dto.Prescription.Time.Constraints.Max <- d.Time.Maximum |> Option.bind (createSingleValueUnitDto tu)
 
-        dto.Adjust.Constraints.Min <- (200N /1000N) |> createSingleValueUnitDto au
-        dto.Adjust.Constraints.Max <- 150N |> createSingleValueUnitDto au
+        if au |> String.contains "kg" then 
+            dto.Adjust.Constraints.Min <- 
+                (200N /1000N) |> createSingleValueUnitDto au
+
+        if au |> String.contains "kg" then 
+            dto.Adjust.Constraints.Max <- 150N |> createSingleValueUnitDto au
+    
         dto.Adjust.Constraints.Vals <-
             d.Adjust
             |> Option.bind (createSingleValueUnitDto au)

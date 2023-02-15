@@ -6,7 +6,7 @@
 * [ ] Refactor setting dose values and dose units in DrugOrder
 * [x] Remove calculation of units?
 * [x] Improve error management and printing
-* [ ] Add manual prepared (i.e. no solutions for divisibility of product) generic products
+* [x] Add manual prepared (i.e. no solutions for divisibility of product) generic products
 * [ ] Filter parenteral meds for reconstitution and dilution
 * [ ] Filter prescription rule product list
 * [ ] Create nicely formatted generic product name
@@ -26,11 +26,11 @@
 * [x] Change ValueUnit to ValuesUnit, i.e. multiple values per unit
 * [ ] Differentiate between substance and shape dose
 * [x] Adding continuous drip medications and rules
-* [ ] Improve product divisibility code, for example droplet detection
+* [x] Improve product divisibility code, for example droplet detection
 * [ ] Adding dose check with Z-index
 * [ ] Differentiate between whether or not, try calculation with manual product
 * [ ] Mathematically investigate whether increment calc works with addition and/or subtraction
 * [ ] Maybe add abs max to constraints
 * [x] Rewrite GStand.fs using anonymous records and split functions
 * [ ] Split Optics modules in Optics and AutoOpen SetGet
-* [ ] Fix problem with selecting right solution rule depending on dose
+* [x] Fix problem with selecting right solution rule depending on dose

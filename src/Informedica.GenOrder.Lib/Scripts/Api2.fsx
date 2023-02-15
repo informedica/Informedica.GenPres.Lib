@@ -190,8 +190,8 @@ let getRule i pat =
     teenager
     adult
 ]
-|> List.skip 4
-|> List.take 1
+// |> List.skip 4
+// |> List.take 1
 |> List.iter (fun pat ->
     let n = getN pat
     printfn $"=== Running pat: {pat |> Patient.toString}: {n} ==="
@@ -202,7 +202,7 @@ let getRule i pat =
 
 
 
-test child 9
+test premature 111
 |> Array.iter (function
     | Ok (pat, ind, (prs, prep, adm)) ->
         [
@@ -221,9 +221,9 @@ startLogger ()
 stopLogger ()
 
 
-child
-|> getRule 9 //|> Api.evaluate (OrderLogger.logger.Logger)
-|> fun pr -> pr |> Api.createDrugOrder (pr.SolutionRules[0] |> Some)  //|> printfn "%A"
+premature
+|> getRule 111 //|> Api.evaluate (OrderLogger.logger.Logger)
+|> fun pr -> pr |> Api.createDrugOrder None //(pr.SolutionRules[0] |> Some)  //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto
 |> Order.applyConstraints //|> Order.toString |> List.iter (printfn "%s")
