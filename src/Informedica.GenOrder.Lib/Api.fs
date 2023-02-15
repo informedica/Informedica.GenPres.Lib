@@ -66,6 +66,7 @@ module Api =
         }
 
 
+
     let setSolutionLimit (sls : SolutionLimit[]) (items : SubstanceItem list) =
         items
         |> List.map (fun item ->
@@ -78,7 +79,8 @@ module Api =
         )
 
 
-    let createDrugOrder (sr : SolutionRule option) (pr : PrescriptionRule) =
+
+    let createDrugOrder (sr: SolutionRule option) (pr : PrescriptionRule) =
         let parenteral = Product.Parenteral.get ()
         let au =
             if pr.DoseRule.AdjustUnit |> String.isNullOrWhiteSpace then "kg"
@@ -102,7 +104,7 @@ module Api =
             |> List.singleton
 
         { DrugOrder.drugOrder with
-            Id = Guid.NewGuid().ToString()
+            Id = "1" //Guid.NewGuid().ToString()
             Name = pr.DoseRule.Generic
             Products =
                 pr.DoseRule.Products
@@ -138,7 +140,6 @@ module Api =
                 match sr with
                 | None -> dro
                 | Some sr ->
-//                    printfn "found solutionrule"
                     { dro with
                         Quantities = sr.Volumes |> Array.toList
                         DoseCount = sr.DosePerc.Maximum
@@ -163,7 +164,6 @@ module Api =
                             |> Array.tryFind (fun p -> p.Generic |> String.startsWith s)
                             |> function
                             | Some p ->
-//                                printfn $"adding solution {p.Generic}"
                                 [|p|]
                                 |> createProductComponent true pr.DoseRule.FreqUnit [||]
                                 |> List.singleton
@@ -174,11 +174,66 @@ module Api =
                     }
 
 
-    let evaluate (dr : DrugOrder) =
-        dr
-        |> DrugOrder.toOrder
-        |> Order.Dto.fromDto
-        |> Order.solveMinMax true { Log = ignore }
+
+    let evaluate logger (rule : PrescriptionRule) =
+        let rec solve retry sr pr =
+            pr
+            |> createDrugOrder sr
+            |> DrugOrder.toOrder
+            |> Order.Dto.fromDto
+            |> Order.solveMinMax false logger
+            |> function
+            | Ok ord ->
+                let dto = ord |> Order.Dto.toDto
+
+                let shps =
+                    dto.Orderable.Components
+                    |> List.choose (fun cDto -> cDto.ComponentQuantity.Variable.Vals)
+                    |> List.toArray
+                    |> Array.collect (fun dto -> dto.Value |> Array.map BigRational.fromDecimal)
+
+                let sbsts =
+                    dto.Orderable.Components
+                    |> List.toArray
+                    |> Array.collect (fun cDto ->
+                        cDto.Items
+                        |> List.toArray
+                        |> Array.choose (fun iDto ->
+                            iDto.ComponentConcentration.Variable.Vals
+                            |> Option.map (fun v ->
+                                iDto.Name,
+                                v.Value
+                                |> Array.map BigRational.fromDecimal
+                                |> Array.tryHead
+                            )
+                        )
+                    )
+                    |> Array.distinct
+
+                let pr =
+                    pr
+                    |> PrescriptionRule.filterProducts
+                        shps
+                        sbsts
+
+                Ok (ord, pr)
+            | Error _ when retry ->
+                    printfn "trying a second time with manual product"
+                    { pr with
+                        DoseRule =
+                            { pr.DoseRule with
+                                Products =
+                                    pr.DoseRule.Products
+                                    |> Array.choose Product.manual
+                            }
+                    }
+                    |> solve false None
+            | Error (ord, m) -> Error (ord, pr, m)
+
+        if rule.SolutionRules |> Array.isEmpty then [| solve true None rule |]
+        else
+            rule.SolutionRules
+            |> Array.map (fun sr -> solve true (Some sr) rule)
 
 
     // print an order list
@@ -199,4 +254,6 @@ module Api =
                     Administration = adm
                 }
         )
+
+
 
