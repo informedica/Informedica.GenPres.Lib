@@ -292,7 +292,7 @@ module Types =
                 /// the `DrugOrder` unit
                 Quantities : BigRational list
                 /// The "divisibility" of the products
-                Divisible : BigRational
+                Divisible : BigRational option
                 /// The time unit used for frequency
                 TimeUnit : string
                 /// The time unit used for rate

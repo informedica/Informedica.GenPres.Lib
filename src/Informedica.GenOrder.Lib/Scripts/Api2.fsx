@@ -44,7 +44,7 @@ let test pat n =
                 ord
                 |> Order.Print.printPrescription ns
             let p =
-                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.DoseType} {pr.DoseRule.Indication}"
+                $"{pr.DoseRule.Generic}, {pr.DoseRule.Shape}, {pr.DoseRule.DoseType |> DoseType.toString} {pr.DoseRule.Indication}"
             Ok (pat, p, o)
         | Error (ord, pr, m) ->
             let o =
@@ -220,8 +220,9 @@ test child 9
 startLogger ()
 stopLogger ()
 
+
 child
-|> getRule 9 |> Api.evaluate (OrderLogger.logger.Logger)
+|> getRule 9 //|> Api.evaluate (OrderLogger.logger.Logger)
 |> fun pr -> pr |> Api.createDrugOrder (pr.SolutionRules[0] |> Some)  //|> printfn "%A"
 |> DrugOrder.toOrder
 |> Order.Dto.fromDto

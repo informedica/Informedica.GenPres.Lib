@@ -7,6 +7,7 @@ module Api =
     open System
     open MathNet.Numerics
     open Informedica.Utils.Lib.BCL
+    open Informedica.GenUnits.Lib
     open Informedica.GenForm.Lib
     open Informedica.GenOrder.Lib
 
@@ -39,7 +40,6 @@ module Api =
                 ps
                 |> Array.choose (fun p -> p.Divisible)
                 |> Array.tryHead
-                |> Option.defaultValue 1N
             Substances =
                 if noSubst then []
                 else
@@ -220,13 +220,18 @@ module Api =
             | Error (ord, m) when retry ->
                     if sr |> Option.isSome then Error(ord, pr, m)
                     else
-                        printfn "trying a second time with manual product"
+                        let dose = ord.Orderable.Components[0].Items[0].Dose.Quantity
+                        printfn $"trying a second time with manual product: {dose |> OrderVariable.Quantity.toString}"
                         { pr with
                             DoseRule =
                                 { pr.DoseRule with
-                                    Products =
+                                    Products = 
                                         pr.DoseRule.Products
-                                        |> Array.choose Product.manual
+                                        |> Array.map (fun p ->
+                                            { p with
+                                                Divisible = None
+                                            }
+                                        )
                                 }
                         }
                         |> solve false None

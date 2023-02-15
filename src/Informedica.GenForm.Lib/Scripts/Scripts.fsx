@@ -29,39 +29,6 @@ open Informedica.GenForm.Lib
 
 
 
-Product.get ()
-|> Array.filter (fun p -> p.Generic = "argipressine")
-
-
-Mapping.mappingRouteShape
-
-
-Mapping.filterRouteShapeUnit "INTRAMUSCULAIR" "POEDER VOOR SUSPENSIE VOOR INJECTIE" "stuk"
-
-
-{ Patient.patient with
-    Department = "ICK"
-    Age = 365N * 10N |> Some
-    Weight = 1000N * 30N |> Some
-}
-|> PrescriptionRule.get
-|> Array.filter (fun pr ->
-    pr.DoseRule.Products |> Array.exists (fun p -> p.RequiresReconstitution)
-)
-|> Array.item 1
-|> fun pr ->
-    printfn $"{pr.Patient.Department}, {pr.Patient.Location}"
-    pr.DoseRule
-    |> DoseRule.reconstitute pr.Patient.Department pr.Patient.Location
-
-
-DoseRule.get ()
-|> Array.filter (fun dr ->
-    dr.Generic = "adrenaline"
-)
-
-
-
 { Patient.patient with
     Department = "ICK"
     Age = 365N * 4N |> Some
@@ -69,5 +36,5 @@ DoseRule.get ()
     Location = CVL
 }
 |> PrescriptionRule.get
-|> Array.filter (fun r -> r.DoseRule.Generic = "adrenaline")
+|> Array.filter (fun r -> r.DoseRule.Generic = "acetazolamide")
 |> Array.item 0

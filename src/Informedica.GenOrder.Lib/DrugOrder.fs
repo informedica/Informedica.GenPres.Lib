@@ -85,7 +85,7 @@ module DrugOrder =
             Quantities = []
             TimeUnit = ""
             RateUnit = ""
-            Divisible = 1N
+            Divisible = Some 1N
             Substances = []
         }
 
@@ -230,7 +230,8 @@ module DrugOrder =
                     let cdto = Order.Orderable.Component.Dto.dto d.Id d.Name p.Name p.Shape
 
                     cdto.ComponentQuantity.Constraints.Vals <- p.Quantities |> createValueUnitDto ou
-                    cdto.OrderableQuantity.Constraints.Incr <- 1N / p.Divisible |> createSingleValueUnitDto ou
+                    if p.Divisible.IsSome then
+                        cdto.OrderableQuantity.Constraints.Incr <- 1N / p.Divisible.Value |> createSingleValueUnitDto ou
 
                     cdto.Items <- [
                         for s in p.Substances do
