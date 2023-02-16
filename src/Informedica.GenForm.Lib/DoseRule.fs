@@ -484,6 +484,7 @@ module DoseRule =
                                 Generic = dr.Generic |> Some
                                 Shape = dr.Shape |> Some
                             }
+                                
                 }
             )
 

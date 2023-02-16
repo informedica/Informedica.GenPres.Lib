@@ -193,3 +193,8 @@ module List =
             xs |> replace pred x
         else
             x :: xs
+
+
+    let someIfOne = function
+        | [x] -> Some x
+        | _   -> None

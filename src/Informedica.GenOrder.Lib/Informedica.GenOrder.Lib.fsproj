@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -20,6 +20,7 @@
     <Compile Include="Patient.fs" />
     <Compile Include="OrderLogger.fs" />
     <Compile Include="Api.fs" />
+    <Compile Include="Demo.fs" />
     <None Include="Scripts\load.fsx" />
     <None Include="Scripts\Api2.fsx" />
     <None Include="Scripts\Patient.fsx" />

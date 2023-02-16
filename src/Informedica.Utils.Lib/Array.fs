@@ -62,3 +62,8 @@ module Array =
 
 
     let allEqualToOpt xs = xs |> allEqual Some None
+
+
+    let someIfOne = function
+        | [|x|] -> Some x
+        | _   -> None

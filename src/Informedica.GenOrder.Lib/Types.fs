@@ -332,6 +332,22 @@ module Types =
             }
 
 
+        type ScenarioResult =
+            {
+                Indications: string []
+                Generics: string []
+                Routes: string []
+                Shapes: string []
+                Indication: string option
+                Generic: string option
+                Route: string option
+                Shape: string option
+                Patient: Patient
+                Scenarios: string []
+            }
+
+
+
         module Exceptions =
 
             type Message =

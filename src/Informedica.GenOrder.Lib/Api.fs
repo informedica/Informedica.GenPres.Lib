@@ -130,12 +130,14 @@ module Api =
             |> List.singleton
 
         { DrugOrder.drugOrder with
-            Id = "1" //Guid.NewGuid().ToString()
+            Id = Guid.NewGuid().ToString()
             Name = pr.DoseRule.Generic
             Products =
-                pr.DoseRule.Products
-                |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
-                |> List.singleton
+                if pr.DoseRule.Products |> Array.isEmpty then []
+                else
+                    pr.DoseRule.Products
+                    |> createProductComponent noSubst pr.DoseRule.FreqUnit pr.DoseRule.DoseLimits
+                    |> List.singleton
             Quantities = []
             Frequencies = pr.DoseRule.Frequencies |> Array.toList
             FreqUnit = pr.DoseRule.FreqUnit
@@ -269,9 +271,9 @@ module Api =
 
 
     // print an order list
-    let toScenarios ind sn (sc : Order list) =
-        sc
-        |> List.mapi (fun i o ->
+    let toScenarios ind sn (ords : Order[]) =
+        ords
+        |> Array.mapi (fun i o ->
             o
             |> Order.Print.printPrescription sn
             |> fun (pres, prep, adm) ->
@@ -287,5 +289,5 @@ module Api =
                 }
         )
 
-
+        
 

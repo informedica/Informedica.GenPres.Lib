@@ -131,7 +131,6 @@ let getRule i pat =
 )
 
 
-
 test Patient.premature 111
 |> Array.iter (function
     | Ok (pat, ind, (prs, prep, adm)) ->
@@ -232,3 +231,43 @@ Patient.infant
 Patient.infant
 |> Api.getGenerics
 |> Array.iter (printfn "%s")
+
+
+
+Patient.child
+|> Demo.scenarioResult
+|> Demo.filter
+|> fun scr -> 
+    { scr with
+        Generics = 
+            scr.Generics 
+            |> Array.filter ((=) "cotrimoxazol")
+    }
+|> Demo.filter
+
+
+// failing case
+Patient.adult
+|> PrescriptionRule.get 
+|> Array.filter (fun pr -> pr.DoseRule.Generic = "amfotericine-b-liposomaal")
+|> Array.head 
+|> Api.evaluate OrderLogger.logger.Logger
+
+
+Informedica.ZIndex.Lib.GenPresProduct.search "cotrimoxazol"
+
+
+DoseRule.get ()
+|> Array.filter (fun dr -> dr.Products |> Array.isEmpty)
+|> Array.map (fun dr -> 
+    $"{dr.Generic} {dr.Shape}",
+    Informedica.ZIndex.Lib.GenPresProduct.search dr.Generic
+    |> Array.map (fun gpp -> 
+        $"{gpp.Name |> String.toLower} {gpp.Shape |> String.toLower}"
+    )
+    |> Array.distinct
+    |> String.concat ", "
+)
+|> Array.distinct
+|> Array.sort
+|> Array.iter (fun (g, ns) -> printfn $"{g}:{ns}")
