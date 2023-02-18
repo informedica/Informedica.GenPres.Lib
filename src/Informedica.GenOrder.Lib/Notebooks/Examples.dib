@@ -1,3 +1,7 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","aliases":[]},{"name":".NET","languageName":null,"aliases":[]},{"name":"html","languageName":"HTML","aliases":[]},{"name":"vscode","languageName":null,"aliases":["frontend"]}]}}
+
 #!markdown
 
 # Examples for use of the `Informedica.GenOrder.Lib` library
@@ -16,22 +20,15 @@ open MathNet.Numerics
 open Informedica.GenUnits.Lib
 open Informedica.GenOrder.Lib
 
-open Types
-
-module Units = ValueUnit.Units
-module DrugConstraint = DrugOrder.DrugConstraint
-module Quantity = VariableUnit.Quantity
-
-open OrderLogger
-
 #!markdown
 
 Start up the logger which will retrieve all the calculation messages. This can be used for profiling the calculation code. When the logger start message is send, the logger will start with a clean logging que.
 
 #!fsharp
 
-// Start the logger at an informative level
-logger.Start Level.Informative
+let path = Some $"{__SOURCE_DIRECTORY__}/log.txt"
+
+let logInformative = fun () -> OrderLogger.logger.Start path OrderLogger.Level.Informative
 
 #!markdown
 
@@ -49,6 +46,8 @@ Now define a drug order. In this example a paracetamol suppository with the foll
 The resulting dosing scenarios will then be printed out.
 
 #!fsharp
+
+logInformative ()
 
 // Paracetamol supp example
 // First define the drug order
@@ -83,20 +82,32 @@ The resulting dosing scenarios will then be printed out.
         Route = "rect"
         OrderType = DiscontinuousOrder
 }
-|> DrugOrder.create 
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "paracetamol"
+|> DrugOrder.toConstrainedOrder false
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "paracetamol"
+            Shape = "suppository"
+            Route = "rectal"
+            OrderType = OrderType.DiscontinuousOrder
             Frequencies = [ 2N..4N ]            // Allowed frequencies are 2, 3 or 4 per day
-            SubstanceName = "paracetamol"
-            MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
-            MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
-            MinDoseTotalAdjust = Some 60N       // Min adjusted dose = 40 mg/kg/day
-            MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
+            DoseUnit = "mg"
+            AdjUnit = "kg"
+            TimeUnit = "day"
+            Limits = [
+                {
+                    DrugOrder.DoseRule.limit with
+                        SubstanceName = "paracetamol"
+                        MaxDoseQuantity = Some 1000N        // Max per single dose = 1000 mg
+                        MaxDoseTotal = Some 4000N           // Max daily dose = 4000 mg/day
+                        MinDoseTotalAdjust = Some 40N       // Min adjusted dose = 40 mg/kg/day
+                        MaxDoseTotalAdjust = Some 90N       // Max adjusted daily dose = 90 mg/kg/day
+
+                }
+            ]
     }
-|> DrugOrder.setAdjust "paracetamol" 10N        // Now calculate the scenarios for 10 kg
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["paracetamol"]
+|> DrugOrder.setAdjust "paracetamol" 10N 
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["paracetamol"])
 
 #!markdown
 
@@ -104,8 +115,7 @@ Another paracetemol example. However now we have a paracetamol solution. This me
 
 #!fsharp
 
-logger.Start Level.Informative
-
+logInformative ()
 
 // Paracetamol drink
 {
@@ -138,32 +148,27 @@ logger.Start Level.Informative
         Route = "or"
         OrderType = DiscontinuousOrder
 }
-|> DrugOrder.create
-|> DrugOrder.setAdjust "paracetamol" 8N
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "paracetamol"
+|> DrugOrder.toConstrainedOrder false
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "paracetamol"
             Frequencies = [ 2N ]
-            SubstanceName = "paracetamol"
-            MaxDoseQuantity = Some 1000N
-            MaxDoseTotal = Some 4000N
-            MinDoseTotalAdjust = Some 40N
-            MaxDoseTotalAdjust = Some 90N
+            DoseUnit = "mg"
+            AdjUnit = "kg"
+            TimeUnit = "day"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "paracetamol"
+                    MaxDoseQuantity = Some 1000N
+                    MaxDoseTotal = Some 4000N
+                    MinDoseTotalAdjust = Some 40N
+                    MaxDoseTotalAdjust = Some 90N
+                }                
+            ]
     }
-|> DrugOrder.evaluate logger.Logger
-//|> List.length
-|> printScenarios false ["paracetamol"]
-
-#!markdown
-
-We can also write the logging of all the calculations to a file with the name in the ``fileName`` in the current directory.
-
-#!fsharp
-
-let fileName = "gentamicin.txt"
-
-$"{__SOURCE_DIRECTORY__}/{fileName}"
-|> logger.Write
+|> DrugOrder.setAdjust "paracetamol" 8N
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["paracetamol"])
 
 #!markdown
 
@@ -174,8 +179,7 @@ Now do this for a more complicated example in which a ``Component``, i.e. a prod
 
 #!fsharp
 
-logger.Start Level.Informative
-
+logInformative ()
 
 // Drug with multiple items
 // cotrimoxazol for infection
@@ -189,6 +193,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with 
                         Name = "cotrimoxazol"
                         Quantities = [ 1N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances =
                             [
@@ -219,28 +224,32 @@ logger.Start Level.Informative
         Route = "or"
         OrderType = DiscontinuousOrder
 }
-|> DrugOrder.create
+|> DrugOrder.toConstrainedOrder false
 // setting dose limits for infection
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "cotrimoxazol"
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "cotrimoxazol"
             Frequencies = [ 2N ]
-            SubstanceName = "sulfamethoxazol"
-            MaxDoseTotal = Some 1600N
-            MaxDoseTotalAdjust = Some 30N
+            DoseUnit = "mg"
+            AdjUnit = "kg"
+            TimeUnit = "day"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "sulfamethoxazol"
+                    MaxDoseTotal = Some 1600N
+                    MaxDoseTotalAdjust = Some 30N
+                }
+
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "trimethoprim"
+                    MaxDoseTotal = Some 320N
+                    MaxDoseTotalAdjust = Some 6N
+                }
+            ]
     }
 |> DrugOrder.setAdjust "cotrimoxazol" 10N
-// is not be necessary when a single product is chosen
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "cotrimoxazol"
-            Frequencies = [ 2N ]
-            SubstanceName = "trimethoprim"
-            MaxDoseTotal = Some 320N
-            MaxDoseTotalAdjust = Some 6N
-    }
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["sulfamethoxazol"; "trimethoprim"])
 
 #!markdown
 
@@ -248,7 +257,7 @@ The same *cotrimoxazol* example, but now contained in a drinkable solution.
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // Drug with multiple items
 // cotrimoxazol drink for infection
@@ -292,20 +301,32 @@ logger.Start Level.Informative
         Route = "or"
         OrderType = DiscontinuousOrder
 }
-|> DrugOrder.create
+|> DrugOrder.toConstrainedOrder false
 // setting dose limits for infection
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "cotrimoxazol"
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "cotrimoxazol"
             Frequencies = [ 2N ]
-            SubstanceName = "sulfamethoxazol"
-            MaxDoseTotal = Some 1600N
-            MaxDoseTotalAdjust = Some 30N
+            DoseUnit = "mg"
+            AdjUnit = "kg"
+            TimeUnit = "day"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "sulfamethoxazol"
+                    MaxDoseTotal = Some 1600N
+                    MaxDoseTotalAdjust = Some 30N
+                }
+
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "trimethoprim"
+                    MaxDoseTotal = Some 320N
+                    MaxDoseTotalAdjust = Some 6N
+                }
+            ]
     }
 |> DrugOrder.setAdjust "cotrimoxazol" 10N
-|> DrugOrder.evaluate logger.Logger
-//|> List.length
-|> printScenarios false ["sulfamethoxazol"; "trimethoprim"]
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["sulfamethoxazol"; "trimethoprim"])
 
 #!markdown
 
@@ -317,7 +338,7 @@ But a ``Component`` cannot only have multiple ``Items``, multiple ``Components``
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // Dopamin infusion calculate scenario's 
 // with a number of standard solutions
@@ -326,7 +347,6 @@ logger.Start Level.Informative
         Id = "1"
         Name = "dopamin infusion"
         Quantities = [ 50N ]
-        Divisible = 10N
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"
@@ -337,6 +357,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "dopamin"
                         Quantities = [ 5N ]
+                        Divisible = 10N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -356,6 +377,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "saline"
                         Quantities = [ 5000N ]
+                        Divisible = 10N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -381,18 +403,22 @@ logger.Start Level.Informative
             ]
         OrderType = ContinuousOrder
 }
-|> DrugOrder.create
-|> DrugOrder.setAdjust "dopamin infusion" 3N
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "dopamin infusion"
-            SubstanceName = "dopamin"
-            MinDoseRateAdjust = Some 2N
-            MaxDoseRateAdjust = Some 20N
+|> DrugOrder.toConstrainedOrder false
+// setting dose limits for infection
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "dopamin infusion"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "dopamin"
+                    MinDoseRateAdjust = Some 2N
+                    MaxDoseRateAdjust = Some 20N
+                }
+            ]
     }
-|> DrugOrder.evaluate logger.Logger
-//|> Order.calcScenarios2
-|> printScenarios false ["dopamin"]
+|> DrugOrder.setAdjust "dopamin" 10N
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["dopamin"])
 
 #!markdown
 
@@ -400,7 +426,7 @@ A different way to calculate the same dopamine pump infusion order.
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // Dopamin infusion calculate scenario's 
 // with a a fixed infusion - dose rate
@@ -409,7 +435,6 @@ logger.Start Level.Informative
         Id = "1"
         Name = "dopamin infusion"
         Quantities = [ 50N ]
-        Divisible = 1N
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"
@@ -420,6 +445,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "dopamin"
                         Quantities = [ 5N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -438,6 +464,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "saline"
                         Quantities = [ 5000N ]
+                        Divisible = 1N
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -463,18 +490,22 @@ logger.Start Level.Informative
             ]
         OrderType = ContinuousOrder
 }
-|> DrugOrder.create
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "dopamin infusion"
-            Rates = [ 1N ]
-            SubstanceName = "dopamin"
-            MinDoseRateAdjust = Some 2N
-            MaxDoseRateAdjust = Some 20N
+|> DrugOrder.toConstrainedOrder false
+// setting dose limits for infection
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "dopamin infusion"
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "dopamin"
+                    MinDoseRateAdjust = Some 2N
+                    MaxDoseRateAdjust = Some 20N
+                }
+            ]
     }
-|> DrugOrder.setAdjust "dopamin infusion" 10N
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["dopamin"]
+|> DrugOrder.setAdjust "dopamin" 10N
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["dopamin"])
 
 #!markdown
 
@@ -482,7 +513,7 @@ An even more complicated example is the calculation of gentamicin, an antibiotic
 
 #!fsharp
 
-logger.Start Level.Informative
+logInformative ()
 
 // gentamicin
 {
@@ -490,7 +521,6 @@ logger.Start Level.Informative
         Id = "1"
         Name = "gentamicin"
         Quantities = [ ]
-        Divisible = 1N 
         Unit = "ml"
         TimeUnit = "day"
         Shape = "infusion fluid"
@@ -501,6 +531,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "gentamicin"
                         Quantities = [ 2N; 10N ]
+                        Divisible = 1N 
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -519,6 +550,7 @@ logger.Start Level.Informative
                     DrugOrder.productComponent with
                         Name = "saline"
                         Quantities = [ 5000N ]
+                        Divisible = 1N 
                         TimeUnit = "day"
                         Substances = 
                             [
@@ -545,27 +577,34 @@ logger.Start Level.Informative
             ]
         OrderType = TimedOrder
     }
-|> DrugOrder.create
-|> DrugOrder.setAdjust "gentamicin" (4N)
-|> DrugOrder.setDoseLimits
-    {   DrugOrder.doseLimits with
-            Name = "gentamicin"
-            SubstanceName = "gentamicin"
+|> DrugOrder.toConstrainedOrder false
+|> DrugOrder.setAdjust "gentamicin" 4N
+|> DrugOrder.setDoseRule
+    {   DrugOrder.DoseRule.rule with
+            Medication = "gentamicin"
             Frequencies = [ 1N ]
-            MinDoseTotalAdjust = Some (4N)
-            MaxDoseTotalAdjust = Some (6N)
+            Limits = [
+                { DrugOrder.DoseRule.limit with
+                    SubstanceName = "gentamicin"
+                    MinDoseTotalAdjust = Some 4N
+                    MaxDoseTotalAdjust = Some 6N
+                }                
+            ]
     }
-|> DrugOrder.setSolutionLimits 
-    {
-        DrugOrder.solutionLimits with
-            Name = "gentamicin"
-            Component = "gentamicin"
-//            MinConcentration = Some (1N)
-            MaxConcentration = Some (2N)
-            DoseCount = Some (1N)
-//            MinTime = (Some (1N/2N))
-            MaxTime = (Some (1N/2N))
+|> DrugOrder.setSolutionRule false
+    { DrugOrder.SolutionRule.rule with
+        Medication = "gentamicin"
+        Solutions = ["saline"]
+        Quantities = [5N;10N;20N;50N;100N;200N]
+        RateUnit = "hour"
+        Limits = [
+            { DrugOrder.SolutionRule.limit with
+                SubstanceName = "gentamicin"
+                MinConcentration = Some (1N/10N)
+                MaxConcentration = Some (2N/10N)
+            }
+        ]
 
     }
-|> DrugOrder.evaluate logger.Logger
-|> printScenarios false ["gentamicin"]
+|> DrugOrder.evaluate OrderLogger.logger.Logger      // Now calculate the scenarios for 10 kg
+|> List.map (Order.printPrescription ["gentamicin"])

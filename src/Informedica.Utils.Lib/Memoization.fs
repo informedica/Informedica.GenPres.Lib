@@ -10,11 +10,11 @@ module Memoization =
     let memoize f =
         let cache = ref Map.empty
         fun x ->
-            match (!cache).TryFind(x) with
+            match cache.Value.TryFind(x) with
             | Some r -> r
             | None ->
                 let r = f x
-                cache := (!cache).Add(x, r)
+                cache.Value <- cache.Value.Add(x, r)
                 r
 
 

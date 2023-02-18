@@ -1,112 +1,105 @@
-﻿namespace Informedica.GenSolver.Lib
-
-/// ToDo: should move to Informedica.Utils.Lib
+namespace Informedica.GenSolver.Lib
 
 
-/// Helper functions for `BigRational`
-module BigRational = 
-    
-    open MathNet.Numerics
-    open Informedica.Utils.Lib.BCL.BigRational
-    
-    /// ToDo: doesn't return `NoOp` but fails, 
-    /// have to rewrite
-    /// 
-    /// Match an operator `op` to either
-    /// multiplication, division, addition
-    /// or subtraction, returns `NoOp` when
-    /// the operation is neither.
-    let (|Mult|Div|Add|Subtr|) op =
-        match op with
-        | _ when op |> opIsMult  -> Mult
-        | _ when op |> opIsDiv   -> Div
-        | _ when op |> opIsAdd   -> Add
-        | _ when op |> opIsSubtr -> Subtr
-        | _ -> failwith "Operator is not supported"
+[<AutoOpen>]
+module Utils =
 
-    let private toMultipleOf b d n  =
-        let m = (n / d) |> BigRational.ToBigInt |> BigRational.FromBigInt
-        if b then
-            if m * d < n then (m + 1N) * d else m * d
-        else 
-            if m * d > n then (m - 1N) * d else m * d
+    module Constants =
 
 
-    let toMinMultipleOf = toMultipleOf true
-
-    let toMaxMultipleOf = toMultipleOf false
-
-        
-    let calcMinOrMaxToMultiple isMax isIncl incrs m =
-        incrs
-        |> Set.fold (fun (b, acc) i ->
-            let ec = if isMax then (>=) else (<=)
-            let nc = if isMax then (>) else (<)
-            let ad = if isMax then (-) else (+)
-
-            let m' = 
-                if isMax then m |> toMaxMultipleOf i
-                else m |> toMinMultipleOf i
-                
-            let m' = 
-                if (isIncl |> not) && (m' |> ec <| m) then 
-                    printfn $"recalc because is excl: {(m' |> ad <| i) }"
-                    (m' |> ad <| i) 
-                else m'
-            
-            match acc with 
-            | Some a -> if (m' |> nc <| a) then (true, Some m') else (b, Some a)
-            | None   -> (true, Some m')
-        ) (isIncl, None)
-        |> fun (b, r) -> b, r |> Option.defaultValue m
+        let MAX_LOOP_COUNT = 10
 
 
-    let maxInclMultipleOf = calcMinOrMaxToMultiple true true 
-
-    let maxExclMultipleOf = calcMinOrMaxToMultiple true false 
-
-    let minInclMultipleOf = calcMinOrMaxToMultiple false true
-
-    let minExclMultipleOf = calcMinOrMaxToMultiple false false
+        let MAX_CALC_COUNT = 5000
 
 
-/// Helper functions for `List`
-module List =
-
-    /// Replace an element in a list
-    /// when the `pred` function returns `true`.
-    let replace pred x xs =
-        match xs |> List.tryFindIndex pred with
-        | Some(ind) ->
-            (xs |> Seq.take ind |> Seq.toList) @ [x] @ 
-            (xs |> Seq.skip (ind + 1) |> Seq.toList)
-        | None -> xs
-
-    let distinct xs = xs |> Seq.ofList |> Seq.distinct |> Seq.toList
+        let MAX_BIGINT =
+            999999999999999999999999999999999999999999999999I
 
 
-    let replaceOrAdd pred x xs =
-        if xs |> List.exists pred then
-            xs 
-            |> List.map (fun x' ->
-                if x' |> pred then x else x'
-            )
-        else x::xs
+
+    module BigRational =
+
+        open MathNet.Numerics
 
 
-/// Helper functions for `Array`
-module Array = 
-    
-    let replace pred x xs = 
-        xs 
-        |> Array.toList 
-        |> List.replace pred x
-        |> List.toArray
+        let denominator (br: BigRational) = br.Denominator
+
+        let numerator (br: BigRational) = br.Numerator
 
 
-/// Helper functions for `Option`
-module Option = 
 
-    let none _ = None
+    module Array =
+
+        open Informedica.Utils.Lib.BCL
+
+        let removeBigRationalMultiples xs =
+            if xs |> Array.isEmpty then
+                xs
+            else
+                xs
+                |> Array.fold
+                    (fun acc x1 ->
+                        acc
+                        |> Array.filter (fun x2 -> x1 = x2 || x2 |> BigRational.isMultiple x1 |> not)
+                    )
+                    xs
 
 
+
+    module ValueUnit =
+
+        open MathNet.Numerics
+
+        open Informedica.Utils.Lib
+        open Informedica.Utils.Lib.BCL
+
+        open Informedica.GenUnits.Lib
+        open ValueUnit
+
+
+
+
+        module Operators =
+
+            /// Constant 0
+            let zero =
+                [| 0N |] |> create Units.Count.times
+
+            /// Constant 1
+            let one =
+                [| 1N |] |> create Units.Count.times
+
+            /// Constant 2
+            let two =
+                [| 2N |] |> create Units.Count.times
+
+            /// Constant 3
+            let three =
+                [| 3N |] |> create Units.Count.times
+
+            /// Check whether the operator is subtraction
+            let opIsSubtr op = (three |> op <| two) = three - two // = 1
+
+            /// Check whether the operator is addition
+            let opIsAdd op = (three |> op <| two) = three + two // = 5
+
+            /// Check whether the operator is multiplication
+            let opIsMult op = (three |> op <| two) = three * two // = 6
+
+            /// Check whether the operator is divsion
+            let opIsDiv op = (three |> op <| two) = three / two // = 3/2
+
+
+
+            /// Match an operator `op` to either
+            /// multiplication, division, addition
+            /// or subtraction, returns `NoOp` when
+            /// the operation is neither.
+            let (|Mult|Div|Add|Subtr|) op =
+                match op with
+                | _ when op |> opIsMult -> Mult
+                | _ when op |> opIsDiv -> Div
+                | _ when op |> opIsAdd -> Add
+                | _ when op |> opIsSubtr -> Subtr
+                | _ -> failwith "Operator is not supported"

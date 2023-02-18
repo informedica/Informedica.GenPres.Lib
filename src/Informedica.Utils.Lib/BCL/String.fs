@@ -2,7 +2,8 @@ namespace Informedica.Utils.Lib.BCL
 
 /// Helper functions for `System.String`
 //open System.Security.Cryptography
-module String = 
+[<RequireQualifiedAccess>]
+module String =
 
     open System
     open System.Text.RegularExpressions
@@ -11,34 +12,34 @@ module String =
 
     /// Apply `f` to string `s`
     let apply f (s: string) = f s
-    
+
     /// Utility to enable type inference
     let get = apply id
 
     /// Split string `s` at character `c`
-    let splitAt c s = 
-        s |> NullCheck.nullOrDef (fun s' -> (s' |> get).Split([|c|])) [||] 
-        
+    let splitAt c s =
+        s |> NullCheck.nullOrDef (fun s' -> (s' |> get).Split([|c|])) [||]
+
     let arrayConcat (cs : char[]) = String.Concat(cs)
 
     /// Check if string `s2` contains string `s1`
-    let contains= 
+    let contains=
         NullCheck.nullOrDef2 (fun s1 s2 -> (s2 |> get).Contains(s1)) false
 
     /// Trim string `s`
-    let trim= 
+    let trim=
         NullCheck.nullOrDef (fun s -> (s |> get).Trim()) ""
 
     /// Make string all lower chars
-    let toLower = 
+    let toLower =
         NullCheck.nullOrDef (fun s -> (s |> get).ToLower()) ""
 
     /// Make string all upper chars
-    let toUpper = 
+    let toUpper =
         NullCheck.nullOrDef (fun s -> (s |> get).ToUpper()) ""
 
     /// Get the length of s
-    let length = 
+    let length =
         NullCheck.nullOrDef (fun s -> (s |> get).Length) 0
 
     /// Check if string is null or only white space
@@ -55,11 +56,11 @@ module String =
         NullCheck.nullOrDef3 (fun os ns s -> (s |> get).Replace(os, ns)) ""
 
     /// Convert object to string
-    let toString o = 
+    let toString o =
         o |> NullCheck.nullOrDef (fun o' ->  o'.ToString()) ""
 
     /// Get a substring starting at `start` with length `length`
-    let subString start length = 
+    let subString start length =
         let sub s =
             if start < 0 || s |> String.length < start + length || start + length < 0  then ""
             else
@@ -73,7 +74,7 @@ module String =
     let firstStringChar = subString 0 1
 
     /// Return the rest of a string as a string
-    let restString s = 
+    let restString s =
         if s = "" then ""
         else
             subString 1 ((s |> length) - 1) s
@@ -86,14 +87,14 @@ module String =
     let firstToUpper = firstStringChar >> toUpper
 
     /// Make the first character upper and the rest lower of a string
-    let capitalize s = 
+    let capitalize s =
         if s = "" then ""
         else
             (s |> firstToUpper) + (s |> restString |> toLower)
 
     /// Get all letters as a string list
-    let letters = 
-        ['a'..'z'] @ ['A'..'Z'] 
+    let letters =
+        ['a'..'z'] @ ['A'..'Z']
         |> List.map string
 
     /// Check if a string is a letter
@@ -102,11 +103,11 @@ module String =
     let equals s1 s2 = s1 = s2
 
     /// Check if string `s1` equals `s2` caps insensitive
-    let equalsCapInsens s1 s2 = s1 |> toLower |> trim = (s2 |> toLower |> trim) 
+    let equalsCapInsens s1 s2 = s1 |> toLower |> trim = (s2 |> toLower |> trim)
 
     /// Split a string `s` at string `dels`
-    let split (dels: string) (s: string) = 
-        NullCheck.nullOrDef2 (fun (s': string) (dels': string) -> s'.Split(dels'.ToCharArray()) |> Array.toList) [] s dels
+    let split (dels: string) (s: string) =
+        NullCheck.nullOrDef2 (fun (s': string) (dels': string) -> s'.Split(dels') |> Array.toList) [] s dels
 
     /// Check whether **s1** starts with
     /// **s2** using string comparison **eqs**
@@ -133,13 +134,13 @@ module String =
         if String.IsNullOrEmpty(c) then "Cannot count empty string in text: '" + t + "'" |> failwith
         (c |> regex).Matches(t).Count
 
-    /// Count the number of times that a 
+    /// Count the number of times that a
     /// string t starts with character c
     let countFirstChar c t =
-        let _, count = 
+        let _, count =
             if String.IsNullOrEmpty(t) then (false, 0)
             else
-                t |> Seq.fold(fun (flag, dec) c' -> if c' = c && flag then (true, dec + 1) else (false, dec)) (true, 0) 
+                t |> Seq.fold(fun (flag, dec) c' -> if c' = c && flag then (true, dec + 1) else (false, dec)) (true, 0)
         count
 
 
@@ -151,7 +152,33 @@ module String =
 
 
     let removeTextBetweenBrackets = removeTextBetween "[" "]"
-        
-  
-    let removeBrackets (s: String) = 
+
+
+    let removeBrackets (s: String) =
         (regex "\[[^\]]*]").Replace(s, "")
+
+
+    let removeTrailing chars (s : String) =
+        s
+        |> Seq.rev
+        |> Seq.map string
+        |> Seq.skipWhile (fun c ->
+            chars |> Seq.exists ((=) c)
+        )
+        |> Seq.rev
+        |> String.concat ""
+
+
+    let removeTrailingZerosFromDutchNumber (s : string) =
+        s.Split([|","|], StringSplitOptions.None)
+        |> function
+        | [|n; d|] ->
+            let d = d |> removeTrailing ["0"]
+            n + "," + d
+        | _ -> s
+
+
+    let containsCapsInsens s2 s1 = 
+        let s1 = s1 |> toLower
+        let s2 = s2 |> toLower
+        s1 |> contains s2

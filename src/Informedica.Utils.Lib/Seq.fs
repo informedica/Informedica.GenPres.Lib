@@ -1,6 +1,13 @@
 namespace Informedica.Utils.Lib
 
+
+[<RequireQualifiedAccess>]
 module Seq =
+
+
+
+    let prepend xs1 xs2 = xs1 |> Seq.append xs2
+
 
     let pickSeq pl (xs: 'a seq) =
         match pl with

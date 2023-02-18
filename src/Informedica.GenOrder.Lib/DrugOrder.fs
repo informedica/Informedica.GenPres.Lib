@@ -1,224 +1,59 @@
-﻿namespace Informedica.GenOrder.Lib
+namespace Informedica.GenOrder.Lib
 
 
-// Creating a drug order
 module DrugOrder =
 
     open MathNet.Numerics
     open Informedica.Utils.Lib
+    open Informedica.Utils.Lib.BCL
     open Informedica.GenUnits.Lib
 
+    type MinMax = Informedica.GenForm.Lib.Types.MinMax
 
-    open Types
-
-
-    module OrderType =
-
-        let map (o : Order) =
-            match o.Prescription with
-            | Prescription.Process         -> ProcessOrder
-            | Prescription.Discontinuous _ -> DiscontinuousOrder
-            | Prescription.Continuous      -> ContinuousOrder
-            | Prescription.Timed (_, _)    -> TimedOrder
+    module DoseRule = Informedica.GenForm.Lib.DoseRule
+    module DoseLimit = DoseRule.DoseLimit
+    module MinMax = Informedica.GenForm.Lib.MinMax
 
 
-
-    module RouteShape =
-
-        let mapping = 
-            [
-                "rect", "supp", RectalSolid
-                "rect", "zetpil", RectalSolid
-                "rectaal", "supp", RectalSolid
-                "rectaal", "zetpil", RectalSolid
-                "or", "tablet", OralSolid
-                "or", "pill", OralSolid
-                "or", "pil", OralSolid
-                "or", "capsule", OralSolid
-                "oraal", "tablet", OralSolid
-                "oraal", "pill", OralSolid
-                "oraal", "pil", OralSolid
-                "oraal", "capsule", OralSolid
-                "or", "drink", OralFluid
-                "or", "drank", OralFluid
-                "iv", "infusion fluid", IntravenousFluid
-            ]
-
-        let map route shape =
-            mapping
-            |> List.find (fun (r, s, _) -> r = route && s = shape )
-            |> fun (_, _, x) -> x
+    let createValueUnitDto u br =
+        if u |> String.isNullOrWhiteSpace then None
+        else
+            let vuDto = ValueUnit.Dto.dto()
+            vuDto.Value <- br |> Seq.toArray |> Array.map BigRational.toDecimal
+            vuDto.Unit <- u
+            vuDto |> Some
 
 
-    module DrugConstraint =
-
-        module Name = WrappedString.Name
-        module Mapping = Order.Mapping
-        module Props = Informedica.GenSolver.Lib.Props
-        module Constraint = Informedica.GenSolver.Lib.Constraint
-
-        open Informedica.GenSolver.Lib.Types
-        open Types 
-
-        let create n m p l rs ps = 
-            {
-                Name = n
-                Mapping = m
-                Property = p
-                Limit = l
-                RouteShape = rs
-                OrderType = ps
-            }
+    let createSingleValueUnitDto u br =
+        createValueUnitDto u [| br |]
 
 
-        let mapToConstraint o (dc : DrugConstraint) : Constraint = 
-            {
-                Name = 
-                    Order.mapName dc.Name dc.Mapping o
-                Property = dc.Property
-                Limit = dc.Limit
-            }
+    module MinMax =
 
+        let setConstraints un (brs : BigRational []) (minMax : MinMax) (dto: OrderVariable.Dto.VarDto) =
+            let min =
+                match minMax.Minimum, brs with
+                | None, [|br|] -> br - br / 10N |> Some
+                | _  -> minMax.Minimum
 
-        let toString (c : DrugConstraint) =
-            sprintf "%A %A %A %A" c.Name c.Mapping c.Property
+            let max =
+                match minMax.Maximum, brs with
+                | None, [|br|] -> br + br / 10N |> Some
+                | _  -> minMax.Maximum
 
+            match min with
+            | None -> ()
+            | Some min ->
+                dto.MinIncl <- true
+                dto.Min <- min |> createSingleValueUnitDto un
 
-        let constraints n =
-            let dr =
-                [(1N/10N)..(1N/10N)..10N] 
-                |> List.append [11N..1N..100N]
-                |> List.append [105N..5N..1000N]
-                |> Set.ofList
+            match max with
+            | None -> ()
+            | Some max ->
+                dto.MaxIncl <- true
+                dto.Max <- max |> createSingleValueUnitDto un
 
-            let c m p vs rs ps =
-                create n m p vs rs ps
-            // list of general orderable constraints
-            [
-                // ALL
-                c OrderAdjustQty (MaxInclProp 650N) NoLimit 
-                  AnyRouteShape AnyOrder
-                c OrderAdjustQty (MinInclProp (250N/1000N)) NoLimit 
-                  AnyRouteShape AnyOrder
-                c OrderAdjustQty ((50N/1000N) |> Set.singleton |> IncrProp) NoLimit 
-                  AnyRouteShape AnyOrder
-                // == Oral Solid ==
-                // == Discontinuous ==
-                // give max 10 pieces each time
-                c OrderableDoseQty (MaxInclProp 10N) NoLimit 
-                  OralSolid DiscontinuousOrder
-                // == Rectal Solid ==
-                // == Discontinuous ==
-                // Give 1 piece each time
-                c OrderableDoseQty (MaxInclProp 1N) NoLimit 
-                  RectalSolid DiscontinuousOrder
-                // == Oral Fluid ==
-                // == Discontinuous ==
-                // give the total orderable quantity each time
-                c OrderableDoseCount (1N |> Set.singleton |> ValsProp) NoLimit 
-                    OralFluid DiscontinuousOrder
-                // give max 500 ml each time
-                c OrderableDoseQty (MaxInclProp 500N) NoLimit 
-                  OralFluid DiscontinuousOrder
-                // give max 10 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 10N) NoLimit 
-                  OralFluid DiscontinuousOrder
-                // == Oral Fluid ==
-                // == Timed ==
-                // Give max 500 ml each time
-                c OrderableDoseQty (MaxInclProp 500N) NoLimit
-                  OralFluid TimedOrder
-                // give max 10 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 10N) NoLimit 
-                  OralFluid TimedOrder
-                // == Oral Fluid ==
-                // == Continuous ==
-                // Max dose rate is 200 ml/hour
-                c OrderableDoseRate (MaxInclProp 200N) NoLimit
-                  OralFluid ContinuousOrder
-                // Max dose rate per kg is 5 ml/kg/hour
-                c OrderableDoseRate (MaxInclProp 5N) NoLimit
-                  OralFluid ContinuousOrder
-                // Set dose rate values
-                c OrderableDoseRate (ValsProp dr) NoLimit
-                  OralFluid ContinuousOrder
-                // == Intravenuous Fluid ==
-                // == Discontinuous ==
-                // Give max 1000 ml each time
-                c OrderableDoseQty (MaxInclProp 1000N) NoLimit
-                  IntravenousFluid DiscontinuousOrder
-                // Give max 20 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 20N) NoLimit
-                  IntravenousFluid DiscontinuousOrder
-                // == Intravenuous Fluid ==
-                // == Timed ==
-                // Give max 1000 ml each time
-                c OrderableDoseQty (MaxInclProp 1000N) NoLimit
-                  IntravenousFluid TimedOrder
-                // Give max 20 ml/kg each time
-                c OrderableDoseAdjustQtyAdjust (MaxInclProp 20N) NoLimit
-                  IntravenousFluid TimedOrder
-                // Select 1 possible value from dose rates
-                c OrderableDoseRate (ValsProp dr) (MinLim 10)
-                  IntravenousFluid TimedOrder
-                // == Intravenuous Fluid ==
-                // == Continuous ==
-                // Max dose rate is 200 ml/hour
-                c OrderableDoseRate (MaxInclProp 200N) NoLimit
-                  IntravenousFluid ContinuousOrder
-                // Max dose rate per kg is 5 ml/kg/hour
-                c OrderableDoseRate (MaxInclProp 5N) NoLimit
-                  IntravenousFluid ContinuousOrder
-                // Set dose rate values
-                c OrderableDoseRate (ValsProp dr) NoLimit
-                  IntravenousFluid ContinuousOrder
-            ]
-
-
-
-        let apply log cs (o : Order) =
-            let rs = RouteShape.map o.Route o.Orderable.Shape
-            let ot = o |> OrderType.map
-
-            let propHasVals = function
-            | ValsProp vs
-            | IncrProp vs -> vs |> Set.isEmpty |> not
-            | _ -> true
-
-            let filter cs =
-                cs
-                |> List.filter(fun c ->
-                    (c.Property |> propHasVals) &&
-                    (c.RouteShape = AnyRouteShape || c.RouteShape = rs) &&
-                    (c.OrderType =  AnyOrder      || c.OrderType = ot)
-                )
-
-            let cs = 
-                cs 
-                |> filter
-                |> List.map (mapToConstraint o)
-
-            o
-            |> Order.solveUnits log
-            |> Order.solveConstraints log cs
-            |> fun o -> 
-                Order.calcScenarios log o
-
-
-    module Item = Orderable.Item
-    module IDto = Item.Dto
-    module Component = Orderable.Component
-    module CDto = Component.Dto
-    module ODto = Orderable.Dto
-
-    module Mapping = Order.Mapping
-    module Props = Informedica.GenSolver.Lib.Props
-    module Constraint = Informedica.GenSolver.Lib.Constraint
-    module Name = WrappedString.Name
-
-    open Informedica.GenSolver.Lib.Types
-
-    let (>|>) (cs, o) c = (c |> List.append cs, o)
+            dto
 
 
     let drugOrder =
@@ -228,21 +63,29 @@ module DrugOrder =
             Products = []
             Quantities = []
             Unit = ""
-            TimeUnit = ""
-            RateUnit = "hour"
-            Shape = ""
-            Divisible = 1N
             Route = ""
-            OrderType = ProcessOrder
+            OrderType = AnyOrder
+            Frequencies = []
+            FreqUnit = ""
+            Rates = []
+            RateUnit = ""
+            Time = MinMax.none
+            TimeUnit = ""
+            Dose = None
+            DoseCount = None
+            Adjust = None
+            AdjustUnit = ""
         }
 
 
     let productComponent =
         {
             Name = ""
+            Shape = ""
             Quantities = []
-            TimeUnit = "day"
-            RateUnit = "hour"
+            TimeUnit = ""
+            RateUnit = ""
+            Divisible = Some 1N
             Substances = []
         }
 
@@ -251,479 +94,263 @@ module DrugOrder =
         {
             Name = ""
             Concentrations = []
-            OrderableQuantities = []
             Unit = ""
-            DoseUnit = ""
             TimeUnit = ""
-            RateUnit = ""
+            Dose = None //DoseLimit.limit
+            Solution = None
         }
 
 
     let unitGroup u =
-        ValueUnit.Units.units
-        |> List.filter (fun ud ->
-            ud.Group <> ValueUnit.Group.WeightGroup
-        )
-        |> List.tryFind (fun ud ->
-            [ 
-                ud.Abbreviation.Dut
-                ud.Abbreviation.Eng
-                ud.Name.Dut
-                ud.Name.Eng
-            ]
-            |> List.append ud.Synonyms
-            |> List.exists((=) u)
-        )
-        |> function 
-        | Some ud -> 
-            ud.Group 
-            |> ValueUnit.Group.toString 
-        | None -> "General"
-        |> sprintf "%s[%s]" u
-            
+        if u = "kg" then "kg[Weight]"
+        else
+            Units.units
+            |> List.filter (fun ud ->
+                ud.Group <> Group.WeightGroup
+            )
+            |> List.tryFind (fun ud ->
+                [
+                    ud.Abbreviation.Dut
+                    ud.Abbreviation.Eng
+                    ud.Name.Dut
+                    ud.Name.Eng
+                ]
+                |> List.append ud.Synonyms
+                |> List.exists(String.equalsCapInsens u)
+            )
+            |> function
+            | Some ud ->
+                ud.Group
+                |> ValueUnit.Group.toString
+            | None -> "General"
+            |> sprintf "%s[%s]" u
 
-    let create (d : DrugOrder) : ConstrainedOrder =
+
+    let toOrder (d : DrugOrder) =
+        let toArr = Option.map Array.singleton >> Option.defaultValue [||]
+
+        let standDoseRate un (orbDto : Order.Orderable.Dto.Dto) =
+            orbDto.Dose.Rate.Constraints.Incr <- 1N/10N |> createSingleValueUnitDto un
+            orbDto.Dose.Rate.Constraints.MinIncl <- true
+            orbDto.Dose.Rate.Constraints.Min <- 1N/10N |> createSingleValueUnitDto un
+            orbDto.Dose.Rate.Constraints.MaxIncl <- true
+            orbDto.Dose.Rate.Constraints.Max <- 1000N |> createSingleValueUnitDto un
+
+        // create the units
+        let cu = "x[Count]"
+        let ml = "ml[Volume]"
+
         let ou = d.Unit |> unitGroup
-        let odto = ODto.dto d.Id d.Name d.Shape
+        let au = d.AdjustUnit |> unitGroup
+        let du =
+            match d.Dose with
+            | Some dl -> dl.DoseUnit |> unitGroup
+            | None -> ou
+        let ft = d.FreqUnit |> unitGroup
+        let ru = d.RateUnit |> unitGroup
+        let tu = d.TimeUnit |> unitGroup
 
-        odto.OrderableQuantity.Unit <- ou
-        odto.OrderQuantity.Unit <- ou
-            
+        let ofu = $"{cu}/{ft}"
+        let oru = $"{ml}/{ru}"
+        let ora = $"{ml}/{au}/{ru}"
+        let oda = $"{du}/{au}"
+        let opt = $"{du}/{ft}"
+        let pta = $"{du}/{au}/{ft}"
+
+        let orbDto = Order.Orderable.Dto.dto d.Id d.Name
+
+        orbDto.DoseCount.Constraints.Vals <-
+            d.DoseCount
+            |> Option.bind (createSingleValueUnitDto cu)
+
+        orbDto.OrderableQuantity.Constraints.Vals <- d.Quantities |> createValueUnitDto ou
+
+        let setOrbDoseRate (dl : DoseLimit) =
+            orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Minimum.IsSome
+            orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Minimum |> Option.bind (createSingleValueUnitDto oru)
+            orbDto.Dose.Rate.Constraints.MinIncl <- dl.Rate.Maximum.IsSome
+            orbDto.Dose.Rate.Constraints.Min <- dl.Rate.Maximum |> Option.bind (createSingleValueUnitDto oru)
+
+            orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Minimum.IsSome
+            orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Minimum |> Option.bind (createSingleValueUnitDto ora)
+            orbDto.Dose.RateAdjust.Constraints.MinIncl <- dl.RateAdjust.Maximum.IsSome
+            orbDto.Dose.RateAdjust.Constraints.Min <- dl.RateAdjust.Maximum |> Option.bind (createSingleValueUnitDto ora)
+
+        let setOrbDoseQty (dl : DoseLimit) =
+            orbDto.Dose.Quantity.Constraints.Vals <- dl.NormQuantity |> createValueUnitDto du
+
+            orbDto.Dose.Quantity.Constraints.MinIncl <- dl.Quantity.Minimum.IsSome
+            orbDto.Dose.Quantity.Constraints.Min <- dl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto du)
+            orbDto.Dose.Quantity.Constraints.MaxIncl <- dl.Quantity.Maximum.IsSome
+            orbDto.Dose.Quantity.Constraints.Max <- dl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto du)
+
+            orbDto.Dose.QuantityAdjust.Constraints.MinIncl <- dl.QuantityAdjust.Minimum.IsSome
+            orbDto.Dose.QuantityAdjust.Constraints.Min <- dl.QuantityAdjust.Minimum |> Option.bind (createSingleValueUnitDto oda)
+            orbDto.Dose.QuantityAdjust.Constraints.MaxIncl <- dl.QuantityAdjust.Maximum.IsSome
+            orbDto.Dose.QuantityAdjust.Constraints.Max <- dl.QuantityAdjust.Maximum |> Option.bind (createSingleValueUnitDto oda)
+
+            orbDto.Dose.PerTime.Constraints.MinIncl <- dl.PerTime.Minimum.IsSome
+            orbDto.Dose.PerTime.Constraints.Min <- dl.PerTime.Minimum |> Option.bind (createSingleValueUnitDto opt)
+            orbDto.Dose.PerTime.Constraints.MaxIncl <- dl.PerTime.Maximum.IsSome
+            orbDto.Dose.PerTime.Constraints.Max <- dl.PerTime.Maximum |> Option.bind (createSingleValueUnitDto opt)
+
+            orbDto.Dose.PerTimeAdjust.Constraints.MinIncl <- dl.PerTimeAdjust.Minimum.IsSome
+            orbDto.Dose.PerTimeAdjust.Constraints.Min <- dl.PerTimeAdjust.Minimum |> Option.bind (createSingleValueUnitDto pta)
+            orbDto.Dose.PerTimeAdjust.Constraints.MaxIncl <- dl.PerTimeAdjust.Maximum.IsSome
+            orbDto.Dose.PerTimeAdjust.Constraints.Max <- dl.PerTimeAdjust.Maximum |> Option.bind (createSingleValueUnitDto pta)
+
         match d.OrderType with
         | AnyOrder
         | ProcessOrder -> ()
 
-        | ContinuousOrder ->                
-            odto.DoseRate.Unit <- 
-                d.RateUnit
-                |> unitGroup
-                |> sprintf "%s/%s" ou
-            odto.DoseRateAdjust.Unit <-
-                d.RateUnit
-                |> unitGroup 
-                |> sprintf "%s/kg[Weight]/%s" ou
+        | ContinuousOrder ->
+            orbDto |> standDoseRate oru
 
-        | DiscontinuousOrder ->                
-            odto.DoseTotal.Unit <-
-                d.TimeUnit
-                |> unitGroup
-                |> sprintf "%s/%s" ou
+            match d.Dose with
+            | Some dl -> dl |> setOrbDoseRate
+            | None -> ()
 
-        | TimedOrder ->                
-            odto.DoseTotal.Unit <-
-                d.TimeUnit
-                |> unitGroup
-                |> sprintf "%s/%s" ou
-            odto.DoseRate.Unit <- 
-                d.RateUnit
-                |> unitGroup
-                |> sprintf "%s/%s" ou
-            odto.DoseRateAdjust.Unit <-
-                d.RateUnit
-                |> unitGroup 
-                |> sprintf "%s/kg[Weight]/%s" ou
+        | DiscontinuousOrder ->
+            match d.Dose with
+            | Some dl -> dl |> setOrbDoseQty
+            | None -> ()
 
-        odto.Components <- 
+        | TimedOrder ->
+            orbDto |> standDoseRate oru
+
+            match d.Dose with
+            | Some dl ->
+                dl |> setOrbDoseRate
+                dl |> setOrbDoseQty
+            | None -> ()
+
+        orbDto.Components <-
             [
                 for p in d.Products do
-                    let cdto = CDto.dto d.Id p.Name
+                    let cdto = Order.Orderable.Component.Dto.dto d.Id d.Name p.Name p.Shape
 
-                    cdto.Items <- [ 
+                    cdto.ComponentQuantity.Constraints.Vals <- p.Quantities |> createValueUnitDto ou
+                    if p.Divisible.IsSome then
+                        cdto.OrderableQuantity.Constraints.Incr <- 1N / p.Divisible.Value |> createSingleValueUnitDto ou
+
+                    cdto.Items <- [
                         for s in p.Substances do
                             let su = s.Unit |> unitGroup
-                            let du = s.DoseUnit |> unitGroup
-                            let tu = s.TimeUnit |> unitGroup
+                            let du =
+                                match s.Dose with
+                                | Some dl ->
+                                    if dl.DoseUnit |> String.isNullOrWhiteSpace then su
+                                    else
+                                        dl.DoseUnit |> unitGroup
+                                | None -> ""
 
-                            let idto = IDto.dto d.Id s.Name
+                            let itmDto =
+                                Order.Orderable.Item.Dto.dto d.Id d.Name p.Name s.Name
 
-                            idto.ComponentConcentration.Unit <- 
-                                sprintf "%s/%s" su ou
-                            idto.ComponentQuantity.Unit <- su
+                            itmDto.ComponentConcentration.Constraints.Vals <- s.Concentrations |> createValueUnitDto $"{su}/{ou}"
+
+                            match s.Solution with
+                            | Some sl ->
+                                itmDto.OrderableQuantity.Constraints.MinIncl <- sl.Quantity.Minimum.IsSome
+                                itmDto.OrderableQuantity.Constraints.Min <- sl.Quantity.Minimum |> Option.bind (createSingleValueUnitDto su)
+                                itmDto.OrderableQuantity.Constraints.MaxIncl <- sl.Quantity.Maximum.IsSome
+                                itmDto.OrderableQuantity.Constraints.Max <- sl.Quantity.Maximum |> Option.bind (createSingleValueUnitDto su)
+                                itmDto.OrderableConcentration.Constraints.MinIncl <- sl.Concentration.Minimum.IsSome
+                                itmDto.OrderableConcentration.Constraints.Min <- sl.Concentration.Minimum |> Option.bind (createSingleValueUnitDto $"{su}/{ou}")
+                                itmDto.OrderableConcentration.Constraints.MaxIncl <- sl.Concentration.Maximum.IsSome
+                                itmDto.OrderableConcentration.Constraints.Max <- sl.Concentration.Maximum |> Option.bind (createSingleValueUnitDto $"{su}/{ou}")
+                            | None -> ()
+
+                            let setDoseRate (dl : DoseLimit) =
+                                let dru = $"{du}/{dl.RateUnit |> unitGroup}"
+                                let dra = $"{du}/{au}/{dl.RateUnit |> unitGroup}"
+
+                                itmDto.Dose.Rate.Constraints <-
+                                    itmDto.Dose.Rate.Constraints
+                                    |> MinMax.setConstraints dru dl.NormRate dl.Rate
+
+                                itmDto.Dose.RateAdjust.Constraints <-
+                                    itmDto.Dose.RateAdjust.Constraints
+                                    |> MinMax.setConstraints dra (dl.NormRateAdjust |> toArr) dl.RateAdjust
+
+                            let setDoseQty (dl : DoseLimit) =
+                                    itmDto.Dose.Quantity.Constraints <-
+                                        itmDto.Dose.Quantity.Constraints
+                                        |> MinMax.setConstraints du dl.NormQuantity dl.Quantity
+
+                                    itmDto.Dose.QuantityAdjust.Constraints <-
+                                        itmDto.Dose.QuantityAdjust.Constraints
+                                        |> MinMax.setConstraints $"{du}/{au}" (dl.NormQuantityAdjust |> toArr) dl.QuantityAdjust
+
+                                    itmDto.Dose.PerTime.Constraints <-
+                                        itmDto.Dose.PerTime.Constraints
+                                        |> MinMax.setConstraints $"{du}/{s.TimeUnit |> unitGroup}" dl.NormPerTime dl.PerTime
+
+                                    itmDto.Dose.PerTimeAdjust.Constraints <-
+                                        itmDto.Dose.PerTimeAdjust.Constraints
+                                        |> MinMax.setConstraints $"{du}/{au}/{s.TimeUnit |> unitGroup}" (dl.NormPerTimeAdjust |> toArr) dl.PerTimeAdjust
+
 
                             match d.OrderType with
                             | AnyOrder -> ()
                             | ProcessOrder -> ()
                             | ContinuousOrder ->
-                                idto.DoseRateAdjust.Unit <- 
-                                    sprintf "%s/kg[Weight]/%s" du tu
+                                match s.Dose with
+                                | None    -> ()
+                                | Some dl -> dl |> setDoseRate
+
                             | DiscontinuousOrder ->
-                                idto.DoseQuantity.Unit <- du
-                                idto.DoseTotalAdjust.Unit <- 
-                                    p.TimeUnit
-                                    |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du 
+                                match s.Dose with
+                                | None -> ()
+                                | Some dl -> dl |> setDoseQty
+
                             | TimedOrder ->
-                                idto.DoseQuantity.Unit <- du
-                                idto.DoseTotalAdjust.Unit <- 
-                                    p.TimeUnit
-                                    |> unitGroup
-                                    |> sprintf "%s/kg[Weight]/%s" du 
-                                idto.DoseRateAdjust.Unit <- 
-                                    sprintf "%s/kg[Weight]/%s" du tu
-                                
-                            idto                
+                                match s.Dose with
+                                | None -> ()
+                                | Some dl ->
+                                    dl |> setDoseRate
+                                    dl |> setDoseQty
+                            itmDto
                     ]
 
-                    cdto.OrderableQuantity.Unit <- ou
-                    cdto.OrderableConcentration.Unit <- "x[Count]"
-                    cdto.OrderQuantity.Unit <- ou
-
-                    cdto                        
+                    cdto
             ]
 
-        let dto = 
+        let dto =
             match d.OrderType with
-            | AnyOrder -> 
-                "the order type cannot by 'Any'" 
+            | AnyOrder ->
+                "the order type cannot by 'Any'"
                 |> failwith
             | ProcessOrder ->
-                Order.Dto.``process`` d.Id d.Name d.Shape d.Route
+                "the order type cannot by 'Any'"
+                |> failwith
             | ContinuousOrder ->
-                Order.Dto.continuous d.Id d.Name d.Shape d.Route
+                Order.Dto.continuous d.Id d.Name d.Route []
             | DiscontinuousOrder ->
-                Order.Dto.discontinuous d.Id d.Name d.Shape d.Route
+                Order.Dto.discontinuous d.Id d.Name d.Route []
             | TimedOrder ->
-                Order.Dto.timed d.Id d.Name d.Shape d.Route
+                Order.Dto.timed d.Id d.Name d.Route []
 
-        dto.Orderable <- odto
+        dto.Orderable <- orbDto
 
-        dto.Prescription.Frequency.Unit <- 
-            sprintf "x[Count]/%s" (d.TimeUnit |> unitGroup)
-        dto.Adjust.Unit <- "kg[Weight]"
+        dto.Prescription.Frequency.Constraints.Vals <- d.Frequencies |> createValueUnitDto ofu
 
-        let cstr m p vs rs ot = 
-            DrugConstraint.create d.Name m p vs rs ot
+        dto.Prescription.Time.Constraints.MinIncl <- d.Time.Minimum.IsSome
+        dto.Prescription.Time.Constraints.Min <- d.Time.Minimum |> Option.bind (createSingleValueUnitDto tu)
+        dto.Prescription.Time.Constraints.MaxIncl <- d.Time.Maximum.IsSome
+        dto.Prescription.Time.Constraints.Max <- d.Time.Maximum |> Option.bind (createSingleValueUnitDto tu)
+
+        if au |> String.contains "kg" then 
+            dto.Adjust.Constraints.Min <- 
+                (200N /1000N) |> createSingleValueUnitDto au
+
+        if au |> String.contains "kg" then 
+            dto.Adjust.Constraints.Max <- 150N |> createSingleValueUnitDto au
+    
+        dto.Adjust.Constraints.Vals <-
+            d.Adjust
+            |> Option.bind (createSingleValueUnitDto au)
 
         dto
-        |> Order.Dto.fromDto
-        |> fun o ->
-            // first add all general orderable constraints
-            let co = (DrugConstraint.constraints (o.Orderable.Name |> Name.toString), o)
-            // adding orderable constraints
-            co 
-            >|> [ 
-                    // ALL set possible orderable quantities
-                    cstr OrderableOrderableQty 
-                        (d.Quantities |> Set.ofList |> ValsProp) 
-                        NoLimit
-                        AnyRouteShape AnyOrder
 
-                    // RECTAL SOLID give max 1 piece from rectal solid 
-                    cstr OrderableDoseQty 
-                        (1N |> Set.singleton |> ValsProp) 
-                        NoLimit
-                        RectalSolid DiscontinuousOrder
-
-                    // ORAL SOLID give max 10 pieces from oral solid
-                    cstr OrderableDoseQty 
-                        ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
-                            |> Set.ofList |> ValsProp)
-                        NoLimit
-                        OralSolid DiscontinuousOrder
-
-                    // ORAL FLUID increment
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid DiscontinuousOrder
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        OralFluid ContinuousOrder
-
-                    // INTRAVENUOUS FLUID increment
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid DiscontinuousOrder
-                    cstr OrderableDoseQty 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid TimedOrder
-                    cstr OrderableDoseRate 
-                        ((1N/d.Divisible) |> Set.singleton 
-                                            |> IncrProp)
-                        NoLimit
-                        IntravenousFluid ContinuousOrder
-
-                ]
-        |> fun co ->
-            d.Products
-            |> Seq.fold (fun co p ->
-                let n = p.Name
-                // adding component constraints
-                let co =
-                    co
-                    >|> [ 
-                            // ALL set possible component quantities
-                            DrugConstraint.create n 
-                                ComponentComponentQty 
-                                (p.Quantities |> Set.ofList |> ValsProp) 
-                                NoLimit
-                                AnyRouteShape AnyOrder
-                            // give max 10 solid oral each time
-                            //DrugConstraint.create n 
-                            //    ComponentOrderableQty 
-                            //    ([ 1N / d.Divisible.. 1N / d.Divisible ..10N ]
-                            //     |> Set.ofList |> ValsProp)
-                            //    NoLimit
-                            //    OralSolid DiscontinuousOrder
-                            // give max 
-
-                            // ORAL FLUID
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible.. 1N / d.Divisible ..250N ]
-                                    |> Set.ofList |> ValsProp)
-                                NoLimit
-                                OralFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible]
-                                    |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid DiscontinuousOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                OralFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    OralFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    OralFluid ContinuousOrder
-
-                            // INRAVENOUS FLUID
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible.. 1N / d.Divisible ..500N ]
-                                    |> Set.ofList |> ValsProp)
-                                NoLimit
-                                IntravenousFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                ([ 1N / d.Divisible ]
-                                    |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid AnyOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid DiscontinuousOrder
-                            DrugConstraint.create n 
-                                ComponentDoseQty 
-                                ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                                NoLimit
-                                IntravenousFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    IntravenousFluid TimedOrder
-                            //DrugConstraint.create n 
-                            //    ComponentDoseRate 
-                            //    ([ 1N / d.Divisible ] |> Set.ofList |> IncrProp)
-                            //    NoLimit
-                            //    IntravenousFluid ContinuousOrder
-
-                            // RECTAL SOLID
-                            DrugConstraint.create n 
-                                ComponentOrderableQty 
-                                (1N |> Set.singleton |> ValsProp)  
-                                NoLimit
-                                RectalSolid DiscontinuousOrder
-
-                            // SINGLE COMPONENT
-                            if d.Products |> List.length = 1 then
-                                DrugConstraint.create n
-                                    ComponentOrderableConc
-                                    (1N |> Set.singleton |> ValsProp)  
-                                    NoLimit
-                                    AnyRouteShape AnyOrder
-                        ]
-
-                p.Substances 
-                |> Seq.fold (fun co s ->
-                    let n = s.Name
-                    // adding item constraints
-                    co
-                    >|> [ 
-                            // ALL set concentrations and quanties
-                            DrugConstraint.create n 
-                                ItemComponentConc 
-                                (s.Concentrations |> Set.ofList |> ValsProp) 
-                                NoLimit
-                                AnyRouteShape AnyOrder
-                            DrugConstraint.create n 
-                                ItemOrderableQty 
-                                (s.OrderableQuantities |> Set.ofList |> ValsProp) 
-                                NoLimit
-                                AnyRouteShape AnyOrder
-                            if d.Products |> List.length = 1 then
-                                DrugConstraint.create n
-                                    ItemOrderableConc
-                                    (s.Concentrations |> Set.ofList |> ValsProp) 
-                                    NoLimit
-                                    AnyRouteShape AnyOrder
-                                    
-                        ]
-                ) co
-            ) co
-                
-
-    let doseLimits =
-        {
-            Name = ""
-            Frequencies = []
-            Rates = []
-            SubstanceName = ""
-            MaxDoseQuantity = None
-            MinDoseQuantity = None
-            MinDoseQuantityAdjust = None
-            MaxDoseQuantityAdjust = None
-            MaxDoseTotal = None
-            MinDoseTotal = None
-            MaxDoseTotalAdjust = None
-            MinDoseTotalAdjust = None
-            MaxDoseRate = None
-            MinDoseRate = None
-            MaxDoseRateAdjust = None
-            MinDoseRateAdjust = None
-        }
-
-
-    let solutionLimits =
-        {
-            Name = ""
-            Component = ""
-            MinConcentration = None
-            MaxConcentration = None
-            DoseCount = Some 1N
-            MinTime = None
-            MaxTime = None
-        }
-
-
-    let setDoseLimits (dl : DoseLimits) (co : ConstrainedOrder) : ConstrainedOrder =
-        let sn = dl.SubstanceName
-
-        let cr m c v co =
-            match v with
-            | Some v -> 
-                co
-                >|> [ DrugConstraint.create sn m (c v) NoLimit AnyRouteShape AnyOrder ]
-            | None -> co
-                    
-        co
-        |> function
-        | (cs, o) ->
-            if dl.Rates |> List.isEmpty then (cs, o)
-            else
-                let drc =
-                    DrugConstraint.create dl.Name 
-                        OrderableDoseRate  
-                        (dl.Rates |> Set.ofList |> ValsProp)
-                        NoLimit AnyRouteShape ContinuousOrder 
-                        
-                cs 
-                |> List.replace (fun c -> c.Mapping = OrderableDoseRate &&
-                                            c.OrderType = ContinuousOrder) drc
-                , o
-        >|> [ 
-                DrugConstraint.create dl.Name
-                    PresFreq 
-                    (dl.Frequencies |> Set.ofList |> ValsProp) 
-                    NoLimit AnyRouteShape DiscontinuousOrder 
-                DrugConstraint.create dl.Name 
-                    PresFreq  
-                    (dl.Frequencies |> Set.ofList |> ValsProp)
-                    NoLimit AnyRouteShape TimedOrder 
-            ]
-        |> cr ItemDoseQty MaxInclProp dl.MaxDoseQuantity
-        |> cr ItemDoseQty MinInclProp dl.MinDoseQuantity
-        |> cr ItemDoseAdjustQtyAdjust MaxInclProp dl.MaxDoseQuantityAdjust
-        |> cr ItemDoseAdjustQtyAdjust MinInclProp dl.MinDoseQuantityAdjust
-        |> cr ItemDoseTotal MaxInclProp dl.MaxDoseTotal
-        |> cr ItemDoseTotal MinInclProp dl.MinDoseTotal
-        |> cr ItemDoseAdjustTotalAdjust MaxInclProp dl.MaxDoseTotalAdjust
-        |> cr ItemDoseAdjustTotalAdjust MinInclProp dl.MinDoseTotalAdjust
-        |> cr ItemDoseRate MaxInclProp dl.MaxDoseRate
-        |> cr ItemDoseRate MinInclProp dl.MinDoseRate
-        |> cr ItemDoseAdjustRateAdjust MaxInclProp dl.MaxDoseRateAdjust
-        |> cr ItemDoseAdjustRateAdjust MinInclProp dl.MinDoseRateAdjust
-
-
-    let setSolutionLimits (sl : SolutionLimits) 
-                            (co : ConstrainedOrder) : ConstrainedOrder =
-        let (_, o) = co
-        let set n m c v co =
-            match v with
-            | Some v -> 
-                co
-                >|> [ DrugConstraint.create n m (c v) NoLimit AnyRouteShape AnyOrder ]
-            | None -> co
-
-        co
-        >|> [
-                if sl.DoseCount |> Option.isSome then
-                    DrugConstraint.create 
-                        sl.Name 
-                        OrderableDoseCount 
-                        (sl.DoseCount |> Option.get |> Set.singleton |> ValsProp) 
-                        NoLimit AnyRouteShape AnyOrder
-            ]
-        |> set sl.Name ItemOrderableConc MinInclProp sl.MinConcentration
-        |> set sl.Name ItemOrderableConc MaxInclProp sl.MaxConcentration
-        |> set sl.Name PresTime MinInclProp sl.MinTime
-        |> set sl.Name PresTime MaxInclProp sl.MaxTime
-
-
-
-    let setAdjust n a (co : ConstrainedOrder) : ConstrainedOrder =
-        co
-        >|> [ 
-                DrugConstraint.create 
-                    n 
-                    OrderAdjustQty 
-                    (a |> Set.singleton |> ValsProp) 
-                    NoLimit
-                    AnyRouteShape AnyOrder 
-            ]
-
-
-    let evaluate log (co : ConstrainedOrder) =
-        let (cs, o) = co
-
-        DrugConstraint.apply log cs o
 

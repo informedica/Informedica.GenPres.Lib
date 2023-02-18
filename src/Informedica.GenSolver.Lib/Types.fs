@@ -1,123 +1,93 @@
-﻿namespace Informedica.GenSolver.Lib
+namespace Informedica.GenSolver.Lib
 
-open System
-open MathNet.Numerics
 
-module Types =
+[<AutoOpen>]
+module rec Types =
+
+    open System
+    open MathNet.Numerics
+
+    open Informedica.GenUnits.Lib
 
     /// Represents a non empty/null string identifying a `Variable`.
-    /// `Name` can be no longer than 1000 characters.
+    /// `Name` can be no longer than 1000 characters and cannot be
+    /// a null string
     type Name = Name of string
 
 
     /// The minimal value in
-    /// a `Range`. Can be inclusive
+    /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Minimum =
-        | MinIncl of BigRational
-        | MinExcl of BigRational
+        | MinIncl of ValueUnit
+        | MinExcl of ValueUnit
 
 
     /// The maximum value in
-    /// a `Range`. Can be inclusive
+    /// a `ValueRange`. Can be inclusive
     /// or exclusive.
     type Maximum =
-        | MaxIncl of BigRational
-        | MaxExcl of BigRational
+        | MaxIncl of ValueUnit
+        | MaxExcl of ValueUnit
 
 
-    /// The increment in a `Range`. This is the set of multiples by which each
-    /// value in a `ValueRange` must be divisible. 
-    /// So for each value in valuerange there is an incr -> value % incr = 0
-    ///
-    /// An increment cannnot be zero or negative.   
-    type Increment = Increment of Set<BigRational>
+    type ValueSet = ValueSet of ValueUnit
 
 
-    /// `ValueRange` represents a discrete set of
-    /// rational numbers.
-    /// A `ValueRange` is either unrestricted,
-    /// a finite set of `BigRational` or a `Range`.
-    ///
-    /// Notation:
-    /// * Unrestricted: <..>
-    /// * ValueSet: [1N/2N, 2N, 3N/5N, 5N]
-    /// * Range: <0N..[2N,3N]..20N] 
+    type Increment = Increment of ValueUnit
+
+
+    /// `ValueRange` represents a domain of
+    /// rational numbers. A `ValueRange` can be either
+    /// - `Unrestricted`: any rational number
+    /// - `Increment`: any number that is a multiple of an increment
+    /// - `Min`: have a minimum
+    /// - `MinIncrement`: a minimum with the domain consisting of multiples of one increment
+    /// - `Max`: have a maximum
+    /// - `IncrementMax`: a domain of multiples of an increment with a maximum
+    /// - `MinMax`: have both a minimum and maximum
     type ValueRange =
         | Unrestricted
-        | ValueSet of Set<BigRational>
-        | Range of Range
-
-
-    /// A `Range` is restricted by either a
-    /// `Minimum`, a `Maximum`, a `Minimum`
-    /// and a increment, an increment and
-    /// a `Maximum` or a `Minimum` and a
-    /// `Maximum`. 
-    and Range =
+        | NonZeroNoneNegative
         | Min of Minimum
         | Max of Maximum
-        | MinIncr of Minimum * Increment
-        | IncrMax of Increment * Maximum
-        | MinMax  of Minimum * Maximum
-        | MinIncrMax of Minimum * Increment * Maximum
-
+        | MinMax of Minimum * Maximum
+        | Incr of Increment
+        | MinIncr of min: Minimum * incr: Increment
+        | IncrMax of incr: Increment * max: Maximum
+        | MinIncrMax of min: Minimum * incr: Increment * max: Maximum
+        | ValSet of ValueSet // Set<BigRational>
 
     /// Represents a variable in an
     /// `Equation`. The variable is
     /// identified by `Name` and has
-    /// a `Values` that are either
-    /// `Unrestricted` or restricted by
-    /// a `ValueSet` or a `Range`.
-    type Variable =
-        {
-            Name: Name
-            Values: ValueRange
-        }
+    /// a `Values` described by the
+    /// `ValueRange`.
+    type Variable = { Name: Name; Values: ValueRange }
 
+    /// Represents a property of a `Variable`.
+    type Property =
+        | MinProp of Minimum
+        | MaxProp of Maximum
+        | IncrProp of Increment
+        | ValsProp of ValueSet
 
     /// An equation is either a `ProductEquation`
     /// or a `Sumequation`, the first variable is the
-    /// dependent variable, i.e. the result of the 
+    /// dependent variable, i.e. the result of the
     /// equation, the second part are the independent
     /// variables in the equation
-    type Equation = 
+    type Equation =
         | ProductEquation of Variable * Variable list
-        | SumEquation     of Variable * Variable list
-
+        | SumEquation of Variable * Variable list
 
     /// The `Result` of solving an `Equation`
-    /// is that either the `Equation` is the 
+    /// is that either the `Equation` is the
     /// same or has `Changed`.
-    type Result =
-        | UnChanged
-        | Changed   of Variable list
-
-
-    /// Represents a property of a `Variable`.
-    ///
-    /// * `Vals`: A set of distinct values
-    /// * `Increment`: A set of distinct increments
-    /// * `MinIncl`: An inclusive minimum
-    /// * `MinExcl`: An exclusive minimum
-    /// * `MaxIncl`: An inclusive maximum
-    /// * `MaxExcl`: An exclusive maximum
-    type Property =
-        | ValsProp of BigRational Set
-        | IncrProp of BigRational Set
-        | MinInclProp of BigRational
-        | MinExclProp of BigRational
-        | MaxInclProp of BigRational
-        | MaxExclProp of BigRational
-
-
-    /// A limitation of the maximum number
-    /// of values to use as a constraint
-    type Limit = 
-        | MinLim of int
-        | MaxLim of int
-        | MinMaxLim of (int * int)
-        | NoLimit
+    type SolveResult =
+        | Unchanged
+        | Changed of List<Variable * Property Set>
+        | Errored of Exceptions.Message list
 
 
     /// Represents a constraint on a `Variable`.
@@ -125,59 +95,72 @@ module Types =
     /// or a minimum of maximum.
     type Constraint =
         {
-            Name : Name
-            Property : Property
-            Limit : Limit
+            Name: Name
+            Property: Property
         }
+
+
+    module Exceptions =
+
+        type Message =
+            | NameNullOrWhiteSpaceException
+            | NameLongerThan1000 of name: string
+            | ValueRangeMinLargerThanMax of Minimum * Maximum
+            | ValueRangeNotAValidOperator
+            | ValueRangeEmptyValueSet
+            | ValueRangeTooManyValues of valueCount: int
+            | ValueRangeEmptyIncrement
+            | ValueRangeMinOverFlow of Minimum
+            | ValueRangeMaxOverFlow of Maximum
+            | ValueRangeMinMaxException of string
+            | VariableCannotSetValueRange of Variable * ValueRange
+            | VariableCannotCalcVariables of
+                v1: Variable *
+                op: (ValueRange -> ValueRange -> ValueRange) *
+                v2: Variable
+            | EquationDuplicateVariables of duplicateVars: Variable list
+            | EquationEmptyVariableList
+            | ConstraintVariableNotFound of Constraint * Equation list
+            | SolverInvalidEquations of Equation list
+            | SolverTooManyLoops of loopCount : int * Equation list
+            | SolverErrored of loopCount: int * Message list * Equation list
 
 
     module Events =
 
         type Event =
-        | EquationCouldNotBeSolved of Equation
-        | EquationStartedCalculation of Variable list
-        | EquationStartedSolving of Equation
-        | EquationFinishedCalculation of Variable list * Variable list
-        | EquationVariableChanged of Variable
-        | EquationFinishedSolving of Variable list
-        | EquationLoopedSolving of bool * Variable * Variable list * Variable list
-        | SolverLoopedQue of Equation list
-        | ConstraintSortOrder of (int * Constraint) list
-        | ConstraintVariableNotFound of Constraint * Equation list
-        | ConstraintLimitSetToVariable of Limit * Variable
-        | ConstraintVariableApplied of Constraint * Variable
-        | ConstrainedEquationsSolved of Constraint * Equation list
-        | ApiSetVariable of Variable * Equation list
-        | ApiEquationsSolved of Equation list
-        | ApiAppliedConstraints of Constraint list * Equation list
-
-    
-    module Exceptions =
-
-        type Message =
-        | NameNullOrWhiteSpaceException
-        | NameLongerThan1000 of string
-        | IncrementZeroNegativeOrEmpty of BigRational Set
-        | ValueRangeMinLargerThanMax of Minimum * Maximum
-        | ValueRangeNotAValidOperator
-        | ValueRangeEmptyValueSet
-        | VariableCannotSetValueRange of (Variable * ValueRange)
-        | EquationDuplicateVariables of Variable list
-        | EquationEmptyVariableList 
-        | SolverInvalidEquations of Equation list
+            | EquationStartedSolving of Equation
+            | EquationStartCalculation of
+                op1: (Variable -> Variable -> Variable) *
+                op2: (Variable -> Variable -> Variable) *
+                x: Variable *
+                y: Variable *
+                xs: Variable List
+            | EquationFinishedCalculation of Variable list * changed : bool
+            | EquationCouldNotBeSolved of Equation
+            | EquationFinishedSolving of Equation * SolveResult
+            | SolverStartSolving of Equation list
+            | SolverLoopedQue of loopCount: int * Equation list
+            | SolverFinishedSolving of Equation list
+            | ConstraintSortOrder of (int * Constraint) list
+            | ConstraintApplied of Constraint
+            | ConstrainedSolved of Constraint
 
 
     module Logging =
 
+        type IMessage =
+            interface
+            end
 
-        type IMessage = interface end
+
         type TimeStamp = DateTime
 
 
         type Level =
             | Informative
-            | Debug
             | Warning
+            | Debug
             | Error
 
 
@@ -189,14 +172,10 @@ module Types =
 
         type Message =
             {
-                TimeStamp : TimeStamp
-                Level : Level
-                Message : IMessage
+                TimeStamp: TimeStamp
+                Level: Level
+                Message: IMessage
             }
 
-    
-        type Logger =   
-            {
-                Log : Message -> unit
-            }
 
+        type Logger = { Log: Message -> unit }

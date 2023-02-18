@@ -1,18 +1,16 @@
 namespace Informedica.GenUnits.Lib
 
+
 module Parser =
 
     open MathNet.Numerics
-
     open Informedica.Utils.Lib.BCL
-
     open FParsec
-    open ValueUnit
 
 
     let setUnitValue u v =
         u
-        |> apply (fun _ -> v)
+        |> ValueUnit.apply (fun _ -> v)
 
 
     let ws =
@@ -39,7 +37,7 @@ module Parser =
             opt pfloat
             .>> ws
             .>>. p
-            |>> (fun (f, u) -> f |> Option.bind BigRational.fromFloat, u)
+            |>> (fun (f, u) -> f |> Option.map (decimal >> BigRational.fromDecimal), u)
 
 
     let pCombiUnit units =  sepBy1 (pUnit units) (ws >>. (pchar '/') .>> ws)
@@ -73,13 +71,13 @@ module Parser =
                         | None   -> 1N |> tu
                     )
                     |> List.rev
-                    |> List.reduce per
+                    |> List.reduce ValueUnit.per
                     |> ValueUnit.create
-                    |> fun f -> f br
+                    |> fun f -> f  [|br|]
                     |> Some
                 | None -> None
             | Failure (msg, _, _) ->
-                printfn "parsing failure: %s" msg
+                printfn $"parsing failure: %s{msg}"
                 None
 
     let parse = parseWitUnits Units.units

@@ -15,7 +15,7 @@ open ValueUnit
 // using kg as a weight
 let parse =
     let exclude u (ud : Units.UnitDetails) = ud.Unit <> u
-    ValueUnit.Units.units
+    Units.units
     // leave out kg as mass so only kg as weigh is recognized
     |> List.filter (exclude Units.Mass.kiloGram)
     // leave out gr as weight to avoid confusion with gr as mass
@@ -37,7 +37,7 @@ let parse =
 // fix calculation count when combining units
 "1 g/100 mg"
 |> parse
-|> Option.map (fun vu -> vu * (1N |> create count))
+|> Option.map (fun vu -> vu * ([|1N|] |> create count))
 
 "10 gram/dag"
 |> parse
@@ -54,7 +54,7 @@ let oneMg = "4000 mg" |> parse |> Option.get
 let onePerDay = "1 x / day" |> parse |> Option.get
 
 oneMg * onePerDay
-|> ValueUnit.toBase
+|> ValueUnit.toBaseValue
 
 
 

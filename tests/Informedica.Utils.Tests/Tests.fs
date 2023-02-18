@@ -1,11 +1,21 @@
-module Tests
+namespace Informedica.Utils.Tests
 
+
+
+
+module Tests =
+
+    open System
     open Expecto
+    open Expecto.Flip
+    open Informedica.Utils.Lib.BCL
+    open Informedica.Utils.Lib
 
-    [<Tests>]
-    let test =
-        testCase "Hello World" <| fun _ ->
-            Expect.isTrue true "This is true"
+    let testHelloWorld =
+        test "hello world test" {
+            "Hello World"
+            |> Expect.equal "Strings should be equal" "Hello World"
+        }
 
 
     module String =
@@ -59,7 +69,7 @@ module Tests
                     null
                     |> String.capitalize
                     |> equals "" "returns an empty string"
-                }    
+                }
 
                 test "capitalize of hello world" {
                     "hello world"
@@ -149,13 +159,13 @@ module Tests
                     null
                     |> String.subString 0 1
                     |> equals "" "returns an empty string"
-                }    
+                }
 
                 test "subString of an empty string will yield" {
                     ""
                     |> String.subString 0 1
                     |> equals "" "returns an empty string"
-                }    
+                }
 
                 test "subString 0 1 of abc string will yield" {
                     "abc"
@@ -275,8 +285,8 @@ module Tests
 
             let equals exp txt res = Expect.equal res exp txt
 
-            let config = 
-                { FsCheckConfig.defaultConfig with 
+            let config =
+                { FsCheckConfig.defaultConfig with
                     maxTest = 10000 }
 
             testList "Double" [
@@ -307,7 +317,7 @@ module Tests
                     else
                         a
                         |> Double.getPrecision n
-                        |> (fun x -> 
+                        |> (fun x ->
                             if a |> abs < 0. && x < n then
                                 printfn "decimals %i < precision %i for value %f" x n a
                                 false
@@ -319,7 +329,7 @@ module Tests
                     else
                         a
                         |> Double.getPrecision n
-                        |> (fun x -> 
+                        |> (fun x ->
                             if n < 0 then
                                 x = (a |> Double.getPrecision 0)
                             else true
@@ -327,123 +337,123 @@ module Tests
 
                 // * 66.666 |> Double.getPrecision 1 = 0
                 test "66.666 |> Double.getPrecision 1 = 0" {
-                    66.666 |> Double.getPrecision 1 
-                    |> equals 0 ""            
+                    66.666 |> Double.getPrecision 1
+                    |> equals 0 ""
                 }
 
                 // * 6.6666 |> Double.getPrecision 1 = 0
                 test "6.6666 |> Double.getPrecision 1 = 0" {
-                    6.6666 |> Double.getPrecision 1 
-                    |> equals 0 ""            
+                    6.6666 |> Double.getPrecision 1
+                    |> equals 0 ""
                 }
 
                 // * 0.6666 |> Double.getPrecision 1 = 1
                 test "6.6666 |> Double.getPrecision 1 = 1" {
-                    0.6666 |> Double.getPrecision 1 
-                    |> equals 1 ""            
+                    0.6666 |> Double.getPrecision 1
+                    |> equals 1 ""
                 }
 
                 // * 0.0666 |> Double.getPrecision 1 = 2
                 test "0.0666 |> Double.getPrecision 1 = 2" {
                     0.0666 |> Double.getPrecision 1
-                    |> equals 2 ""            
+                    |> equals 2 ""
                 }
 
                 // * 0.0666 |> Double.getPrecision 0 = 0
                 test "0.0666 |> Double.getPrecision 0 = 0" {
                     0.0666 |> Double.getPrecision 0
-                    |> equals 0 ""            
+                    |> equals 0 ""
                 }
 
                 // * 0.0666 |> Double.getPrecision 2 = 3
                 test "0.0666 |> Double.getPrecision 2 = 3" {
                     0.0666 |> Double.getPrecision 2
-                    |> equals 3 ""            
+                    |> equals 3 ""
                 }
 
                 // * 0.0666 |> Double.getPrecision 3 = 4
                 test "0.0666 |> Double.getPrecision 3 = 4" {
                     0.0666 |> Double.getPrecision 3
-                    |> equals 4 ""            
+                    |> equals 4 ""
                 }
 
                 // * 6.6666 |> Double.getPrecision 0 = 0
                 test "6.6666 |> Double.getPrecision 0 = 0" {
                     6.6666 |> Double.getPrecision 0
-                    |> equals 0 ""            
+                    |> equals 0 ""
                 }
 
                 // * 6.6666 |> Double.getPrecision 2 = 1
                 test "6.6666 |> Double.getPrecision 2 = 1" {
                     6.6666 |> Double.getPrecision 2
-                    |> equals 1 ""            
+                    |> equals 1 ""
                 }
 
                 // * 6.6666 |> Double.getPrecision 3 = 2
                 test "6.6666 |> Double.getPrecision 3 = 2" {
                     6.6666 |> Double.getPrecision 3
-                    |> equals 2 ""            
+                    |> equals 2 ""
                 }
 
 
                 // * 66.666 |> Double.fixPrecision 1 = 67
                 test "66.666 |> Double.fixPrecision 1 = 67" {
-                    66.666 |> Double.fixPrecision 1 
-                    |> equals 67. ""            
+                    66.666 |> Double.fixPrecision 1
+                    |> equals 67. ""
                 }
 
                 // * 6.6666 |> Double.fixPrecision 1 = 7
                 test "6.6666 |> Double.fixPrecision 1 = 7" {
-                    6.6666 |> Double.fixPrecision 1 
-                    |> equals 7. ""            
+                    6.6666 |> Double.fixPrecision 1
+                    |> equals 7. ""
                 }
 
                 // * 0.6666 |> Double.fixPrecision 1 = 0.7
                 test "6.6666 |> Double.fixPrecision 1 = 0.7" {
-                    0.6666 |> Double.fixPrecision 1 
-                    |> equals 0.7 ""            
+                    0.6666 |> Double.fixPrecision 1
+                    |> equals 0.7 ""
                 }
 
                 // * 0.0666 |> Double.fixPrecision 1 = 0.07
                 test "0.0666 |> Double.fixPrecision 1 = 0.07" {
                     0.0666 |> Double.fixPrecision 1
-                    |> equals 0.07 ""            
+                    |> equals 0.07 ""
                 }
 
                 // * 0.0666 |> Double.fixPrecision 0 = 0
                 test "0.0666 |> Double.fixPrecision 0 = 0" {
                     0.0666 |> Double.fixPrecision 0
-                    |> equals 0. ""            
+                    |> equals 0. ""
                 }
 
                 // * 0.0666 |> Double.fixPrecision 2 = 0.067
                 test "0.0666 |> Double.fixPrecision 2 = 0.067" {
                     0.0666 |> Double.fixPrecision 2
-                    |> equals 0.067 ""            
+                    |> equals 0.067 ""
                 }
 
                 // * 0.0666 |> Double.fixPrecision 3 = 0.0666
                 test "0.0666 |> Double.fixPrecision 3 = 0.0666" {
                     0.0666 |> Double.fixPrecision 3
-                    |> equals 0.0666 ""            
+                    |> equals 0.0666 ""
                 }
 
                 // * 6.6666 |> Double.fixPrecision 0 = 7
                 test "6.6666 |> Double.fixPrecision 0 = 7" {
                     6.6666 |> Double.fixPrecision 0
-                    |> equals 7. ""            
+                    |> equals 7. ""
                 }
 
                 // * 6.6666 |> Double.fixPrecision 2 = 6.7
                 test "6.6666 |> Double.fixPrecision 2 = 6.7" {
                     6.6666 |> Double.fixPrecision 2
-                    |> equals 6.7 ""            
+                    |> equals 6.7 ""
                 }
 
                 // * 6.6666 |> Double.fixPrecision 3 = 6.67
                 test "6.6666 |> Double.fixPrecision 3 = 6.67" {
                     6.6666 |> Double.fixPrecision 3
-                    |> equals 6.67 ""            
+                    |> equals 6.67 ""
                 }
 
                 testPropertyWithConfig config "for any valid float, this float can be converted to a fraction" <| fun f ->
@@ -454,7 +464,7 @@ module Tests
                         |> (fun r ->
                             match r with
                             | None -> true
-                            | Some (n, d) -> 
+                            | Some (n, d) ->
                                 ((n |> BigRational.FromBigInt) / (d |> BigRational.FromBigInt))
                                 |> ((=) (f |> BigRational.fromFloat |> Option.get))
                         )
@@ -471,39 +481,15 @@ module Tests
         open Informedica.Utils.Lib.BCL
 
 
-        /// Create the necessary test generators
-        module Generators =
-
-            open FsCheck
-
-            let bigRGen (n, d) = 
-                    let d = if d = 0 then 1 else d
-                    let n' = abs(n) |> BigRational.FromInt
-                    let d' = abs(d) |> BigRational.FromInt
-                    n'/d'
-
-            let bigRGenerator =
-                gen {
-                    let! n = Arb.generate<int>
-                    let! d = Arb.generate<int>
-                    return bigRGen(n, d)
-                }
-
-            type MyGenerators () =
-                static member BigRational () =
-                    { new Arbitrary<BigRational>() with
-                        override x.Generator = bigRGenerator }
-
-
         [<Tests>]
         let tests =
 
             let equals exp txt res = Expect.equal res exp txt
 
-            let config = 
-                { FsCheckConfig.defaultConfig with 
+            let config =
+                { FsCheckConfig.defaultConfig with
                     maxTest = 10000
-                    arbitrary = [ typeof<Generators.MyGenerators> ] }
+                    arbitrary = [ typeof<Generators.BigRGenerator> ] }
 
             let opMult f () = f (*)
 
@@ -516,9 +502,9 @@ module Tests
                 }
 
                 testPropertyWithConfig config "can try to convert any double to bigrational" <| fun (a: float) ->
-                    a 
-                    |> (BigRational.fromFloat >> Option.defaultValue 0N >> BigRational.toFloat) 
-                    |> (fun b -> 
+                    a
+                    |> (BigRational.fromFloat >> Option.defaultValue 0N >> BigRational.toFloat)
+                    |> (fun b ->
                         if b = 0. || Accuracy.areClose Accuracy.veryHigh a b then true
                         else
                             printfn "%f <> %f" a b
@@ -527,12 +513,12 @@ module Tests
 
 
                 testPropertyWithConfig config "can convert any bigrational to a double" <| fun br ->
-                    let f = 
-                        br 
+                    let f =
+                        br
                         |> BigRational.toFloat
                     f
-                    |> BigRational.fromFloat 
-                    |> (fun r -> 
+                    |> BigRational.fromFloat
+                    |> (fun r ->
                         if r |> Option.isNone then false
                         else
                             r
@@ -543,17 +529,17 @@ module Tests
 
                 testPropertyWithConfig config "can parse any string float" <| fun (a: float) ->
                     match a |> (BigRational.fromFloat >> Option.defaultValue 0N >> string >> BigRational.tryParse) with
-                    | Some b -> 
+                    | Some b ->
                         b
-                        |> BigRational.toString 
+                        |> BigRational.toString
                         |> BigRational.parse = b
                     | None -> true
 
                 testPropertyWithConfig config "parse can be reversed" <| fun a ->
                     match a |> BigRational.tryParse with
-                    | Some b -> 
-                        b 
-                        |> BigRational.toString 
+                    | Some b ->
+                        b
+                        |> BigRational.toString
                         |> BigRational.parse = b
                     | None -> true
 
@@ -562,7 +548,7 @@ module Tests
                     if (b = 0N || c = 0N) then true
                     else
                         let a = BigRational.gcd b c
-                        b |> BigRational.isMultiple a && 
+                        b |> BigRational.isMultiple a &&
                         c |> BigRational.isMultiple a
 
 
@@ -571,13 +557,13 @@ module Tests
                     if (b = 0N || c = 0N) then true
                     else
                         let a = b |> BigRational.toMultipleOf c
-                        a |> BigRational.isMultiple c 
+                        a |> BigRational.isMultiple c
 
                 testPropertyWithConfig config "can check is multiple for any bigrational" <| fun b c ->
                     if c = 0N then b |> BigRational.isMultiple c |> not
                     else
                         if b |> BigRational.isMultiple c then (b / c).Denominator = 1I
-                        else (b / c).Denominator <> 1I 
+                        else (b / c).Denominator <> 1I
 
                 test "when operator is multiplication" {
                     Expect.equal ((*) |> BigRational.opIsMult) true ""
@@ -654,7 +640,7 @@ module Tests
 
             testCase "of discriminate union TestUnion" <| fun _ ->
               Expect.equal (TestUnion |> Reflection.toString) "TestUnion" "should print TestUnion"
-     
+
             test "of discriminate union AnotherTestUnion" {
               Expect.equal (AnotherTestUnion |> Reflection.toString) "AnotherTestUnion" "should print AnotherTestUnion"
             }
@@ -666,5 +652,204 @@ module Tests
             test "will return None with a non existing union type" {
                 Expect.equal ("blah" |> Reflection.fromString<TestUnion>) None "from string blah"
             }
- 
+
           ]
+
+
+    module Csv =
+
+        let inline parse<'T> dt (p : string -> 'T option) (s: string) =
+            s
+            |> Csv.parse false dt p
+            |> unbox<'T>
+
+
+        let inline tryParse<'T> dt (p : string -> 'T option) (s: string) =
+            s
+            |> Csv.parse true dt p
+            |> unbox<'T>
+
+        let parseString (s : string) =
+            s
+            |> Csv.parse false Csv.StringData Some
+            |> unbox<string>
+
+        let parserTests =
+            testList "parse" [
+                test "string" {
+                    "a string"
+                    |> parseString
+                    |> Expect.equal "should be equal to" "a string"
+                }
+
+                fun (s1 : string) ->
+                    s1
+                    |> parseString
+                    |> fun s2 ->
+                        s2 = s1
+                |> Generators.testProp "any string"
+
+                test "string with trailing spaces" {
+                    "trailing "
+                    |> parseString
+                    |> fun s1 ->
+                        Swensen.Unquote.Assertions.test<@ s1 = "trailing " @>
+                }
+
+                fun (i : int) ->
+                    i
+                    |> string
+                    |> parse<int> Csv.Int32Data Int32.tryParse
+                    |> fun result -> i = result
+                |> Generators.testProp "any integer"
+
+
+                fun (i : decimal) ->
+                    i
+                    |> string
+                    |> parse<decimal> Csv.DecimalData Decimal.tryParse
+                    |> fun result -> i = result
+                |> Generators.testProp "any decimal"
+
+                fun s ->
+                    s
+                    |> tryParse
+                    |> fun _ -> true
+                |> Generators.testProp "try parse never fails"
+            ]
+
+        let tryCastTests =
+            testList "tryCast" [
+                test "trailing spaces " {
+                    "trailing spaces "
+                    |> Csv.tryCast<string> Csv.StringData
+                    |> fun r ->
+                        Swensen.Unquote.Assertions.test<@ r = "trailing spaces" @>
+                }
+
+                test "without option fails" {
+                    try
+                        "cannot cast to integer"
+                        |> Csv.tryCast<int> Csv.Int32Data
+                        |> ignore
+                        Swensen.Unquote.Assertions.test<@ false @>
+                    with
+                    | _ ->
+                        Swensen.Unquote.Assertions.test<@ true @>
+                }
+
+                fun x ->
+                    x
+                    |> Csv.tryCast<int option> Csv.Int32OptionData
+                    |> ignore
+                    true
+                |> Generators.testProp "with int option never fails"
+
+                fun x ->
+                    x
+                    |> Csv.tryCast<double option> Csv.FloatOptionData
+                    |> ignore
+                    true
+                |> Generators.testProp "with double option never fails"
+
+                fun x ->
+                    x
+                    |> Csv.tryCast<decimal option> Csv.DecimalOptionData
+                    |> ignore
+                    true
+                |> Generators.testProp "with decimal option never fails"
+            ]
+
+
+        let tryGetColumnTests =
+            let intData = 1
+            let floatData = 2.4
+            let stringData = "hello"
+
+            let cols = [|"a"; "b"; "c"|]
+            let data = [|$"%i{intData}"; $"%f{floatData}"; $"%s{stringData}"|]
+
+            testList "tryGetColmun" [
+                test "can get 'a' column" {
+                    data
+                    |> Csv.getColumn<int> Csv.Int32Data cols
+                    |> fun get -> get "a"
+                    |> Expect.equal $"column a should be %i{intData}" intData
+                }
+
+                test "can get 'b' column" {
+                    data
+                    |> Csv.getColumn<float> Csv.FloatData cols
+                    |> fun get -> get "b"
+                    |> Expect.equal $"column b should be %f{floatData}" floatData
+                }
+
+                test "can get 'c' column" {
+                    data
+                    |> Csv.getColumn<string> Csv.StringData cols
+                    |> fun get -> get "c"
+                    |> Expect.equal $"column c should be %s{stringData}" stringData
+                }
+
+                test "cannot get non-existing 'd' column" {
+                    fun () ->
+                        data
+                        |> Csv.getColumn<string> Csv.StringData cols
+                        |> fun get -> get "d"
+                        |> ignore
+                    |> Expect.throws $"should throw exception when trying to get non-existing d column"
+                }
+            ]
+
+
+        let parseCsvTests =
+            let intData = 1
+            let floatData = 2.4
+            let stringData = "hello"
+
+            let cols = [|"a"; "b"; "c"|]
+            let data = [|$"%i{intData}"; $"%f{floatData}"; $"%s{stringData}"|]
+
+            let testCsv =
+                    $"""
+"{cols |> String.concat "\",\""}"
+"{data |> String.concat "\",\""}"
+"{data |> String.concat "\",\""}"
+"{data |> String.concat "\",\""}"
+"""
+
+            testList "parseCsv" [
+                test "can parse csv formatted string" {
+                    testCsv
+                    |> Csv.parseCSV
+                    |> Ok
+                    |> Expect.isOk "should be ok"
+                }
+
+                test "should contain the c column with hello" {
+                    testCsv
+                    |> Csv.parseCSV
+                    |> function
+                    | [|cols; row1; _; _ |] ->
+                        row1
+                        |> Csv.getColumn<string> Csv.StringData cols
+                        |> fun get -> get "c"
+                        |> Expect.equal $"column a should be %s{stringData}" stringData
+                    | _ ->
+                        Console.WriteLine($"%A{testCsv}")
+                        false |> Expect.isTrue "cannot get the c column"
+                }
+            ]
+
+
+        [<Tests>]
+        let tests =
+            testList "Csv" [
+                parserTests
+                tryCastTests
+                tryGetColumnTests
+                parseCsvTests
+            ]
+
+
+

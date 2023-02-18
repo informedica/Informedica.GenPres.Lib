@@ -1,6 +1,9 @@
 namespace Informedica.Utils.Lib.BCL
 
+open System.Globalization
 
+
+[<RequireQualifiedAccess>]
 module Double =
 
     open System
@@ -15,11 +18,11 @@ module Double =
 
     /// Check whether a `Double` is positive or
     /// negative infinity
-    let isInfinity n = (n = infinity) || (n = -infinity) 
+    let isInfinity n = (n = infinity) || (n = -infinity)
 
 
     /// Check whether a `Double` is valid
-    let isValid n = 
+    let isValid n =
         (isNaN n ||
          isInfinity n ||
          n >= Double.MaxValue ||
@@ -28,13 +31,16 @@ module Double =
 
     /// Get the double value of a string
     /// using `InvariantCulture`
-    let parse s = Double.Parse(s, Globalization.CultureInfo.InvariantCulture)
+    let parse s = Double.Parse(s, CultureInfo.InvariantCulture)
 
 
     /// Get a `float Option` from a string
     let tryParse (s : string) =
-        let (b, n) = Double.TryParse(s)
-        if b then Some n else None
+        let style = NumberStyles.Any
+        let cult = CultureInfo.InvariantCulture
+        match Double.TryParse(s, style, cult) with
+        | true, v -> Some v
+        | false, _ -> None
 
 
     /// Get a `float32` from a string
@@ -46,8 +52,8 @@ module Double =
         | None -> 0.f
 
 
-    /// Calculates the number of decimal digits that 
-    /// should be shown according to a precision 
+    /// Calculates the number of decimal digits that
+    /// should be shown according to a precision
     /// number n that specifies the number of non
     /// zero digits in the decimals.
     /// * 66.666 |> getPrecision 1 = 0
@@ -73,25 +79,25 @@ module Double =
                 // chech whether the string is of type "1E-05"
                 if(s.Contains "E") then
                     let k = s.IndexOf("E")+2 // get the index of the number after the "-"
-                    let h = s.[k..] |> int // get int 5
+                    let h = s[k..] |> int // get int 5
                     let p = h + n - 1  // precision is 5 + n -1
                     p
                 else
                 let s = s.Split([|'.'|])
                 // calculate number of remaining decimal digits (after '.')
-                let p = n - (if s.[0] = "0" then 0 else s.[0].Length)
+                let p = n - (if s[0] = "0" then 0 else s[0].Length)
                 let p = if p < 0 then 0 else p
                 //printfn $"parse int: {s.[0]}"
-                if (int s.[0]) > 0 then // s.[0] |> int64 > 0L if (*)
+                if (int s[0]) > 0 then // s.[0] |> int64 > 0L if (*)
                     p
                 else
                     // calculate the the first occurance of a non-zero decimal digit
-                    let c = (s.[1] |> String.countFirstChar '0')
+                    let c = (s[1] |> String.countFirstChar '0')
                     c + p
         with
         | e ->
-            printfn "cannot get precision %i for %f" n f 
-            printfn "catching error %A" e
+            printfn $"cannot get precision %i{n} for %f{f}"
+            printfn $"catching error %A{e}"
             printfn "returning 1 as default value"
             1
 
@@ -118,15 +124,15 @@ module Double =
         Math.Round(f, f |> getPrecision n)
 
 
-    /// Check whether a float has any 
+    /// Check whether a float has any
     /// decimal digits
-    let floatHasDecimals (v: float) = 
+    let floatHasDecimals (v: float) =
         v <> 0. &&
-        (if v  > 0. then v > float(BigInteger v) 
+        (if v  > 0. then v > float(BigInteger v)
          else v < float(BigInteger v))
 
 
-    /// Return a float as a fraction of 
+    /// Return a float as a fraction of
     /// two `BigInteger`s
     let floatToFract v =
         if v = infinity || v = -infinity || v |> isNaN then None
@@ -138,3 +144,14 @@ module Double =
             fract v 1N
             |> (fun (n, d) -> (n, d.Numerator))
             |> Some
+
+
+    let toStringNumberNL p (n: float) = n.ToString("R" + p, CultureInfo.GetCultureInfo("nl"))
+
+
+    let toStringNumberNLWithoutTrailingZeros =
+        toStringNumberNL "" >> String.removeTrailingZerosFromDutchNumber
+
+
+    let toStringNumberNLWithoutTrailingZerosFixPrecision n =
+        fixPrecision n >> toStringNumberNLWithoutTrailingZeros
